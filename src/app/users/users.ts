@@ -1,5 +1,5 @@
 
-import { IdEntity, FieldOptions, BackendMethod, Filter, Entity, Field, Validators, isBackend, Allow } from "remult";
+import { IdEntity, FieldOptions, BackendMethod, Filter, Entity, Field, Validators, isBackend, Allow, DateOnlyField } from "remult";
 import { Remult, } from 'remult';
 import { Roles } from './roles';
 import { InputField } from "@remult/angular";
@@ -43,10 +43,26 @@ export class Users extends IdEntity {
     mobile: string = '';
     
     @Field({
-        validate: [Validators.required, Validators.unique],
+        // validate: [Validators.required, Validators.unique],
         caption: terms.email
     })
     email: string = '';
+    
+    @DateOnlyField({
+        caption: terms.birthday
+    })
+    birthday!: Date;
+    
+    @Field({
+        caption: terms.tenant
+    }) 
+    defTid: string = '';
+    
+    @Field({
+        caption: terms.branch
+    })
+    bid: string = '';
+
 
     @Field({ includeInApi: false })
     password: string = '';

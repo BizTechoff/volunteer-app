@@ -33,15 +33,15 @@ export class AuthService {
                     name: u.name
                 };
                 if (u.admin) {
-                    result.roles.push(Roles.admin);//,Roles.volunteer);
+                    result.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);
                 }
-                if (u.board) {
-                    result.roles.push(Roles.board);
+                else if (u.board) {
+                    result.roles.push(Roles.board, Roles.manager, Roles.volunteer);
                 }
-                if (u.manager) {
-                    result.roles.push(Roles.manager);
+                else if (u.manager) {
+                    result.roles.push(Roles.manager, Roles.volunteer);
                 }
-                if (u.volunteer) {
+                else if (u.volunteer) {
                     result.roles.push(Roles.volunteer);
                 }
             }
@@ -70,4 +70,3 @@ export function getJwtTokenSignKey() {
         return process.env.TOKEN_SIGN_KEY!;
     return "my secret key";
 }
- 

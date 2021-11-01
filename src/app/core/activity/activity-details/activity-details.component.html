@@ -1,0 +1,17 @@
+<div class="full-page">
+    <div class="header">
+        <h4> {{ this.terms.activityDetails }} </h4>
+        <data-area [settings]='this.top'></data-area>
+    </div>
+    <div class="grow-item">
+        <data-area [settings]='this.fields'></data-area>
+    </div>
+    <div class="footer">
+        <ng-container *ngFor='let img of this.images'>
+            <mat-card>
+                <mat-card-title> {{ img.desc }} </mat-card-title>
+                <img [src]='img.data'>
+            </mat-card>
+        </ng-container>
+    </div>
+</div>

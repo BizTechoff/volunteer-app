@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Users } from './users';
-import { BackendMethod, Remult } from 'remult';
-
-import { DialogService } from '../common/dialog';
-import { Roles } from './roles';
 import { GridSettings } from '@remult/angular';
+import { BackendMethod, Remult } from 'remult';
+import { DialogService } from '../common/dialog';
+import { terms } from '../terms';
+import { Roles } from './roles';
+import { Users } from './users';
+
 
 
 @Component({
@@ -30,20 +31,52 @@ export class UsersComponent implements OnInit {
 
     columnSettings: users => [
       users.name,
-      users.admin,
-      users.board,
-      users.manager,
-      users.volunteer,
+      {
+        field: users.admin, valueChanged: () => {
+          if (users.admin) {
+            // users.board = false;
+            // users.manager = false;
+            // users.volunteer = false;
+          }
+        }
+      },
+      {
+        field: users.board, valueChanged: () => {
+          if (users.board) {
+            // users.admin = false;
+            // users.manager = false;
+            // users.volunteer = false;
+          }
+        }
+      },
+      {
+        field: users.manager, valueChanged: () => {
+          if (users.manager) {
+            // users.admin = false;
+            // users.board = false;
+            // users.volunteer = false;
+          }
+        }
+      },
+      {
+        field: users.volunteer, valueChanged: () => {
+          if (users.volunteer) {
+            // users.admin = false;
+            // users.board = false;
+            // users.manager = false;
+          }
+        }
+      },
       users.mobile,
       users.email
     ],
     rowButtons: [{
-      name: 'Reset Password',
+      name: terms.resetPassword,
       click: async () => {
 
         if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
           await UsersComponent.resetPassword(this.users.currentRow.id);
-          this.dialog.info("Password deleted");
+          this.dialog.info(terms.passwordReset);
         };
       }
     }
@@ -51,12 +84,13 @@ export class UsersComponent implements OnInit {
     confirmDelete: async (h) => {
       return await this.dialog.confirmDelete(h.name)
     },
-  });
+  }); 
   @BackendMethod({ allowed: Roles.admin })
   static async resetPassword(userId: string, remult?: Remult) {
     let u = await remult!.repo(Users).findId(userId);
     if (u) {
-      u.password = '';
+      let pass = process.env.DEFAULT_PASSWORD;
+      await u.updatePassword(pass!);
       await u._.save();
     }
   }

@@ -1,4 +1,4 @@
-import { Allow, Entity, Field, IdEntity, isBackend, Remult } from "remult";
+import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult } from "remult";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Activity } from "../activity/activity";
@@ -43,7 +43,10 @@ export class Tenant extends IdEntity{
     @Field({ caption: terms.status })
     defVids: string[] = [];
 
-    @Field({ caption: terms.photo })
-    photoId: string = '';
+    @DateOnlyField({ caption: terms.birthday })
+    birthday!: Date;
+
+    // @Field({ caption: terms.photo })
+    // photoId: string = '';
 
 }

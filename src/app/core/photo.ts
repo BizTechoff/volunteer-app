@@ -30,11 +30,8 @@ export class Photo extends IdEntity {
     @Field({ caption: terms.data })
     data: string = '';
 
-    @Field({ caption: terms.entityType })
-    entType: string = '';
-
     @Field({ caption: terms.entityId })
-    entId: string = '';
+    eid: string = '';
 
 }
 

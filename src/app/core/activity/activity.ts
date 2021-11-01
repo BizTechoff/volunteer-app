@@ -4,6 +4,59 @@ import { ValueListValueConverter } from 'remult/valueConverters';
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 
+@DataControl({
+    // valueList: async remult => DeliveryStatus.getOptions(remult)
+    // , width: '150'
+
+})
+@ValueListFieldType(ActivityPurpose, {
+    // displayValue: (e, val) => val.caption,
+    // translation: l => l.deliveryStatus
+})
+export class ActivityPurpose {
+    // static none = new ActivityType(0, 'ללא');
+    static friendly = new ActivityPurpose(1, 'חברותא');
+    static assistance = new ActivityPurpose(2, 'סיוע');
+    static cleaning = new ActivityPurpose(3, 'ניקיון');
+    static shopping = new ActivityPurpose(4, 'קניות');
+    static maintenance = new ActivityPurpose(5, 'תחזוקה');
+
+    constructor(public id: number, public caption: string) { }
+    // id:number;
+
+    static getOptions(remult: Remult) {
+        let op = new ValueListValueConverter(ActivityPurpose).getOptions();
+        return op;
+    }
+}
+
+@DataControl({
+    // valueList: async remult => DeliveryStatus.getOptions(remult)
+    // , width: '150'
+
+})
+@ValueListFieldType(ActivityStatus, {
+    // displayValue: (e, val) => val.caption,
+    // translation: l => l.deliveryStatus
+})
+export class ActivityStatus {
+    // static none = new ActivityStatus(0, 'ללא');
+    static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ');
+    static w4_start = new ActivityStatus(2, 'ממתין להתחלה');
+    static w4_end = new ActivityStatus(3, 'ממתין לסיום');
+    static success = new ActivityStatus(4, 'הסתיים בהצלחה');
+    static fail = new ActivityStatus(5, 'הסתיים בבעיה');
+    static cancel = new ActivityStatus(6, 'בוטל');
+
+    constructor(public id: number, public caption: string) { }
+    // id:number;
+
+    static getOptions(remult: Remult) {
+        let op = new ValueListValueConverter(ActivityStatus).getOptions();
+        return op;
+    }
+}
+
 @Entity<Activity>('activities',
     {
         allowApiInsert: Roles.manager,
@@ -23,12 +76,15 @@ export class Activity extends IdEntity {
 
     // constructor(private remult: Remult){super();}
 
-    @Field({ caption: terms.type })
-    type: ActivityType = ActivityType.none;
+    @Field({ caption: terms.purpose })
+    purpose: ActivityPurpose = ActivityPurpose.friendly;
+
+    @Field({ caption: terms.desc })
+    purposeDesc: string = '';
 
     @Field({ caption: terms.title })
     title: string = '';
-
+ 
     @Field({ caption: terms.subTitle })
     subTitle: string = '';
 
@@ -41,62 +97,16 @@ export class Activity extends IdEntity {
     @DateOnlyField({ caption: terms.date })
     date: Date = new Date();
 
-    @Field({ caption: terms.fromHour })
-    fh: string[] = [];
+    @Field({ caption: terms.fromHour, inputType: 'time', defaultValue: () => '00:00' })
+    fh!: string;
 
-    @Field({ caption: terms.toHour })
-    th: string[] = [];
+    @Field({ caption: terms.toHour, inputType: 'time', defaultValue: () => '00:00' })
+    th!: string;
 
     @Field({ caption: terms.status })
-    status: ActivityStatus = ActivityStatus.none;
+    status: ActivityStatus = ActivityStatus.w4_assign;
 
-    @Field({ caption: terms.photos })
-    photoIds: string[] = [];
+    @Field({ caption: terms.remark })
+    remark: string = '';
 
-}
-
-@DataControl({
-    // valueList: async remult => DeliveryStatus.getOptions(remult)
-    // , width: '150'
-
-})
-@ValueListFieldType(ActivityType, {
-    // displayValue: (e, val) => val.caption,
-    // translation: l => l.deliveryStatus
-})
-export class ActivityType {
-    static none = new ActivityType(0, 'ללא');
-    static clean = new ActivityType(1, 'ניקיון');
-    static friendly = new ActivityType(1, 'חברותא');
-
-    constructor(public id: number, public desc: string) { }
-    // id:number;
-
-    static getOptions(remult: Remult) {
-        let op = new ValueListValueConverter(ActivityType).getOptions();
-        return op;
-    }
-}
-
-@DataControl({
-    // valueList: async remult => DeliveryStatus.getOptions(remult)
-    // , width: '150'
-
-})
-@ValueListFieldType(ActivityStatus, {
-    // displayValue: (e, val) => val.caption,
-    // translation: l => l.deliveryStatus
-})
-export class ActivityStatus {
-    static none = new ActivityStatus(0, 'ללא');
-    static clean = new ActivityStatus(1, 'ניקיון');
-    static friendly = new ActivityStatus(2, 'חברותא');
- 
-    constructor(public id: number, public desc: string) { }
-    // id:number;
-
-    static getOptions(remult: Remult) {
-        let op = new ValueListValueConverter(ActivityStatus).getOptions();
-        return op;
-    }
 }
