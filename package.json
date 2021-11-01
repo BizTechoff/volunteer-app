@@ -3,21 +3,40 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "node dist/server/server/",
+    "build": "ng build && tsc -p tsconfig.server.json",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "dev-ng": "ng serve  --proxy-config proxy.conf.json",
+    "dev-node": "ts-node-dev --project tsconfig.server.json src/server/"
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "~12.2.0",
+    "@angular/cdk": "~12.2.0",
     "@angular/common": "~12.2.0",
     "@angular/compiler": "~12.2.0",
     "@angular/core": "~12.2.0",
     "@angular/forms": "~12.2.0",
+    "@angular/material": "~12.2.0",
     "@angular/platform-browser": "~12.2.0",
     "@angular/platform-browser-dynamic": "~12.2.0",
     "@angular/router": "~12.2.0",
+    "@auth0/angular-jwt": "^5.0.2",
+    "@remult/angular": "^0.4.19",
+    "chart.js": "^3.6.0",
+    "compression": "^1.7.3",
+    "dotenv": "^8.1.0",
+    "express": "^4.16.4",
+    "express-jwt": "^6.0.0",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "ng2-charts": "^2.4.3",
+    "nodemailer": "^6.7.0",
+    "password-hash": "^1.2.2",
+    "pg": "^8.3.0",
+    "reflect-metadata": "^0.1.12",
+    "remult": "^0.4.19",
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
@@ -34,6 +53,18 @@
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
-    "typescript": "~4.3.5"
+    "typescript": "~4.3.5",
+    "ts-node-dev": "^1.1.6",
+    "@types/chart.js": "^2.9.34",
+    "@types/pg": "^7.14.4",
+    "@types/express": "^4.16.1",
+    "@types/compression": "^1.7.0",
+    "@types/jsonwebtoken": "^8.5.1",
+    "@types/password-hash": "^1.2.20",
+    "@types/express-jwt": "^6.0.1"
+  },
+  "browser": {
+    "jsonwebtoken": false,
+    "password-hash": false
   }
 }
