@@ -12,9 +12,9 @@ import * as jwt from 'express-jwt';
 import * as compression from 'compression';
 import './send-email';
  
-import '../app/app.module';
-// import '../app/app-routing.module';
-// import '../app/app.component';
+//import '../app/app.module';
+import '../app/app-routing.module';
+//import '../app/app.component';
 // import '../app/core/activity/activity'
 import { getJwtTokenSignKey } from '../app/auth.service';
 async function startup() {

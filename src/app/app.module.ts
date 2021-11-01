@@ -30,7 +30,7 @@ import { TenantsListComponent } from './core/tenant/tenants-list/tenants-list.co
 import { TenantDetailsComponent } from './core/tenant/tenant-details/tenant-details.component';
 import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
 import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/volunteer-details.component';
-// import { ChartsModule } from 'ng2-charts';
+ import { ChartsModule } from 'ng2-charts';
 @NgModule({
   declarations: [
     AppComponent,
@@ -63,7 +63,7 @@ import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/vo
     MatMenuModule,
     RemultModule,
     BrowserAnimationsModule,
-    // ChartsModule
+     ChartsModule
   ], 
   providers: [DialogService, AdminGuard],
   bootstrap: [AppComponent],
