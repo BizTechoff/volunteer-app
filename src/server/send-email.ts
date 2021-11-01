@@ -1,11 +1,10 @@
-//import('nodemailer');
+import { createTransport } from 'nodemailer';
 import { Remult } from 'remult';
 import { EmailSvc } from '../app/common/utils';
 //
 EmailSvc.sendMail = async (subject: string, message: string, email: string, remult: Remult) => {
-    const newLocal = 'nodemailer';
-    var nodemailer = await import(newLocal);
-    var transporter = nodemailer.createTransport({
+
+    var transporter = createTransport({
         service: 'gmail',
         port: 587,
         secure: false,
