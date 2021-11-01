@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { GridSettings, openDialog } from '@remult/angular';
-import { Remult } from 'remult';
+import { Field, getFields, Remult } from 'remult';
 import { terms } from '../../../terms';
-import { Activity } from '../activity';
+import { Activity, ActivityStatus } from '../activity';
 import { ActivityDetailsComponent } from '../activity-details/activity-details.component';
 
 @Component({
@@ -12,20 +12,30 @@ import { ActivityDetailsComponent } from '../activity-details/activity-details.c
 })
 export class ActivitiesListComponent implements OnInit {
 
+  terms = terms;
+  get $() { return getFields(this, this.remult) };
+  @Field({ caption: terms.status })
+  status: ActivityStatus = ActivityStatus.w4_assign;
+  @Field({ caption: terms.branch })
+  bid: string = '';
   activities: GridSettings<Activity> = new GridSettings<Activity>(
     this.remult.repo(Activity),
     {
-      allowInsert: true,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
-      allowDelete: true,
-      allowUpdate: true,// this.remult.isAllowed(Roles.manager),
+      where: _ => _.status.isIn(ActivityStatus.openStatuses()),
+      allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
       numOfColumnsInGrid: 10,
-      columnSettings: _ => [_.title, _.subTitle, _.tid, _.vids, _.purpose, _.fh, _.th, _.date, _.status],
+      columnSettings: _ => [_.tid, _.status, _.purpose, _.purposeDesc, _.date, _.fh, _.th, _.vids],
       rowButtons: [
         {
           visible: (_) => !_.isNew(),
           textInMenu: terms.activityDetails,
           click: async (_) => await this.showActivityDetails(_)
+        },
+        {
+          visible: (_) => !_.isNew(),
+          textInMenu: terms.cancelActivity,
+          click: async (_) => await this.cancelActivity(_)
         }
       ]
     }
@@ -36,7 +46,23 @@ export class ActivitiesListComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  private async showActivityDetails(act: Activity) {
-    let changes = await openDialog(ActivityDetailsComponent);
+  async refresh() {
+    await this.activities.reloadData();
+  }
+
+  async showActivityDetails(act?: Activity) {
+    let id = act ? act.id : '';
+    let changes = await openDialog(ActivityDetailsComponent,
+      _ => _.args = { tid: id },
+      _ => _ ? _.args.changed : false);
+    if (changes) {
+      await this.refresh();
+    }
+  }
+
+  private async cancelActivity(act: Activity) {
+    act.status = ActivityStatus.cancel;
+    await act.save();
+    await this.refresh();
   }
 }

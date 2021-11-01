@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { GridSettings } from '@remult/angular';
-import { Remult } from 'remult';
+import { GridSettings, openDialog } from '@remult/angular';
+import { getFields, Remult } from 'remult';
+import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { terms } from '../../../terms';
 import { Users } from '../../../users/users';
 
@@ -11,6 +12,8 @@ import { Users } from '../../../users/users';
 })
 export class VolunteersListComponent implements OnInit {
 
+  get $() { return getFields(this, this.remult) };
+  terms = terms;
   volunteers: GridSettings<Users> = new GridSettings<Users>(
     this.remult.repo(Users),
     {
@@ -28,6 +31,24 @@ export class VolunteersListComponent implements OnInit {
   constructor(private remult: Remult) { }
 
   ngOnInit(): void {
+  }
+
+  async refresh() {
+    await this.volunteers.reloadData();
+  }
+
+  async addVolunteer() {
+    let t = this.remult.repo(Users).create();
+    let changed = await openDialog(InputAreaComponent,
+      _ => _.args = {
+        title: terms.addVolunteer,
+        fields: () => [{ field: t.$.name, caption: terms.name }, t.$.mobile, t.$.email, t.$.birthday, { field: t.$.defTid, caption: terms.defaultTenant }],
+        ok: async () => { /*await t.save();*/ }
+      },
+      _ => _ ? _.args.ok : false);
+    if (changed) {
+      await this.refresh();
+    }
   }
 
 }

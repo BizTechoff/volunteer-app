@@ -55,6 +55,14 @@ export class ActivityStatus {
         let op = new ValueListValueConverter(ActivityStatus).getOptions();
         return op;
     }
+
+    static openStatuses(){
+        return [
+            ActivityStatus.w4_assign,
+            ActivityStatus.w4_start,
+            ActivityStatus.w4_end
+        ];
+    }
 }
 
 @Entity<Activity>('activities',
@@ -67,7 +75,24 @@ export class ActivityStatus {
     (options, remult) => {
         options.saving = async (act) => {
             if (isBackend()) {
-                if (act._.isNew()) {
+                // if validate() === true
+                if (act.$.date.valueChanged() || act.$.fh.valueChanged() || act.$.th.valueChanged()) {
+                    let conflicts = [] as Activity[];
+                    for await (const a of remult.repo(Activity).iterate({
+                        where: (_) => _.date.isEqualTo(act.date)
+                            .and(_.fh.isLessOrEqualTo(act.th))
+                            .and(_.th.isGreaterOrEqualTo(act.fh))
+                    })) {//if _.tid === act.tid || _.vids equalsAny act.vids
+                        if (!a.isNew()) {
+                            if (a.id === act.id) {
+                                continue;//same record has current checked.
+                            }
+                        }
+                        conflicts.push(a);
+                    }
+                    if (conflicts.length > 0) {
+                        throw terms.sameDateAndTimes;
+                    }
                 }
             }
         }
@@ -84,7 +109,7 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.title })
     title: string = '';
- 
+
     @Field({ caption: terms.subTitle })
     subTitle: string = '';
 

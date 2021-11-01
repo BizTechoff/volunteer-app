@@ -1,8 +1,7 @@
-import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult } from "remult";
+import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
-import { Activity } from "../activity/activity";
- 
+
 @Entity<Tenant>('tenants',
     {
         allowApiInsert: [Roles.admin, Roles.manager],
@@ -22,16 +21,22 @@ import { Activity } from "../activity/activity";
             }
         };
     })
-export class Tenant extends IdEntity{
+export class Tenant extends IdEntity {
 
     constructor(private remult: Remult) {
         super();
     }
 
-    @Field({ caption: terms.name })
+    @Field({
+        caption: terms.name,
+        validate: Validators.required.withMessage(terms.requiredField)
+    })
     name: string = '';
 
-    @Field({ caption: terms.mobile })
+    @Field({
+        caption: terms.mobile,
+        validate: [Validators.required.withMessage(terms.requiredField), Validators.unique]
+    })
     mobile: string = '';
 
     @Field({ caption: terms.address })
