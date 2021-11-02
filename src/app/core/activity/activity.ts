@@ -1,7 +1,7 @@
 import { DataControl } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
-import { StringRequiredValidation } from "../../common/globals";
+import { StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 
@@ -122,10 +122,10 @@ export class Activity extends IdEntity {
     @DateOnlyField({ caption: terms.date })
     date: Date = new Date();
 
-    @Field({ caption: terms.fromHour, inputType: 'time', defaultValue: () => '00:00' })
+    @Field({ caption: terms.fromHour, inputType: 'time', defaultValue: () => '00:00', validate: TimeRequireValidator })
     fh!: string;
 
-    @Field({ caption: terms.toHour, inputType: 'time', defaultValue: () => '00:00' })
+    @Field({ caption: terms.toHour, inputType: 'time', defaultValue: () => '00:00', validate: TimeRequireValidator })
     th!: string;
 
     @Field({ caption: terms.status })

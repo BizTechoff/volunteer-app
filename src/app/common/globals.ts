@@ -18,9 +18,20 @@ export const StringRequiredValidation = (_: any, col: FieldRef<any, string>) => 
         col.error = terms.requiredField;
 }
 
+export const TimeRequireValidator = (_: any, col: FieldRef<any, string>) => {
+    let ok = col.value && col.value.trim().length > 0 ? true : false;
+    if(ok){
+        ok &&= col.value !== '00:00' &&  col.value !== '--:--';
+    }
+    if (!ok!)
+        col.error = terms.requiredField;
+}
+
 // export  interface UserInfoEx extends userInfo{
 // constructor(){super();}
 // }
+
+
 
 export const ValidBranchValidation = (_: any, col: FieldRef<Users, string>) => {
     let ok = true;
