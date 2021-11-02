@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Remult } from 'remult';
+import { terms } from '../terms';
 
 @Component({
   selector: 'app-home',
@@ -8,6 +9,7 @@ import { Remult } from 'remult';
 })
 export class HomeComponent implements OnInit {
 
+  terms = terms;
   constructor(public remult: Remult) { }
 
   ngOnInit() {

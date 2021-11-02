@@ -1,7 +1,7 @@
 import { Allow, Entity, Field, IdEntity } from "remult";
+import { StringRequiredValidation } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
-import { Users } from "../../users/users";
 
 @Entity<Branch>('branches', {
     allowApiInsert: Roles.admin,
@@ -11,13 +11,10 @@ import { Users } from "../../users/users";
 })
 export class Branch extends IdEntity {
 
-    @Field({ caption: 'שם' })
+    @Field({ caption: terms.name, validate: StringRequiredValidation })
     name: string = '';
 
-    @Field({ caption: terms.manager, dbName: 'manager' })
-    manager!: Users;
-
-    @Field({ caption: terms.address })
+    @Field({ caption: terms.address, validate: StringRequiredValidation })
     address: string = '';
 
 }

@@ -1,10 +1,10 @@
 
-import { IdEntity, FieldOptions, BackendMethod, Filter, Entity, Field, Validators, isBackend, Allow, DateOnlyField } from "remult";
-import { Remult, } from 'remult';
-import { Roles } from './roles';
 import { InputField } from "@remult/angular";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
 import { InputTypes } from "remult/inputTypes";
+import { StringRequiredValidation } from "../common/globals";
 import { terms } from "../terms";
+import { Roles } from './roles';
 
 @Entity<Users>("Users", {
     allowApiRead: Allow.authenticated,
@@ -41,28 +41,27 @@ export class Users extends IdEntity {
         caption: terms.mobile
     })
     mobile: string = '';
-    
+
     @Field({
         // validate: [Validators.required, Validators.unique],
         caption: terms.email
     })
     email: string = '';
-    
+
     @DateOnlyField({
         caption: terms.birthday
     })
     birthday!: Date;
-    
+
     @Field({
         caption: terms.tenant
-    }) 
-    defTid: string = '';
-    
+    })
+    defTid: string = '';    
+
     @Field({
-        caption: terms.branch
+        caption: terms.branch, validate: StringRequiredValidation
     })
     bid: string = '';
-
 
     @Field({ includeInApi: false })
     password: string = '';
@@ -70,28 +69,28 @@ export class Users extends IdEntity {
         allowApiUpdate: false
     })
     createDate: Date = new Date();
- 
+
     @Field({
         allowApiUpdate: Roles.admin,
-        caption:terms.admin
+        caption: terms.admin
     })
     admin: Boolean = false;
 
     @Field({
         allowApiUpdate: Roles.admin,
-        caption:terms.board
+        caption: terms.board
     })
     board: Boolean = false;
 
     @Field({
         allowApiUpdate: Roles.admin,
-        caption:terms.manager
+        caption: terms.manager
     })
     manager: Boolean = false;
 
     @Field({
         allowApiUpdate: Roles.admin,
-        caption:terms.volunteer
+        caption: terms.volunteer
     })
     volunteer: Boolean = false;
 
@@ -113,8 +112,13 @@ export class Users extends IdEntity {
     }
     @BackendMethod({ allowed: Allow.authenticated })
     async updatePassword(password: string) {
-        if (this._.isNew() || this.id != this.remult.user.id)
+        console.log(this.id);
+        console.log(this.remult.user.id);
+        console.log(this.id != this.remult.user.id);
+        if (this._.isNew() || this.id != this.remult.user.id && !this.remult.isAllowed(Roles.admin)) {
+            // if (this._.isNew() || this.id != this.remult.user.id)
             throw new Error(terms.invalidOperation);
+        }
         await this.hashAndSetPassword(password);
         await this._.save();
     }

@@ -68,7 +68,8 @@ export class UsersComponent implements OnInit {
         }
       },
       users.mobile,
-      users.email
+      users.email,
+      { field: users.bid, caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) }
     ],
     rowButtons: [{
       name: terms.resetPassword,
@@ -84,7 +85,7 @@ export class UsersComponent implements OnInit {
     confirmDelete: async (h) => {
       return await this.dialog.confirmDelete(h.name)
     },
-  }); 
+  });
   @BackendMethod({ allowed: Roles.admin })
   static async resetPassword(userId: string, remult?: Remult) {
     let u = await remult!.repo(Users).findId(userId);

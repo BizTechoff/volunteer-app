@@ -1,6 +1,7 @@
 import { DataControl } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
+import { StringRequiredValidation } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 
@@ -56,7 +57,7 @@ export class ActivityStatus {
         return op;
     }
 
-    static openStatuses(){
+    static openStatuses() {
         return [
             ActivityStatus.w4_assign,
             ActivityStatus.w4_start,
@@ -75,6 +76,11 @@ export class ActivityStatus {
     (options, remult) => {
         options.saving = async (act) => {
             if (isBackend()) {
+                if (act.isNew()) {
+                    if (!(act.bid && act.bid.length > 0)) {
+                        act.bid = 'not-set';
+                    }
+                }
                 // if validate() === true
                 if (act.$.date.valueChanged() || act.$.fh.valueChanged() || act.$.th.valueChanged()) {
                     let conflicts = [] as Activity[];
@@ -107,12 +113,6 @@ export class Activity extends IdEntity {
     @Field({ caption: terms.desc })
     purposeDesc: string = '';
 
-    @Field({ caption: terms.title })
-    title: string = '';
-
-    @Field({ caption: terms.subTitle })
-    subTitle: string = '';
-
     @Field({ caption: terms.tenant })
     tid: string = '';
 
@@ -133,5 +133,10 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.remark })
     remark: string = '';
+
+    @Field({
+        caption: terms.branch, validate: StringRequiredValidation
+    })
+    bid: string = '';
 
 }

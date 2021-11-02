@@ -18,10 +18,10 @@ import { ActivitiesListComponent } from './core/activity/activities-list/activit
 const defaultRoute = terms.home;
 const routes: Routes = [
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
-  { path: terms.currentState, component: CurrentStateComponent, canActivate: [AdminGuard] },
-  { path: terms.activities, component: ActivitiesListComponent, canActivate: [AdminGuard] },
-  { path: terms.tenants, component: TenantsListComponent, canActivate: [AdminGuard] },
-  { path: terms.volunteers, component: VolunteersListComponent, canActivate: [AdminGuard] },
+  { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerGuard] },
+  { path: terms.activities, component: ActivitiesListComponent, canActivate: [ManagerGuard] },
+  { path: terms.tenants, component: TenantsListComponent, canActivate: [ManagerGuard] },
+  { path: terms.volunteers, component: VolunteersListComponent, canActivate: [ManagerGuard] },
   { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
   { path: '**', redirectTo: '/'+defaultRoute, pathMatch: 'full' }
 

@@ -1,8 +1,10 @@
 <div class="full-page">
+  <div class="header"></div>
   <div class="grow-item">
     <div style="margin-top: 5% ;display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
 
-      <h2 style="display:flex;justify-content: center;">שלום {{ remult && remult.authenticated() ? remult.user.name : ' - ' }}
+      <h2 style="display:flex;justify-content: center;">שלום {{ remult && remult.authenticated() ? remult.user.name : '
+        - ' }}
         <span style="color: green;">{{ remult.authenticated() ? '' : 'לכניסה יש ללחוץ למעלה' }}</span>
       </h2>
 
@@ -12,11 +14,11 @@
         </a>
       </div> -->
       <div style="display:flex;flex-direction: row;justify-content: center;">
-        
-      <div style="display:flex;flex-direction: column;justify-content: space-evenly;">
-        <h1>אשל ירושלים</h1>
-        <!-- <h4 style="text-align: end;">CALIBRATION & GREAT SERVICE</h4> -->
-      </div>
+
+        <div style="display:flex;flex-direction: column;justify-content: space-evenly;">
+          <h1>אשל ירושלים</h1>
+          <!-- <h4 style="text-align: end;">CALIBRATION & GREAT SERVICE</h4> -->
+        </div>
         <!-- <h3 style="text-align: end;">CALIBRATION</h3>
         <h3 style="text-align: end;">& GREAT SERVICE</h3> -->
       </div>
@@ -35,6 +37,11 @@
         </a>
       </h2>
 
+    </div>
+  </div>
+  <div class="footer">
+    <div style="display:flex;flex-direction: row;justify-content: flex-end;">
+      {{ this.terms.appDesc + ' v' + this.terms.appVersion }}
     </div>
   </div>
 </div>

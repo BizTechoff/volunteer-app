@@ -1,4 +1,5 @@
 import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
+import { DateRequiredValidation, StringRequiredValidation } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 
@@ -20,7 +21,7 @@ import { Roles } from "../../users/roles";
                 }
             }
         };
-    })
+    }) 
 export class Tenant extends IdEntity {
 
     constructor(private remult: Remult) {
@@ -29,29 +30,31 @@ export class Tenant extends IdEntity {
 
     @Field({
         caption: terms.name,
-        validate: Validators.required.withMessage(terms.requiredField)
+        validate: StringRequiredValidation
     })
     name: string = '';
 
     @Field({
         caption: terms.mobile,
-        validate: [Validators.required.withMessage(terms.requiredField), Validators.unique]
+        validate: [StringRequiredValidation, Validators.unique]
     })
     mobile: string = '';
 
-    @Field({ caption: terms.address })
+    @Field({ caption: terms.address, validate: StringRequiredValidation })
     address: string = '';
 
     @Field({ caption: terms.status })
     status: string = '';
 
-    @Field({ caption: terms.status })
+    @Field({ caption: terms.defaultVolunteers })
     defVids: string[] = [];
 
-    @DateOnlyField({ caption: terms.birthday })
+    @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
     birthday!: Date;
 
-    // @Field({ caption: terms.photo })
-    // photoId: string = '';
+    @Field({
+        caption: terms.branch, validate: StringRequiredValidation
+    })
+    bid: string = '';
 
 }
