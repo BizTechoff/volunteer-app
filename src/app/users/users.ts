@@ -2,7 +2,6 @@
 import { InputField } from "@remult/angular";
 import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
 import { InputTypes } from "remult/inputTypes";
-import { ValidBranchValidation } from "../common/globals";
 import { terms } from "../terms";
 import { Roles } from './roles';
 
@@ -25,10 +24,25 @@ import { Roles } from './roles';
                 if (!remult.isAllowed(Roles.manager)) {
                     return user.id.isEqualTo(remult.user.id);
                 }
-                return user.bid.isEqualTo('6');//remult.user.bid);
+                return user.bid.isEqualTo(remult.user.bid);
             }
             return undefined!;
         };
+        options.validation = async (user) => {
+            let ok = true;
+            console.log('ValidBranchValidation-1');
+
+            if (!user.board && user.volunteer) {
+                console.log('ValidBranchValidation-2');
+                ok &&= user.bid && user.bid && user.bid.length > 1 ? true : false;
+                ok &&= user.bid !== '0';
+            }
+            console.log('ValidBranchValidation-3');
+            if (!ok!) {
+                console.log('ValidBranchValidation-4');
+                user._.error = terms.requiredField;
+            }
+        }
         options.saving = async (user) => {
             if (isBackend()) {
                 if (user._.isNew()) {
@@ -51,6 +65,8 @@ export class Users extends IdEntity {
         caption: terms.username
     })
     name: string = '';
+    @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
+    numOfActivities: number = 0;
 
     @Field({
         validate: [Validators.required, Validators.unique],
@@ -75,10 +91,10 @@ export class Users extends IdEntity {
     defTid: string = '';
 
     @Field({
-        caption: terms.branch, validate: ValidBranchValidation
+        caption: terms.branch
     })
     bid: string = '';
-
+ 
     @Field({ includeInApi: false })
     password: string = '';
     @Field({

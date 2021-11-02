@@ -77,3 +77,8 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות'
 }
+declare module 'remult' {
+    export interface UserInfo {
+        bid:string;
+    }
+}

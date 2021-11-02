@@ -33,7 +33,7 @@ export class VolunteersListComponent implements OnInit {
         { field: _.defTid, caption: terms.defaultTenant },],
       rowButtons: [
         {
-          // visible: async (v) => { return await this.showActivities(v)},
+          //  visible: (v) => { return  this.showActivities(v)},
           textInMenu: terms.showActivities
         }
       ]

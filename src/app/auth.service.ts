@@ -12,6 +12,7 @@ const AUTH_TOKEN_KEY = "authToken";
 })
 export class AuthService {
     constructor(private remult: Remult) {
+        // (<MotiUserInfo>remult.user).snif
         let token = AuthService.fromStorage();
         if (token) {
             this.setAuthToken(token);
@@ -30,7 +31,8 @@ export class AuthService {
                 result = {
                     id: u.id,
                     roles: [],
-                    name: u.name
+                    name: u.name,
+                    bid: u.bid
                 };
                 if (u.admin) {
                     result.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);

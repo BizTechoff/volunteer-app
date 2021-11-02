@@ -29,11 +29,13 @@ export class UsersComponent implements OnInit {
     columnSettings: users => [
       users.name,
       {
-        field: users.admin, width: '80', valueChanged: () => {
-          if (users.admin) {
-            // users.board = false;
-            // users.manager = false;
-            // users.volunteer = false;
+
+        field: users.admin, width: '80',
+        valueChange: user => () => {
+          if (user.admin) {
+            user.board = false;
+            user.manager = false;
+            user.volunteer = false;
           }
         }
       },
