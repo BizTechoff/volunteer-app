@@ -88,6 +88,7 @@ export class ActivityStatus {
                         where: (_) => _.date.isEqualTo(act.date)
                             .and(_.fh.isLessOrEqualTo(act.th))
                             .and(_.th.isGreaterOrEqualTo(act.fh))
+                            .and(_.status.isDifferentFrom(ActivityStatus.cancel))
                     })) {//if _.tid === act.tid || _.vids equalsAny act.vids
                         if (!a.isNew()) {
                             if (a.id === act.id) {

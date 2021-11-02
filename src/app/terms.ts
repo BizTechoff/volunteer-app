@@ -1,4 +1,5 @@
 export const terms = {
+    showActivities: 'הצג פעילויות',
     opens: 'פתוחות',
     closes:'סגורות',
     inProgress:'בתהליך',

@@ -30,7 +30,13 @@ export class VolunteersListComponent implements OnInit {
         { field: _.name, caption: 'שם' },
         _.mobile,
         _.birthday,
-        { field: _.defTid, caption: terms.defaultTenant },]
+        { field: _.defTid, caption: terms.defaultTenant },],
+      rowButtons: [
+        {
+          // visible: async (v) => { return await this.showActivities(v)},
+          textInMenu: terms.showActivities
+        }
+      ]
     }
   );
 
@@ -43,6 +49,10 @@ export class VolunteersListComponent implements OnInit {
     await this.volunteers.reloadData();
   }
 
+  async showActivities(user: Users) {
+    return true;
+  }
+
   async addVolunteer() {
     let t = this.remult.repo(Users).create();
     t.volunteer = true;
@@ -50,7 +60,7 @@ export class VolunteersListComponent implements OnInit {
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: terms.addVolunteer,
-        fields: () => [ 
+        fields: () => [
           { field: t.$.bid, visible: this.remult.isAllowed(Roles.board) },
           { field: t.$.name, caption: terms.name },
           t.$.mobile,
