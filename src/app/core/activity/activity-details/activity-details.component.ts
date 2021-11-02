@@ -21,6 +21,7 @@ export class ActivityDetailsComponent implements OnInit {
   } = { aid: '', tid: '', readonly: false, changed: false };
   today = new Date();
   activity = this.remult.repo(Activity).create({
+    bid: '6',
     purposeDesc: 'לארח חברה לספר ולהקשיב',
     date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
     fh: '14:00',
@@ -53,13 +54,11 @@ export class ActivityDetailsComponent implements OnInit {
       this.activity = await this.remult.repo(Activity).findId(
         this.args.aid);
     }
-    console.log(1);
     this.top = new DataAreaSettings({
       fields: () => [
         [this.activity.$.status]//, this.$.bid]
       ]
     }) 
-    console.log(2);
     this.fields = new DataAreaSettings({
       fields: () => [
         this.activity.$.purpose,

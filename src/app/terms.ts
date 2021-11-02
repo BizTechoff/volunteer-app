@@ -1,4 +1,10 @@
 export const terms = {
+    opens: 'פתוחות',
+    closes:'סגורות',
+    inProgress:'בתהליך',
+    endSuccess:'הסתיימו בהצלחה',
+    problems:'בעיות',
+    invalidBranch: 'סניף אינו תקין',
     appVersion: '2021.11.02.0',
     defaultVolunteers: 'מתנדבים ברירת מחדל',
     appDesc: 'אפליקציה לניהול מפגשי התנדבות',
@@ -65,6 +71,8 @@ export const terms = {
     cancel: 'ביטול',
     home: 'ברוכים הבאים',
     userAccounts: 'משתמשים',
+    myActivities: 'הפעילויות שלי',
+    personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות'
 }

@@ -1,0 +1,19 @@
+<div class="full-page">
+    <div class="header"></div>
+    <div class="grow-item">
+
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <ng-container *ngFor='let a of this.activities'>
+                <mat-card>
+                    <mat-card-title> {{ a.tid }} </mat-card-title>
+                    <mat-card-content>
+                        {{ a.date | date:'dd.MM.yyyy' }}
+                        {{ a.fh }} - {{ a.th }}
+                    </mat-card-content>
+                </mat-card>
+            </ng-container>
+        </div>
+
+    </div>
+    <div class="footer"></div>
+</div>

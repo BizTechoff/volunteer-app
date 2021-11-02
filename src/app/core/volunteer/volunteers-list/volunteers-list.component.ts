@@ -3,6 +3,7 @@ import { GridSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { terms } from '../../../terms';
+import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
 
 @Component({
@@ -24,7 +25,12 @@ export class VolunteersListComponent implements OnInit {
       allowUpdate: true,// this.remult.isAllowed(Roles.manager),
       // allowSelection: true,
       numOfColumnsInGrid: 10,
-      columnSettings: _ => [{ field: _.bid, caption: 'שם' }, { field: _.name, caption: 'שם' }, _.mobile, _.birthday, { field: _.defTid, caption: terms.defaultTenant },]
+      columnSettings: _ => [
+        { field: _.bid, caption: 'סניף' },
+        { field: _.name, caption: 'שם' },
+        _.mobile,
+        _.birthday,
+        { field: _.defTid, caption: terms.defaultTenant },]
     }
   );
 
@@ -39,10 +45,18 @@ export class VolunteersListComponent implements OnInit {
 
   async addVolunteer() {
     let t = this.remult.repo(Users).create();
+    t.volunteer = true;
+    // t.bid = this.remult.user.bid;
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: terms.addVolunteer,
-        fields: () => [{ field: t.$.name, caption: terms.name }, t.$.mobile, t.$.email, t.$.birthday, { field: t.$.defTid, caption: terms.defaultTenant }],
+        fields: () => [ 
+          { field: t.$.bid, visible: this.remult.isAllowed(Roles.board) },
+          { field: t.$.name, caption: terms.name },
+          t.$.mobile,
+          t.$.email,
+          t.$.birthday,
+          { field: t.$.defTid, caption: terms.defaultTenant }],
         ok: async () => { /*await t.save();*/ }
       },
       _ => _ ? _.args.ok : false);

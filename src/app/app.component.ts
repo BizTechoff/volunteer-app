@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router, Route, ActivatedRoute } from '@angular/router';
 import { MatSidenav } from '@angular/material/sidenav';
-import { Remult } from 'remult';
-import { DialogService } from './common/dialog';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { InputField, openDialog, RouteHelperService } from '@remult/angular';
-import { PasswordControl, Users } from './users/users';
-import { InputAreaComponent } from './common/input-area/input-area.component';
+import { Remult } from 'remult';
 import { AuthService } from './auth.service';
+import { DialogService } from './common/dialog';
+import { InputAreaComponent } from './common/input-area/input-area.component';
 import { terms } from './terms';
+import { PasswordControl, Users } from './users/users';
 
 @Component({
   selector: 'app-root',
@@ -44,8 +44,9 @@ export class AppComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-
+  usersCount = 1;
+  async ngOnInit() {
+    // this.usersCount = await this.remult.repo(Users).count();
   }
 
   signOut() {
@@ -69,6 +70,7 @@ export class AppComponent implements OnInit {
           confirmPassword.error = terms.doesNotMatchPassword;
           throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
         }
+        user.bid = '0';// only admin should be here
         await user.create(password.value);
         this.auth.signIn(user.name, password.value);
 
@@ -116,8 +118,8 @@ export class AppComponent implements OnInit {
       name = route.data.name;
     return name;
   }
-  
-  
+
+
   currentTitle() {
     if (this.activeRoute!.snapshot && this.activeRoute!.firstChild)
       if (this.activeRoute.snapshot.firstChild!.data!.name) {

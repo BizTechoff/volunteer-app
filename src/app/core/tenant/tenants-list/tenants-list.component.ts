@@ -3,6 +3,7 @@ import { GridSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { terms } from '../../../terms';
+import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Tenant } from '../tenant';
 
@@ -51,13 +52,21 @@ export class TenantsListComponent implements OnInit {
       await this.refresh();
     }
   }
-
+isBoard(){
+  return this.remult.isAllowed(Roles.board);
+}
   async addTenant() {
     let t = this.remult.repo(Tenant).create();
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: terms.addTenant,
-        fields: () => [t.$.name, t.$.mobile, t.$.address, t.$.birthday, t.$.defVids],
+        fields: () => [
+          { field: t.$.bid, visible: () => this.isBoard() },
+          t.$.name, 
+          t.$.mobile, 
+          t.$.address, 
+          t.$.birthday, 
+          t.$.defVids],
         ok: async () => { await t.save(); }
       },
       _ => _ ? _.args.ok : false);

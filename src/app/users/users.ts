@@ -2,7 +2,7 @@
 import { InputField } from "@remult/angular";
 import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
 import { InputTypes } from "remult/inputTypes";
-import { StringRequiredValidation } from "../common/globals";
+import { ValidBranchValidation } from "../common/globals";
 import { terms } from "../terms";
 import { Roles } from './roles';
 
@@ -13,9 +13,20 @@ import { Roles } from './roles';
     allowApiInsert: Roles.admin
 },
     (options, remult) => {
+        options.defaultOrderBy = (user) => [
+            user.admin.descending(),
+            user.board.descending(),
+            user.manager.descending(),
+            user.name
+        ];
         options.apiPrefilter = (user) => {
-            if (!(remult.isAllowed(Roles.admin)))
-                return user.id.isEqualTo(remult.user.id);
+            if (!(remult.isAllowed(Roles.board)))// include admin
+            {
+                if (!remult.isAllowed(Roles.manager)) {
+                    return user.id.isEqualTo(remult.user.id);
+                }
+                return user.bid.isEqualTo('6');//remult.user.bid);
+            }
             return undefined!;
         };
         options.saving = async (user) => {
@@ -25,8 +36,13 @@ import { Roles } from './roles';
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
                 }
+                if (user.board) {//include admin
+                    if (!user.bid || user.bid.length < 1 || user.bid !== '0') {
+                        user.bid = '0';
+                    }
+                }
             }
-        }
+        };
     }
 )
 export class Users extends IdEntity {
@@ -56,10 +72,10 @@ export class Users extends IdEntity {
     @Field({
         caption: terms.tenant
     })
-    defTid: string = '';    
+    defTid: string = '';
 
     @Field({
-        caption: terms.branch, validate: StringRequiredValidation
+        caption: terms.branch, validate: ValidBranchValidation
     })
     bid: string = '';
 
@@ -97,6 +113,15 @@ export class Users extends IdEntity {
     constructor(private remult: Remult) {
         super();
     }
+
+    hasValidBranch() {
+        let result = true;
+        if (!this.board && this.volunteer) {
+            result &&= this.bid && this.bid.length > 1 ? true : false;
+            result &&= this.bid !== '0';
+        }
+        return result;
+    }
     async hashAndSetPassword(password: string) {
         this.password = (await import('password-hash')).generate(password);
     }
@@ -112,9 +137,6 @@ export class Users extends IdEntity {
     }
     @BackendMethod({ allowed: Allow.authenticated })
     async updatePassword(password: string) {
-        console.log(this.id);
-        console.log(this.remult.user.id);
-        console.log(this.id != this.remult.user.id);
         if (this._.isNew() || this.id != this.remult.user.id && !this.remult.isAllowed(Roles.admin)) {
             // if (this._.isNew() || this.id != this.remult.user.id)
             throw new Error(terms.invalidOperation);

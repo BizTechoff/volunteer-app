@@ -26,13 +26,10 @@ export class UsersComponent implements OnInit {
     allowUpdate: true,
     numOfColumnsInGrid: 10,
 
-    orderBy: h => [h.name],
-    rowsInPage: 100,
-
     columnSettings: users => [
       users.name,
       {
-        field: users.admin, valueChanged: () => {
+        field: users.admin, width: '80', valueChanged: () => {
           if (users.admin) {
             // users.board = false;
             // users.manager = false;
@@ -41,7 +38,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.board, valueChanged: () => {
+        field: users.board, width: '80', valueChanged: () => {
           if (users.board) {
             // users.admin = false;
             // users.manager = false;
@@ -50,7 +47,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.manager, valueChanged: () => {
+        field: users.manager, width: '80', valueChanged: () => {
           if (users.manager) {
             // users.admin = false;
             // users.board = false;
@@ -59,7 +56,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.volunteer, valueChanged: () => {
+        field: users.volunteer, width: '80', valueChanged: () => {
           if (users.volunteer) {
             // users.admin = false;
             // users.board = false;
@@ -67,9 +64,9 @@ export class UsersComponent implements OnInit {
           }
         }
       },
-      users.mobile,
-      users.email,
-      { field: users.bid, caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) }
+      { field: users.mobile, width: '100' },
+      { field: users.bid, width: '80', caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) },
+      { field: users.email }
     ],
     rowButtons: [{
       name: terms.resetPassword,

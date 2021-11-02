@@ -29,8 +29,9 @@ import { TenantsListComponent } from './core/tenant/tenants-list/tenants-list.co
 import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/volunteer-details.component';
 import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
 import { HomeComponent } from './home/home.component';
-import { AdminGuard, BoardGuard, ManagerGuard, VolunteerGuard } from './users/roles';
+import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
 import { UsersComponent } from './users/users.component';
+import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { UsersComponent } from './users/users.component';
     TenantDetailsComponent,
     VolunteersListComponent,
     VolunteerDetailsComponent,
-    ActivityDetailsComponent
+    ActivityDetailsComponent,
+    VolunteerActivitiesComponent
   ],
   imports: [
     BrowserModule,
@@ -67,7 +69,7 @@ import { UsersComponent } from './users/users.component';
     BrowserAnimationsModule,
     ChartsModule
   ],
-  providers: [DialogService, AdminGuard, BoardGuard, ManagerGuard, VolunteerGuard],
+  providers: [DialogService, AdminGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent]
 })

@@ -1,9 +1,9 @@
-import { AuthenticatedInGuard } from '@remult/angular';
 import { Injectable } from '@angular/core';
+import { AuthenticatedInGuard } from '@remult/angular';
 
 
 
-export const Roles = { 
+export const Roles = {
     admin: 'admin',
     board: 'board',
     manager: 'manager',
@@ -42,3 +42,12 @@ export class VolunteerGuard extends AuthenticatedInGuard {
         return Roles.volunteer;
     }
 }
+
+@Injectable()
+export class OnlyVolunteerGuard extends AuthenticatedInGuard {
+
+    isAllowed() {
+        return this.remult.isAllowed(Roles.volunteer) &&
+            !this.remult.isAllowed(Roles.manager);
+    }
+} 

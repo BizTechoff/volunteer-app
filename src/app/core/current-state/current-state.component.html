@@ -5,6 +5,7 @@
             <!-- <div style="display: block;"> -->
                 <!-- <button (click)="sendEmail()">שליחת מייל בדיקה</button> -->
                 <canvas baseChart 
+                      [colors]="pieChartColors" 
                       [data]="pieChartData" 
                       [labels]="pieChartLabels" 
                       [chartType]="pieChartType"
