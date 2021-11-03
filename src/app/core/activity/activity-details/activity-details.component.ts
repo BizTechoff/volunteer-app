@@ -22,7 +22,7 @@ export class ActivityDetailsComponent implements OnInit {
   today = new Date();
   activity = this.remult.repo(Activity).create({
     bid: '6',
-    purposeDesc: 'לארח חברה לספר ולהקשיב',
+    purposeDesc: terms.defaultPurposeDesc6,
     date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
     fh: '14:00',
     th: '16:00'
@@ -56,17 +56,20 @@ export class ActivityDetailsComponent implements OnInit {
     }
     this.top = new DataAreaSettings({
       fields: () => [
-        [this.activity.$.status]//, this.$.bid]
+        [ 
+          {field: this.activity.$.tid, readonly: true },
+          {field: this.activity.$.status, readonly: true }
+        ]//, this.$.bid]
       ]
     }) 
     this.fields = new DataAreaSettings({
       fields: () => [
+        
         this.activity.$.purpose,
         this.activity.$.purposeDesc,
-        {field: this.activity.$.tid, readonly: true },
-        this.activity.$.vids,
         this.activity.$.date,
         [this.activity.$.fh, this.activity.$.th],
+        this.activity.$.vids,
         { field: this.activity.$.remark, caption: terms.commentAndSummary }
       ]
     });

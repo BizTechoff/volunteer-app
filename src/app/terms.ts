@@ -1,10 +1,11 @@
 export const terms = {
+    defaultPurposeDesc6: 'לארח חברה לספר ולהקשיב',
     showActivities: 'הצג פעילויות',
     opens: 'פתוחות',
-    closes:'סגורות',
-    inProgress:'בתהליך',
-    endSuccess:'הסתיימו בהצלחה',
-    problems:'בעיות',
+    closes: 'סגורות',
+    inProgress: 'בתהליך',
+    endSuccess: 'הסתיימו בהצלחה',
+    problems: 'בעיות',
     invalidBranch: 'סניף אינו תקין',
     appVersion: '2021.11.02.0',
     defaultVolunteers: 'מתנדבים ברירת מחדל',
@@ -15,17 +16,17 @@ export const terms = {
     addActivity: 'הוספת פעילות',
     cancelActivity: 'בטל פעילות',
     sameDateAndTimes: 'לו"ז חופף',
-    close: 'סגור', 
+    close: 'סגור',
     saveAndClose: 'שמור וסגור',
     commentAndSummary: 'הערות וסיכום פעילות',
-    purpose: 'מטרה', 
+    purpose: 'מטרה',
     passwordReset: 'סיסמא אופסה',
     resetPassword: 'איפוס סיסמא',
     activityDetails: 'פרטי פעילות',
     activity: 'פעילות',
     defaultTenant: 'דייר ברירת מחדל',
     entityType: 'סוג ישות',
-    entityId: 'מזהה ישות', 
+    entityId: 'מזהה ישות',
     desc: 'תיאור',
     remark: 'הערות',
     name: 'שם',
@@ -48,7 +49,7 @@ export const terms = {
     address: 'כתובת',
     photos: 'תמונות',
     data: 'מידע',
-    birthday:'תאריך לידה',
+    birthday: 'תאריך לידה',
     status: 'סטטוס',
     mobile: "סלולרי",
     username: "שם משתמש",
@@ -79,6 +80,6 @@ export const terms = {
 }
 declare module 'remult' {
     export interface UserInfo {
-        bid:string;
+        bid: string;
     }
 }

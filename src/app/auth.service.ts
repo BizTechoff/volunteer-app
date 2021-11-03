@@ -17,7 +17,7 @@ export class AuthService {
         if (token) {
             this.setAuthToken(token);
         }
-    }
+    } 
 
     async signIn(username: string, password: string) {
         this.setAuthToken(await AuthService.signIn(username, password));

@@ -30,7 +30,7 @@ export class UsersComponent implements OnInit {
       users.name,
       {
 
-        field: users.admin, width: '80',
+        field: users.admin, //width: '80',
         valueChange: user => () => {
           if (user.admin) {
             user.board = false;
@@ -40,7 +40,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.board, width: '80', valueChanged: () => {
+        field: users.board, valueChanged: () => {//, width: '80'
           if (users.board) {
             // users.admin = false;
             // users.manager = false;
@@ -49,7 +49,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.manager, width: '80', valueChanged: () => {
+        field: users.manager, valueChanged: () => {//, width: '80'
           if (users.manager) {
             // users.admin = false;
             // users.board = false;
@@ -58,7 +58,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.volunteer, width: '80', valueChanged: () => {
+        field: users.volunteer, valueChanged: () => {//, width: '80'
           if (users.volunteer) {
             // users.admin = false;
             // users.board = false;
@@ -66,8 +66,8 @@ export class UsersComponent implements OnInit {
           }
         }
       },
-      { field: users.mobile, width: '100' },
-      { field: users.bid, width: '80', caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) },
+      { field: users.mobile },//, width: '100'
+      { field: users.bid, caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) },//, width: '80'
       { field: users.email }
     ],
     rowButtons: [{
