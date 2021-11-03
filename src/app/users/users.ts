@@ -19,12 +19,12 @@ import { Roles } from './roles';
             user.name
         ];
         options.apiPrefilter = (user) => {
-            if (!(remult.isAllowed(Roles.board)))// include admin
+            if (!(remult.isAllowed(Roles.board)))// all
             {
                 if (!remult.isAllowed(Roles.manager)) {
-                    return user.id.isEqualTo(remult.user.id);
+                    return user.id.isEqualTo(remult.user.id);//volunteer only himself
                 }
-                return user.bid.isEqualTo(remult.user.bid);
+                return user.bid.isEqualTo(remult.user.bid);//manager only his branch
             }
             return undefined!;
         };

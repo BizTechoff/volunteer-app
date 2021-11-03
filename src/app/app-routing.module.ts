@@ -16,6 +16,7 @@ import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunt
 import { ActivitiesListComponent } from './core/activity/activities-list/activities-list.component';
 import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
 import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/volunteer-details.component';
+import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
   
 const defaultRoute = terms.home;
 const routes: Routes = [
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: terms.activities, component: ActivitiesListComponent, canActivate: [ManagerGuard] },
   { path: terms.tenants, component: TenantsListComponent, canActivate: [ManagerGuard] },
   { path: terms.volunteers, component: VolunteersListComponent, canActivate: [ManagerGuard] },
+  { path: terms.dailyActivityReport, component: ActivityDailyComponent, canActivate: [ManagerGuard] },
   { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
   { path: terms.myActivities, component: VolunteerActivitiesComponent, canActivate: [OnlyVolunteerGuard] },
   { path: terms.personalInfo, component: VolunteerDetailsComponent, canActivate: [OnlyVolunteerGuard] },

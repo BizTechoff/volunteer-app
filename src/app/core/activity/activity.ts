@@ -1,9 +1,10 @@
-import { DataControl } from "@remult/angular";
+import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { TenantDetailsComponent } from "../tenant/tenant-details/tenant-details.component";
 
 @DataControl({
     // valueList: async remult => DeliveryStatus.getOptions(remult)
@@ -135,6 +136,12 @@ export class Activity extends IdEntity {
     @Field({ caption: terms.remark })
     remark: string = '';
 
+    @DataControl<Activity>({
+        click: async (a) => {
+            await openDialog(TenantDetailsComponent);
+            a.bid = '888';
+        }
+    })
     @Field({
         caption: terms.branch, validate: StringRequiredValidation
     })

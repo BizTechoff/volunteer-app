@@ -25,7 +25,7 @@ export class InputAreaComponent implements OnInit {
     cancel?: () => void,
     validate?: () => Promise<void>,
     buttons?: button[]
-  };
+  };  
   terms=terms;
   constructor(
     public dialogRef: MatDialogRef<any>,

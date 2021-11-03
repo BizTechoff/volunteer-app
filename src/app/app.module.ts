@@ -32,6 +32,7 @@ import { HomeComponent } from './home/home.component';
 import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
 import { UsersComponent } from './users/users.component';
 import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
+import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activit
     VolunteersListComponent,
     VolunteerDetailsComponent,
     ActivityDetailsComponent,
-    VolunteerActivitiesComponent
+    VolunteerActivitiesComponent,
+    ActivityDailyComponent
   ],
   imports: [
     BrowserModule,

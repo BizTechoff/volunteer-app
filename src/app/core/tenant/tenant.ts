@@ -1,5 +1,5 @@
 import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
-import { DateRequiredValidation, StringRequiredValidation } from "../../common/globals";
+import { DateRequiredValidation, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 
@@ -11,6 +11,17 @@ import { Roles } from "../../users/roles";
         allowApiRead: Allow.authenticated
     },
     async (options, remult) => {
+        options.apiPrefilter = (tnt) => {
+            if (!(remult.isAllowed(Roles.board)))//manager|volunteer
+            {
+                return tnt.bid.isEqualTo(remult.user.bid);//only same branch
+                // if (!remult.isAllowed(Roles.manager)) {
+                //     return FILTER_RESTRICT;//volunteer only himself
+                // }  
+                // return tnt.bid.isEqualTo(remult.user.bid);//manager only his branch
+            }
+            return FILTER_IGNORE!;// all
+        };
         // options.deleting = async (tnt) => {
         //     let found = await remult.repo(Activity).findFirst(_ => _.tid.isEqualTo(tnt.id));
 
@@ -21,7 +32,7 @@ import { Roles } from "../../users/roles";
                 }
             }
         };
-    }) 
+    })
 export class Tenant extends IdEntity {
 
     constructor(private remult: Remult) {

@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { GridSettings, openDialog } from '@remult/angular';
-import { getFields, Remult } from 'remult';
+import { Field, getFields, Remult } from 'remult';
+import { FILTER_IGNORE } from '../../../common/globals';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
- 
+
 @Component({
   selector: 'app-volunteers-list',
   templateUrl: './volunteers-list.component.html',
@@ -13,12 +14,18 @@ import { Users } from '../../../users/users';
 })
 export class VolunteersListComponent implements OnInit {
 
+  // @DataControl({ clickIcon: 'search', allowClick: () => true, click: () => {} })
+  @Field({ caption: `${terms.serachForTenantNameHere}` })
+  search: string = ''
+
   get $() { return getFields(this, this.remult) };
   terms = terms;
+
   volunteers: GridSettings<Users> = new GridSettings<Users>(
     this.remult.repo(Users),
     {
-      where: _ => _.volunteer.isEqualTo(true),
+      where: _ => _.volunteer.isEqualTo(true)
+        .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid)),
       newRow: _ => _.volunteer = true,
       allowInsert: true,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       allowDelete: true,
@@ -35,6 +42,9 @@ export class VolunteersListComponent implements OnInit {
         {
           //  visible: (v) => { return  this.showActivities(v)},
           textInMenu: terms.showActivities
+        },
+        {
+          textInMenu: terms.volunteerDetails
         }
       ]
     }
@@ -43,6 +53,10 @@ export class VolunteersListComponent implements OnInit {
   constructor(private remult: Remult) { }
 
   ngOnInit(): void {
+  }
+
+  isBoard() {
+    return this.remult.isAllowed(Roles.board);
   }
 
   async refresh() {
@@ -61,7 +75,7 @@ export class VolunteersListComponent implements OnInit {
       _ => _.args = {
         title: terms.addVolunteer,
         fields: () => [
-          { field: t.$.bid, visible: this.remult.isAllowed(Roles.board) },
+          { field: t.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
           { field: t.$.name, caption: terms.name },
           t.$.mobile,
           t.$.email,

@@ -34,7 +34,7 @@
       <h4 style="margin-right: 2px;" *ngIf="remult.authenticated()">{{terms.hello}} {{remult.user.name}}</h4>
       <mat-nav-list role="list">
         <ng-container *ngFor="let m of router.config">
-          <mat-divider *ngIf="shouldDisplayRoute(m) && terms.userAccounts === m.path"></mat-divider>
+          <mat-divider *ngIf="shouldDisplayRoute(m) && terms.dailyActivityReport === m.path"></mat-divider>
           <mat-list-item *ngIf="shouldDisplayRoute(m)" routerLinkActive="active-route">
             <a matLine [routerLink]="m.path" (click)="routeClicked()">{{routeName(m)}}</a>
           </mat-list-item>

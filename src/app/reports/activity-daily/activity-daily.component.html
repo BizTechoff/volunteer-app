@@ -1,0 +1,35 @@
+<div class="full-page">
+    <div class="header">
+        <div style="display: flex; flex-direction: row; justify-content: start; ">
+
+            <data-control [field]='this.$.selectedDate'></data-control>
+            <button mat-mini-fab color='primary' (click)='this.retrieve()'>
+                <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-mini-fab color='primary' (click)='this.print()'>
+                <mat-icon>print</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div class="grow-item">
+        <!-- <div class="ng-container"> -->
+            <table>
+                <thead>
+                    <th> {{ terms.tenant }} </th>
+                    <th> {{ terms.volunteer }} </th>
+                    <th> {{ terms.remark }} </th>
+                </thead>
+                <tbody>
+                    <tr *ngFor='let a of this.activities'>
+                        <td> {{ a.tid }} </td>
+                        <td> {{ a.vids }} </td>
+                        <td> {{ a.remark }} </td>
+                    </tr>
+                </tbody>
+            </table>
+        <!-- </div> -->
+    </div>
+    <div class="footer">
+        <span> מציג: {{ this.activities.length }} רשומות </span>
+    </div>
+</div>
