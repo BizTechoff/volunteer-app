@@ -1,4 +1,8 @@
 export const terms = {
+    refresh: 'רענן',
+    addActivityToCurrentTenant:'הוסף פעילות לדייר זה',
+    shouldAddActivity: 'האם להוסיף ל!t.name! פעילות חדשה?',
+    shouldOpenTheActivity: 'לפתוח את הפעילות שהקמת כרגע?',
     serachForTenantNameHere: 'חיפוש שם דייר..',
     serachForVolunteerHere: 'חיפוש מתנדב..',
     selectDate: 'בחירת תאריך',
@@ -53,6 +57,7 @@ export const terms = {
     volunteers: 'מתנדבים',
     email: 'דוא"ל',
     photo: 'תמונה',
+    active: 'פעיל',
     address: 'כתובת',
     photos: 'תמונות',
     data: 'מידע',
@@ -84,9 +89,10 @@ export const terms = {
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות'
-}
+} 
 declare module 'remult' {
     export interface UserInfo {
         bid: string;
     }
 }
+

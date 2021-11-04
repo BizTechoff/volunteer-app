@@ -1,7 +1,7 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
-import { StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
+import { FILTER_IGNORE, StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { TenantDetailsComponent } from "../tenant/tenant-details/tenant-details.component";
@@ -53,7 +53,7 @@ export class ActivityStatus {
     constructor(public id: number, public caption: string) { }
     // id:number;
 
-    static getOptions(remult: Remult) {
+    static getOptions() {
         let op = new ValueListValueConverter(ActivityStatus).getOptions();
         return op;
     }
@@ -65,8 +65,37 @@ export class ActivityStatus {
             ActivityStatus.w4_end
         ];
     }
+
+    static closeStatuses() {
+        return [
+            ActivityStatus.success,
+            ActivityStatus.cancel
+        ];
+    }
+
+    static inProgressStatuses() {
+        return [
+            ActivityStatus.w4_end
+        ];
+    }
+
+    static problemStatuses() {
+        return [
+            ActivityStatus.fail
+        ];
+    }
 }
 
+@ValueListFieldType(ActivityGeneralStatus)
+export class ActivityGeneralStatus{
+    static opens = new ActivityGeneralStatus(1, 'פתוחות', ActivityStatus.openStatuses());
+    static inProgress = new ActivityGeneralStatus(2, 'בתהליך', ActivityStatus.inProgressStatuses());
+    static closed = new ActivityGeneralStatus(3, 'סגורות', ActivityStatus.closeStatuses());
+    static problems = new ActivityGeneralStatus(4, 'בעיות', ActivityStatus.problemStatuses());
+    static all = new ActivityGeneralStatus(0, 'הכל', ActivityStatus.getOptions());
+    constructor(public id: number, public caption: string, public statuses: ActivityStatus[]){}
+}
+ 
 @Entity<Activity>('activities',
     {
         allowApiInsert: Roles.manager,
@@ -75,14 +104,28 @@ export class ActivityStatus {
         allowApiRead: Allow.authenticated
     },
     (options, remult) => {
-        options.saving = async (act) => {
+        options.apiPrefilter = async (act) => {
+            let result = FILTER_IGNORE;
+            if(!remult.isAllowed(Roles.board)){
+                return act.bid.isEqualTo(remult.user.bid);
+            }
+            return result;
+        };
+        options.validation = async (act) => {
             if (isBackend()) {
-                if (act.isNew()) {
-                    if (!(act.bid && act.bid.length > 0)) {
-                        act.bid = 'not-set';
+                let validId = (act.bid && act.bid.length > 0)!;
+                if (!validId) {
+                    act.bid = '0';
+                }
+                if (act.bid === '0') {
+                    if (!remult.isAllowed(Roles.board)) {
+                        act.$.bid.error = terms.requiredField;
                     }
                 }
-                // if validate() === true
+            }
+        };
+        options.saving = async (act) => {
+            if (isBackend()) {
                 if (act.$.date.valueChanged() || act.$.fh.valueChanged() || act.$.th.valueChanged()) {
                     let conflicts = [] as Activity[];
                     for await (const a of remult.repo(Activity).iterate({
@@ -103,11 +146,21 @@ export class ActivityStatus {
                     }
                 }
             }
-        }
+        };
     })
 export class Activity extends IdEntity {
 
     // constructor(private remult: Remult){super();}
+    // @DataControl<Activity>({
+    //     click: async (a) => {
+    //         await openDialog(TenantDetailsComponent);
+    //         a.bid = '888';
+    //     }
+    // }) 
+    @Field({
+        caption: terms.branch, validate: StringRequiredValidation
+    }) 
+    bid: string = '';
 
     @Field({ caption: terms.purpose })
     purpose: ActivityPurpose = ActivityPurpose.friendly;
@@ -135,16 +188,5 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.remark })
     remark: string = '';
-
-    @DataControl<Activity>({
-        click: async (a) => {
-            await openDialog(TenantDetailsComponent);
-            a.bid = '888';
-        }
-    })
-    @Field({
-        caption: terms.branch, validate: StringRequiredValidation
-    })
-    bid: string = '';
 
 }

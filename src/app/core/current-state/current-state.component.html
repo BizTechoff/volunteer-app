@@ -1,18 +1,17 @@
 <div class="full-page">
-    <div class="header" style="margin: 1em;"></div>
-    <div class="grow-item" style="margin: 1em;">
+    <div class="header" style="margin: 1em;">
+        <button mat-mini-fab color='primary' (click)='this.refresh()'>
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+    <div class="grow-item">
         <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: center;">
             <!-- <div style="display: block;"> -->
-                <!-- <button (click)="sendEmail()">שליחת מייל בדיקה</button> -->
-                <canvas baseChart 
-                      [colors]="pieChartColors" 
-                      [data]="pieChartData" 
-                      [labels]="pieChartLabels" 
-                      [chartType]="pieChartType"
-                      [options]="pieChartOptions"
-                      [plugins]="pieChartPlugins"
-                      [legend]="pieChartLegend">
-                    </canvas>
+            <!-- <button (click)="sendEmail()">שליחת מייל בדיקה</button> -->
+            <canvas baseChart [colors]="pieChartColors" [data]="pieChartData" [labels]="pieChartLabels"
+                [chartType]="pieChartType" [options]="pieChartOptions" [plugins]="pieChartPlugins"
+                [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+            </canvas>
             <!-- </div> -->
         </div>
     </div>

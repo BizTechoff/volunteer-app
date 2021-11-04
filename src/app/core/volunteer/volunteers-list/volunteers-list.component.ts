@@ -15,7 +15,7 @@ import { Users } from '../../../users/users';
 export class VolunteersListComponent implements OnInit {
 
   // @DataControl({ clickIcon: 'search', allowClick: () => true, click: () => {} })
-  @Field({ caption: `${terms.serachForTenantNameHere}` })
+  @Field({ caption: `${terms.serachForVolunteerHere}` })
   search: string = ''
 
   get $() { return getFields(this, this.remult) };
@@ -38,6 +38,13 @@ export class VolunteersListComponent implements OnInit {
         _.mobile,
         _.birthday,
         { field: _.defTid, caption: terms.defaultTenant },],
+      gridButtons: [
+        {
+          textInMenu: () => terms.refresh,
+          icon: 'refresh',
+          click: async () => { await this.refresh(); }
+        }
+      ],
       rowButtons: [
         {
           //  visible: (v) => { return  this.showActivities(v)},
@@ -65,25 +72,25 @@ export class VolunteersListComponent implements OnInit {
 
   async showActivities(user: Users) {
     return true;
-  }
-
+  } 
+  
   async addVolunteer() {
-    let t = this.remult.repo(Users).create();
-    t.volunteer = true;
-    // t.bid = this.remult.user.bid;
+    let u = this.remult.repo(Users).create();
+    u.volunteer = true;
+    u.bid = this.isBoard() ? '' : this.remult.user.bid;
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: terms.addVolunteer,
         fields: () => [
-          { field: t.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
-          { field: t.$.name, caption: terms.name },
-          t.$.mobile,
-          t.$.email,
-          t.$.birthday,
-          { field: t.$.defTid, caption: terms.defaultTenant }],
-        ok: async () => { /*await t.save();*/ }
+          { field: u.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
+          { field: u.$.name, caption: terms.name },
+          u.$.mobile,
+          u.$.email,
+          u.$.birthday,
+          { field: u.$.defTid, caption: terms.defaultTenant }],
+        ok: async () => { await u.create(); }
       },
-      _ => _ ? _.args.ok : false);
+      _ => _ ? _.ok : false);
     if (changed) {
       await this.refresh();
     }

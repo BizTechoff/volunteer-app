@@ -2,6 +2,7 @@
 import { InputField } from "@remult/angular";
 import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
 import { InputTypes } from "remult/inputTypes";
+import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
 import { terms } from "../terms";
 import { Roles } from './roles';
 
@@ -9,7 +10,7 @@ import { Roles } from './roles';
     allowApiRead: Allow.authenticated,
     allowApiUpdate: Allow.authenticated,
     allowApiDelete: Roles.admin,
-    allowApiInsert: Roles.admin
+    allowApiInsert: Roles.manager
 },
     (options, remult) => {
         options.defaultOrderBy = (user) => [
@@ -19,14 +20,15 @@ import { Roles } from './roles';
             user.name
         ];
         options.apiPrefilter = (user) => {
+            let active = FILTER_IGNORE;// user.active.isEqualTo(true);
             if (!(remult.isAllowed(Roles.board)))// all
             {
                 if (!remult.isAllowed(Roles.manager)) {
-                    return user.id.isEqualTo(remult.user.id);//volunteer only himself
+                    return active.and(user.id.isEqualTo(remult.user.id));//volunteer only himself
                 }
-                return user.bid.isEqualTo(remult.user.bid);//manager only his branch
+                return active.and(user.bid.isEqualTo(remult.user.bid));//manager only his branch
             }
-            return undefined!;
+            return active;
         };
         options.validation = async (user) => {
             let ok = true;
@@ -34,13 +36,13 @@ import { Roles } from './roles';
 
             if (!user.board && user.volunteer) {
                 console.log('ValidBranchValidation-2');
-                ok &&= user.bid && user.bid && user.bid.length > 1 ? true : false;
+                ok &&= user.bid && user.bid && user.bid.length > 0 ? true : false;
                 ok &&= user.bid !== '0';
             }
             console.log('ValidBranchValidation-3');
             if (!ok!) {
                 console.log('ValidBranchValidation-4');
-                user._.error = terms.requiredField;
+                user.$.bid.error = user.$.bid.metadata.caption + ': ' + terms.requiredField;
             }
         }
         options.saving = async (user) => {
@@ -60,16 +62,23 @@ import { Roles } from './roles';
     }
 )
 export class Users extends IdEntity {
+
     @Field({
-        validate: [Validators.required, Validators.unique],
+        caption: terms.branch
+    })
+    bid: string = '';
+
+    @Field({
+        validate: [StringRequiredValidation, Validators.unique],
         caption: terms.username
     })
     name: string = '';
+
     @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
     numOfActivities: number = 0;
 
     @Field({
-        validate: [Validators.required, Validators.unique],
+        validate: [StringRequiredValidation, Validators.unique],
         caption: terms.mobile
     })
     mobile: string = '';
@@ -90,13 +99,9 @@ export class Users extends IdEntity {
     })
     defTid: string = '';
 
-    @Field({
-        caption: terms.branch
-    })
-    bid: string = '';
- 
     @Field({ includeInApi: false })
     password: string = '';
+
     @Field({
         allowApiUpdate: false
     })
@@ -109,22 +114,25 @@ export class Users extends IdEntity {
     admin: Boolean = false;
 
     @Field({
-        allowApiUpdate: Roles.admin,
+        allowApiUpdate: Roles.board,
         caption: terms.board
     })
     board: Boolean = false;
 
     @Field({
-        allowApiUpdate: Roles.admin,
+        allowApiUpdate: Roles.board,
         caption: terms.manager
     })
     manager: Boolean = false;
 
     @Field({
-        allowApiUpdate: Roles.admin,
+        allowApiUpdate: Roles.manager,//by adding new volunteer for his branch
         caption: terms.volunteer
     })
     volunteer: Boolean = false;
+
+    @Field({ caption: terms.active })
+    active: boolean = true;
 
     constructor(private remult: Remult) {
         super();
@@ -145,7 +153,11 @@ export class Users extends IdEntity {
         return !this.password || (await import('password-hash')).verify(password, this.password);
     }
     @BackendMethod({ allowed: true })
-    async create(password: string) {
+    async create(password: string = '') {
+        console.log(this);
+        if (!password || password.trim().length === 0) {
+            password = process.env.DEFAULT_PASSWORD!;
+        }
         if (!this._.isNew())
             throw new Error(terms.invalidOperation);
         await this.hashAndSetPassword(password);

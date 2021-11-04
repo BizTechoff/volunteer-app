@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ChartOptions, ChartType } from 'chart.js';
+import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { BackendMethod, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
 import { EmailSvc } from '../../common/utils';
-import { ChartType, ChartOptions, Chart } from 'chart.js';
-import { SingleDataSet, Label, Color } from 'ng2-charts';
 import { terms } from '../../terms';
 import { Activity, ActivityStatus } from '../activity/activity';
 
@@ -17,40 +17,52 @@ export class CurrentStateComponent implements OnInit {
   public pieChartOptions: ChartOptions = {
     responsive: true, defaultColor: 'red'
   };
-  public pieChartColors: Color[] = [
-    // { backgroundColor: 'pink' },
-    // { backgroundColor: 'blue' },
-    // { backgroundColor: 'yellow' },
-    // { backgroundColor: 'red' }
-  ];
-  public pieChartLegend = true;
-  public pieChartLabels: Label[] = [
-    terms.activities + ' ' + terms.opens,
-    terms.activities + ' ' + terms.inProgress,
-    terms.activities + ' ' + terms.endSuccess,
-    terms.problems];
-  public pieChartData: SingleDataSet = [300, 500, 100, 25];
+  public pieChartColors: Color[] = [];
+  public pieChartLabels: Label[] = [];
+  public pieChartData: SingleDataSet = [];
   public pieChartType: ChartType = 'pie';
+  public pieChartLegend = true;
   public pieChartPlugins = [];
-  
-  activities : {status: ActivityStatus, count: number}[] = [];
+
+  activities: { status: ActivityStatus, count: number }[] = [];
 
   constructor(private remult: Remult, private dialog: DialogService) {
 
   }
 
-  ngOnInit() {
-   
+  async ngOnInit() {
+    await this.refresh();
   }
 
-  async refresh(){
-    let acts = await this.remult.repo(Activity).find();
-    for (const a of acts) {
-      // let found = this.activities.find()
-      // if(!this.activities.values)
-      // this.activities.push({
-      //   status: a.status
-      // });
+  async refresh() {
+    for await (const a of this.remult.repo(Activity).iterate({})) {
+      let found = this.activities.find(itm => itm.status === a.status);
+      if (!found) {
+        found = { status: a.status, count: 0 };
+        this.activities.push(found);
+      }
+      ++found.count;
+    }
+
+    this.pieChartColors = [{ backgroundColor: 'pink' }];
+    this.pieChartLabels = [];
+    this.pieChartData = [];
+    for (const a of this.activities) {
+      // this.pieChartColors.push( { backgroundColor: a.color });
+      let label = a.status.caption;
+      if (a.status === ActivityStatus.fail) {
+        label = terms.activities + ' ' + label;
+      }
+      this.pieChartLabels.push(label);
+      this.pieChartData.push(a.count);
+    }
+  }
+  
+  public chartClicked(e: any): void {
+    if (e.active && e.active.length > 0) {
+      let index = e.active[0]._index;
+      // this.selectedStatus = this.statuses.statuses[index];
+      // this.refreshDeliveries();
     }
   }
 

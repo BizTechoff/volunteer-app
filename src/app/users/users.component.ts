@@ -29,7 +29,6 @@ export class UsersComponent implements OnInit {
     columnSettings: users => [
       users.name,
       {
-
         field: users.admin, //width: '80',
         valueChange: user => () => {
           if (user.admin) {

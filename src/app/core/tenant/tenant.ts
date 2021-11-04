@@ -12,15 +12,12 @@ import { Roles } from "../../users/roles";
     },
     async (options, remult) => {
         options.apiPrefilter = (tnt) => {
+            let active = FILTER_IGNORE;// tnt.active.isEqualTo(true);
             if (!(remult.isAllowed(Roles.board)))//manager|volunteer
             {
-                return tnt.bid.isEqualTo(remult.user.bid);//only same branch
-                // if (!remult.isAllowed(Roles.manager)) {
-                //     return FILTER_RESTRICT;//volunteer only himself
-                // }  
-                // return tnt.bid.isEqualTo(remult.user.bid);//manager only his branch
+                return active.and( tnt.bid.isEqualTo(remult.user.bid));//only same branch
             }
-            return FILTER_IGNORE!;// all
+            return active;// all
         };
         // options.deleting = async (tnt) => {
         //     let found = await remult.repo(Activity).findFirst(_ => _.tid.isEqualTo(tnt.id));
@@ -40,6 +37,11 @@ export class Tenant extends IdEntity {
     }
 
     @Field({
+        caption: terms.branch, validate: StringRequiredValidation
+    })
+    bid: string = '';
+
+    @Field({
         caption: terms.name,
         validate: StringRequiredValidation
     })
@@ -54,18 +56,13 @@ export class Tenant extends IdEntity {
     @Field({ caption: terms.address, validate: StringRequiredValidation })
     address: string = '';
 
-    @Field({ caption: terms.status })
-    status: string = '';
+    @Field({ caption: terms.active })
+    active: boolean = true;
 
     @Field({ caption: terms.defaultVolunteers })
     defVids: string[] = [];
 
     @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
     birthday!: Date;
-
-    @Field({
-        caption: terms.branch, validate: StringRequiredValidation
-    })
-    bid: string = '';
 
 }
