@@ -1,19 +1,56 @@
 <div class="full-page">
     <div class="header" style="margin: 1em;">
-        <button mat-mini-fab color='primary' (click)='this.refresh()'>
-            <mat-icon>refresh</mat-icon>
-        </button>
-    </div>
+        <div style="display: flex; flex-direction: row; justify-content: start;">
+            <button mat-mini-fab color='primary' (click)='this.refresh()'>
+                <mat-icon>refresh</mat-icon>
+            </button>
+            <data-control style="width: 100%;" [field]="this.$.branch"></data-control>
+        </div>
+    </div> 
     <div class="grow-item">
-        <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: center;">
-            <!-- <div style="display: block;"> -->
-            <!-- <button (click)="sendEmail()">שליחת מייל בדיקה</button> -->
-            <canvas baseChart [colors]="pieChartColors" [data]="pieChartData" [labels]="pieChartLabels"
-                [chartType]="pieChartType" [options]="pieChartOptions" [plugins]="pieChartPlugins"
-                [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
-            </canvas>
-            <!-- </div> -->
+        <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-around; flex-wrap: wrap;">
+            <div style="display: block; width:420px;">
+                <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataStatuses" [labels]="pieChartLabelsStatuses"
+                    [chartType]="pieChartType" [options]="pieChartOptionsByStatuses" [plugins]="pieChartPlugins"
+                    [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                </canvas>
+            </div>
+            <div style="display: block; width:420px;">
+                <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataPurposes" [labels]="pieChartLabelsPurposes"
+                    [chartType]="pieChartType" [options]="pieChartOptionsByPurpose" [plugins]="pieChartPlugins"
+                    [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                </canvas>
+            </div>
+            <!-- <div style="display: block; width:420px;">
+                <canvas baseChart [colors]="pieChartColors" [data]="pieChartData" [labels]="pieChartLabels"
+                    [chartType]="pieChartType" [options]="pieChartOptions" [plugins]="pieChartPlugins"
+                    [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                </canvas>
+            </div> -->
+            <!-- </div>
+        <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;"> -->
+            
+            <div style="display: block; width:420px;">
+                <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataWeekDay" [labels]="pieChartLabelsWeekDay"
+                    [chartType]="pieChartType" [options]="pieChartOptionsByWeekDay" [plugins]="pieChartPlugins"
+                    [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                </canvas>
+            </div> 
+            <div style="display: block; width:420px;">
+                <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataDayPeriods" [labels]="pieChartLabelsDayPeriods"
+                    [chartType]="pieChartType" [options]="pieChartOptionsByDayPeriods" [plugins]="pieChartPlugins"
+                    [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                </canvas>
+            </div>
+            <!-- <div style="display: block; width:420px;">
+                <canvas baseChart [colors]="pieChartColors" [data]="pieChartData" [labels]="pieChartLabels"
+                    [chartType]="pieChartType" [options]="pieChartOptions" [plugins]="pieChartPlugins"
+                    [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                </canvas>
+            </div> -->
         </div>
     </div>
-    <div class="footer" style="margin: 1em;"></div>
+    <div class="footer" style="margin: 1em;">
+        <span> נכון ל: {{ this.refreshedTime }} </span>
+    </div>
 </div>

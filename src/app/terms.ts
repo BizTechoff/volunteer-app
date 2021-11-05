@@ -1,4 +1,8 @@
 export const terms = {
+    activitiesByWeekDay: 'פעילויות לפי ימי השבוע',
+    activitiesByPurpose: 'פעילויות לפי מטרות',
+    activitiesByStatuses: 'פעילויות לפי סטטוסים',
+    activitiesByDayPeriods: 'פעילויות לפי זמני היום',
     refresh: 'רענן',
     addActivityToCurrentTenant:'הוסף פעילות לדייר זה',
     shouldAddActivity: 'האם להוסיף ל!t.name! פעילות חדשה?',
@@ -96,3 +100,4 @@ declare module 'remult' {
     }
 }
 
+ 

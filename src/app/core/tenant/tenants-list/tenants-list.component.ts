@@ -56,6 +56,11 @@ export class TenantsListComponent implements OnInit {
           visible: (_) => !_.isNew(),
           textInMenu: terms.tenantDetails,
           click: async (_) => await this.addTenant(_)
+        },
+        {
+          visible: (_) => !_.isNew(),
+          textInMenu: terms.showActivities,
+          click: async (_) => await this.showActivities(_)
         }
       ]
     }
@@ -68,6 +73,15 @@ export class TenantsListComponent implements OnInit {
 
   async refresh() {
     await this.tenants.reloadData();
+  }
+
+  async showActivities(tnt: Tenant) {
+    // let changes = await openDialog(ActivityDetailsComponent,
+    //   _ => _.args = { bid: tnt.bid, tid: tnt.id },
+    //   _ => _ ? _.args.changed : false);
+    // if (changes) {
+    //   await this.refresh();
+    // }
   }
 
   async openActivity(tnt: Tenant) {

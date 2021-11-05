@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { BackendMethod, DateOnlyField, Field, getFields, Remult } from 'remult';
+import { DataControl, GridSettings } from '@remult/angular';
+import { DateOnlyField, getFields, Remult } from 'remult';
 import { Activity } from '../../core/activity/activity';
 import { terms } from '../../terms';
-import { Roles } from '../../users/roles';
 
 @Component({
   selector: 'app-activity-daily',
@@ -12,23 +12,36 @@ import { Roles } from '../../users/roles';
 export class ActivityDailyComponent implements OnInit {
 
   activities = [] as Activity[];
+  grid = new GridSettings<Activity>(this.remult.repo(Activity),
+    {
+      where: row => row.date.isEqualTo(this.selectedDate),
+      allowCrud: false,
+      columnSettings: (_) => [
+        _.tid,
+        _.vids,
+        _.remark
+      ]
+    });
 
   constructor(private remult: Remult) { }
 
   terms = terms;
   get $() { return getFields(this, this.remult) };
 
+  @DataControl<ActivityDailyComponent>({ valueChange: async (r, v) => { await r.retrieve(); } })
   @DateOnlyField({ caption: terms.selectDate })
   selectedDate: Date = new Date();
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    await this.retrieve();
   }
 
   async retrieve() {
-    this.activities = await this.getDailyActivities(this.selectedDate, this.remult);
+    await this.grid.reloadData();
+    // this.activities = await this.getDailyActivities(this.selectedDate, this.remult);
   }
 
-  async print(){
+  async print() {
     window.print();
   }
 
@@ -37,7 +50,7 @@ export class ActivityDailyComponent implements OnInit {
     var result = [] as Activity[];
     for await (const a of remult!.repo(Activity).iterate({
       where: row => row.date.isEqualTo(date)
-    })) { 
+    })) {
       result.push(a);
     }
     return result;

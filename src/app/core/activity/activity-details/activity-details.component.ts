@@ -73,7 +73,7 @@ export class ActivityDetailsComponent implements OnInit {
       fields: () => [
         [
           { field: this.activity.$.tid, readonly: true },
-          { field: this.activity.$.status, readonly: true }
+          { field: this.activity.$.status }//, readonly: true }
         ]
       ]
     })
