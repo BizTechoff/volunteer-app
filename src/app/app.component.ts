@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  usersCount = 1;
+  usersCount = 0;
   async ngOnInit() {
     // this.usersCount = await this.remult.repo(Users).count();
   }

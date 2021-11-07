@@ -1,4 +1,5 @@
 <div style="height:100%;display:flex;flex-direction: column;">
+  <!-- <mat-toolbar color="primary" style="flex-shrink: 0; background-image: linear-gradient(90deg, #F69A48, #2CBCC1)"> -->
   <mat-toolbar color="primary" style="flex-shrink: 0;">
     <button mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
@@ -19,7 +20,7 @@
     <!-- <ng-container>
       <span class="toolbar-title">{{ 'ב"ה, כ"ה חשון ה` אלפים תשפ"ב' }}</span>
     </ng-container> -->
-  </mat-toolbar> 
+  </mat-toolbar>
   <mat-sidenav-container class="app-sidenav-container">
     <mat-sidenav #sidenav class="app-sidenav mat-elevation-z10 no-print" [opened]="!dialogService.isScreenSmall()"
       [mode]="dialogService.isScreenSmall()?'over':'side'">

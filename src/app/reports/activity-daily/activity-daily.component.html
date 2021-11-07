@@ -3,7 +3,7 @@
         <div style="display: flex; flex-direction: row; justify-content: start; ">
 
             <data-control [field]='this.$.selectedDate'></data-control>
-            <button mat-mini-fab color='primary' (click)='this.retrieve()'>
+            <button mat-mini-fab color='primary' (click)='this.refresh()'>
                 <mat-icon>refresh</mat-icon>
             </button>
             <button mat-mini-fab color='primary' (click)='this.print()'>
@@ -14,7 +14,7 @@
     <div class="grow-item">
         <data-grid [settings]="grid"></data-grid>
         <!-- <div class="ng-container"> -->
-            <table>
+            <!-- <table>
                 <thead>
                     <th> {{ terms.tenant }} </th>
                     <th> {{ terms.volunteer }} </th>
@@ -27,7 +27,7 @@
                         <td> {{ a.remark }} </td>
                     </tr>
                 </tbody>
-            </table>
+            </table> -->
         <!-- </div> -->
     </div>
     <div class="footer">

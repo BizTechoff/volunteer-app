@@ -20,6 +20,13 @@ export class ActivityDailyComponent implements OnInit {
         _.tid,
         _.vids,
         _.remark
+      ],
+      gridButtons: [
+        {
+          textInMenu: () => terms.refresh,
+          icon: 'refresh',
+          click: async () => { await this.refresh(); }
+        }
       ]
     });
 
@@ -28,15 +35,15 @@ export class ActivityDailyComponent implements OnInit {
   terms = terms;
   get $() { return getFields(this, this.remult) };
 
-  @DataControl<ActivityDailyComponent>({ valueChange: async (r, v) => { await r.retrieve(); } })
+  @DataControl<ActivityDailyComponent>({ valueChange: async (r, v) => { await r.refresh(); } })
   @DateOnlyField({ caption: terms.selectDate })
   selectedDate: Date = new Date();
 
   async ngOnInit() {
-    await this.retrieve();
+    await this.refresh();
   }
 
-  async retrieve() {
+  async refresh() {
     await this.grid.reloadData();
     // this.activities = await this.getDailyActivities(this.selectedDate, this.remult);
   }

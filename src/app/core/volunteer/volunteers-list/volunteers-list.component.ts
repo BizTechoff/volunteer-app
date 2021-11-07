@@ -27,9 +27,7 @@ export class VolunteersListComponent implements OnInit {
       where: _ => _.volunteer.isEqualTo(true)
         .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid)),
       newRow: _ => _.volunteer = true,
-      allowInsert: true,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
-      allowDelete: true,
-      allowUpdate: true,// this.remult.isAllowed(Roles.manager),
+      allowCrud: false,
       // allowSelection: true,
       numOfColumnsInGrid: 10,
       columnSettings: _ => [
@@ -47,11 +45,20 @@ export class VolunteersListComponent implements OnInit {
       ],
       rowButtons: [
         {
-          //  visible: (v) => { return  this.showActivities(v)},
-          textInMenu: terms.showActivities
+          textInMenu: terms.volunteerDetails,
+          icon: 'edit',
+          click: async (u) => await this.addVolunteer(u)
         },
         {
-          textInMenu: terms.volunteerDetails
+          //  visible: (v) => { return  this.showActivities(v)},
+          textInMenu: terms.showActivities,
+          icon: 'list'
+        },
+        {
+          visible: (_) => !_.isNew(),
+          textInMenu: terms.deleteVolunteer,
+          icon: 'delete',//,
+          // click: async (_) => await this.addTenant(_)
         }
       ]
     }
@@ -72,23 +79,26 @@ export class VolunteersListComponent implements OnInit {
 
   async showActivities(user: Users) {
     return true;
-  } 
-  
-  async addVolunteer() {
-    let u = this.remult.repo(Users).create();
-    u.volunteer = true;
-    u.bid = this.isBoard() ? '' : this.remult.user.bid;
+  }
+
+  async addVolunteer(u?: Users) {
+    if (!u) {
+      u = this.remult.repo(Users).create();
+      u.volunteer = true;
+      u.bid = this.isBoard() ? '' : this.remult.user.bid;
+    }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
-        title: terms.addVolunteer,
+        title: u!.isNew() ? terms.addVolunteer : terms.volunteerDetails,
         fields: () => [
-          { field: u.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
-          { field: u.$.name, caption: terms.name },
-          u.$.mobile,
-          u.$.email,
-          u.$.birthday,
-          { field: u.$.defTid, caption: terms.defaultTenant }],
-        ok: async () => { await u.create(); }
+          { field: u!.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
+          { field: u!.$.name, caption: terms.name },
+          u!.$.mobile,
+          u!.$.langs,
+          u!.$.birthday,
+          u!.$.email,
+          { field: u!.$.defTid, caption: terms.defaultTenant }],
+        ok: async () => { await u!.create(); }
       },
       _ => _ ? _.ok : false);
     if (changed) {

@@ -33,6 +33,7 @@ import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuar
 import { UsersComponent } from './users/users.component';
 import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
+import { VolunteersAssignmentComponent } from './core/volunteer/volunteers-assignment/volunteers-assignment.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.
     VolunteerDetailsComponent,
     ActivityDetailsComponent,
     VolunteerActivitiesComponent,
-    ActivityDailyComponent
+    ActivityDailyComponent,
+    VolunteersAssignmentComponent
   ],
   imports: [
     BrowserModule,
@@ -70,9 +72,9 @@ import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.
     RemultModule,
     BrowserAnimationsModule,
     ChartsModule
-  ],
+  ], 
   providers: [DialogService, AdminGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
-  entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent]
+  entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent]
 })
 export class AppModule { }

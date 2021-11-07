@@ -1,4 +1,10 @@
 export const terms = {
+    yoursDetailsSuccesfulySaved: 'פרטים עודכנו בהצלחה',
+    langs:'שפות',
+    mustSetBidForThisAction: 'חובה לבחור סניף לפני ביצוע שיבוץ',
+    selected: 'נבחרו',
+    deleteVolunteer: 'מחיקת מתנדב',
+    deleteTenant:'מחיקת דייר',
     activitiesByWeekDay: 'פעילויות לפי ימי השבוע',
     activitiesByPurpose: 'פעילויות לפי מטרות',
     activitiesByStatuses: 'פעילויות לפי סטטוסים',
@@ -34,9 +40,10 @@ export const terms = {
     passwordReset: 'סיסמא אופסה',
     resetPassword: 'איפוס סיסמא',
     tenantDetails: 'פרטי דייר',
+    delete:'מחק',
     volunteerDetails: 'פרטי מתנדב',
     activityDetails: 'פרטי פעילות',
-    activity: 'פעילות',
+    activity: 'פעילות', 
     defaultTenant: 'דייר ברירת מחדל',
     entityType: 'סוג ישות',
     entityId: 'מזהה ישות',
@@ -99,5 +106,5 @@ declare module 'remult' {
         bid: string;
     }
 }
-
+ 
  

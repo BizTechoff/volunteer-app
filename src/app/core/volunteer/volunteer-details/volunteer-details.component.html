@@ -1,1 +1,15 @@
-<p>volunteer-details works!</p>
+<div class="full-page">
+    <div class="header">
+        <button mat-raised-button color="accent" (click)="update()">
+            Update
+        </button>
+    </div>
+    <div class="grow-item">
+        <mat-card *ngIf="this.details">
+            <data-area [settings]="this.details"></data-area>
+        </mat-card>
+    </div>
+    <div class="footer">
+
+    </div>
+</div>

@@ -1,5 +1,9 @@
 <div class="full-page">
-    <div class="header"></div>
+    <div class="header">
+        <button mat-mini-fab color="primary" (click)="this.refresh()">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
     <div class="grow-item">
 
         <div style="display: flex; flex-direction: column; justify-content: center;">
@@ -11,6 +15,9 @@
                         {{ a.fh }} - {{ a.th }}
                     </mat-card-content>
                 </mat-card>
+                <button>התחלתי</button>
+                <button>סיימתי</button>
+                <button>ישנה בעיה</button>
             </ng-container>
         </div>
 

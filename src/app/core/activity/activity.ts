@@ -1,4 +1,4 @@
-import { DataControl } from "@remult/angular";
+import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { FILTER_IGNORE, StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
@@ -193,8 +193,8 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.tenant })
     tid: string = '';
-
-    @Field({ caption: terms.volunteers })
+    
+    @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
     vids: string[] = [];
 
     @DateOnlyField({ caption: terms.date })

@@ -50,18 +50,21 @@ export class ActivitiesListComponent implements OnInit {
       rowButtons: [
         {
           visible: (_) => !_.isNew(),
+          textInMenu: terms.addActivityToCurrentTenant,
+          icon: 'add',
+          click: async (_) => await this.addActivityToCurrentTenant(_)
+        },
+        {
+          visible: (_) => !_.isNew(),
           textInMenu: terms.activityDetails,
+          icon: 'edit',
           click: async (_) => await this.showActivityDetails(_)
         },
         {
           visible: (_) => !_.isNew(),
           textInMenu: terms.cancelActivity,
+          icon: 'cancel',
           click: async (_) => await this.cancelActivity(_)
-        },
-        {
-          visible: (_) => !_.isNew(),
-          textInMenu: terms.addActivityToCurrentTenant,
-          click: async (_) => await this.addActivityToCurrentTenant(_)
         }
       ]
     }

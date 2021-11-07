@@ -1,23 +1,21 @@
 <div class="ng-container">
     <div class="header">
-            <div style="display: flex; flex-direction: column; justify-content: space-between; ">
-                <div style="display: flex; flex-direction: row; justify-content: space-evenly;">
-                    <div style="display: flex;">
-                        <button mat-icon-button mat-dialog-close title="סגור" (click)="close()">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </div>
-                    <div style="display: flex;">
-                        <h2> {{ this.terms.activityDetails }} </h2>
-                    </div>
-                    <div style="display: flex;">
-                        <button (click)='saveAndClose()'> {{ terms.saveAndClose }} </button>
-                    </div>
-                </div>
-                <div style="display: flex;">
-                    <data-area [settings]='this.top'></data-area>
-                </div>
+        <div style="display: flex; flex-direction: row; justify-content: space-between; ">
+            <div style="display: flex; flex-direction: row; justify-content: start;">
+                <button mat-icon-button mat-dialog-close title="סגור" (click)="close()">
+                    <mat-icon>close</mat-icon>
+                </button>
+                <h2> {{ this.terms.activityDetails }} </h2>
             </div>
+            <div style="display: flex; flex-direction: row; justify-content: end;">
+                <button mat-flat-button color="primary"  style="height: 35px;"
+                (click)='saveAndClose()'>
+                {{ terms.saveAndClose }} 
+            </button>
+            </div>
+        </div>
+
+        <data-area [settings]='this.top'></data-area>
 
 
     </div>

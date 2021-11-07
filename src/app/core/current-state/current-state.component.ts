@@ -21,24 +21,28 @@ export class CurrentStateComponent implements OnInit {
   @Field({ caption: terms.branch })
   branch: string = '';
 
-  colors = {
-    blue2: '36a2eb'
-    , purple: 'cc65fe'
-    , yellow2: 'ffce56',
-    yellow: '#FDE098'//yello
-    , orange: '#FAC090'//orange
-    , blue: '#84C5F1'//blue
-    , green: '#91D7D7'//green
-    , red: '#FD9FB3'//red
-    , red2: 'ff6384'
+  // colors = {
+  //   blue2: '36a2eb'
+  //   , purple: 'cc65fe'
+  //   , yellow2: 'ffce56',
+  //   yellow: '#FDE098'//yello
+  //   , orange: '#FAC090'//orange
+  //   , blue: '#84C5F1'//blue
+  //   , green: '#91D7D7'//green
+  //   , red: '#FD9FB3'//red
+  //   , red2: 'ff6384'
 
-  };
-  colors2 = [
-    '#FDE098',//yello
-    '#FAC090',//orange
-    '#84C5F1',//blue
+  // }; 
+  colors = [
     '#91D7D7',//green
+    '#FAC090',//orange
+    '#FDE098',//yello
+    '#84C5F1',//blue
     '#FD9FB3',//red
+    'ffce56',//yellow2
+    'cc65fe',//purple
+    '36a2eb',//blue2
+    'ff6384',//red2
     'gray'
   ];
 
@@ -204,7 +208,7 @@ export class CurrentStateComponent implements OnInit {
   }
 
   setChart() {
-    this.pieChartColors = [{ backgroundColor: this.colors2 }];
+    this.pieChartColors = [{ backgroundColor: this.colors }];
     this.pieChartLabelsStatuses = [];
     this.pieChartDataStatuses = [];
     this.pieChartLabelsPurposes = [];

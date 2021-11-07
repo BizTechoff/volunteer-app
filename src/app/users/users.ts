@@ -1,10 +1,27 @@
 
 import { InputField } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
+import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
 import { terms } from "../terms";
 import { Roles } from './roles';
+
+
+@ValueListFieldType(Langs, { /*multi: true*/ })
+export class Langs {
+    static hebrew = new Langs(1, 'עברית');
+    static english = new Langs(2, 'אנגלית');
+    static russian = new Langs(3, 'רוסית');
+    static french = new Langs(4, 'צרפתית');
+    constructor(public id: number, public caption: string) { }
+    
+    static getOptions() {
+        let op = new ValueListValueConverter(Langs).getOptions();
+        return op;
+    }
+
+}
 
 @Entity<Users>("Users", {
     allowApiRead: Allow.authenticated,
@@ -76,6 +93,9 @@ export class Users extends IdEntity {
 
     @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
     numOfActivities: number = 0;
+
+    @Field({ caption: terms.langs })
+    langs: Langs = Langs.hebrew;
 
     @Field({
         validate: [StringRequiredValidation, Validators.unique],

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DataAreaSettings } from '@remult/angular';
-import { Field, getFields, Remult } from 'remult';
+import { DataAreaSettings, openDialog } from '@remult/angular';
+import { getFields, Remult } from 'remult';
+import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Photo } from '../../photo';
-import { Activity } from '../activity';
+import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
+import { Activity, ActivityStatus } from '../activity';
 
 @Component({
   selector: 'app-activity-details',
@@ -27,11 +29,11 @@ export class ActivityDetailsComponent implements OnInit {
   fields = new DataAreaSettings({});
   images: Photo[] = [];
   terms = terms;
-  @Field({ caption: terms.branch })
-  bid: string = '';
+  // @Field({ caption: terms.branch })
+  // bid: string = '';
   get $() { return getFields(this, this.remult) };
 
-  constructor(private remult: Remult, private win: MatDialogRef<any>) { }
+  constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) { }
 
   async ngOnInit() {
     if (!this.args) {
@@ -80,7 +82,7 @@ export class ActivityDetailsComponent implements OnInit {
     this.fields = new DataAreaSettings({
       fields: () => [
         { field: this.activity.$.bid, visible: (r, v) => this.isBoard() },
-        this.activity.$.vids,
+        { field: this.activity.$.vids, clickIcon: 'search', click: async () => await this.openAssignment() },
         this.activity.$.purpose,
         this.activity.$.purposeDesc,
         this.activity.$.date,
@@ -88,6 +90,32 @@ export class ActivityDetailsComponent implements OnInit {
         { field: this.activity.$.remark, caption: terms.commentAndSummary }
       ]
     });
+  }
+
+  async openAssignment() {
+
+    let bidOk = (this.activity.bid && this.activity.bid.length > 0 && this.activity.bid !== '0')!;
+    if (bidOk) { 
+      let vids = await openDialog(VolunteersAssignmentComponent,
+        input => input.args = { 
+          bid: this.activity.bid, 
+          aid: this.activity.id, 
+          tname: this.activity.tid, 
+          langs: '',// this.t.langs, 
+          vids: this.activity.vids },
+        output => output ? output.args.changed ? output.args.vids : undefined : undefined);
+      console.log(vids);
+      if (vids) {
+        this.activity.vids = vids;
+        if (vids.length > 0) {
+          this.activity.status = ActivityStatus.w4_start;
+        }
+        // await this.refresh();
+      }
+    }
+    else {
+      await this.dialog.error(terms.mustSetBidForThisAction);
+    }
   }
 
   async saveAndClose() {

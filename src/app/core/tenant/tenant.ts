@@ -2,6 +2,7 @@ import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Valid
 import { DateRequiredValidation, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { Langs } from "../../users/users";
 
 @Entity<Tenant>('tenants',
     {
@@ -55,6 +56,9 @@ export class Tenant extends IdEntity {
 
     @Field({ caption: terms.address, validate: StringRequiredValidation })
     address: string = '';
+
+    @Field({ caption: terms.langs })
+    langs: Langs = Langs.hebrew;
 
     @Field({ caption: terms.active })
     active: boolean = true;
