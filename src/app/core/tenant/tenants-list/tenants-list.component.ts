@@ -16,7 +16,7 @@ import { Tenant } from '../tenant';
 })
 export class TenantsListComponent implements OnInit {
 
-  @DataControl<TenantsListComponent>({ valueChange: async (r, v) => await r.refresh() })
+  @DataControl<TenantsListComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForTenantNameHere}` })
   search: string = ''
 
@@ -24,9 +24,9 @@ export class TenantsListComponent implements OnInit {
   terms = terms;
   tenants: GridSettings<Tenant> = new GridSettings<Tenant>(
     this.remult.repo(Tenant),
-    {
-      where: _ => this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid)
-        .and(this.search && this.search.trim().length > 0 ? _.name.contains(this.search) : FILTER_IGNORE),
+    { 
+      where: _ => (this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid))
+        .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
       numOfColumnsInGrid: 10,
       columnSettings: t => [
@@ -34,8 +34,8 @@ export class TenantsListComponent implements OnInit {
         t.name,
         t.mobile,
         t.address,
-        t.langs,
         t.birthday,
+        t.langs,
         t.defVids],
       gridButtons: [
         {
@@ -116,8 +116,8 @@ export class TenantsListComponent implements OnInit {
           t!.$.name,
           t!.$.mobile,
           t!.$.address,
-          t!.$.langs,
           t!.$.birthday,
+          t!.$.langs,
           t!.$.defVids],
         ok: async () => { await t!.save(); }
       },

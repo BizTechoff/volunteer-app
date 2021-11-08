@@ -22,7 +22,7 @@ export class VolunteersAssignmentComponent implements OnInit {
     vids: string[]
   } = { bid: '', aid: '', tname: '', langs: '', changed: false, vids: [] };
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
-  @Field({ caption: `${terms.serachForVolunteerHere}` })
+  @Field({ caption: `${terms.serachForTenantNameHere}` })
   search: string = ''
 
   volunteers = new GridSettings<Users>(this.remult.repo(Users),
@@ -59,9 +59,9 @@ export class VolunteersAssignmentComponent implements OnInit {
 
   async refresh() {
     await this.volunteers.reloadData();
-    for (let i = 0; i < 30; ++i) {
-      this.volunteers.addNewRow();
-    }
+    // for (let i = 0; i < 30; ++i) {
+    //   this.volunteers.addNewRow();
+    // }
   }
 
   select() {

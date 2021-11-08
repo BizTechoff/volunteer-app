@@ -34,6 +34,7 @@ import { UsersComponent } from './users/users.component';
 import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
 import { VolunteersAssignmentComponent } from './core/volunteer/volunteers-assignment/volunteers-assignment.component';
+import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { VolunteersAssignmentComponent } from './core/volunteer/volunteers-assig
     ActivityDetailsComponent,
     VolunteerActivitiesComponent,
     ActivityDailyComponent,
-    VolunteersAssignmentComponent
+    VolunteersAssignmentComponent,
+    PhotosAlbumComponent
   ],
   imports: [
     BrowserModule,

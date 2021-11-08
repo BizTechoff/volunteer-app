@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GridSettings, openDialog } from '@remult/angular';
+import { DataControl, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
@@ -14,7 +14,7 @@ import { Users } from '../../../users/users';
 })
 export class VolunteersListComponent implements OnInit {
 
-  // @DataControl({ clickIcon: 'search', allowClick: () => true, click: () => {} })
+  @DataControl<VolunteersListComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForVolunteerHere}` })
   search: string = ''
 
@@ -25,7 +25,8 @@ export class VolunteersListComponent implements OnInit {
     this.remult.repo(Users),
     {
       where: _ => _.volunteer.isEqualTo(true)
-        .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid)),
+        .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid))
+        .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
       newRow: _ => _.volunteer = true,
       allowCrud: false,
       // allowSelection: true,

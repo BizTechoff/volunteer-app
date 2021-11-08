@@ -66,15 +66,17 @@ export class ActivityDayPeriod {
 })
 export class ActivityStatus {
     // static none = new ActivityStatus(0, 'ללא');
-    static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ');
-    static w4_start = new ActivityStatus(2, 'ממתין להתחלה');
-    static w4_end = new ActivityStatus(3, 'ממתין לסיום');
-    static success = new ActivityStatus(4, 'הסתיים בהצלחה');
-    static fail = new ActivityStatus(5, 'הסתיים בבעיה');
-    static cancel = new ActivityStatus(6, 'בוטל');
+    static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ', () => ActivityStatus.w4_start);
+    static w4_start = new ActivityStatus(2, 'ממתין להתחלה', () => ActivityStatus.w4_end);
+    static w4_end = new ActivityStatus(3, 'ממתין לסיום',  () => ActivityStatus.success);
+    static success = new ActivityStatus(4, 'הסתיים בהצלחה', () => undefined);
+    static fail = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined);
+    static cancel = new ActivityStatus(6, 'בוטל', () => undefined);
 
-    constructor(public id: number, public caption: string) { }
+    constructor(public id: number, public caption: string, public next: () => ActivityStatus | undefined) { }
     // id:number;
+
+    
 
     static getOptions() {
         let op = new ValueListValueConverter(ActivityStatus).getOptions();
@@ -112,7 +114,7 @@ export class ActivityStatus {
 @ValueListFieldType(ActivityGeneralStatus)
 export class ActivityGeneralStatus {
     static opens = new ActivityGeneralStatus(1, 'פתוחות', ActivityStatus.openStatuses());
-    static inProgress = new ActivityGeneralStatus(2, 'בתהליך', ActivityStatus.inProgressStatuses());
+    // static inProgress = new ActivityGeneralStatus(2, 'בתהליך', ActivityStatus.inProgressStatuses());
     static closed = new ActivityGeneralStatus(3, 'סגורות', ActivityStatus.closeStatuses());
     static problems = new ActivityGeneralStatus(4, 'בעיות', ActivityStatus.problemStatuses());
     static all = new ActivityGeneralStatus(0, 'הכל', ActivityStatus.getOptions());
@@ -176,7 +178,7 @@ export class Activity extends IdEntity {
     // constructor(private remult: Remult){super();}
     // @DataControl<Activity>({
     //     click: async (a) => {
-    //         await openDialog(TenantDetailsComponent);
+    //         await openDialog(DynamicSelect(Branch));
     //         a.bid = '888';
     //     }
     // }) 
@@ -190,7 +192,15 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.desc })
     purposeDesc: string = '';
-
+    
+    // @DataControl<Tenant>({ האם הוא מחובר למזהה של היישות? היכן אמור להיות הקליק לבחירה מרשימה
+    //     click: async (a) => {
+    //         await openDialog(DynamicSelect(Tenant));
+    //         a.bid = '888';
+    //     }
+    // })
+    // @Field({ valueType: Tenant }, { caption: terms.tenant })
+    // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
     @Field({ caption: terms.tenant })
     tid: string = '';
     

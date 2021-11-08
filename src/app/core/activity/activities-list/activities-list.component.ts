@@ -33,13 +33,14 @@ export class ActivitiesListComponent implements OnInit {
       columnSettings: _ => [
         { field: _.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
         _.tid,
+        _.vids,
         _.status,
         _.purpose,
         _.purposeDesc,
         _.date,
         _.fh,
         _.th,
-        _.vids],
+        _.remark],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,

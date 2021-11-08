@@ -1,5 +1,5 @@
 <div class="full-page">
-    <div class="header">
+    <div class="header" style="padding-bottom: 10px;">
         <button mat-mini-fab color="primary" (click)="this.refresh()">
             <mat-icon>refresh</mat-icon>
         </button>
@@ -7,17 +7,52 @@
     <div class="grow-item">
 
         <div style="display: flex; flex-direction: column; justify-content: center;">
-            <ng-container *ngFor='let a of this.activities'>
+            <ng-container style="margin-top: 7px;" *ngFor='let a of this.activities'>
                 <mat-card>
-                    <mat-card-title> {{ a.tid }} </mat-card-title>
-                    <mat-card-content>
-                        {{ a.date | date:'dd.MM.yyyy' }}
-                        {{ a.fh }} - {{ a.th }}
-                    </mat-card-content>
+                    <mat-card-title> 
+                        {{ a.tid }}
+                        <button mat-mini-fab (click)="this.openPhotosAlbum(a)">
+                            <mat-icon>camera</mat-icon>
+                        </button>
+                        <span *ngIf="this.showClosedActivitySign(a)">
+                            <h2 style="width: 70px; background: darkblue; color: white; transform: rotate(45deg); display: inline-block">{{ a.status.caption }}</h2>
+                        </span>
+                    </mat-card-title>
+                    <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
+                        <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-start;">
+                            <div>
+                                {{ a.date | date:'dd.MM.yyyy' }}
+                            </div>
+                            <div>
+                                {{ a.fh }} - {{ a.th }}
+                            </div>
+                            <div>
+                                {{ 'שפות' }}
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;">
+                            <div>
+                                {{ a.purpose.caption }}
+                            </div>
+                            <div>
+                                {{ a.purposeDesc? a.purposeDesc : '(אין תיאור)' }}
+                            </div>
+                            <div>
+                                {{ a.remark? a.remark :  '(אין סיכום פגישה)' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
+                        <button (click)='this.setNextStatus(a)' *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
+                            style="margin-top: 7px; background: blue; color: white;">התחלתי</button>
+                        <button (click)='this.setNextStatus(a)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
+                            style="margin-top: 7px; background: green; color: white;">סיימתי</button>
+                        <button (click)='this.setNextStatus(a)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
+                            style="margin-top: 7px; background: red; color: white;">ישנה
+                            בעיה</button>
+                    </div>
                 </mat-card>
-                <button>התחלתי</button>
-                <button>סיימתי</button>
-                <button>ישנה בעיה</button>
             </ng-container>
         </div>
 

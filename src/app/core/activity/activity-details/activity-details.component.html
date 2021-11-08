@@ -8,10 +8,13 @@
                 <h2> {{ this.terms.activityDetails }} </h2>
             </div>
             <div style="display: flex; flex-direction: row; justify-content: end;">
-                <button mat-flat-button color="primary"  style="height: 35px;"
-                (click)='saveAndClose()'>
-                {{ terms.saveAndClose }} 
-            </button>
+                <button *ngIf="this.activity && !this.activity.isNew()" mat-flat-button color="primary" style="height: 35px; margin-left: 5px;" (click)='openPhotosAlbum()'>
+                    <!-- {{ terms.saveAndClose }} -->
+                    <mat-icon>camera</mat-icon>
+                </button>
+                <button mat-flat-button color="primary" style="height: 35px;" (click)='saveAndClose()'>
+                    {{ terms.saveAndClose }}
+                </button>
             </div>
         </div>
 
@@ -23,11 +26,21 @@
         <data-area [settings]='this.fields'></data-area>
     </div>
     <div class="footer">
+        <!-- <app-photos-album *ngIf='this.activity' [entityId]='this.activity.id'></app-photos-album> -->
+        <!-- <div>
+            <button title=' {{ this.terms.unpoladYoursPhotosTogether }} ' mat-button *ngIf="this.images.length < 10">
+                <label for="uploadImage" style="display: flex;      align-items: center;">
+                    <mat-icon>photo_camera</mat-icon>
+                </label>
+            </button>
+            <input #fileInput type="file" (input)="onFileInput($event)" accept="image/*" id="uploadImage"
+                style="display:none" />
+        </div>
         <ng-container *ngFor='let img of this.images'>
             <mat-card>
-                <mat-card-title> {{ img.desc }} </mat-card-title>
-                <img [src]='img.data'>
+                <h5> {{ img.title }} <button mat-flat-button (click)="this.removeImage(img)"><mat-icon>close</mat-icon></button> </h5>
+                <img [src]='img.data' style="height: 30px; width: 30px;">
             </mat-card>
-        </ng-container>
+        </ng-container> -->
     </div>
 </div>

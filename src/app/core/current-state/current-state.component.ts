@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ChartOptions, ChartType } from 'chart.js';
+import { Chart, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { BackendMethod, Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
+import { FILTER_IGNORE } from '../../common/globals';
 import { EmailSvc } from '../../common/utils';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
@@ -167,10 +168,14 @@ export class CurrentStateComponent implements OnInit {
   async refresh() {
     this.activitiesByStatus = [];
     this.activitiesByPurpose = [];
+    this.activitiesByWeekDay = [];
+    this.activitiesByDayPeriods = [];
     var options = { hour12: false };
     // console.log(date.toLocaleString('en-US', options));
     this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
-    for await (const a of this.remult.repo(Activity).iterate({})) {
+    for await (const a of this.remult.repo(Activity).iterate({
+      where: row => this.branch ? row.bid.isEqualTo(this.branch) : FILTER_IGNORE
+    })) {
       // By Staus
       let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
       if (!foundStatus) {
@@ -208,6 +213,26 @@ export class CurrentStateComponent implements OnInit {
   }
 
   setChart() {
+    // Chart.plugins.register({
+    //   afterDraw: function (chart) {
+    //     if (chart) {
+    //       if (chart.data.datasets.length === 0) {
+    //         // No data is present
+    //         var ctx = chart.chart.ctx;
+    //         var width = chart.chart.width;
+    //         var height = chart.chart.height
+    //         chart.clear();
+
+    //         ctx.save();
+    //         ctx.textAlign = 'center';
+    //         ctx.textBaseline = 'middle';
+    //         ctx.font = "16px normal 'Helvetica Nueue'";
+    //         ctx.fillText('No data to display', width / 2, height / 2);
+    //         ctx.restore();
+    //       }
+    //     }
+    //   }
+    // });
     this.pieChartColors = [{ backgroundColor: this.colors }];
     this.pieChartLabelsStatuses = [];
     this.pieChartDataStatuses = [];
@@ -223,31 +248,32 @@ export class CurrentStateComponent implements OnInit {
       if (a.status === ActivityStatus.fail) {
         label = label;
       }
+      label += ` (${a.count})`;
       this.pieChartLabelsStatuses.push(label.padEnd(20));
       this.pieChartDataStatuses.push(a.count);
     }
 
     for (const a of this.activitiesByPurpose) {
-      let label = a.purpose.caption.padEnd(20);
+      let label = (a.purpose.caption  + ` (${a.count})`);
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsPurposes.push(label);
+      this.pieChartLabelsPurposes.push(label.padEnd(20));
       this.pieChartDataPurposes.push(a.count);
     }
     // (this.pieChartColors[0].backgroundColor as string[]).push(...this.colors2);
 
     for (const a of this.activitiesByDayPeriods) {
-      let label = a.period.caption.padEnd(20);
+      let label = a.period.caption + ` (${a.count})`;
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsDayPeriods.push(label);
+      this.pieChartLabelsDayPeriods.push(label.padEnd(20));
       this.pieChartDataDayPeriods.push(a.count);
     }
 
     for (const a of this.activitiesByWeekDay) {
-      let label = 'יום ' + this.weekDays[a.day];
+      let label = 'יום ' + this.weekDays[a.day] + ` (${a.count})`;
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }

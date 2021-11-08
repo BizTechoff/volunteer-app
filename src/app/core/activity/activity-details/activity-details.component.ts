@@ -5,7 +5,8 @@ import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
-import { Photo } from '../../photo';
+import { Photo } from '../../photo/photo';
+import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
 import { Activity, ActivityStatus } from '../activity';
 
@@ -74,14 +75,14 @@ export class ActivityDetailsComponent implements OnInit {
     this.top = new DataAreaSettings({
       fields: () => [
         [
-          { field: this.activity.$.tid, readonly: true },
-          { field: this.activity.$.status }//, readonly: true }
+          { field: this.activity.$.bid, visible: (r, v) => this.isBoard() },
+          { field: this.activity.$.status },//, readonly: true }
         ]
       ]
     })
     this.fields = new DataAreaSettings({
       fields: () => [
-        { field: this.activity.$.bid, visible: (r, v) => this.isBoard() },
+        { field: this.activity.$.tid, readonly: true },
         { field: this.activity.$.vids, clickIcon: 'search', click: async () => await this.openAssignment() },
         this.activity.$.purpose,
         this.activity.$.purposeDesc,
@@ -95,14 +96,15 @@ export class ActivityDetailsComponent implements OnInit {
   async openAssignment() {
 
     let bidOk = (this.activity.bid && this.activity.bid.length > 0 && this.activity.bid !== '0')!;
-    if (bidOk) { 
+    if (bidOk) {
       let vids = await openDialog(VolunteersAssignmentComponent,
-        input => input.args = { 
-          bid: this.activity.bid, 
-          aid: this.activity.id, 
-          tname: this.activity.tid, 
+        input => input.args = {
+          bid: this.activity.bid,
+          aid: this.activity.id,
+          tname: this.activity.tid,
           langs: '',// this.t.langs, 
-          vids: this.activity.vids },
+          vids: this.activity.vids
+        },
         output => output ? output.args.changed ? output.args.vids : undefined : undefined);
       console.log(vids);
       if (vids) {
@@ -118,6 +120,15 @@ export class ActivityDetailsComponent implements OnInit {
     }
   }
 
+  async openPhotosAlbum(){
+    let changes = await openDialog(PhotosAlbumComponent,
+      _ => _.args = { entityId: this.activity.id },
+      _ => _ ? _.args.changed : false);
+    if (changes) {
+      // await this.refresh();
+    }
+  }
+
   async saveAndClose() {
     await this.activity.save();
     this.args.changed = true;
@@ -129,4 +140,104 @@ export class ActivityDetailsComponent implements OnInit {
     this.win.close();
   }
 
+  async addPhoto() {
+
+  }
+
+  async onFileInput(e: any) {
+    let changed = this.loadFiles(e.target.files);
+    // if (changed) {
+    //   await this.refresh();
+    // }
+  }
+
+  private async loadFiles(files: any) {
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index];
+      let f: File = file;
+      // console.log(f);
+      // f.lastModified;
+      // f.name;
+      // f.size;
+      // f.type;
+      // f.webkitRelativePath;
+      await new Promise((res) => {
+        var fileReader = new FileReader();
+
+        fileReader.onload = async (e: any) => {
+          var img = new Image();
+
+          var canvas = document.createElement("canvas");
+          if (true) {
+            img.onload = async () => {
+              var ctx = canvas.getContext("2d");
+              ctx!.drawImage(img, 0, 0);
+
+              var MAX_WIDTH = 800;
+              var MAX_HEIGHT = 600;
+              var width = img.width;
+              var height = img.height;
+
+              if (width > height) {
+                if (width > MAX_WIDTH) {
+                  height *= MAX_WIDTH / width;
+                  width = MAX_WIDTH;
+                }
+              } else {
+                if (height > MAX_HEIGHT) {
+                  width *= MAX_HEIGHT / height;
+                  height = MAX_HEIGHT;
+                }
+              }
+              canvas.width = width;
+              canvas.height = height;
+
+              let margin = 50;
+              // canvas.pad?
+
+              var ctx = canvas.getContext("2d");
+              ctx!.drawImage(img, 0, 0, width, height);
+
+              var dataurl = canvas.toDataURL("image/png");
+              //console.log(dataurl);
+              //create row in db
+
+              let uimg = await this.addImage(f.name, dataurl);
+              this.images.push(uimg);
+
+              // addImageInfo(imgId)
+
+
+            }
+            img.src = e.target.result.toString();
+            // console.log(img.src)
+          }
+          //   this.image.image.value = e.target.result.toString();
+          //   this.image.fileName.value = f.name;
+          res({});
+        };
+        fileReader.readAsDataURL(f);
+      });
+    }
+  }
+
+  async removeImage(img: Photo) {
+    let yes = await this.dialog.confirmDelete(terms.delete)!;
+    if (yes) {
+      await img.delete();
+      var index = this.images.indexOf(img);
+      if (index >= 0) {
+        this.images.splice(index, 1);
+        this.dialog.info('התמונה הוסרה בהצלחה');
+      }
+    }
+  }
+
+  async addImage(title: string, data: string): Promise<Photo> {
+    let result = this.remult.repo(Photo).create();
+    result.title = title;
+    result.data = data;
+    await result.save();
+    return result;
+  }
 }

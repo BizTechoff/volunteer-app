@@ -1,0 +1,29 @@
+<div class="full-page">
+    <div class="header"></div>
+    <div class="ng-container">
+        <div>
+            <button title='{{ this.terms.uploadPhoto }}' mat-button *ngIf="this.photos.length < 25">
+                <label for="uploadImage" style="display: flex; align-items: center;">
+                    <mat-icon>add</mat-icon>
+                    <mat-icon>photo_camera</mat-icon>
+                </label>
+            </button>
+            <input #fileInput type="file" (input)="onFileInput($event)" accept="image/*" id="uploadImage"
+                style="display:none" />
+        </div>
+        <div class="image-container">
+            <ng-container *ngFor='let img of this.photos'>
+                <div class="image">
+                    <button [title]='this.terms.removeImage' mat-flat-button (click)="this.removePhoto(img)">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                    <img [src]='img.data' style="height: 200px; width: 200px;"><!-- max-width: 100%; -->
+                </div>
+            </ng-container>
+        </div>
+        <div *ngIf="this.photos.length == 0">
+            <h2> {{ terms.noPhotosOfYoursTogether }} </h2>
+        </div>
+    </div>
+    <div class="footer"></div>
+</div>
