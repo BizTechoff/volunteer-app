@@ -39,19 +39,26 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   ActivityStatus = ActivityStatus;
 
+  refreshing = false;
   async refresh() {
-    this.activities.splice(0);
-    for await (const a of this.remult.repo(Activity).iterate({
-      where: row => row.vids.contains(this.remult.user.id)
-    })) {
-      await a.$.tid.load();
-      this.activities.push(a);
-    }
+    if (!this.refreshing) {
+      this.refreshing = true;
+      let as = [] as Activity[];
+      for await (const a of this.remult.repo(Activity).iterate({
+        where: row => row.vids.contains(this.remult.user.id)
+      })) {
+        await a.$.tid.load();
+        as.push(a);
+      } 
+      this.activities.splice(0);
+      this.activities.push(...as);
+      this.refreshing = false;
+    }  
   }
 
-  getLang(langs:Langs[]){
+  getLang(langs: Langs[]) {
     let result = 'לא צויינו';
-    if(langs && langs.length > 0){
+    if (langs && langs.length > 0) {
       result = langs.map(l => l.caption).join(', ');
     }
     return result;
