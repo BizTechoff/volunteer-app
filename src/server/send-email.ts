@@ -13,8 +13,8 @@ EmailSvc.sendMail = async (subject: string, message: string, email: string, remu
         secure: false,
         requireTLS: true,
         auth: {
-            user: 'motidru@gmail.com',
-            pass: 'Monns2012!'
+            user: process.env.ADMIN_GMAIL_MAIL,
+            pass: process.env.ADMIN_GMAIL_MAIL
         }
     });
 
@@ -46,8 +46,8 @@ EmailSvc.sendMail = async (subject: string, message: string, email: string, remu
     END:VCALENDAR`;
 
     var mailOptions: Mail.Options = {
-        from: 'motidru@gmail.com',
-        to: 'motidru@gmail.com',
+        from: process.env.ADMIN_GMAIL_MAIL,
+        to: process.env.ADMIN_GMAIL_MAIL,
         subject: 'TX!! Got New Activity With Tenant',
         date: new Date(),
         icalEvent: {
