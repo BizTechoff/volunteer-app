@@ -1,12 +1,11 @@
 
 import { DataControl, InputField, openDialog } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, OneToMany, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
 import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
-import { ActivitiesVolunteers } from "../core/activity/activity-volunteer";
 import { CommaSeparatedStringArrayField } from "../core/tenant/tenant";
 import { terms } from "../terms";
 import { Roles } from './roles';
@@ -19,7 +18,7 @@ export class Langs {
     static russian = new Langs(3, 'רוסית');
     static french = new Langs(4, 'צרפתית');
     constructor(public id: number, public caption: string) { }
- 
+
     static getOptions() {
         let op = new ValueListValueConverter(Langs).getOptions();
         return op;
@@ -30,7 +29,7 @@ export class Langs {
         // console.log(split);
         let result = [] as Langs[];
         let options = Langs.getOptions();
-        split.forEach(l => { 
+        split.forEach(l => {
             let found = options.find(_ => _.id === parseInt(l));
             if (found) {
                 result.push(found);
@@ -67,6 +66,18 @@ export class Langs {
 //         })
 //     }
 // })
+// @DataControl<any, Users[]>({
+//     hideDataOnInput: true,
+//     clickIcon: 'search',
+//     getValue: (_, f) => f.value.map(u => u.$.name).join(', '),
+//     // click: async (_, f) => {
+//     //     await openDialog(SelectVolunteersComponent, x => x.args = {
+//     //         onSelect: u => f.value = u,
+//     //         title: f.metadata.caption,
+//     //         usersLangs: f.value.langs
+//     //     })
+//     // }
+// }) 
 @DataControl<any, Users>({
     hideDataOnInput: true,
     clickIcon: 'search',
@@ -141,7 +152,7 @@ export class Langs {
     }
 )
 export class Users extends IdEntity {
-    
+
     constructor(private remult: Remult) {
         super();
     }
@@ -150,12 +161,12 @@ export class Users extends IdEntity {
     //     where: _ => _.u!.isEqualTo(this)
     // })
 
-    static async fromString(str: string, remult?:Remult) {
+    static async fromString(str: string, remult?: Remult) {
         // console.log(str);
         let split = str.toString().split(',');
         // console.log(split);
         let result = [] as Users[];
-        split.forEach(async l => { 
+        split.forEach(async l => {
             let found = await remult?.repo(Users).findId(l);
             if (found) {
                 result.push(found);
@@ -178,12 +189,12 @@ export class Users extends IdEntity {
     @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
     numOfActivities: number = 0;
 
-    
+
 
     @DataControl<Users, Langs[]>({
         hideDataOnInput: true,
         clickIcon: 'search',
-        getValue: (r,v) => {return v && v.value? v.value.map(i => i.caption).join(', ').trim() : '';},
+        getValue: (r, v) => { return v && v.value ? v.value.map(i => i.caption).join(', ').trim() : ''; },
         // getValue : (r,v) => {v.displayValue},
         click: async (_, f) => {
             await openDialog(SelectLangsComponent, x => x.args = {
@@ -191,11 +202,11 @@ export class Users extends IdEntity {
                 // title: f.metadata.caption,
                 langs: f.value
             })
-        }    
-    })  
+        }
+    })
     @CommaSeparatedStringArrayField<Users>({ caption: terms.langs })
     langs: Langs[] = [Langs.hebrew];
- 
+
     @Field({
         validate: [StringRequiredValidation, Validators.unique],
         caption: terms.mobile
@@ -208,7 +219,7 @@ export class Users extends IdEntity {
     })
     email: string = '';
 
-    @Field({caption: terms.linkClicked})
+    @Field({ caption: terms.linkClicked })
     clickedLink: boolean = false;
 
     @DateOnlyField({

@@ -340,16 +340,16 @@ export class CurrentStateComponent implements OnInit {
 
   public async chartClicked(e: any) {
     // console.log(e);
-    if (e.active && e.active.length > 0) {
-      let index = e.active[0]._index;
-      let act = this.activitiesByStatus[index];
-      // this.selectedStatus = this.statuses.statuses[index];
-      // this.refreshDeliveries();
-      if (this.isBoard()) {
-        //dril-down to view by branches
-      }
-      await this.openActivities(act.branch, act.status);
-    }
+    // if (e.active && e.active.length > 0) {
+    //   let index = e.active[0]._index;
+    //   let act = this.activitiesByStatus[index];
+    //   // this.selectedStatus = this.statuses.statuses[index];
+    //   // this.refreshDeliveries();
+    //   if (this.isBoard()) {
+    //     //dril-down to view by branches
+    //   }
+    //   await this.openActivities(act.branch, act.status);
+    // }
   }
 
   async openActivities(bid: string, status: ActivityStatus) {

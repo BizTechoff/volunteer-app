@@ -69,6 +69,13 @@ export class UsersComponent implements OnInit {
       { field: users.bid, caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) },//, width: '80'
       { field: users.email }
     ],
+    gridButtons: [
+      {
+        textInMenu: () => terms.refresh,
+        icon: 'refresh',
+        click: async () => { await this.refresh(); }
+      }
+    ],
     rowButtons: [{
       name: terms.resetPassword,
       click: async () => {
@@ -97,6 +104,10 @@ export class UsersComponent implements OnInit {
 
 
   ngOnInit() {
+  }
+
+  async refresh(){
+    await this.users.reloadData();
   }
 
 }

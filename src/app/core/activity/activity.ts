@@ -190,11 +190,11 @@ export class ActivityGeneralStatus {
                 }
                 if (act._.isNew()) {
                     act.created = new Date();
-                    act.createdBy = remult.user.id;
+                    act.createdBy = await remult.repo(Users).findId(remult.user.id);
                 }
                 else {
                     act.modified = new Date();
-                    act.modifiedBy = remult.user.id;
+                    act.modifiedBy = await remult.repo(Users).findId(remult.user.id);
                 }
             }
         };
@@ -256,13 +256,13 @@ export class Activity extends IdEntity {
     remark: string = '';
 
     @Field({ caption: terms.createdBy })
-    createdBy: string = '';
+    createdBy!: Users;
 
     @Field({ caption: terms.created })
     created!: Date;
 
     @Field({ caption: terms.modifiedBy })
-    modifiedBy: string = '';
+    modifiedBy!: Users;
 
     @Field({ caption: terms.modified })
     modified!: Date;
