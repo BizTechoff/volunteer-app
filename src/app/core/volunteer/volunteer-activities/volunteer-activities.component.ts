@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
 import { Remult } from 'remult';
 import { terms } from '../../../terms';
+import { Langs } from '../../../users/users';
 import { Activity, ActivityStatus } from '../../activity/activity';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 
@@ -44,20 +45,37 @@ export class VolunteerActivitiesComponent implements OnInit {
       where: row => row.vids.contains(this.remult.user.id)
     })) {
       await a.$.tid.load();
-      console.log(a.tid ? a.tid.name : 'NULL');
       this.activities.push(a);
     }
+  }
+
+  getLang(langs:Langs[]){
+    let result = 'לא צויינו';
+    if(langs && langs.length > 0){
+      result = langs.map(l => l.caption).join(', ');
+    }
+    return result;
   }
 
   async setNextStatus(a: Activity, status: ActivityStatus) {
     let next = a.status.next();
     if (!next) {
       next = status;
-    } 
+    }
     if (next !== a.status) {
       a.status = next;
       await a.save();
     }
+  }
+
+  openWaze(address: string) {
+    let url = `waze://?q=${encodeURI(address)}&navigate=yes`;
+    window.open(url, '_blank');
+  }
+
+  call(mobile: string) {
+    let url = `tel:${mobile}`;
+    window.open(url, '_blank');
   }
 
 }

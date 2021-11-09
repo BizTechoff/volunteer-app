@@ -1,5 +1,8 @@
 export const terms = {
-    referrer: 'גורם מפנה',
+    openPhotosAlbum : 'פתח אלבום תמונות',
+    linkClicked:'לינק נלחץ',
+    voulnteerNewAssign:'נקבעה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
+    referrer: 'גורם מפנה', 
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
     removeImage: 'הסרת תמונה',
     noPhotosOfYoursTogether:'לא הועלו תמונות שלכם יחד',

@@ -11,9 +11,16 @@
             <ng-container style="margin-top: 7px;" *ngFor='let a of this.activities'>
                 <mat-card>
                     <mat-card-title> 
-                        {{ a?.tid?.name }}
-                        <button mat-mini-fab (click)="this.openPhotosAlbum(a)">
-                            <mat-icon>camera</mat-icon>
+                        {{ a?.tid?.name }} 
+                        <button mat-mini-fab [title]="a?.tid?.mobile!" (click)="this.call(a?.tid?.mobile!)">
+                            <mat-icon>call</mat-icon>
+                        </button> 
+                        <button mat-mini-fab [title]='a?.tid?.address' (click)="this.openWaze(a?.tid?.address!)">
+                            <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
+                            <img src="./assets/waze.svg">
+                        </button> 
+                        <button mat-mini-fab [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
+                            <mat-icon>photo</mat-icon>
                         </button>
                         <span *ngIf="this.showClosedActivitySign(a)">
                             <h2 style="width: 70px; background: darkblue; color: white; transform: rotate(45deg); display: inline-block">{{ a.status.caption }}</h2>
@@ -28,7 +35,7 @@
                                 {{ a.fh }} - {{ a.th }}
                             </div>
                             <div>
-                                {{ 'שפות' }}
+                                שפות: {{ this.getLang(a.tid.langs) }}
                             </div>
                         </div>
 

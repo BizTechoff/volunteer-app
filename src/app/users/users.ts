@@ -208,6 +208,9 @@ export class Users extends IdEntity {
     })
     email: string = '';
 
+    @Field({caption: terms.linkClicked})
+    clickedLink: boolean = false;
+
     @DateOnlyField({
         caption: terms.birthday
     })

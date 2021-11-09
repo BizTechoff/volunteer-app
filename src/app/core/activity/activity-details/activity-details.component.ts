@@ -3,8 +3,10 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
+import { EmailSvc } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
+import { Users } from '../../../users/users';
 import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
@@ -31,6 +33,7 @@ export class ActivityDetailsComponent implements OnInit {
   fields = new DataAreaSettings({});
   images: Photo[] = [];
   terms = terms;
+  lastVids = [] as string[];
   // @Field({ caption: terms.branch })
   // bid: string = '';
   get $() { return getFields(this, this.remult) };
@@ -61,11 +64,12 @@ export class ActivityDetailsComponent implements OnInit {
       let found = await this.remult.repo(Activity).findId(this.args.aid!, { useCache: false });
       if (found) {
         this.activity = found;
+        this.lastVids.push(...this.activity.vids);
       }
     }
     if (!this.activity) {
       this.activity = this.remult.repo(Activity).create({
-        bid: this.isBoard() ? (this.args.bid ? this.args.bid : '0') : this.remult.user.bid,
+        bid: this.isBoard() ? (this.args.bid ? this.args.bid : '') : this.remult.user.bid,
         tid: this.args.tid,//await this.remult.repo(Tenant).findId(this.args.tid!),
         purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
@@ -109,13 +113,13 @@ export class ActivityDetailsComponent implements OnInit {
           volids: this.activity.volids
         },
         output => output ? (output.args.changed ? output.args.volids : undefined) : undefined);
-      
+
       if (volids) {
-          this.activity.volids.splice(0);
-          // this.activity.volids.push(...volids);
-          // console.log(volids.length);
-          // console.log(this.activity.volids.length);
-          // console.log(this.activity.volids);
+        this.activity.volids.splice(0);
+        // this.activity.volids.push(...volids);
+        // console.log(volids.length);
+        // console.log(this.activity.volids.length);
+        // console.log(this.activity.volids);
         // this.activity.vids = vids;
         if (volids.length > 0) {
           this.activity.status = ActivityStatus.w4_start;
@@ -141,11 +145,41 @@ export class ActivityDetailsComponent implements OnInit {
     await this.activity.save();
     this.args.changed = true;
     this.args.aid = this.activity.id;
+    // await this.sendEmails();
     this.close();
   }
-
+  // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
   close() {
     this.win.close();
+  }
+
+  async sendEmails(){
+    if (this.lastVids !== this.activity.vids) {
+      let yes = await this.dialog.yesNoQuestion('האם לשלוח אימייל למתנדבים');
+      if (yes) {
+        this.lastVids.forEach(async id => {
+          let u = await this.remult.repo(Users).findId(id);
+          if (u) {
+            let text = '';
+            let email = u.email;
+            if(u.clickedLink){
+              // send update mail
+              text = 'עדכון למייל קיים בין המתנדב לדייר';
+            }
+            else{
+              //send new mail
+            text = terms.voulnteerNewAssign
+              .replace('!name!', this.activity.tid.name)
+              .replace('!date!', this.activity.date.toLocaleDateString())
+              .replace('!from!', this.activity.fh)
+              .replace('!to!', this.activity.th)
+              .replace('!address!', this.activity.tid.address);
+            }
+            await EmailSvc.SendEmail(email, text);
+          }
+        });// this.lastVids, this.activity.vids)
+      }
+    }
   }
 
   async addPhoto() {
