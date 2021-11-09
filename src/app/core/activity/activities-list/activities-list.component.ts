@@ -26,21 +26,22 @@ export class ActivitiesListComponent implements OnInit {
     this.remult.repo(Activity),
     {
       where: _ => _.status.isIn(this.status.statuses)
+        .and(this.bid && this.bid.length > 0 && this.bid !== '0' ? _.bid.isEqualTo(this.bid) : FILTER_IGNORE)
         .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid)),
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
-      numOfColumnsInGrid: 20, 
+      numOfColumnsInGrid: 20,
       columnSettings: _ => [
         { field: _.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
         _.tid,
-        _.vids, 
+        _.vids,
         _.status,
-        _.purpose,
-        _.purposeDesc,
         _.date,
         _.fh,
         _.th,
-        _.remark, 
+        _.purpose,
+        _.purposeDesc,
+        _.remark,
         _.created,
         _.createdBy,
         _.modifiedBy,
@@ -90,7 +91,7 @@ export class ActivitiesListComponent implements OnInit {
 
   async addActivityToCurrentTenant(act?: Activity) {
     let changes = await openDialog(ActivityDetailsComponent,
-      _ => _.args = { tid: act?.tid },
+      _ => _.args = { bid: act?.bid, tid: act?.tid },
       _ => _ ? _.args.changed : false);
     if (changes) {
       await this.refresh();

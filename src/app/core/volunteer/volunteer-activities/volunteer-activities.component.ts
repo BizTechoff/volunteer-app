@@ -52,7 +52,7 @@ export class VolunteerActivitiesComponent implements OnInit {
   async setNextStatus(a: Activity, status: ActivityStatus) {
     let next = a.status.next();
     if (!next) {
-      next = a.status;
+      next = status;
     } 
     if (next !== a.status) {
       a.status = next;

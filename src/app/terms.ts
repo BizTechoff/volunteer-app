@@ -1,4 +1,5 @@
 export const terms = {
+    referrer: 'גורם מפנה',
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
     removeImage: 'הסרת תמונה',
     noPhotosOfYoursTogether:'לא הועלו תמונות שלכם יחד',
@@ -18,6 +19,7 @@ export const terms = {
     activitiesByPurpose: 'פעילויות לפי מטרות',
     activitiesByStatuses: 'פעילויות לפי סטטוסים',
     activitiesByDayPeriods: 'פעילויות לפי זמני היום',
+    activitiesByReferrer: 'פעילויות לפי גורם מפנה',
     refresh: 'רענן',
     addActivityToCurrentTenant:'הוסף פעילות לדייר זה',
     shouldAddActivity: 'האם להוסיף ל!t.name! פעילות חדשה?',

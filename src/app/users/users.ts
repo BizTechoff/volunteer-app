@@ -18,7 +18,7 @@ export class Langs {
     static russian = new Langs(3, 'רוסית');
     static french = new Langs(4, 'צרפתית');
     constructor(public id: number, public caption: string) { }
-
+ 
     static getOptions() {
         let op = new ValueListValueConverter(Langs).getOptions();
         return op;

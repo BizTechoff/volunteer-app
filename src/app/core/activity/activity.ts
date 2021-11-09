@@ -37,15 +37,15 @@ export class ActivityPurpose {
     // , width: '150'
 
 })
-@ValueListFieldType(ActivityPurpose, {
+@ValueListFieldType(ActivityDayPeriod, {
     // displayValue: (e, val) => val.caption,
     // translation: l => l.deliveryStatus
 })
 export class ActivityDayPeriod {
     // static none = new ActivityType(0, 'ללא');
-    static morning = new ActivityPurpose(1, 'בוקר');
-    static afternoon = new ActivityPurpose(2, 'צהריים');
-    static evening = new ActivityPurpose(3, 'ערב');
+    static morning = new ActivityDayPeriod(1, 'בוקר');
+    static afternoon = new ActivityDayPeriod(2, 'צהריים');
+    static evening = new ActivityDayPeriod(3, 'ערב');
 
     constructor(public id: number, public caption: string) { }
     // id:number;
@@ -127,7 +127,8 @@ export class ActivityGeneralStatus {
         allowApiInsert: Roles.manager,
         allowApiDelete: Roles.manager,
         allowApiUpdate: Allow.authenticated,
-        allowApiRead: Allow.authenticated
+        allowApiRead: Allow.authenticated,
+        defaultOrderBy: (_) => [_.date.descending(), _.fh, _.status]
     },
     (options, remult) => {
         options.apiPrefilter = async (act) => {

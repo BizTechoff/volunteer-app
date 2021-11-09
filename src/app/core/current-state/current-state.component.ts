@@ -8,6 +8,7 @@ import { EmailSvc } from '../../common/utils';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
+import { Referrer } from '../tenant/tenant';
 
 @Component({
   selector: 'app-current-state',
@@ -88,6 +89,26 @@ export class CurrentStateComponent implements OnInit {
     },
   };
 
+  public pieChartOptionsByReferrer: ChartOptions = {
+    responsive: true,
+    // onClick: (event: MouseEvent, legendItem: any) => {
+    //   return false;
+    // },
+    title: { text: terms.activitiesByReferrer, display: true },
+    // maintainAspectRatio: false,
+    layout: { padding: 12 },
+    legend: {
+      rtl: true,
+      textDirection: 'rtl',
+      position: 'right',
+      // onClick: (event: MouseEvent, legendItem: any) => {
+      //   // this.currentStatFilter = this.pieChartStatObjects[legendItem.index];
+
+      //   return false;
+      // }
+    },
+  };
+
   public pieChartOptionsByPurpose: ChartOptions = {
     responsive: true,
     title: { text: terms.activitiesByPurpose, display: true },
@@ -144,15 +165,19 @@ export class CurrentStateComponent implements OnInit {
   public pieChartLabelsWeekDay: Label[] = [];
   public pieChartDataWeekDay: SingleDataSet = [];
 
+  public pieChartLabelsReferrer: Label[] = [];
+  public pieChartDataReferrer: SingleDataSet = [];
+
   refreshedTime = '00:00';
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-  maxLabelLength = 20;
+  maxLabelLength = 25;
 
   activitiesByStatus: { branch: string, status: ActivityStatus, count: number }[] = [];
   activitiesByPurpose: { branch: string, purpose: ActivityPurpose, count: number }[] = [];
   activitiesByDayPeriods: { branch: string, period: ActivityDayPeriod, count: number }[] = [];
   activitiesByWeekDay: { branch: string, day: number, count: number }[] = [];
-
+  activitiesByReferrer: { branch: string, referrer: Referrer, count: number }[] = [];
+  
   constructor(private remult: Remult, private dialog: DialogService) {
 
   }
@@ -170,6 +195,7 @@ export class CurrentStateComponent implements OnInit {
     this.activitiesByPurpose = [];
     this.activitiesByWeekDay = [];
     this.activitiesByDayPeriods = [];
+    this.activitiesByReferrer = [];
     var options = { hour12: false };
     // console.log(date.toLocaleString('en-US', options));
     this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
@@ -207,7 +233,25 @@ export class CurrentStateComponent implements OnInit {
         this.activitiesByWeekDay.push(foundDayWeekDay);
       }
       ++foundDayWeekDay.count;
+
+      // By Purpose
+      // let referrer = this.activitiesByReferrer.find(itm => itm.referrer === a.tid.referrer);
+      // if (!referrer) {
+      //   referrer = { branch: a.bid, referrer: a.tid.referrer, count: 0 };
+      //   this.activitiesByReferrer.push(referrer);
+      // }
+      // ++referrer.count;
     }
+
+    this.activitiesByStatus.sort((a1,a2) => a1.status.id - a2.status.id );
+    this.activitiesByWeekDay.sort((a1,a2) => a1.day - a2.day );
+    this.activitiesByDayPeriods.sort((a1,a2) => a1.period.id - a2.period.id );
+    this.activitiesByPurpose.sort((a1,a2) => a1.purpose.id - a2.purpose.id );
+    this.activitiesByReferrer.sort((a1,a2) => a1.referrer.id - a2.referrer.id );
+
+
+    // let c = this.activitiesByWeekDay.reduce((sum, current) => sum + current.count, 0);
+    // this.pieChartOptionsByWeekDay.title =  { text: terms.activitiesByWeekDay + ` (${c})`, display: true };
 
     this.setChart();
   }
@@ -242,6 +286,8 @@ export class CurrentStateComponent implements OnInit {
     this.pieChartDataWeekDay = [];
     this.pieChartLabelsDayPeriods = [];
     this.pieChartDataDayPeriods = [];
+    this.pieChartLabelsReferrer = [];
+    this.pieChartDataReferrer = [];
 
     for (const a of this.activitiesByStatus) {
       let label = a.status.caption;
@@ -270,6 +316,15 @@ export class CurrentStateComponent implements OnInit {
       // }
       this.pieChartLabelsDayPeriods.push(label.padEnd(20));
       this.pieChartDataDayPeriods.push(a.count);
+    }
+
+    for (const a of this.activitiesByReferrer) {
+      let label = a.referrer.caption + ` (${a.count})`;
+      // if (a.purpose === ActivityPurpose.fail) {
+      //   label = terms.activities + ' ' + label;
+      // }
+      this.pieChartLabelsReferrer.push(label.padEnd(20));
+      this.pieChartDataReferrer.push(a.count);
     }
 
     for (const a of this.activitiesByWeekDay) {

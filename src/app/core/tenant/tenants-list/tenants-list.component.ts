@@ -30,7 +30,8 @@ export class TenantsListComponent implements OnInit {
       allowCrud: false,
       numOfColumnsInGrid: 10,
       columnSettings: t => [
-        { field: t.bid, visible: () => false },
+        t.referrer,
+        { field: t.bid, visible: (r, v) => this.isBoard() },
         t.name,
         t.mobile,
         t.address,
@@ -105,15 +106,17 @@ export class TenantsListComponent implements OnInit {
   }
 
   async addTenant(t?: Tenant) {
+    let isNew = false;
     if (!t) {
       t = this.remult.repo(Tenant).create();
+      isNew = true;
       t.bid = this.isBoard() ? '' : this.remult.user.bid;
     }
-    f1:Field;
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: terms.addTenant,
         fields: () => [
+          t!.$.referrer,
           { field: t!.$.bid, visible: (r, v) => this.isBoard() },
           t!.$.name,
           t!.$.mobile,
@@ -123,11 +126,13 @@ export class TenantsListComponent implements OnInit {
           t!.$.defVids],
         ok: async () => { await t!.save(); }
       },
-      _ => _ ? _.ok : false); 
+      _ => _ ? _.ok : false);
     if (changed) {
       await this.refresh();
-      if (await this.dialog.yesNoQuestion(terms.shouldAddActivity.replace('!t.name!', t.name))) {
-        this.openActivity(t);
+      if (isNew) {
+        if (await this.dialog.yesNoQuestion(terms.shouldAddActivity.replace('!t.name!', t.name))) {
+          this.openActivity(t);
+        }
       }
     }
   }

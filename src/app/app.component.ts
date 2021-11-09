@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
 import { terms } from './terms';
+import { Roles } from './users/roles';
 import { PasswordControl, Users } from './users/users';
 
 @Component({
@@ -44,9 +45,48 @@ export class AppComponent implements OnInit {
     });
   }
 
-  usersCount = 0;
+  usersCount = 1;
   async ngOnInit() {
     // this.usersCount = await this.remult.repo(Users).count();
+  }
+
+  getUserBrnachDesc() {
+    if (this.isValidBidId()) {
+      if (this.remult.user.bid !== '0') {
+        return `סניף: ${this.remult.user.bid}`;
+      }
+    }
+    return '';
+  }
+
+  isValidBidId() {
+    let bid = this.remult.user.bid;
+    if (bid && bid.length) {
+      if (bid.trim() === '0') {
+        if (!this.remult.isAllowed(Roles.board)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  getUserAuthName() {
+    let result = 'לא מורשה';
+    if (this.remult.user.roles.find(r => r === Roles.admin)) {
+      result = 'אדמין';
+    }
+    else if (this.remult.user.roles.find(r => r === Roles.board)) {
+      result = 'הנהלה';
+    }
+    else if (this.remult.user.roles.find(r => r === Roles.manager)) {
+      result = 'מנהל סניף ' + this.remult.user.bid;
+    }
+    else if (this.remult.user.roles.find(r => r === Roles.volunteer)) {
+      result = 'מתנדב בסניף ' + this.remult.user.bid;
+    }
+    return result;
   }
 
   signOut() {
@@ -131,7 +171,7 @@ export class AppComponent implements OnInit {
       }
     return terms.volunteerApp;
   }
-
+ 
   shouldDisplayRoute(route: Route) {
     if (!(route.path && route.path.indexOf(':') < 0 && route.path.indexOf('**') < 0))
       return false;

@@ -39,6 +39,7 @@ import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuar
 import { UsersComponent } from './users/users.component';
 import { SelectVolunteersComponent } from './common/select-volunteers/select-volunteers.component';
 import { SelectLangsComponent } from './common/select-langs/select-langs.component';
+import { SelectReferrerComponent } from './common/select-referrer/select-referrer.component';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import { SelectLangsComponent } from './common/select-langs/select-langs.compone
     PhotosAlbumComponent,
     SelectTenantComponentComponent,
     SelectVolunteersComponent,
-    SelectLangsComponent
+    SelectLangsComponent,
+    SelectReferrerComponent
   ],
   imports: [
     BrowserModule,
@@ -86,6 +88,6 @@ import { SelectLangsComponent } from './common/select-langs/select-langs.compone
   providers: [DialogService, AdminGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
-    SelectVolunteersComponent, SelectTenantComponentComponent, SelectLangsComponent]
+    SelectVolunteersComponent, SelectTenantComponentComponent, SelectLangsComponent]//, SelectReferrerComponent]
 })
 export class AppModule { }

@@ -1,5 +1,6 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { ValueListValueConverter } from "remult/valueConverters";
 import { DateRequiredValidation, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
 import { SelectTenantComponentComponent } from "../../common/select-tenant-component/select-tenant-component.component";
@@ -7,12 +8,27 @@ import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Langs } from "../../users/users";
 
+
+@ValueListFieldType(Referrer, { /*displayValue: () => {return '';}*/ /*multi: true*/ })
+export class Referrer {
+    static welfare = new Referrer(1, 'רווחה');
+    static municipality = new Referrer(2, 'עירייה');
+    static tenant = new Referrer(3, 'דייר אחר');
+    constructor(public id: number, public caption: string) { }
+
+    static getOptions() {
+        let op = new ValueListValueConverter(Referrer).getOptions();
+        return op;
+    }
+
+}
+
 export function CommaSeparatedStringArrayField<entityType = any>(
     ...options: (FieldOptions<entityType, Langs[]> |
         ((options: FieldOptions<entityType, Langs[]>, remult: Remult) => void))[]) {
     return Field({
-        displayValue: (r,x) => {
-            return x? x.map(i => i.caption).join(', ').trim() : '';
+        displayValue: (r, x) => {
+            return x ? x.map(i => i.caption).join(', ').trim() : '';
         },
         valueConverter: {
             toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
@@ -20,6 +36,20 @@ export function CommaSeparatedStringArrayField<entityType = any>(
         }
     }, ...options);
 }
+
+// export function CommaSeparatedStringArrayField2<entityType = any>(
+//     ...options: (FieldOptions<entityType, Referrer[]> |
+//         ((options: FieldOptions<entityType, Referrer[]>, remult: Remult) => void))[]) {
+//     return Field({
+//         displayValue: (r, x) => {
+//             return x ? x.map(i => i.caption).join(', ').trim() : '';
+//         },
+//         valueConverter: {
+//             toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
+//             fromDb: x => x ? Referrer.fromString(x.toString()) : []
+//         }
+//     }, ...options);
+// }
 
 
 @DataControl<any, Tenant>({
@@ -29,7 +59,7 @@ export function CommaSeparatedStringArrayField<entityType = any>(
     click: async (_, f) => {
         await openDialog(SelectTenantComponentComponent, x => x.args = {
             onSelect: site => f.value = site,
-            title: f.metadata.caption,
+            title: 'בחירה',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
             tenantLangs: f.value.langs
         })
     }
@@ -71,6 +101,9 @@ export class Tenant extends IdEntity {
         caption: terms.branch, validate: StringRequiredValidation
     })
     bid: string = '';
+ 
+    @Field({ caption: terms.referrer, validate: Validators.required.withMessage(terms.requiredField) })
+    referrer: Referrer = Referrer.welfare;
 
     @Field({
         caption: terms.name,
@@ -90,7 +123,7 @@ export class Tenant extends IdEntity {
     @DataControl<Tenant, Langs[]>({
         hideDataOnInput: true,
         clickIcon: 'search',
-        getValue: (r,v) => {return v && v.value? v.value.map(i => i.caption).join(', ').trim() : '';},
+        getValue: (r, v) => { return v && v.value ? v.value.map(i => i.caption).join(', ').trim() : ''; },
         // getValue : (r,v) => {v.displayValue},
         click: async (_, f) => {
             await openDialog(SelectLangsComponent, x => x.args = {
@@ -98,8 +131,8 @@ export class Tenant extends IdEntity {
                 // title: f.metadata.caption,
                 langs: f.value
             })
-        }    
-    })  
+        }
+    })
     @CommaSeparatedStringArrayField<Tenant>({ caption: terms.langs })
     langs: Langs[] = [Langs.hebrew];
 
