@@ -3,15 +3,15 @@
         <div style="display: flex; flex-direction: row; justify-content: start; ">
 
             <data-control [field]='this.$.selectedDate'></data-control>
-            <button mat-mini-fab color='primary' (click)='this.refresh()'>
+            <!-- <button mat-mini-fab color='primary' (click)='this.refresh()'>
                 <mat-icon>refresh</mat-icon>
-            </button>
-            <button mat-mini-fab color='primary' (click)='this.print()'>
+            </button> -->
+            <!-- <button mat-mini-fab color='primary' (click)='this.print()'>
                 <mat-icon>print</mat-icon>
-            </button>
+            </button> -->
         </div>
     </div>
-    <div class="grow-item">
+    <div class="grow-item" id="data">
         <data-grid [settings]="grid"></data-grid>
         <!-- <div class="ng-container"> -->
             <!-- <table>

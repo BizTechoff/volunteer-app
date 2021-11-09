@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
       }
     });
   }
-
+ 
   usersCount = 1;
   async ngOnInit() {
     // this.usersCount = await this.remult.repo(Users).count();
@@ -70,8 +70,8 @@ export class AppComponent implements OnInit {
       return true;
     }
     return false;
-  }
-
+  } 
+ 
   getUserAuthName() {
     let result = 'לא מורשה';
     if (this.remult.user.roles.find(r => r === Roles.admin)) {

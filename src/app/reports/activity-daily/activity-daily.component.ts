@@ -26,6 +26,11 @@ export class ActivityDailyComponent implements OnInit {
           textInMenu: () => terms.refresh,
           icon: 'refresh',
           click: async () => { await this.refresh(); }
+        },
+        {
+          textInMenu: () => terms.print,
+          icon: 'print',
+          click: async () => { await this.print(); }
         }
       ]
     });
@@ -49,7 +54,25 @@ export class ActivityDailyComponent implements OnInit {
   }
 
   async print() {
-    window.print();
+    // this.grid.
+    // var divToPrint = document.getElementById("data")!;
+    let data = '';
+    data = '<html><head><title></title></head><body>'
+    '<table border="1" cellpadding="1">'
+              '<tr>'
+              '<th></th>'
+              '</tr>'
+              'DATA'
+              '<tr>'
+              '<td></td>'
+              '</tr>'
+          '</table>'
+          '</body><html>';
+    var newWin = window.open();
+    newWin!.document.write(data);
+    newWin!.print();
+    newWin!.close();
+    // window!.print();
   }
 
   // @BackendMethod({ allowed: Roles.manager })
