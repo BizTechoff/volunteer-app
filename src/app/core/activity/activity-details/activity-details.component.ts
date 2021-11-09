@@ -17,7 +17,7 @@ import { Activity, ActivityStatus } from '../activity';
   styleUrls: ['./activity-details.component.scss']
 })
 export class ActivityDetailsComponent implements OnInit {
- 
+
   args: {
     bid?: string,
     aid?: string,
@@ -85,6 +85,7 @@ export class ActivityDetailsComponent implements OnInit {
       fields: () => [
         { field: this.activity.$.tid },//, readonly: true },
         { field: this.activity.$.vids, clickIcon: 'search', click: async () => await this.openAssignment() },
+        { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
         this.activity.$.purpose,
         this.activity.$.purposeDesc,
         this.activity.$.date,
@@ -98,19 +99,25 @@ export class ActivityDetailsComponent implements OnInit {
 
     let bidOk = (this.activity.bid && this.activity.bid.length > 0 && this.activity.bid !== '0')!;
     if (bidOk) {
-      let vids = await openDialog(VolunteersAssignmentComponent,
+      let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
           bid: this.activity.bid,
           aid: this.activity.id,
           tname: this.activity.tid.name,
           langs: this.activity.tid?.langs,// this.t.langs, 
-          vids: this.activity.vids
+          vids: this.activity.vids,
+          volids: this.activity.volids
         },
-        output => output ? output.args.changed ? output.args.vids : undefined : undefined);
-      // console.log(vids);
-      if (vids) {
-        this.activity.vids = vids;
-        if (vids.length > 0) {
+        output => output ? (output.args.changed ? output.args.volids : undefined) : undefined);
+      
+      if (volids) {
+          this.activity.volids.splice(0);
+          // this.activity.volids.push(...volids);
+          // console.log(volids.length);
+          // console.log(this.activity.volids.length);
+          // console.log(this.activity.volids);
+        // this.activity.vids = vids;
+        if (volids.length > 0) {
           this.activity.status = ActivityStatus.w4_start;
         }
         // await this.refresh();

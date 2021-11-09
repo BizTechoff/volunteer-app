@@ -29,7 +29,7 @@ export class SelectVolunteersComponent implements OnInit {
       where: t =>
         // if there is a search value, search by it
         t.volunteer.isEqualTo(true)
-          .and(t.langs.isIn([this.langs]))
+          // .and(t.langs.isIn([this.langs]))
           .and(t.active.isEqualTo(true))
           .and(
             this.searchString ? t.name.contains(this.searchString)

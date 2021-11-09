@@ -1,10 +1,26 @@
-import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
+import { DataControl } from "@remult/angular";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { FILTER_IGNORE, StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { Users } from "../../users/users";
 import { Tenant } from "../tenant/tenant";
+
+
+export function CommaSeparatedStringArrayField<entityType = any>(
+    ...options: (FieldOptions<entityType, Users[]> |
+        ((options: FieldOptions<entityType, Users[]>, remult: Remult) => void))[]) {
+    return Field({
+        displayValue: (r, x) => {
+            return x ? x.map(i => i.name).join(', ').trim() : '';
+        },
+        valueConverter: {
+            toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
+            // fromDb: x => x ? Users.fromString(x.toString(), remult!) : []
+        }
+    }, ...options);
+}
 
 @DataControl({
     // valueList: async remult => DeliveryStatus.getOptions(remult)
@@ -179,19 +195,18 @@ export class ActivityGeneralStatus {
                 else {
                     act.modified = new Date();
                     act.modifiedBy = remult.user.id;
-                } 
+                }
             }
         };
     })
 export class Activity extends IdEntity {
 
-    // constructor(private remult: Remult){super();}
-    // @DataControl<Activity>({
-    //     click: async (a) => {
-    //         await openDialog(DynamicSelect(Branch));
-    //         a.bid = '888';
-    //     }
-    // }) 
+    constructor(private remult: Remult) { super(); }
+
+    // vols = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
+    //     where: _ => _.a!.isEqualTo(this)
+    // })
+
     @Field({
         caption: terms.branch, validate: StringRequiredValidation
     })
@@ -214,17 +229,25 @@ export class Activity extends IdEntity {
     //@Field({ caption: terms.tenant })
     tid!: Tenant;
 
-    @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
+    //@CommaSeparatedStringArrayField<Users>({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
+    @Field({ caption: terms.volunteers })
     vids: string[] = [];
+
+    @Field({ caption: terms.volunteers })
+    // volids = new OneToMany(this.remult.repo(Users), {
+    //     // where: (_) => {  _.  }
+    // })
+    // @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
+    volids: Users[] = [] as Users[];
 
     @DateOnlyField({ caption: terms.date })
     date: Date = new Date();
 
-    @Field({ caption: terms.fromHour, inputType: 'time', defaultValue: () => '00:00', validate: TimeRequireValidator })
-    fh!: string;
+    @Field({ caption: terms.fromHour, inputType: 'time', validate: TimeRequireValidator })
+    fh: string = '00:00';
 
-    @Field({ caption: terms.toHour, inputType: 'time', defaultValue: () => '00:00', validate: TimeRequireValidator })
-    th!: string;
+    @Field({ caption: terms.toHour, inputType: 'time', validate: TimeRequireValidator })
+    th: string = '00:00';
 
     @Field({ caption: terms.status })
     status: ActivityStatus = ActivityStatus.w4_assign;

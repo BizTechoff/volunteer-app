@@ -12,15 +12,16 @@ import { Langs, Users } from '../../../users/users';
   styleUrls: ['./volunteers-assignment.component.scss']
 })
 export class VolunteersAssignmentComponent implements OnInit {
- 
+
   args: {
     bid: string,
     aid: string,
-    tname: string, 
+    tname: string,
     langs: Langs[],
     changed?: boolean,
-    vids: string[]
-  } = { bid: '', aid: '', tname: '', langs: [], changed: false, vids: [] };
+    vids: string[],
+    volids: Users[]
+  } = { bid: '', aid: '', tname: '', langs: [], changed: false, vids: [], volids: [] as Users[] };
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForTenantNameHere}` })
   search: string = ''
@@ -33,8 +34,8 @@ export class VolunteersAssignmentComponent implements OnInit {
         .and(u.bid.isEqualTo(this.args.bid))
         .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
-      allowSelection: true, 
-      columnSettings: (u) => [{field: u.name, caption: 'שם'}, u.langs],
+      allowSelection: true,
+      columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -50,28 +51,28 @@ export class VolunteersAssignmentComponent implements OnInit {
   terms = terms;
 
   async ngOnInit() {
-    this.lgDesc= this.args.langs.map(_ => _.caption).join(', ');
-    if (this.args.vids.length > 0) {
+    this.lgDesc = this.args.langs.map(_ => _.caption).join(', ');
+    if (this.args.vids && this.args.vids.length > 0) {
       let vids = await this.remult.repo(Users).find({
         where: u => u.id.isIn(this.args.vids)
       });
-      if (vids && vids.length > 0)
+      if (vids && vids.length > 0) {
         this.volunteers.selectedRows.push(...vids);
+      }
     }
   }
 
   async refresh() {
     await this.volunteers.reloadData();
-    // for (let i = 0; i < 30; ++i) {
-    //   this.volunteers.addNewRow();
-    // }
   }
 
   select() {
     this.args.changed = true;
     this.args.vids.splice(0);
+    this.args.volids.splice(0);
     for (const u of this.volunteers.selectedRows) {
       this.args.vids.push(u.id);
+      this.args.volids.push(u);
     }
     this.win.close();
   }

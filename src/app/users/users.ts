@@ -1,11 +1,12 @@
 
 import { DataControl, InputField, openDialog } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, OneToMany, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
 import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
+import { ActivitiesVolunteers } from "../core/activity/activity-volunteer";
 import { CommaSeparatedStringArrayField } from "../core/tenant/tenant";
 import { terms } from "../terms";
 import { Roles } from './roles';
@@ -40,13 +41,39 @@ export class Langs {
 
 }
 
+// export function CommaSeparatedStringArrayField<entityType = any>(
+//     ...options: (FieldOptions<entityType, Users[]> |
+//         ((options: FieldOptions<entityType, Users[]>, remult: Remult) => void))[]) {
+//     return Field({
+//         displayValue: (r, x) => {
+//             return x ? x.map(i => i.id).join(', ').trim() : '';
+//         },
+//         valueConverter: {
+//             toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
+//             fromDb: x => x ? Langs.fromString(x.toString()) : []
+//         }
+//     }, ...options);
+// }
+
+// @DataControl<any, Users[]>({
+//     hideDataOnInput: true,
+//     clickIcon: 'search',
+//     getValue: (_, f) => f.value.map(u => u.name).join(', '),
+//     click: async (_, f) => {
+//         await openDialog(SelectVolunteersComponent, x => x.args = {
+//             onSelect: site => f.value = site,
+//             title: f.metadata.caption,
+//             usersLangs: f.value.langs
+//         })
+//     }
+// })
 @DataControl<any, Users>({
     hideDataOnInput: true,
     clickIcon: 'search',
     getValue: (_, f) => f.value?.name,
     click: async (_, f) => {
         await openDialog(SelectVolunteersComponent, x => x.args = {
-            onSelect: site => f.value = site,
+            onSelect: u => f.value = u,
             title: f.metadata.caption,
             usersLangs: f.value.langs
         })
@@ -56,15 +83,21 @@ export class Langs {
     allowApiRead: Allow.authenticated,
     allowApiUpdate: Allow.authenticated,
     allowApiDelete: Roles.admin,
-    allowApiInsert: Roles.manager
+    allowApiInsert: Roles.manager,
+    defaultOrderBy: (user) => [
+        user.admin.descending(),
+        user.board.descending(),
+        user.manager.descending(),
+        user.name
+    ]
 },
     (options, remult) => {
-        options.defaultOrderBy = (user) => [
-            user.admin.descending(),
-            user.board.descending(),
-            user.manager.descending(),
-            user.name
-        ];
+        // options.defaultOrderBy = (user) => [
+        //     user.admin.descending(),
+        //     user.board.descending(),
+        //     user.manager.descending(),
+        //     user.name
+        // ];
         options.apiPrefilter = (user) => {
             let active = FILTER_IGNORE;// user.active.isEqualTo(true);
             if (!(remult.isAllowed(Roles.board)))// all
@@ -108,6 +141,28 @@ export class Langs {
     }
 )
 export class Users extends IdEntity {
+    
+    constructor(private remult: Remult) {
+        super();
+    }
+
+    // activities = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
+    //     where: _ => _.u!.isEqualTo(this)
+    // })
+
+    static async fromString(str: string, remult?:Remult) {
+        // console.log(str);
+        let split = str.toString().split(',');
+        // console.log(split);
+        let result = [] as Users[];
+        split.forEach(async l => { 
+            let found = await remult?.repo(Users).findId(l);
+            if (found) {
+                result.push(found);
+            }
+        });
+        return result;
+    }
 
     @Field({
         caption: terms.branch
@@ -198,9 +253,6 @@ export class Users extends IdEntity {
     @Field({ caption: terms.active })
     active: boolean = true;
 
-    constructor(private remult: Remult) {
-        super();
-    }
 
     hasValidBranch() {
         let result = true;

@@ -35,6 +35,7 @@ export class ActivitiesListComponent implements OnInit {
         { field: _.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
         _.tid,
         _.vids,
+        _.volids,
         _.status,
         _.date,
         _.fh,
