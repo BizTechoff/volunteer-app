@@ -54,7 +54,7 @@ export class PhotosAlbumComponent implements OnInit {
         this.photos.push(p);
       }
     }
-    console.log('this.photos',this.photos.length);
+    // console.log('this.photos',this.photos.length);
   }
 
   isValidEntityId() {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControl, GridSettings, openDialog } from '@remult/angular';
-import { Field, getFields, Remult, ValueListFieldType } from 'remult';
+import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { terms } from '../../../terms';
@@ -17,11 +17,11 @@ export class ActivitiesListComponent implements OnInit {
 
   terms = terms;
   get $() { return getFields(this, this.remult) };
-  @DataControl<ActivitiesListComponent, ActivityGeneralStatus>({valueChange: async (r,v) => await r.refresh()})
+  @DataControl<ActivitiesListComponent, ActivityGeneralStatus>({ valueChange: async (r, v) => await r.refresh() })
   @Field({ caption: terms.status })
   status: ActivityGeneralStatus = ActivityGeneralStatus.opens;
-  @Field({ caption: terms.branch }) 
-  bid: string = ''; 
+  @Field({ caption: terms.branch })
+  bid: string = '';
   activities: GridSettings<Activity> = new GridSettings<Activity>(
     this.remult.repo(Activity),
     {
@@ -29,18 +29,22 @@ export class ActivitiesListComponent implements OnInit {
         .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid)),
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
-      numOfColumnsInGrid: 10,
+      numOfColumnsInGrid: 20, 
       columnSettings: _ => [
         { field: _.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
         _.tid,
-        _.vids,
+        _.vids, 
         _.status,
         _.purpose,
         _.purposeDesc,
         _.date,
         _.fh,
         _.th,
-        _.remark],
+        _.remark, 
+        _.created,
+        _.createdBy,
+        _.modifiedBy,
+        _.modified],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -86,7 +90,7 @@ export class ActivitiesListComponent implements OnInit {
 
   async addActivityToCurrentTenant(act?: Activity) {
     let changes = await openDialog(ActivityDetailsComponent,
-      _ => _.args = { tid: act!.tid },
+      _ => _.args = { tid: act?.tid },
       _ => _ ? _.args.changed : false);
     if (changes) {
       await this.refresh();

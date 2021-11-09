@@ -7,6 +7,7 @@ import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
+import { Tenant } from '../../tenant/tenant';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
 import { Activity, ActivityStatus } from '../activity';
 
@@ -16,14 +17,14 @@ import { Activity, ActivityStatus } from '../activity';
   styleUrls: ['./activity-details.component.scss']
 })
 export class ActivityDetailsComponent implements OnInit {
-
+ 
   args: {
     bid?: string,
     aid?: string,
-    tid?: string,
+    tid?: Tenant,
     readonly?: boolean,
     changed?: boolean
-  } = { bid: '', aid: '', tid: '', readonly: false, changed: false };
+  } = { bid: '', aid: '', tid: undefined, readonly: false, changed: false };
   today = new Date();
   activity!: Activity;
   top = new DataAreaSettings({});
@@ -38,10 +39,10 @@ export class ActivityDetailsComponent implements OnInit {
 
   async ngOnInit() {
     if (!this.args) {
-      this.args = { aid: '', tid: '', readonly: false, changed: false };
+      this.args = { aid: '', tid: undefined, readonly: false, changed: false };
     }
     if (!this.args.tid) {
-      this.args.tid = '';
+      this.args.tid = undefined;
     }
     if (!this.args.aid) {
       this.args.aid = '';
@@ -57,7 +58,7 @@ export class ActivityDetailsComponent implements OnInit {
   async retrieve() {
     let validId = this.args.aid && this.args.aid.length > 0;
     if (validId) {
-      let found = await this.remult.repo(Activity).findId(this.args.aid!);
+      let found = await this.remult.repo(Activity).findId(this.args.aid!, { useCache: false });
       if (found) {
         this.activity = found;
       }
@@ -65,7 +66,7 @@ export class ActivityDetailsComponent implements OnInit {
     if (!this.activity) {
       this.activity = this.remult.repo(Activity).create({
         bid: this.isBoard() ? (this.args.bid ? this.args.bid : '0') : this.remult.user.bid,
-        tid: this.args.tid,
+        tid: this.args.tid,//await this.remult.repo(Tenant).findId(this.args.tid!),
         purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
         fh: '14:00',
@@ -82,7 +83,7 @@ export class ActivityDetailsComponent implements OnInit {
     })
     this.fields = new DataAreaSettings({
       fields: () => [
-        { field: this.activity.$.tid, readonly: true },
+        { field: this.activity.$.tid },//, readonly: true },
         { field: this.activity.$.vids, clickIcon: 'search', click: async () => await this.openAssignment() },
         this.activity.$.purpose,
         this.activity.$.purposeDesc,
@@ -101,12 +102,12 @@ export class ActivityDetailsComponent implements OnInit {
         input => input.args = {
           bid: this.activity.bid,
           aid: this.activity.id,
-          tname: this.activity.tid,
-          langs: '',// this.t.langs, 
+          tname: this.activity.tid.name,
+          langs: this.activity.tid?.langs,// this.t.langs, 
           vids: this.activity.vids
         },
         output => output ? output.args.changed ? output.args.vids : undefined : undefined);
-      console.log(vids);
+      // console.log(vids);
       if (vids) {
         this.activity.vids = vids;
         if (vids.length > 0) {
@@ -120,7 +121,7 @@ export class ActivityDetailsComponent implements OnInit {
     }
   }
 
-  async openPhotosAlbum(){
+  async openPhotosAlbum() {
     let changes = await openDialog(PhotosAlbumComponent,
       _ => _.args = { entityId: this.activity.id },
       _ => _ ? _.args.changed : false);

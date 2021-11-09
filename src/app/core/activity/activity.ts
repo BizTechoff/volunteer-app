@@ -4,6 +4,7 @@ import { ValueListValueConverter } from 'remult/valueConverters';
 import { FILTER_IGNORE, StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { Tenant } from "../tenant/tenant";
 
 @DataControl({
     // valueList: async remult => DeliveryStatus.getOptions(remult)
@@ -68,15 +69,15 @@ export class ActivityStatus {
     // static none = new ActivityStatus(0, 'ללא');
     static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ', () => ActivityStatus.w4_start);
     static w4_start = new ActivityStatus(2, 'ממתין להתחלה', () => ActivityStatus.w4_end);
-    static w4_end = new ActivityStatus(3, 'ממתין לסיום',  () => ActivityStatus.success);
+    static w4_end = new ActivityStatus(3, 'ממתין לסיום', () => ActivityStatus.success);
     static success = new ActivityStatus(4, 'הסתיים בהצלחה', () => undefined);
-    static fail = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined);
+    static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined);
     static cancel = new ActivityStatus(6, 'בוטל', () => undefined);
 
     constructor(public id: number, public caption: string, public next: () => ActivityStatus | undefined) { }
     // id:number;
 
-    
+
 
     static getOptions() {
         let op = new ValueListValueConverter(ActivityStatus).getOptions();
@@ -106,7 +107,7 @@ export class ActivityStatus {
 
     static problemStatuses() {
         return [
-            ActivityStatus.fail
+            ActivityStatus.problem
         ];
     }
 }
@@ -170,6 +171,14 @@ export class ActivityGeneralStatus {
                         throw terms.sameDateAndTimes;
                     }
                 }
+                if (act._.isNew()) {
+                    act.created = new Date();
+                    act.createdBy = remult.user.id;
+                }
+                else {
+                    act.modified = new Date();
+                    act.modifiedBy = remult.user.id;
+                } 
             }
         };
     })
@@ -192,18 +201,18 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.desc })
     purposeDesc: string = '';
-    
+
     // @DataControl<Tenant>({ האם הוא מחובר למזהה של היישות? היכן אמור להיות הקליק לבחירה מרשימה
     //     click: async (a) => {
     //         await openDialog(DynamicSelect(Tenant));
     //         a.bid = '888';
     //     }
     // })
-    // @Field({ valueType: Tenant }, { caption: terms.tenant })
+    @Field(options => options.valueType = Tenant, { caption: terms.tenant })
     // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
-    @Field({ caption: terms.tenant })
-    tid: string = '';
-    
+    //@Field({ caption: terms.tenant })
+    tid!: Tenant;
+
     @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
     vids: string[] = [];
 
@@ -221,6 +230,18 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.remark })
     remark: string = '';
+
+    @Field({ caption: terms.createdBy })
+    createdBy: string = '';
+
+    @Field({ caption: terms.created })
+    created!: Date;
+
+    @Field({ caption: terms.modifiedBy })
+    modifiedBy: string = '';
+
+    @Field({ caption: terms.modified })
+    modified!: Date;
 
     period() {
         let result = ActivityDayPeriod.morning;

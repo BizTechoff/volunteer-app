@@ -16,12 +16,13 @@ export class VolunteerActivitiesComponent implements OnInit {
   constructor(private remult: Remult) { }
 
   terms = terms;
+  AcitivityStatus = ActivityStatus;
 
   async ngOnInit(): Promise<void> {
     await this.refresh();
 
   }
- 
+
   async openPhotosAlbum(a: Activity) {
     let changes = await openDialog(PhotosAlbumComponent,
       _ => _.args = { entityId: a.id },
@@ -42,15 +43,17 @@ export class VolunteerActivitiesComponent implements OnInit {
     for await (const a of this.remult.repo(Activity).iterate({
       where: row => row.vids.contains(this.remult.user.id)
     })) {
+      await a.$.tid.load();
+      console.log(a.tid ? a.tid.name : 'NULL');
       this.activities.push(a);
     }
   }
 
-  async setNextStatus(a: Activity) {
+  async setNextStatus(a: Activity, status: ActivityStatus) {
     let next = a.status.next();
     if (!next) {
       next = a.status;
-    }
+    } 
     if (next !== a.status) {
       a.status = next;
       await a.save();

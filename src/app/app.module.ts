@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -20,21 +21,24 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
+import { SelectTenantComponentComponent } from './common/select-tenant-component/select-tenant-component.component';
 import { YesNoQuestionComponent } from './common/yes-no-question/yes-no-question.component';
 import { ActivitiesListComponent } from './core/activity/activities-list/activities-list.component';
 import { ActivityDetailsComponent } from './core/activity/activity-details/activity-details.component';
 import { CurrentStateComponent } from './core/current-state/current-state.component';
+import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.component';
 import { TenantDetailsComponent } from './core/tenant/tenant-details/tenant-details.component';
 import { TenantsListComponent } from './core/tenant/tenants-list/tenants-list.component';
+import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
 import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/volunteer-details.component';
+import { VolunteersAssignmentComponent } from './core/volunteer/volunteers-assignment/volunteers-assignment.component';
 import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
 import { HomeComponent } from './home/home.component';
+import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
 import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
 import { UsersComponent } from './users/users.component';
-import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
-import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
-import { VolunteersAssignmentComponent } from './core/volunteer/volunteers-assignment/volunteers-assignment.component';
-import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.component';
+import { SelectVolunteersComponent } from './common/select-volunteers/select-volunteers.component';
+import { SelectLangsComponent } from './common/select-langs/select-langs.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +57,10 @@ import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.com
     VolunteerActivitiesComponent,
     ActivityDailyComponent,
     VolunteersAssignmentComponent,
-    PhotosAlbumComponent
+    PhotosAlbumComponent,
+    SelectTenantComponentComponent,
+    SelectVolunteersComponent,
+    SelectLangsComponent
   ],
   imports: [
     BrowserModule,
@@ -73,10 +80,12 @@ import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.com
     MatMenuModule,
     RemultModule,
     BrowserAnimationsModule,
-    ChartsModule
-  ], 
+    ChartsModule,
+    MatSelectModule
+  ],
   providers: [DialogService, AdminGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
-  entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent]
+  entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
+    SelectVolunteersComponent, SelectTenantComponentComponent, SelectLangsComponent]
 })
 export class AppModule { }

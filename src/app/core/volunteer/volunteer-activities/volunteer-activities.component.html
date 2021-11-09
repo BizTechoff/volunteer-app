@@ -7,10 +7,11 @@
     <div class="grow-item">
 
         <div style="display: flex; flex-direction: column; justify-content: center;">
+            <h1 *ngIf="this.activities && this.activities.length == 0"> {{ terms.volunteerNoActivities }} </h1>
             <ng-container style="margin-top: 7px;" *ngFor='let a of this.activities'>
                 <mat-card>
                     <mat-card-title> 
-                        {{ a.tid }}
+                        {{ a?.tid?.name }}
                         <button mat-mini-fab (click)="this.openPhotosAlbum(a)">
                             <mat-icon>camera</mat-icon>
                         </button>
@@ -44,11 +45,11 @@
                         </div>
                     </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
-                        <button (click)='this.setNextStatus(a)' *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_start)' *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
                             style="margin-top: 7px; background: blue; color: white;">התחלתי</button>
-                        <button (click)='this.setNextStatus(a)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: green; color: white;">סיימתי</button>
-                        <button (click)='this.setNextStatus(a)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.problem)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: red; color: white;">ישנה
                             בעיה</button>
                     </div>

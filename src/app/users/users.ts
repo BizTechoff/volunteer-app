@@ -1,28 +1,57 @@
 
-import { InputField } from "@remult/angular";
+import { DataControl, InputField, openDialog } from "@remult/angular";
 import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
+import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
+import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
+import { CommaSeparatedStringArrayField } from "../core/tenant/tenant";
 import { terms } from "../terms";
 import { Roles } from './roles';
 
 
-@ValueListFieldType(Langs, { /*multi: true*/ })
+@ValueListFieldType(Langs, { /*displayValue: () => {return '';}*/ /*multi: true*/ })
 export class Langs {
     static hebrew = new Langs(1, 'עברית');
     static english = new Langs(2, 'אנגלית');
     static russian = new Langs(3, 'רוסית');
     static french = new Langs(4, 'צרפתית');
     constructor(public id: number, public caption: string) { }
-    
+
     static getOptions() {
         let op = new ValueListValueConverter(Langs).getOptions();
         return op;
     }
+    static fromString(str: string) {
+        // console.log(str);
+        let split = str.toString().split(',');
+        // console.log(split);
+        let result = [] as Langs[];
+        let options = Langs.getOptions();
+        split.forEach(l => { 
+            let found = options.find(_ => _.id === parseInt(l));
+            if (found) {
+                result.push(found);
+            }
+        });
+        return result;
+    }
 
 }
 
+@DataControl<any, Users>({
+    hideDataOnInput: true,
+    clickIcon: 'search',
+    getValue: (_, f) => f.value?.name,
+    click: async (_, f) => {
+        await openDialog(SelectVolunteersComponent, x => x.args = {
+            onSelect: site => f.value = site,
+            title: f.metadata.caption,
+            usersLangs: f.value.langs
+        })
+    }
+})
 @Entity<Users>("Users", {
     allowApiRead: Allow.authenticated,
     allowApiUpdate: Allow.authenticated,
@@ -49,16 +78,16 @@ export class Langs {
         };
         options.validation = async (user) => {
             let ok = true;
-            console.log('ValidBranchValidation-1');
+            // console.log('ValidBranchValidation-1');
 
             if (!user.board && user.volunteer) {
-                console.log('ValidBranchValidation-2');
+                // console.log('ValidBranchValidation-2');
                 ok &&= user.bid && user.bid && user.bid.length > 0 ? true : false;
                 ok &&= user.bid !== '0';
             }
-            console.log('ValidBranchValidation-3');
+            // console.log('ValidBranchValidation-3');
             if (!ok!) {
-                console.log('ValidBranchValidation-4');
+                // console.log('ValidBranchValidation-4');
                 user.$.bid.error = user.$.bid.metadata.caption + ': ' + terms.requiredField;
             }
         }
@@ -94,9 +123,24 @@ export class Users extends IdEntity {
     @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
     numOfActivities: number = 0;
 
-    @Field({ caption: terms.langs })
-    langs: Langs = Langs.hebrew;
+    
 
+    @DataControl<Users, Langs[]>({
+        hideDataOnInput: true,
+        clickIcon: 'search',
+        getValue: (r,v) => {return v && v.value? v.value.map(i => i.caption).join(', ').trim() : '';},
+        // getValue : (r,v) => {v.displayValue},
+        click: async (_, f) => {
+            await openDialog(SelectLangsComponent, x => x.args = {
+                // onSelect: site => f.value = site,
+                // title: f.metadata.caption,
+                langs: f.value
+            })
+        }    
+    })  
+    @CommaSeparatedStringArrayField<Users>({ caption: terms.langs })
+    langs: Langs[] = [Langs.hebrew];
+ 
     @Field({
         validate: [StringRequiredValidation, Validators.unique],
         caption: terms.mobile
@@ -174,7 +218,7 @@ export class Users extends IdEntity {
     }
     @BackendMethod({ allowed: true })
     async create(password: string = '') {
-        console.log(this);
+        // console.log(this);
         if (!password || password.trim().length === 0) {
             password = process.env.DEFAULT_PASSWORD!;
         }

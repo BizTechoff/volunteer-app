@@ -1,8 +1,9 @@
 export const terms = {
+    volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
     removeImage: 'הסרת תמונה',
     noPhotosOfYoursTogether:'לא הועלו תמונות שלכם יחד',
     created: 'נוצר', 
-    createdBy: 'נןצר ע"י',
+    createdBy: 'נוצר ע"י',
     modified: 'עודכן',
     modifiedBy: 'עודכן ע"י',
     uploadPhoto :'העלאת תמונה',

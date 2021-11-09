@@ -36,6 +36,7 @@ export class VolunteersListComponent implements OnInit {
         { field: _.name, caption: 'שם' },
         _.mobile,
         _.birthday,
+        _.langs,
         { field: _.defTid, caption: terms.defaultTenant },],
       gridButtons: [
         {
@@ -99,7 +100,7 @@ export class VolunteersListComponent implements OnInit {
           u!.$.birthday,
           u!.$.email,
           { field: u!.$.defTid, caption: terms.defaultTenant }],
-        ok: async () => { await u!.create(); }
+        ok: async () => { await (u!.isNew() ? u!.create() : u!.save()); }
       },
       _ => _ ? _.ok : false);
     if (changed) {

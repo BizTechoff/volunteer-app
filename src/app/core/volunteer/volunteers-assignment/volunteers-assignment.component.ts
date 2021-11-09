@@ -4,7 +4,7 @@ import { DataControl, GridSettings } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { terms } from '../../../terms';
-import { Users } from '../../../users/users';
+import { Langs, Users } from '../../../users/users';
 
 @Component({
   selector: 'app-volunteers-assignment',
@@ -12,18 +12,20 @@ import { Users } from '../../../users/users';
   styleUrls: ['./volunteers-assignment.component.scss']
 })
 export class VolunteersAssignmentComponent implements OnInit {
-
+ 
   args: {
     bid: string,
     aid: string,
-    tname: string,
-    langs: string,
+    tname: string, 
+    langs: Langs[],
     changed?: boolean,
     vids: string[]
-  } = { bid: '', aid: '', tname: '', langs: '', changed: false, vids: [] };
+  } = { bid: '', aid: '', tname: '', langs: [], changed: false, vids: [] };
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForTenantNameHere}` })
   search: string = ''
+
+  lgDesc = '';
 
   volunteers = new GridSettings<Users>(this.remult.repo(Users),
     {
@@ -31,8 +33,8 @@ export class VolunteersAssignmentComponent implements OnInit {
         .and(u.bid.isEqualTo(this.args.bid))
         .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
-      allowSelection: true,
-      columnSettings: (u) => [u.name, u.langs],
+      allowSelection: true, 
+      columnSettings: (u) => [{field: u.name, caption: 'שם'}, u.langs],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -48,6 +50,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   terms = terms;
 
   async ngOnInit() {
+    this.lgDesc= this.args.langs.map(_ => _.caption).join(', ');
     if (this.args.vids.length > 0) {
       let vids = await this.remult.repo(Users).find({
         where: u => u.id.isIn(this.args.vids)

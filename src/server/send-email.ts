@@ -59,13 +59,13 @@ EmailSvc.sendMail = async (subject: string, message: string, email: string, remu
     new Promise((res, rej) => {
         transporter.sendMail(mailOptions, function (error: any, info: { response: string; }) {
             if (error) {
-                console.log('mail.error');
-                console.log(error);
+                // console.log('mail.error');
+                // console.log(error);
                 rej(error);
             } else {
-                console.log('mail.ok');
+                // console.log('mail.ok');
                 res(true);
-                console.log('Email sent: ' + info.response);
+                // console.log('Email sent: ' + info.response);
             }
         });
     });

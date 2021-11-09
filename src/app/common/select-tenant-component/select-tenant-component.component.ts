@@ -1,0 +1,100 @@
+import { Component, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+import { BusyService, openDialog } from '@remult/angular';
+import { Remult } from 'remult';
+import { Tenant } from '../../core/tenant/tenant';
+import { terms } from '../../terms';
+import { Roles } from '../../users/roles';
+import { Langs } from '../../users/users';
+import { InputAreaComponent } from '../input-area/input-area.component';
+
+@Component({
+  selector: 'app-select-tenant-component',
+  templateUrl: './select-tenant-component.component.html',
+  styleUrls: ['./select-tenant-component.component.scss']
+})
+export class SelectTenantComponentComponent implements OnInit {
+  searchString = '';
+  langs = [Langs.russian];
+  options = [
+    Langs.hebrew, Langs.english, Langs.russian, Langs.french
+  ]
+  args!: {
+    title?: string,
+    tenantLangs: Langs[],
+    onSelect: (p: Tenant) => void;
+  }
+  constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
+  tenants: Tenant[] = [];
+  terms = terms;
+  ngOnInit() {
+    this.langs = this.args.tenantLangs;
+    this.loadTenants();
+  }
+  async loadTenants() {
+    this.tenants = await this.remult.repo(Tenant).find({
+      where: t =>
+        // if there is a search value, search by it
+        t.langs.isIn([this.langs])
+          .and(t.active.isEqualTo(true))
+          .and(
+            this.searchString ? t.name.contains(this.searchString)
+              : undefined!)
+    });
+  }
+  async doSearch() {
+    await this.busy.donotWait(async () => this.loadTenants());
+  }
+
+  select(p: Tenant) {
+    this.args.onSelect(p);
+    this.dialogRef.close();
+  }
+  selectFirst() {
+    if (this.tenants.length > 0)
+      this.select(this.tenants[0]);
+  }
+  isBoard() {
+    return this.remult.isAllowed(Roles.board);
+  }
+  async create() {
+    let t = this.remult.repo(Tenant).create();
+    t.bid = this.isBoard() ? '' : this.remult.user.bid;
+    let changed = await openDialog(InputAreaComponent,
+      _ => _.args = {
+        title: terms.addTenant,
+        fields: () => [
+          { field: t!.$.bid, visible: (r, v) => this.isBoard() },
+          t!.$.name,
+          t!.$.mobile,
+          t!.$.address,
+          t!.$.birthday,
+          t!.$.langs,
+          t!.$.defVids],
+        ok: async () => {
+          await t!.save();
+          this.select(t);
+        }
+      },
+      _ => _ ? _.ok : false);
+    // if (changed) {
+    // await this.loadTenants();
+    // if (await this.dialog.yesNoQuestion(terms.shouldAddActivity.replace('!t.name!', t.name))) {
+    //   this.openActivity(t);
+    // }
+    // }
+
+
+    // let Tenant = this.remult.repo(Tenant).create({
+    //   name: this.searchString,
+    //   type: this.filterTenant
+    // });
+    // openDialog(EditTenantComponent, x => x.args = {
+    //   Tenant,
+    //   ok: () => {
+    //     this.select(Tenant);
+    //   }
+    // });
+  }
+
+}

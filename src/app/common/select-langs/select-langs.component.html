@@ -1,0 +1,11 @@
+<div class="full-page">
+    <div class="header"></div>
+    <div *ngIf="this.allLangs" class="ng-container">
+        <div *ngFor="let l of this.allLangs">
+            <mat-checkbox [(ngModel)]="l.c"> {{ l.l.caption }} </mat-checkbox>
+        </div>
+    </div>
+    <div class="footer">
+        <button color='primary' (click)="this.close()">סיום בחירה</button>
+    </div>
+</div> 

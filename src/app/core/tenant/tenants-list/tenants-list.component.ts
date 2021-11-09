@@ -24,7 +24,7 @@ export class TenantsListComponent implements OnInit {
   terms = terms;
   tenants: GridSettings<Tenant> = new GridSettings<Tenant>(
     this.remult.repo(Tenant),
-    { 
+    {
       where: _ => (this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid))
         .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
@@ -93,7 +93,7 @@ export class TenantsListComponent implements OnInit {
 
   async openActivity(tnt: Tenant) {
     let changes = await openDialog(ActivityDetailsComponent,
-      _ => _.args = { bid: tnt.bid, tid: tnt.id },
+      _ => _.args = { bid: tnt.bid, tid: tnt },
       _ => _ ? _.args.changed : false);
     if (changes) {
       await this.refresh();
@@ -107,12 +107,14 @@ export class TenantsListComponent implements OnInit {
   async addTenant(t?: Tenant) {
     if (!t) {
       t = this.remult.repo(Tenant).create();
+      t.bid = this.isBoard() ? '' : this.remult.user.bid;
     }
+    f1:Field;
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: terms.addTenant,
         fields: () => [
-          { field: t!.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
+          { field: t!.$.bid, visible: (r, v) => this.isBoard() },
           t!.$.name,
           t!.$.mobile,
           t!.$.address,
@@ -121,7 +123,7 @@ export class TenantsListComponent implements OnInit {
           t!.$.defVids],
         ok: async () => { await t!.save(); }
       },
-      _ => _ ? _.ok : false);
+      _ => _ ? _.ok : false); 
     if (changed) {
       await this.refresh();
       if (await this.dialog.yesNoQuestion(terms.shouldAddActivity.replace('!t.name!', t.name))) {
