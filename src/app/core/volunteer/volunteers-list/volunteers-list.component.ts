@@ -35,8 +35,8 @@ export class VolunteersListComponent implements OnInit {
         { field: _.bid, caption: 'סניף' },
         { field: _.name, caption: 'שם' },
         _.mobile,
-        _.birthday,
         _.langs,
+        _.birthday,
         { field: _.defTid, caption: terms.defaultTenant },],
       gridButtons: [
         {

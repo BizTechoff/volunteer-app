@@ -7,6 +7,7 @@ import { InputAreaComponent } from '../../../common/input-area/input-area.compon
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
+import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
 import { Tenant } from '../tenant';
 
 @Component({
@@ -105,6 +106,10 @@ export class TenantsListComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
 
+
+  @Field({ caption: terms.age })
+  age: number = 0;
+
   async addTenant(t?: Tenant) {
     let isNew = false;
     if (!t) {
@@ -121,9 +126,12 @@ export class TenantsListComponent implements OnInit {
           t!.$.name,
           t!.$.mobile,
           t!.$.address,
-          t!.$.birthday,
+          [
+            { field: t!.$.birthday, valueChange: (r, v) => { this.age = t!.calcAge(); } } ,
+            { field:  this.$.age, width: '60', readonly: true}
+          ], 
           t!.$.langs,
-          t!.$.defVids],
+          { field: t!.$.defVids, clickIcon: 'search', click: async () => await this.openVolunteers(t!) }],
         ok: async () => { await t!.save(); }
       },
       _ => _ ? _.ok : false);
@@ -134,6 +142,29 @@ export class TenantsListComponent implements OnInit {
           this.openActivity(t);
         }
       }
+    }
+  }
+
+  async openVolunteers(t: Tenant) {
+    let bidOk = (t && t.bid && t.bid.length > 0 && t.bid !== '0')!;
+    if (bidOk) {
+      let volids = await openDialog(VolunteersAssignmentComponent,
+        input => input.args = {
+          bid: t.bid,
+          aid: '',
+          tname: t.name,
+          langs: t.langs,// this.t.langs, 
+          vids: t.defVids,
+          volids: []
+        },
+        output => output ? (output.args.changed ? output.args.volids : undefined) : undefined);
+
+      if (volids) {
+        t.defVids.splice(0);
+      }
+    }
+    else {
+      await this.dialog.error(terms.mustSetBidForThisAction);
     }
   }
 

@@ -15,6 +15,7 @@ export class VolunteerDetailsComponent implements OnInit {
   volunteer!: Users;
   details = new DataAreaSettings<Users>();
   constructor(private remult: Remult, private dialog: DialogService) { }
+terms = terms;
 
   async ngOnInit() {
     await this.refresh();

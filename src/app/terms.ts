@@ -1,6 +1,9 @@
 export const terms = {
+    save:'שמור',
+    age: 'גיל',  
+    continue: 'המשך',
     openPhotosAlbum : 'פתח אלבום תמונות',
-    linkClicked:'לינק נלחץ',
+    linkClicked:'לינק נלחץ', 
     voulnteerNewAssign:'נקבעה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     referrer: 'גורם מפנה', 
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',

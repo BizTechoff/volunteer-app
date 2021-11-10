@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
+import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
 import { EmailSvc } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -87,9 +88,9 @@ export class ActivityDetailsComponent implements OnInit {
     })
     this.fields = new DataAreaSettings({
       fields: () => [
-        { field: this.activity.$.tid },//, readonly: true },
+        { field: this.activity.$.tid, clickIcon: 'search', click: async () => await this.openTenants() },//, readonly: true },
         { field: this.activity.$.vids, clickIcon: 'search', click: async () => await this.openAssignment() },
-        { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
+        // { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
         this.activity.$.purpose,
         this.activity.$.purposeDesc,
         this.activity.$.date,
@@ -97,6 +98,15 @@ export class ActivityDetailsComponent implements OnInit {
         { field: this.activity.$.remark, caption: terms.commentAndSummary }
       ]
     });
+  }
+
+  async openTenants(){
+      await openDialog(SelectTenantComponentComponent, x => x.args = {
+          bid: this.activity.bid,
+          onSelect: t => this.activity.tid = t,
+          title: 'בחירה',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+          tenantLangs: []
+      });
   }
 
   async openAssignment() {
@@ -109,19 +119,20 @@ export class ActivityDetailsComponent implements OnInit {
           aid: this.activity.id,
           tname: this.activity.tid.name,
           langs: this.activity.tid?.langs,// this.t.langs, 
-          vids: this.activity.vids,
-          volids: this.activity.volids
+          vids: this.activity.vids//,
+          // volids: this.activity.volids
         },
         output => output ? (output.args.changed ? output.args.volids : undefined) : undefined);
 
       if (volids) {
-        this.activity.volids.splice(0);
         // this.activity.volids.push(...volids);
         // console.log(volids.length);
         // console.log(this.activity.volids.length);
         // console.log(this.activity.volids);
         // this.activity.vids = vids;
+        console.log(111111);
         if (volids.length > 0) {
+          console.log(2222222);
           this.activity.status = ActivityStatus.w4_start;
         }
         // await this.refresh();

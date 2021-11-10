@@ -328,6 +328,9 @@ export class CurrentStateComponent implements OnInit {
     }
 
     for (const a of this.activitiesByWeekDay) {
+      if(a.day >= 6){
+        continue;
+      }
       let label = 'יום ' + this.weekDays[a.day] + ` (${a.count})`;
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;

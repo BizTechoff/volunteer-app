@@ -58,12 +58,13 @@ export function CommaSeparatedStringArrayField<entityType = any>(
     getValue: (_, f) => f.value?.name,
     click: async (_, f) => {
         await openDialog(SelectTenantComponentComponent, x => x.args = {
-            onSelect: site => f.value = site,
+            bid: f.value.bid,
+            onSelect: t => f.value = t,
             title: 'בחירה',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
             tenantLangs: f.value.langs
         })
-    }
-})
+    } 
+}) 
 @Entity<Tenant>('tenants',
     {
         allowApiInsert: [Roles.admin, Roles.manager],
@@ -101,7 +102,7 @@ export class Tenant extends IdEntity {
         caption: terms.branch, validate: StringRequiredValidation
     })
     bid: string = '';
- 
+
     @Field({ caption: terms.referrer, validate: Validators.required.withMessage(terms.requiredField) })
     referrer: Referrer = Referrer.welfare;
 
@@ -144,5 +145,14 @@ export class Tenant extends IdEntity {
 
     @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
     birthday!: Date;
+
+    calcAge() {
+        let result = 0;
+        if (this.birthday && this.birthday.getFullYear() > 1900) {
+            let today = new Date();
+            result = Math.max(1, today.getFullYear() - this.birthday.getFullYear());
+        }
+        return result;
+    }
 
 }

@@ -12,7 +12,7 @@ import { Langs, Users } from '../../../users/users';
   styleUrls: ['./volunteers-assignment.component.scss']
 })
 export class VolunteersAssignmentComponent implements OnInit {
-
+ 
   args: {
     bid: string,
     aid: string,
@@ -20,7 +20,7 @@ export class VolunteersAssignmentComponent implements OnInit {
     langs: Langs[],
     changed?: boolean,
     vids: string[],
-    volids: Users[]
+    volids?: Users[]
   } = { bid: '', aid: '', tname: '', langs: [], changed: false, vids: [], volids: [] as Users[] };
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForTenantNameHere}` })
@@ -52,6 +52,7 @@ export class VolunteersAssignmentComponent implements OnInit {
 
   async ngOnInit() {
     this.lgDesc = this.args.langs.map(_ => _.caption).join(', ');
+    this.args.volids = [];
     if (this.args.vids && this.args.vids.length > 0) {
       let vids = await this.remult.repo(Users).find({
         where: u => u.id.isIn(this.args.vids)
@@ -69,10 +70,10 @@ export class VolunteersAssignmentComponent implements OnInit {
   select() {
     this.args.changed = true;
     this.args.vids.splice(0);
-    this.args.volids.splice(0);
+    // this.args.volids.splice(0);
     for (const u of this.volunteers.selectedRows) {
       this.args.vids.push(u.id);
-      this.args.volids.push(u);
+      // this.args.volids.push(u);
     }
     this.win.close();
   }

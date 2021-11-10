@@ -99,6 +99,7 @@ export class Langs {
         user.admin.descending(),
         user.board.descending(),
         user.manager.descending(),
+        user.bid,
         user.name
     ]
 },

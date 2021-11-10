@@ -29,8 +29,8 @@ export class UsersComponent implements OnInit {
     columnSettings: users => [
       users.name,
       {
-        field: users.admin, //width: '80',
-        valueChange: user => () => {
+        field: users.admin, width: '80', //width: '80',
+        valueChange: user => {
           if (user.admin) {
             user.board = false;
             user.manager = false;
@@ -39,34 +39,35 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.board, valueChanged: () => {//, width: '80'
+        field: users.board, width: '80', 
+        valueChange: user => {//, width: '80'
           if (users.board) {
-            // users.admin = false;
-            // users.manager = false;
-            // users.volunteer = false;
+            user.admin = false;
+            user.manager = false;
+            user.volunteer = false;
           }
         }
       },
       {
-        field: users.manager, valueChanged: () => {//, width: '80'
+        field: users.manager, width: '80', valueChange: user => {//, width: '80'
           if (users.manager) {
-            // users.admin = false;
-            // users.board = false;
-            // users.volunteer = false;
+            user.admin = false;
+            user.board = false;
+            user.volunteer = false;
           }
         }
       },
       {
-        field: users.volunteer, valueChanged: () => {//, width: '80'
+        field: users.volunteer, width: '80', valueChange: user => {//, width: '80'
           if (users.volunteer) {
-            // users.admin = false;
-            // users.board = false;
-            // users.manager = false;
+            user.admin = false;
+            user.board = false;
+            user.manager = false;
           }
         }
       },
       { field: users.mobile },//, width: '100'
-      { field: users.bid, caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) },//, width: '80'
+      { field: users.bid, width: '80', caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) },//, width: '80'
       { field: users.email }
     ],
     gridButtons: [

@@ -233,12 +233,12 @@ export class Activity extends IdEntity {
     @Field({ caption: terms.volunteers })
     vids: string[] = [];
 
-    @Field({ caption: terms.volunteers })
-    // volids = new OneToMany(this.remult.repo(Users), {
-    //     // where: (_) => {  _.  }
-    // })
-    // @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
-    volids: Users[] = [] as Users[];
+    // @Field({ caption: terms.volunteers })
+    // // volids = new OneToMany(this.remult.repo(Users), {
+    // //     // where: (_) => {  _.  }
+    // // })
+    // // @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
+    // volids: Users[] = [] as Users[];
 
     @DateOnlyField({ caption: terms.date })
     date: Date = new Date();

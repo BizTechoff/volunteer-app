@@ -10,21 +10,27 @@
             <h1 *ngIf="this.activities && this.activities.length == 0"> {{ terms.volunteerNoActivities }} </h1>
             <ng-container *ngFor='let a of this.activities'>
                 <mat-card style="margin: 7px;">
-                    <mat-card-title> 
+                    <mat-card-title>
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
                         {{ a?.tid?.name }} 
-                        <button mat-mini-fab color="primary" [title]="a?.tid?.mobile!" (click)="this.call(a?.tid?.mobile!)">
-                            <mat-icon>call</mat-icon>
-                        </button> 
-                        <button mat-mini-fab color="primary" [title]='a?.tid?.address' (click)="this.openWaze(a?.tid?.address!)">
-                            <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
-                            <img src="./assets/waze.svg">
-                        </button> 
-                        <button mat-mini-fab color="primary" [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
-                            <mat-icon>photo</mat-icon>
-                        </button>
+                        
                         <span *ngIf="this.showClosedActivitySign(a)">
                             <h2 style="width: 70px; background: darkblue; color: white; transform: rotate(45deg); display: inline-block">{{ a.status.caption }}</h2>
                         </span>
+                        
+                        <div style="display: flex; flex-direction: row; justify-content: end;">
+                        <button mat-mini-fab color="primary" [title]="a?.tid?.mobile!" (click)="this.call(a?.tid?.mobile!)">
+                            <mat-icon>call</mat-icon>
+                        </button> 
+                        <button style="margin-right: 10px;" mat-mini-fab color="primary" [title]='a?.tid?.address' (click)="this.openWaze(a?.tid?.address!)">
+                            <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
+                            <img src="./assets/waze.svg">
+                        </button> 
+                        <button style="margin-right: 10px;" mat-mini-fab color="primary" [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
+                            <mat-icon>photo</mat-icon>
+                        </button>
+                        </div>
+                        </div>
                     </mat-card-title>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-start;">

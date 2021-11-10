@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { terms } from '../../terms';
 import { Langs } from '../../users/users';
 
 @Component({
@@ -20,6 +21,8 @@ export class SelectLangsComponent implements OnInit {
       this.allLangs.push({l:lng, c: this.args.langs?.find(_ => _.id === lng.id) ? true : false})
     });
   }
+
+  terms = terms;
 
   close(){
     this.args.langs?.splice(0);
