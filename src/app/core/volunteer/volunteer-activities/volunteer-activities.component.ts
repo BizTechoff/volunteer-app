@@ -4,6 +4,7 @@ import { Remult } from 'remult';
 import { terms } from '../../../terms';
 import { Langs } from '../../../users/users';
 import { Activity, ActivityStatus } from '../../activity/activity';
+import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 
 @Component({
@@ -22,6 +23,16 @@ export class VolunteerActivitiesComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.refresh();
 
+  }
+
+  async openActivity(act: Activity) {
+    let id = act && act.id && act.id.length > 0 ? act.id : '';
+    let changes = await openDialog(ActivityDetailsComponent,
+      input => input.args = { aid: id },
+      output => output ? output.args.changed : false);
+    if (changes) {
+      await this.refresh();
+    }
   }
 
   async openPhotosAlbum(a: Activity) {
@@ -49,11 +60,11 @@ export class VolunteerActivitiesComponent implements OnInit {
       })) {
         await a.$.tid.load();
         as.push(a);
-      } 
+      }
       this.activities.splice(0);
       this.activities.push(...as);
       this.refreshing = false;
-    }  
+    }
   }
 
   getLang(langs: Langs[]) {

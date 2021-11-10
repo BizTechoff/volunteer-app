@@ -12,8 +12,12 @@
                 <mat-card style="margin: 7px;">
                     <mat-card-title>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                        {{ a?.tid?.name }} 
                         
+                                <button mat-mini-fab color="primary" [title]="terms.edit" (click)="openActivity(a)">
+                                    <mat-icon>edit</mat-icon>
+                                </button> 
+                            {{ a?.tid?.name }} 
+                         
                         <span *ngIf="this.showClosedActivitySign(a)">
                             <h2 style="width: 70px; background: darkblue; color: white; transform: rotate(45deg); display: inline-block">{{ a.status.caption }}</h2>
                         </span>
