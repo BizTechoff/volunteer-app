@@ -8,6 +8,7 @@ import { EmailSvc } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
+import { Branch } from '../../branch/branch';
 import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
@@ -22,12 +23,12 @@ import { Activity, ActivityStatus } from '../activity';
 export class ActivityDetailsComponent implements OnInit {
 
   args: {
-    bid?: string,
+    bid?: Branch,
     aid?: string,
     tid?: Tenant,
     readonly?: boolean,
     changed?: boolean
-  } = { bid: '', aid: '', tid: undefined, readonly: false, changed: false };
+  } = { bid: undefined, aid: '', tid: undefined, readonly: false, changed: false };
   today = new Date();
   activity!: Activity;
   top = new DataAreaSettings({});
@@ -69,8 +70,17 @@ export class ActivityDetailsComponent implements OnInit {
       }
     }
     if (!this.activity) {
+      let branch = undefined;
+      if (this.isBoard()) {
+        if (this.args.bid) {
+          branch = this.args.bid;
+        }
+      }
+      else {
+        branch = await this.remult.repo(Branch).findId(this.remult.user.bid);
+      }
       this.activity = this.remult.repo(Activity).create({
-        bid: this.isBoard() ? (this.args.bid ? this.args.bid : '') : this.remult.user.bid,
+        bid: branch,
         tid: this.args.tid,//await this.remult.repo(Tenant).findId(this.args.tid!),
         purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
@@ -100,18 +110,18 @@ export class ActivityDetailsComponent implements OnInit {
     });
   }
 
-  async openTenants(){
-      await openDialog(SelectTenantComponentComponent, x => x.args = {
-          bid: this.activity.bid,
-          onSelect: t => this.activity.tid = t,
-          title: 'בחירה',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
-          tenantLangs: []
-      });
+  async openTenants() {
+    await openDialog(SelectTenantComponentComponent, x => x.args = {
+      bid: this.activity.bid,
+      onSelect: t => this.activity.tid = t,
+      title: 'בחירה',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+      tenantLangs: []
+    });
   }
 
   async openAssignment() {
 
-    let bidOk = (this.activity.bid && this.activity.bid.length > 0 && this.activity.bid !== '0')!;
+    let bidOk = (this.activity.bid && this.activity.bid.id && this.activity.bid.id.length > 0)!;
     if (bidOk) {
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
@@ -125,14 +135,7 @@ export class ActivityDetailsComponent implements OnInit {
         output => output ? (output.args.changed ? output.args.volids : undefined) : undefined);
 
       if (volids) {
-        // this.activity.volids.push(...volids);
-        // console.log(volids.length);
-        // console.log(this.activity.volids.length);
-        // console.log(this.activity.volids);
-        // this.activity.vids = vids;
-        console.log(111111);
         if (volids.length > 0) {
-          console.log(2222222);
           this.activity.status = ActivityStatus.w4_start;
         }
         // await this.refresh();
@@ -145,7 +148,7 @@ export class ActivityDetailsComponent implements OnInit {
 
   async openPhotosAlbum() {
     let changes = await openDialog(PhotosAlbumComponent,
-      _ => _.args = { entityId: this.activity.id },
+      _ => _.args = { bid: this.activity.bid, entityId: this.activity.id },
       _ => _ ? _.args.changed : false);
     if (changes) {
       // await this.refresh();
@@ -164,7 +167,7 @@ export class ActivityDetailsComponent implements OnInit {
     this.win.close();
   }
 
-  async sendEmails(){
+  async sendEmails() {
     if (this.lastVids !== this.activity.vids) {
       let yes = await this.dialog.yesNoQuestion('האם לשלוח אימייל למתנדבים');
       if (yes) {
@@ -173,18 +176,18 @@ export class ActivityDetailsComponent implements OnInit {
           if (u) {
             let text = '';
             let email = u.email;
-            if(u.clickedLink){
+            if (u.clickedLink) {
               // send update mail
               text = 'עדכון למייל קיים בין המתנדב לדייר';
             }
-            else{
+            else {
               //send new mail
-            text = terms.voulnteerNewAssign
-              .replace('!name!', this.activity.tid.name)
-              .replace('!date!', this.activity.date.toLocaleDateString())
-              .replace('!from!', this.activity.fh)
-              .replace('!to!', this.activity.th)
-              .replace('!address!', this.activity.tid.address);
+              text = terms.voulnteerNewAssign
+                .replace('!name!', this.activity.tid.name)
+                .replace('!date!', this.activity.date.toLocaleDateString())
+                .replace('!from!', this.activity.fh)
+                .replace('!to!', this.activity.th)
+                .replace('!address!', this.activity.tid.address);
             }
             await EmailSvc.SendEmail(email, text);
           }

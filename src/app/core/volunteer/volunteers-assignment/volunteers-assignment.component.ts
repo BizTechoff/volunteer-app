@@ -5,6 +5,7 @@ import { Field, getFields, Remult } from 'remult';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Langs, Users } from '../../../users/users';
+import { Branch } from '../../branch/branch';
 
 @Component({
   selector: 'app-volunteers-assignment',
@@ -14,14 +15,14 @@ import { Langs, Users } from '../../../users/users';
 export class VolunteersAssignmentComponent implements OnInit {
  
   args: {
-    bid: string,
+    bid: Branch,
     aid: string,
     tname: string,
     langs: Langs[],
     changed?: boolean,
     vids: string[],
     volids?: Users[]
-  } = { bid: '', aid: '', tname: '', langs: [], changed: false, vids: [], volids: [] as Users[] };
+  } = { bid: undefined!, aid: '', tname: '', langs: [], changed: false, vids: [], volids: [] as Users[] };
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForTenantNameHere}` })
   search: string = ''
@@ -31,7 +32,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   volunteers = new GridSettings<Users>(this.remult.repo(Users),
     {
       where: u => u.volunteer.isEqualTo(true)
-        .and(u.bid.isEqualTo(this.args.bid))
+        .and(u.bid!.isEqualTo(this.args.bid))
         .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
       allowSelection: true,

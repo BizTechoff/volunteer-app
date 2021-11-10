@@ -6,6 +6,7 @@ import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
 import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
+import { Branch } from "../core/branch/branch";
 import { CommaSeparatedStringArrayField } from "../core/tenant/tenant";
 import { terms } from "../terms";
 import { Roles } from './roles';
@@ -97,9 +98,10 @@ export class Langs {
     allowApiInsert: Roles.manager,
     defaultOrderBy: (user) => [
         user.admin.descending(),
+        user.donor.descending(),
         user.board.descending(),
         user.manager.descending(),
-        user.bid,
+        user.bid ? user.bid.descending() : user.manager.descending(),
         user.name
     ]
 },
@@ -117,23 +119,20 @@ export class Langs {
                 if (!remult.isAllowed(Roles.manager)) {
                     return active.and(user.id.isEqualTo(remult.user.id));//volunteer only himself
                 }
-                return active.and(user.bid.isEqualTo(remult.user.bid));//manager only his branch
+                return active.and(user.bid!.contains(remult.user.bid));//manager only his branch
             }
             return active;
         };
         options.validation = async (user) => {
             let ok = true;
-            // console.log('ValidBranchValidation-1');
-
-            if (!user.board && user.volunteer) {
-                // console.log('ValidBranchValidation-2');
-                ok &&= user.bid && user.bid && user.bid.length > 0 ? true : false;
-                ok &&= user.bid !== '0';
-            }
-            // console.log('ValidBranchValidation-3');
-            if (!ok!) {
-                // console.log('ValidBranchValidation-4');
-                user.$.bid.error = user.$.bid.metadata.caption + ': ' + terms.requiredField;
+            if (user.manager || user.volunteer) {//manager | volunteer
+                if (!user.bid) {
+                    throw user.$.bid!.metadata.caption + ': ' + terms.requiredField;
+                }
+                ok &&= (user.bid.id && user.bid.id.length > 0 ? true : false);
+                if (!ok!) {
+                    user.bid!._.error = user.$.bid!.metadata.caption + ': ' + terms.requiredField;
+                }
             }
         }
         options.saving = async (user) => {
@@ -143,10 +142,9 @@ export class Langs {
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
                 }
-                if (user.board) {//include admin
-                    if (!user.bid || user.bid.length < 1 || user.bid !== '0') {
-                        user.bid = '0';
-                    }
+                if (user.admin || user.donor || user.board) {
+                    user.bid = undefined;
+                    console.log(' user.bid = undefined');
                 }
             }
         };
@@ -177,9 +175,10 @@ export class Users extends IdEntity {
     }
 
     @Field({
-        caption: terms.branch
+        caption: terms.branch,
+        allowNull: true
     })
-    bid: string = '';
+    bid?: Branch;
 
     @Field({
         validate: [StringRequiredValidation, Validators.unique],
@@ -249,6 +248,12 @@ export class Users extends IdEntity {
 
     @Field({
         allowApiUpdate: Roles.board,
+        caption: terms.donor
+    })
+    donor: Boolean = false;
+
+    @Field({
+        allowApiUpdate: Roles.board,
         caption: terms.board
     })
     board: Boolean = false;
@@ -272,8 +277,7 @@ export class Users extends IdEntity {
     hasValidBranch() {
         let result = true;
         if (!this.board && this.volunteer) {
-            result &&= this.bid && this.bid.length > 1 ? true : false;
-            result &&= this.bid !== '0';
+            result &&= this.bid && this.bid.id && this.bid.id.length > 0 ? true : false;
         }
         return result;
     }

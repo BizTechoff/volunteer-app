@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BusyService, openDialog } from '@remult/angular';
 import { Remult } from 'remult';
+import { Branch } from '../../core/branch/branch';
 import { Tenant } from '../../core/tenant/tenant';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
@@ -19,10 +20,10 @@ export class SelectTenantComponentComponent implements OnInit {
   langs = [Langs.russian];
   options = [
     Langs.hebrew, Langs.english, Langs.russian, Langs.french
-  ]
+  ]    
   args!: {
     title?: string,
-    bid: string,
+    bid: Branch,
     tenantLangs: Langs[],
     onSelect: (p: Tenant) => void;
   }
@@ -47,7 +48,7 @@ export class SelectTenantComponentComponent implements OnInit {
   }
   async doSearch() {
     await this.busy.donotWait(async () => this.loadTenants());
-  } 
+  }
 
   select(p: Tenant) {
     this.args.onSelect(p);
@@ -62,7 +63,9 @@ export class SelectTenantComponentComponent implements OnInit {
   }
   async create() {
     let t = this.remult.repo(Tenant).create();
-    t.bid = this.isBoard() ? '' : this.remult.user.bid;
+    if (!this.isBoard()) {
+      t.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
+    }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: terms.addTenant,

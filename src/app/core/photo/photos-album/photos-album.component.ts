@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
+import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
 
 @Component({
@@ -16,9 +17,10 @@ export class PhotosAlbumComponent implements OnInit {
   entityId: string = '';
 
   args: {
+    bid: Branch,
     entityId: string,
     changed?: boolean
-  } = { entityId: '', changed: false };
+  } = { bid: undefined!, entityId: '', changed: false };
 
   photos = [] as Photo[];
   terms = terms;
@@ -30,7 +32,7 @@ export class PhotosAlbumComponent implements OnInit {
 
   async ngOnInit() {
     if (!this.args) {
-      this.args = { entityId: '', changed: false };
+      this.args = { bid: undefined!, entityId: '', changed: false };
     }
     if (!this.args.entityId) {
       this.args.entityId = '';
@@ -153,6 +155,7 @@ export class PhotosAlbumComponent implements OnInit {
 
   async addPhoto(title: string, data: string): Promise<Photo> {
     let result = this.remult.repo(Photo).create();
+    result.bid = this.args.bid;
     result.eid = this.args.entityId;
     result.title = title;
     result.data = data;

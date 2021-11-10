@@ -1,6 +1,8 @@
 export const terms = {
+    public: 'שתף באלבום הסניף',
+    wrongPassword: 'סיסמא שגויה',
     save:'שמור',
-    age: 'גיל',  
+    age: 'גיל',   
     continue: 'המשך',
     openPhotosAlbum : 'פתח אלבום תמונות',
     linkClicked:'לינק נלחץ', 
@@ -37,16 +39,18 @@ export const terms = {
     defaultPurposeDesc6: 'לארח חברה לספר ולהקשיב',
     showActivities: 'הצג פעילויות',
     opens: 'פתוחות', 
-    closes: 'סגורות',
+    closes: 'סגורות', 
     inProgress: 'בתהליך',
     endSuccess: 'הסתיימו בהצלחה',
-    problems: 'בעיות',
+    problems: 'בעיות', 
     invalidBranch: 'סניף אינו תקין',
     appVersion: '2021.11.10.0',
     defaultVolunteers: 'מתנדבים ברירת מחדל',
     appDesc: 'אפליקציה לניהול מפגשי התנדבות',
     addVolunteer: 'הוספת מתנדב',
     requiredField: 'שדה חובה',
+    donor: 'תורם',  
+    addBranch: 'הוספת סניף',
     addTenant: 'הוספת דייר',
     addActivity: 'הוספת פעילות',
     cancelActivity: 'בטל פעילות',
@@ -82,6 +86,7 @@ export const terms = {
     toHour: 'עד שעה',
     date: 'תאריך',
     reports: 'דוחות',
+    branches: 'סניפים',
     dailyActivityReport: 'דוח פעילות יומי',
     volunteers: 'מתנדבים',
     email: 'דוא"ל',
@@ -118,11 +123,11 @@ export const terms = {
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות'
-} 
-declare module 'remult' {
+}  
+declare module  'remult' {
     export interface UserInfo {
         bid: string;
     }
 }
  
- 
+   

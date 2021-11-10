@@ -7,6 +7,7 @@ import { InputAreaComponent } from '../../../common/input-area/input-area.compon
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
+import { Branch } from '../../branch/branch';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
 import { Tenant } from '../tenant';
 
@@ -26,7 +27,7 @@ export class TenantsListComponent implements OnInit {
   tenants: GridSettings<Tenant> = new GridSettings<Tenant>(
     this.remult.repo(Tenant),
     {
-      where: _ => (this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid))
+      where: _ => (this.isBoard() ? FILTER_IGNORE : _.bid.contains(this.remult.user.bid))
         .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
       numOfColumnsInGrid: 10,
@@ -57,7 +58,7 @@ export class TenantsListComponent implements OnInit {
           visible: (_) => !_.isNew(),
           textInMenu: terms.tenantDetails,
           icon: 'edit',
-          click: async (_) => await this.addTenant(_)
+          click: async (_) => await this.addTenant(_.id)
         },
         {
           visible: (_) => !_.isNew(),
@@ -110,12 +111,18 @@ export class TenantsListComponent implements OnInit {
   @Field({ caption: terms.age })
   age: number = 0;
 
-  async addTenant(t?: Tenant) {
+  async addTenant(tid: string) {
     let isNew = false;
+    let t!: Tenant;
+    if (tid && tid.length > 0) {
+      t = await this.remult.repo(Tenant).findId(tid, { useCache: false });
+    }
     if (!t) {
       t = this.remult.repo(Tenant).create();
       isNew = true;
-      t.bid = this.isBoard() ? '' : this.remult.user.bid;
+      if (!this.isBoard()) {
+        t.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
+      }
     }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
@@ -127,9 +134,9 @@ export class TenantsListComponent implements OnInit {
           t!.$.mobile,
           t!.$.address,
           [
-            { field: t!.$.birthday, valueChange: (r, v) => { this.age = t!.calcAge(); } } ,
-            { field:  this.$.age, width: '60', readonly: true}
-          ], 
+            { field: t!.$.birthday, valueChange: (r, v) => { this.age = t!.calcAge(); } },
+            { field: this.$.age, width: '60', readonly: true }
+          ],
           t!.$.langs,
           { field: t!.$.defVids, clickIcon: 'search', click: async () => await this.openVolunteers(t!) }],
         ok: async () => { await t!.save(); }
@@ -146,7 +153,7 @@ export class TenantsListComponent implements OnInit {
   }
 
   async openVolunteers(t: Tenant) {
-    let bidOk = (t && t.bid && t.bid.length > 0 && t.bid !== '0')!;
+    let bidOk = (t && t.bid && t.bid.id && t.bid.id.length > 0)!;
     if (bidOk) {
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {

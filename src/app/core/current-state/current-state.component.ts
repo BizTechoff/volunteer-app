@@ -8,6 +8,7 @@ import { EmailSvc } from '../../common/utils';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
+import { Branch } from '../branch/branch';
 import { Referrer } from '../tenant/tenant';
 
 @Component({
@@ -172,11 +173,11 @@ export class CurrentStateComponent implements OnInit {
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   maxLabelLength = 25;
 
-  activitiesByStatus: { branch: string, status: ActivityStatus, count: number }[] = [];
-  activitiesByPurpose: { branch: string, purpose: ActivityPurpose, count: number }[] = [];
-  activitiesByDayPeriods: { branch: string, period: ActivityDayPeriod, count: number }[] = [];
-  activitiesByWeekDay: { branch: string, day: number, count: number }[] = [];
-  activitiesByReferrer: { branch: string, referrer: Referrer, count: number }[] = [];
+  activitiesByStatus: { branch: Branch, status: ActivityStatus, count: number }[] = [];
+  activitiesByPurpose: { branch: Branch, purpose: ActivityPurpose, count: number }[] = [];
+  activitiesByDayPeriods: { branch: Branch, period: ActivityDayPeriod, count: number }[] = [];
+  activitiesByWeekDay: { branch: Branch, day: number, count: number }[] = [];
+  activitiesByReferrer: { branch: Branch, referrer: Referrer, count: number }[] = [];
   
   constructor(private remult: Remult, private dialog: DialogService) {
 
@@ -200,7 +201,7 @@ export class CurrentStateComponent implements OnInit {
     // console.log(date.toLocaleString('en-US', options));
     this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
     for await (const a of this.remult.repo(Activity).iterate({
-      where: row => this.branch ? row.bid.isEqualTo(this.branch) : FILTER_IGNORE
+      where: row => this.branch ? row.bid.contains(this.branch) : FILTER_IGNORE
     })) {
       // By Staus
       let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
@@ -358,7 +359,7 @@ export class CurrentStateComponent implements OnInit {
   async openActivities(bid: string, status: ActivityStatus) {
     let list = [];
     for await (const a of this.remult.repo(Activity).iterate({
-      where: row => row.bid.isEqualTo(bid)
+      where: row => row.bid.contains(bid)
         .and(row.status.isEqualTo(status))
     })) {
       list.push(`${a.date.toLocaleDateString()} (${a.fh} - ${a.th})`);

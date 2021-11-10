@@ -6,6 +6,7 @@ import { InputAreaComponent } from '../../../common/input-area/input-area.compon
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
+import { Branch } from '../../branch/branch';
 
 @Component({
   selector: 'app-volunteers-list',
@@ -25,7 +26,7 @@ export class VolunteersListComponent implements OnInit {
     this.remult.repo(Users),
     {
       where: _ => _.volunteer.isEqualTo(true)
-        .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid))
+        .and(this.isBoard() ? FILTER_IGNORE : _.bid!.contains(this.remult.user.bid))
         .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
       newRow: _ => _.volunteer = true,
       allowCrud: false,
@@ -87,7 +88,7 @@ export class VolunteersListComponent implements OnInit {
     if (!u) {
       u = this.remult.repo(Users).create();
       u.volunteer = true;
-      u.bid = this.isBoard() ? '' : this.remult.user.bid;
+      u.bid = this.isBoard() ? undefined : await this.remult.repo(Branch).findId(this.remult.user.bid);
     }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {

@@ -26,7 +26,7 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   async openPhotosAlbum(a: Activity) {
     let changes = await openDialog(PhotosAlbumComponent,
-      _ => _.args = { entityId: a.id },
+      _ => _.args = { bid: a.bid, entityId: a.id },
       _ => _ ? _.args.changed : false);
     if (changes) {
       // await this.refresh();

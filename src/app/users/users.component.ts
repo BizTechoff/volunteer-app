@@ -32,6 +32,18 @@ export class UsersComponent implements OnInit {
         field: users.admin, width: '80', //width: '80',
         valueChange: user => {
           if (user.admin) {
+            user.donor = false;
+            user.board = false;
+            user.manager = false;
+            user.volunteer = false;
+          }
+        }
+      },
+      {
+        field: users.donor, width: '80', 
+        valueChange: user => {//, width: '80'
+          if (users.donor) {
+            user.admin = false;
             user.board = false;
             user.manager = false;
             user.volunteer = false;
@@ -43,15 +55,17 @@ export class UsersComponent implements OnInit {
         valueChange: user => {//, width: '80'
           if (users.board) {
             user.admin = false;
+            user.donor = false;
             user.manager = false;
             user.volunteer = false;
           }
         }
       },
-      {
+      { 
         field: users.manager, width: '80', valueChange: user => {//, width: '80'
           if (users.manager) {
             user.admin = false;
+            user.donor = false;
             user.board = false;
             user.volunteer = false;
           }
@@ -61,13 +75,14 @@ export class UsersComponent implements OnInit {
         field: users.volunteer, width: '80', valueChange: user => {//, width: '80'
           if (users.volunteer) {
             user.admin = false;
+            user.donor = false;
             user.board = false;
             user.manager = false;
           }
         }
       },
       { field: users.mobile },//, width: '100'
-      { field: users.bid, width: '80', caption: terms.branch, readonly: !this.remult.isAllowed(Roles.admin) },//, width: '80'
+      { field: users.bid, caption: terms.branch },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
       { field: users.email }
     ],
     gridButtons: [

@@ -11,6 +11,7 @@ const AUTH_TOKEN_KEY = "authToken";
     providedIn: 'root'
 })
 export class AuthService {
+    forgotPassword = false;
     isFirstLogin = true;//welcome message
     constructor(private remult: Remult) {
         // (<MotiUserInfo>remult.user).snif
@@ -26,6 +27,7 @@ export class AuthService {
     }
     @BackendMethod({ allowed: true })
     static async signIn(user: string, password: string, remult?: Remult) {
+        //which user is here? probably kind of a system user
         let u = await remult!.repo(Users).findFirst(h => h.name.isEqualTo(user));
         if (u) {
             if (await u.passwordMatches(password)) {
@@ -33,10 +35,13 @@ export class AuthService {
                     id: u.id,
                     roles: [],
                     name: u.name,
-                    bid: u.bid
+                    bid: u.bid?.id ?? ''
                 };
                 if (u.admin) {
                     result.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);
+                }
+                else if (u.donor) {
+                    result.roles.push(Roles.board, Roles.manager, Roles.volunteer);
                 }
                 else if (u.board) {
                     result.roles.push(Roles.board, Roles.manager, Roles.volunteer);
@@ -49,6 +54,7 @@ export class AuthService {
                 }
                 return (jwt.sign(result, getJwtTokenSignKey()));
             }
+            // throw new Error(terms.wrongPassword);
         }
         throw new Error(terms.invalidSignIn);
     }

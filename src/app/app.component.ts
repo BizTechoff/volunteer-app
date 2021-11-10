@@ -30,6 +30,7 @@ export class AppComponent implements OnInit {
   }
   terms = terms;
 
+  forgotPassword = false;
   async signIn() {
     let user = new InputField<string>({ caption: terms.username });
     let password = new PasswordControl();
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit {
     });
   }
  
-  usersCount = 1;
+  usersCount = 0;
   async ngOnInit() {
     // this.usersCount = await this.remult.repo(Users).count();
   }
@@ -110,7 +111,7 @@ export class AppComponent implements OnInit {
           confirmPassword.error = terms.doesNotMatchPassword;
           throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
         }
-        user.bid = '0';// only admin should be here
+        user.bid = undefined;// only admin should be here
         await user.create(password.value);
         this.auth.signIn(user.name, password.value);
 

@@ -1,4 +1,4 @@
-import { FieldRef, Filter } from "remult";
+import { EntityBase, FieldRef, Filter, IdEntity } from "remult";
 import { terms } from "../terms";
 
 export const FILTER_IGNORE: Filter = new Filter(x => { return true; });
@@ -7,6 +7,12 @@ export const FILTER_RESTRICT: Filter = new Filter(x => { return false; });
 
 export const DateRequiredValidation = (_: any, col: FieldRef<any, Date>) => {
     let ok = col.value && col.value.getFullYear() > 1900 ? true : false;
+    if (!ok!)
+        col.error = terms.requiredField;
+}
+ 
+export const EntityRequiredValidation = (_: any, col: FieldRef<any, IdEntity>) => {
+    let ok = col.value && col.value.id && col.value.id.length > 0 ? true : false;
     if (!ok!)
         col.error = terms.requiredField;
 }

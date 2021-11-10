@@ -41,6 +41,7 @@
           <mat-list-item *ngIf="shouldDisplayRoute(m)" routerLinkActive="active-route">
             <a matLine [routerLink]="m.path" (click)="routeClicked()">{{routeName(m)}}</a>
           </mat-list-item>
+          <mat-divider *ngIf="shouldDisplayRoute(m) && terms.dailyActivityReport === m.path"></mat-divider>
           <mat-divider *ngIf="shouldDisplayRoute(m) && terms.currentState === m.path"></mat-divider>
         </ng-container>
         <!-- <mat-list-item  routerLinkActive="active-route">

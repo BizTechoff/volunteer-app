@@ -35,11 +35,13 @@ import { VolunteersAssignmentComponent } from './core/volunteer/volunteers-assig
 import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
 import { HomeComponent } from './home/home.component';
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
-import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
+import { AdminGuard, BoardGuard, DonorGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
 import { UsersComponent } from './users/users.component';
 import { SelectVolunteersComponent } from './common/select-volunteers/select-volunteers.component';
 import { SelectLangsComponent } from './common/select-langs/select-langs.component';
 import { SelectReferrerComponent } from './common/select-referrer/select-referrer.component';
+import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
+import { SelectBranchComponent } from './common/select-branch/select-branch.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +64,9 @@ import { SelectReferrerComponent } from './common/select-referrer/select-referre
     SelectTenantComponentComponent,
     SelectVolunteersComponent,
     SelectLangsComponent,
-    SelectReferrerComponent
+    SelectReferrerComponent,
+    BranchesListComponent,
+    SelectBranchComponent
   ],
   imports: [
     BrowserModule,
@@ -85,7 +89,7 @@ import { SelectReferrerComponent } from './common/select-referrer/select-referre
     ChartsModule,
     MatSelectModule
   ],
-  providers: [DialogService, AdminGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
+  providers: [DialogService, AdminGuard, DonorGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
     SelectVolunteersComponent, SelectTenantComponentComponent, SelectLangsComponent]//, SelectReferrerComponent]

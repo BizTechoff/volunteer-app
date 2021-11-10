@@ -1,12 +1,13 @@
 import { DataControl } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
-import { FILTER_IGNORE, StringRequiredValidation, TimeRequireValidator } from "../../common/globals";
+import { EntityRequiredValidation, FILTER_IGNORE, TimeRequireValidator } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
+import { Branch } from "../branch/branch";
 import { Tenant } from "../tenant/tenant";
-
+ 
 
 export function CommaSeparatedStringArrayField<entityType = any>(
     ...options: (FieldOptions<entityType, Users[]> |
@@ -150,20 +151,15 @@ export class ActivityGeneralStatus {
         options.apiPrefilter = async (act) => {
             let result = FILTER_IGNORE;
             if (!remult.isAllowed(Roles.board)) {
-                return act.bid.isEqualTo(remult.user.bid);
+                return act.bid.contains(remult.user.bid);
             }
             return result;
         };
         options.validation = async (act) => {
             if (isBackend()) {
-                let validId = (act.bid && act.bid.length > 0)!;
+                let validId = (act.bid && act.bid.id && act.bid.id.length > 0)!;
                 if (!validId) {
-                    act.bid = '0';
-                }
-                if (act.bid === '0') {
-                    if (!remult.isAllowed(Roles.board)) {
-                        act.$.bid.error = terms.requiredField;
-                    }
+                    act.bid = undefined!;
                 }
             }
         };
@@ -208,9 +204,9 @@ export class Activity extends IdEntity {
     // })
 
     @Field({
-        caption: terms.branch, validate: StringRequiredValidation
+        caption: terms.branch, validate: EntityRequiredValidation
     })
-    bid: string = '';
+    bid!: Branch;
 
     @Field({ caption: terms.purpose })
     purpose: ActivityPurpose = ActivityPurpose.friendly;

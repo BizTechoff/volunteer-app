@@ -7,6 +7,7 @@ import { SelectTenantComponentComponent } from "../../common/select-tenant-compo
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Langs } from "../../users/users";
+import { Branch } from "../branch/branch";
 
 
 @ValueListFieldType(Referrer, { /*displayValue: () => {return '';}*/ /*multi: true*/ })
@@ -77,7 +78,7 @@ export function CommaSeparatedStringArrayField<entityType = any>(
             let active = FILTER_IGNORE;// tnt.active.isEqualTo(true);
             if (!(remult.isAllowed(Roles.board)))//manager|volunteer
             {
-                return active.and(tnt.bid.isEqualTo(remult.user.bid));//only same branch
+                return active.and(tnt.bid.contains(remult.user.bid));//only same branch
             }
             return active;// all
         };
@@ -99,9 +100,9 @@ export class Tenant extends IdEntity {
     }
 
     @Field({
-        caption: terms.branch, validate: StringRequiredValidation
+        caption: terms.branch, validate: Validators.required.withMessage(terms.requiredField)
     })
-    bid: string = '';
+    bid!: Branch;
 
     @Field({ caption: terms.referrer, validate: Validators.required.withMessage(terms.requiredField) })
     referrer: Referrer = Referrer.welfare;

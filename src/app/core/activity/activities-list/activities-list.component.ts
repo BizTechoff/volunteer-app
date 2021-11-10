@@ -26,8 +26,8 @@ export class ActivitiesListComponent implements OnInit {
     this.remult.repo(Activity),
     {
       where: _ => _.status.isIn(this.status.statuses)
-        .and(this.bid && this.bid.length > 0 && this.bid !== '0' ? _.bid.isEqualTo(this.bid) : FILTER_IGNORE)
-        .and(this.isBoard() ? FILTER_IGNORE : _.bid.isEqualTo(this.remult.user.bid)),
+        .and(this.bid && this.bid.length > 0 && this.bid !== '0' ? _.bid.contains(this.bid) : FILTER_IGNORE)
+        .and(this.isBoard() ? FILTER_IGNORE : _.bid.contains(this.remult.user.bid)),
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
       numOfColumnsInGrid: 20,

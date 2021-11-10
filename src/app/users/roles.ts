@@ -5,6 +5,7 @@ import { AuthenticatedInGuard } from '@remult/angular';
 
 export const Roles = {
     admin: 'admin',
+    donor: 'donor',
     board: 'board',
     manager: 'manager',
     volunteer: 'volunteer'
@@ -40,6 +41,14 @@ export class VolunteerGuard extends AuthenticatedInGuard {
 
     isAllowed() {
         return Roles.volunteer;
+    }
+}
+
+@Injectable()
+export class DonorGuard extends AuthenticatedInGuard {
+
+    isAllowed() {
+        return Roles.donor;
     }
 }
 
