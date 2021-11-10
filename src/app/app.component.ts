@@ -6,6 +6,7 @@ import { Remult } from 'remult';
 import { AuthService } from './auth.service';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
+import { Branch } from './core/branch/branch';
 import { terms } from './terms';
 import { Roles } from './users/roles';
 import { PasswordControl, Users } from './users/users';
@@ -73,19 +74,21 @@ export class AppComponent implements OnInit {
     return false;
   } 
  
-  getUserAuthName() {
+  async getUserAuthName() {
     let result = 'לא מורשה';
     if (this.remult.user.roles.find(r => r === Roles.admin)) {
       result = 'אדמין';
     }
     else if (this.remult.user.roles.find(r => r === Roles.board)) {
-      result = 'הנהלה';
+      result = 'הנהלה'; 
     }
     else if (this.remult.user.roles.find(r => r === Roles.manager)) {
-      result = 'מנהל סניף ' + this.remult.user.bid;
-    }
+      let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
+      result = 'מנהל סניף ' + name;
+    } 
     else if (this.remult.user.roles.find(r => r === Roles.volunteer)) {
-      result = 'מתנדב בסניף ' + this.remult.user.bid;
+      let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
+      result = 'מתנדב בסניף ' + name;
     }
     return result;
   }
