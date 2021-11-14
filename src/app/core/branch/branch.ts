@@ -11,6 +11,7 @@ import { Roles } from "../../users/roles";
     getValue: (_, f) => f.value?.name,
     click: async (_, f) => {
         await openDialog(SelectBranchComponent, x => x.args = {
+            onClear: () => f.value = undefined!,
             onSelect: u => f.value = u,
             title: f.metadata.caption
         })

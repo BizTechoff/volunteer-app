@@ -1,8 +1,8 @@
-<h1 mat-dialog-title>בחירת {{args.title||'סניף'}}</h1>
+<h1 mat-dialog-title>בחירת {{args.title||'דייר'}}</h1>
 <div mat-dialog-content>
     <form (submit)="selectFirst()">
         <mat-form-field>
-            <input matInput [(ngModel)]="searchString" [ngModelOptions]="{standalone: true}" placeholder="שם הסניף"
+            <input matInput [(ngModel)]="searchString" [ngModelOptions]="{standalone: true}" placeholder="שם הדייר"
                 (input)="doSearch()">
         </mat-form-field>
         <!-- <mat-form-field >

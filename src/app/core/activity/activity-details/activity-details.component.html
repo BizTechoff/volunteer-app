@@ -5,10 +5,11 @@
                 <button mat-icon-button mat-dialog-close title="סגור" (click)="close()">
                     <mat-icon>close</mat-icon>
                 </button>
-                <h2> {{ this.terms.activityDetails }} </h2>
+                <h2> {{ this.args.aid? this.terms.activityDetails :this.terms.newActivity }} </h2>
             </div>
             <div style="display: flex; flex-direction: row; justify-content: end;">
-                <button *ngIf="this.activity && !this.activity.isNew()" mat-flat-button color="primary" style="height: 35px; margin-left: 5px;" (click)='openPhotosAlbum()'>
+                <button *ngIf="this.activity && !this.activity.isNew()" mat-flat-button color="primary"
+                    style="height: 35px; margin-left: 5px;" (click)='openPhotosAlbum()'>
                     <!-- {{ terms.saveAndClose }} -->
                     <mat-icon>camera</mat-icon>
                 </button>

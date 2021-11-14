@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Chart, ChartOptions, ChartType } from 'chart.js';
+import { DataControl } from '@remult/angular';
+import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { BackendMethod, Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
@@ -21,12 +22,13 @@ export class CurrentStateComponent implements OnInit {
   terms = terms;
   get $() { return getFields(this, this.remult) };
 
+  @DataControl<CurrentStateComponent>({ valueChange: async (r, v) => await r.refresh() })
   @Field({ caption: terms.branch })
-  branch: string = '';
+  branch?: Branch = undefined;
 
   // colors = {
   //   blue2: '36a2eb'
-  //   , purple: 'cc65fe'
+  //   , purple: 'cc65fe' 
   //   , yellow2: 'ffce56',
   //   yellow: '#FDE098'//yello
   //   , orange: '#FAC090'//orange
@@ -178,7 +180,7 @@ export class CurrentStateComponent implements OnInit {
   activitiesByDayPeriods: { branch: Branch, period: ActivityDayPeriod, count: number }[] = [];
   activitiesByWeekDay: { branch: Branch, day: number, count: number }[] = [];
   activitiesByReferrer: { branch: Branch, referrer: Referrer, count: number }[] = [];
-  
+
   constructor(private remult: Remult, private dialog: DialogService) {
 
   }
@@ -201,7 +203,7 @@ export class CurrentStateComponent implements OnInit {
     // console.log(date.toLocaleString('en-US', options));
     this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
     for await (const a of this.remult.repo(Activity).iterate({
-      where: row => this.branch ? row.bid.contains(this.branch) : FILTER_IGNORE
+      where: row => this.branch ? row.bid.isEqualTo(this.branch) : FILTER_IGNORE
     })) {
       // By Staus
       let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
@@ -212,13 +214,16 @@ export class CurrentStateComponent implements OnInit {
       ++foundStatus.count;
 
       // By Purpose
-      let foundPurpose = this.activitiesByPurpose.find(itm => itm.purpose === a.purpose);
-      if (!foundPurpose) {
-        foundPurpose = { branch: a.bid, purpose: a.purpose, count: 0 };
-        this.activitiesByPurpose.push(foundPurpose);
-      }
-      ++foundPurpose.count;
+      a.purposes.forEach(p => {
+        let foundPurpose = this.activitiesByPurpose.find(itm => itm.purpose === p);
+        if (!foundPurpose) {
+          foundPurpose = { branch: a.bid, purpose: p, count: 0 };
+          this.activitiesByPurpose.push(foundPurpose);
+        }
+        ++foundPurpose.count;
+      });
 
+ 
       // By Purpose
       let foundDayPeriod = this.activitiesByDayPeriods.find(itm => itm.period === a.period());
       if (!foundDayPeriod) {
@@ -244,11 +249,11 @@ export class CurrentStateComponent implements OnInit {
       // ++referrer.count;
     }
 
-    this.activitiesByStatus.sort((a1,a2) => a1.status.id - a2.status.id );
-    this.activitiesByWeekDay.sort((a1,a2) => a1.day - a2.day );
-    this.activitiesByDayPeriods.sort((a1,a2) => a1.period.id - a2.period.id );
-    this.activitiesByPurpose.sort((a1,a2) => a1.purpose.id - a2.purpose.id );
-    this.activitiesByReferrer.sort((a1,a2) => a1.referrer.id - a2.referrer.id );
+    this.activitiesByStatus.sort((a1, a2) => a1.status.id - a2.status.id);
+    this.activitiesByWeekDay.sort((a1, a2) => a1.day - a2.day);
+    this.activitiesByDayPeriods.sort((a1, a2) => a1.period.id - a2.period.id);
+    this.activitiesByPurpose.sort((a1, a2) => a1.purpose.id - a2.purpose.id);
+    this.activitiesByReferrer.sort((a1, a2) => a1.referrer.id - a2.referrer.id);
 
 
     // let c = this.activitiesByWeekDay.reduce((sum, current) => sum + current.count, 0);
@@ -294,14 +299,14 @@ export class CurrentStateComponent implements OnInit {
       let label = a.status.caption;
       if (a.status === ActivityStatus.problem) {
         label = label;
-      }  
+      }
       label += ` (${a.count})`;
       this.pieChartLabelsStatuses.push(label.padEnd(20));
       this.pieChartDataStatuses.push(a.count);
     }
 
     for (const a of this.activitiesByPurpose) {
-      let label = (a.purpose.caption  + ` (${a.count})`);
+      let label = (a.purpose.caption + ` (${a.count})`);
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
@@ -329,7 +334,7 @@ export class CurrentStateComponent implements OnInit {
     }
 
     for (const a of this.activitiesByWeekDay) {
-      if(a.day >= 6){
+      if (a.day >= 6) {
         continue;
       }
       let label = 'יום ' + this.weekDays[a.day] + ` (${a.count})`;

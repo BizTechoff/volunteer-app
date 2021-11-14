@@ -42,6 +42,7 @@ import { SelectLangsComponent } from './common/select-langs/select-langs.compone
 import { SelectReferrerComponent } from './common/select-referrer/select-referrer.component';
 import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
 import { SelectBranchComponent } from './common/select-branch/select-branch.component';
+import { SelectPurposesComponent } from './common/select-purposes/select-purposes.component';
 
 @NgModule({
   declarations: [
@@ -66,7 +67,8 @@ import { SelectBranchComponent } from './common/select-branch/select-branch.comp
     SelectLangsComponent,
     SelectReferrerComponent,
     BranchesListComponent,
-    SelectBranchComponent
+    SelectBranchComponent,
+    SelectPurposesComponent
   ],
   imports: [
     BrowserModule,

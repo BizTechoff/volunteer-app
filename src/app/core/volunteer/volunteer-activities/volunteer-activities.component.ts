@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
 import { Remult } from 'remult';
 import { terms } from '../../../terms';
-import { Langs } from '../../../users/users';
+import { Langs, Users } from '../../../users/users';
 import { Activity, ActivityStatus } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
@@ -15,25 +15,26 @@ import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.comp
 export class VolunteerActivitiesComponent implements OnInit {
 
   activities = [] as Activity[];
+  volunteer!: Users;
   constructor(private remult: Remult) { }
 
   terms = terms;
   AcitivityStatus = ActivityStatus;
 
   async ngOnInit(): Promise<void> {
+    this.volunteer = await this.remult.repo(Users).findId(this.remult.user.id);
     await this.refresh();
-
   }
 
-  async openActivity(act: Activity) {
+  async openActivity(act?: Activity) {
     let id = act && act.id && act.id.length > 0 ? act.id : '';
     let changes = await openDialog(ActivityDetailsComponent,
-      input => input.args = { aid: id },
+      input => input.args = { bid: this.volunteer.bid, aid: id },
       output => output ? output.args.changed : false);
     if (changes) {
       await this.refresh();
     }
-  }
+  } 
 
   async openPhotosAlbum(a: Activity) {
     let changes = await openDialog(PhotosAlbumComponent,

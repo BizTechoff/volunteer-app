@@ -92,16 +92,16 @@ export class ActivityDetailsComponent implements OnInit {
       fields: () => [
         [
           { field: this.activity.$.bid, visible: (r, v) => this.isBoard() },
-          { field: this.activity.$.status },//, readonly: true }
+          { field: this.activity.$.status, visible: (r, v) => !this.activity.isNew()}, //, readonly: true  },//, readonly: true }
         ]
-      ]
+      ] 
     })
     this.fields = new DataAreaSettings({
       fields: () => [
         { field: this.activity.$.tid, clickIcon: 'search', click: async () => await this.openTenants() },//, readonly: true },
         { field: this.activity.$.vids, clickIcon: 'search', click: async () => await this.openAssignment() },
         // { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
-        this.activity.$.purpose,
+        this.activity.$.purposes,
         this.activity.$.purposeDesc,
         this.activity.$.date,
         [this.activity.$.fh, this.activity.$.th],
@@ -114,7 +114,7 @@ export class ActivityDetailsComponent implements OnInit {
     await openDialog(SelectTenantComponentComponent, x => x.args = {
       bid: this.activity.bid,
       onSelect: t => this.activity.tid = t,
-      title: 'בחירה',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+      title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
       tenantLangs: []
     });
   }

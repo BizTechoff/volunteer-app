@@ -20,9 +20,10 @@ export class SelectTenantComponentComponent implements OnInit {
   langs = [Langs.russian];
   options = [
     Langs.hebrew, Langs.english, Langs.russian, Langs.french
-  ]    
+  ]
   args!: {
     title?: string,
+    // uid: Users,
     bid: Branch,
     tenantLangs: Langs[],
     onSelect: (p: Tenant) => void;
@@ -40,6 +41,7 @@ export class SelectTenantComponentComponent implements OnInit {
         // if there is a search value, search by it
         // t.langs.isIn([this.langs])
         t.active.isEqualTo(true)
+          .and(t.defVids.contains(this.remult.user.id))//@@@@@@@@@@@2
           .and(this.isBoard() ? FILTER_IGNORE : t.bid.isEqualTo(this.args.bid))
           .and(
             this.searchString ? t.name.contains(this.searchString)

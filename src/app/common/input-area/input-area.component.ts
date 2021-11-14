@@ -3,9 +3,9 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaFieldsSetting, DataAreaSettings, IDataAreaSettings } from '@remult/angular';
 import { getFields } from 'remult';
 import { terms } from '../../terms';
-
-
 import { DialogService } from '../dialog';
+
+
 
 
 
@@ -23,10 +23,10 @@ export class InputAreaComponent implements OnInit {
     object?: any,
     ok: () => void,
     cancel?: () => void,
-    validate?: () => Promise<void>,
+    validate?: () => Promise<boolean>,
     buttons?: button[]
-  };  
-  terms=terms;
+  };
+  terms = terms;
   constructor(
     public dialogRef: MatDialogRef<any>,
     private dialog: DialogService
@@ -55,8 +55,8 @@ export class InputAreaComponent implements OnInit {
   ok = false;
   async confirm() {
     if (this.args.validate) {
-      await this.args.validate();
-
+      if (! await this.args.validate())
+        return;
     }
     await this.args.ok();
     this.ok = true;

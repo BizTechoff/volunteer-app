@@ -1,13 +1,28 @@
-import { DataControl } from "@remult/angular";
+import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { EntityRequiredValidation, FILTER_IGNORE, TimeRequireValidator } from "../../common/globals";
+import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 import { Tenant } from "../tenant/tenant";
- 
+
+
+export function CommaSeparatedStringArrayFieldPurpose<entityType = any>(
+    ...options: (FieldOptions<entityType, ActivityPurpose[]> |
+        ((options: FieldOptions<entityType, ActivityPurpose[]>, remult: Remult) => void))[]) {
+    return Field({
+        displayValue: (r, x) => {
+            return x ? x.map(i => i.caption).join(', ').trim() : '';
+        },
+        valueConverter: {
+            toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
+            fromDb: x => x ? ActivityPurpose.fromString(x.toString()) : []
+        }
+    }, ...options);
+}
 
 export function CommaSeparatedStringArrayField<entityType = any>(
     ...options: (FieldOptions<entityType, Users[]> |
@@ -43,9 +58,23 @@ export class ActivityPurpose {
     constructor(public id: number, public caption: string) { }
     // id:number;
 
-    static getOptions(remult: Remult) {
+    static getOptions() {
         let op = new ValueListValueConverter(ActivityPurpose).getOptions();
         return op;
+    }
+    static fromString(str: string) {
+        // console.log(str);
+        let split = str.toString().split(',');
+        // console.log(split);
+        let result = [] as ActivityPurpose[];
+        let options = ActivityPurpose.getOptions();
+        split.forEach(l => {
+            let found = options.find(_ => _.id === parseInt(l));
+            if (found) {
+                result.push(found);
+            }
+        });
+        return result;
     }
 }
 
@@ -208,8 +237,22 @@ export class Activity extends IdEntity {
     })
     bid!: Branch;
 
-    @Field({ caption: terms.purpose })
-    purpose: ActivityPurpose = ActivityPurpose.friendly;
+    @DataControl<Tenant, ActivityPurpose[]>({
+        hideDataOnInput: true,
+        clickIcon: 'search',
+        getValue: (r, v) => { return v && v.value ? v.value.map(i => i.caption).join(', ').trim() : ''; },
+        // getValue : (r,v) => {v.displayValue},
+        click: async (_, f) => {
+            await openDialog(SelectPurposesComponent, x => x.args = {
+                // onSelect: site => f.value = site,
+                // title: f.metadata.caption,
+                purposes: f.value
+            })
+        }
+    })
+    @CommaSeparatedStringArrayFieldPurpose<Tenant>({ caption: terms.purpose })
+    // @Field({ caption: terms.purpose })
+    purposes: ActivityPurpose[] = [ActivityPurpose.friendly];
 
     @Field({ caption: terms.desc })
     purposeDesc: string = '';

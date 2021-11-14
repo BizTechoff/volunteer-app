@@ -47,6 +47,9 @@ export class Photo extends IdEntity {
  
     @Field({ caption: terms.desc })
     title: string = '';
+ 
+    @Field({ caption: terms.link })
+    link: string = '';
 
     @Field({ caption: terms.data })
     data: string = '';

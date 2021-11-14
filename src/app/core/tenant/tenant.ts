@@ -58,14 +58,15 @@ export function CommaSeparatedStringArrayField<entityType = any>(
     clickIcon: 'search',
     getValue: (_, f) => f.value?.name,
     click: async (_, f) => {
-        await openDialog(SelectTenantComponentComponent, x => x.args = {
-            bid: f.value.bid,
-            onSelect: t => f.value = t,
-            title: 'בחירה',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
-            tenantLangs: f.value.langs
-        })
-    } 
-}) 
+        await openDialog(SelectTenantComponentComponent,
+            x => x.args = {
+                title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+                bid: f.value.bid,
+                onSelect: t => f.value = t,
+                tenantLangs: f.value.langs
+            })
+    }
+})
 @Entity<Tenant>('tenants',
     {
         allowApiInsert: [Roles.admin, Roles.manager],
@@ -86,12 +87,12 @@ export function CommaSeparatedStringArrayField<entityType = any>(
         //     let found = await remult.repo(Activity).findFirst(_ => _.tid.isEqualTo(tnt.id));
 
         // };
-        options.saving = async (act) => {
-            if (isBackend()) {
-                if (act._.isNew()) {
-                }
-            }
-        };
+        // options.saving = async (act) => {
+        //     if (isBackend()) {
+        //         if (act._.isNew()) {
+        //         }
+        //     }
+        // };
     })
 export class Tenant extends IdEntity {
 
@@ -141,11 +142,15 @@ export class Tenant extends IdEntity {
     @Field({ caption: terms.active })
     active: boolean = true;
 
-    @Field({ caption: terms.defaultVolunteers })
-    defVids: string[] = [];
-
     @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
     birthday!: Date;
+
+    @DataControl<Tenant,string[]>({
+        click: () => {},
+        clickIcon: 'search'
+    })
+    @Field({ caption: terms.associatedVolunteers })
+    defVids: string[] = [];
 
     calcAge() {
         let result = 0;

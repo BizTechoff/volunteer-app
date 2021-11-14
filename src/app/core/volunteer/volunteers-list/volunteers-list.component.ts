@@ -3,6 +3,7 @@ import { DataControl, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
+import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
@@ -100,13 +101,23 @@ export class VolunteersListComponent implements OnInit {
           u!.$.langs,
           u!.$.birthday,
           u!.$.email,
-          { field: u!.$.defTid, caption: terms.defaultTenant }],
+          { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
+        ],
         ok: async () => { await (u!.isNew() ? u!.create() : u!.save()); }
       },
       _ => _ ? _.ok : false);
     if (changed) {
       await this.refresh();
     }
+  }
+
+  async openTenants(u: Users) {
+    await openDialog(SelectTenantComponentComponent, x => x.args = {
+      bid: u.bid!,
+      onSelect: t => u.defTid = t,
+      title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+      tenantLangs: []
+    });
   }
 
 }

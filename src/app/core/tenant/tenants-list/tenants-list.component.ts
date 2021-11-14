@@ -138,8 +138,13 @@ export class TenantsListComponent implements OnInit {
             { field: this.$.age, width: '60', readonly: true }
           ],
           t!.$.langs,
-          { field: t!.$.defVids, clickIcon: 'search', click: async () => await this.openVolunteers(t!) }],
-        ok: async () => { await t!.save(); }
+          { field: t!.$.defVids, click: async () => await this.openVolunteers(t!) }],
+        validate: async () => {
+          return await this.canSaveAndClose(t);
+        },
+        ok: async () => {
+          await t!.save();
+        }
       },
       _ => _ ? _.ok : false);
     if (changed) {
@@ -150,6 +155,15 @@ export class TenantsListComponent implements OnInit {
         }
       }
     }
+  }
+
+  async canSaveAndClose(t: Tenant): Promise<boolean> {
+    let result = true;
+    let hasVids = (t.defVids && t.defVids.length > 0)!;
+    if (!hasVids) {
+      result = await this.dialog.yesNoQuestion(terms.notVolunteersForCurrentTenant);
+    }
+    return result;
   }
 
   async openVolunteers(t: Tenant) {

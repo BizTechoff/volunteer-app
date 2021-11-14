@@ -35,7 +35,8 @@ export class AuthService {
                     id: u.id,
                     roles: [],
                     name: u.name,
-                    bid: u.bid?.id ?? ''
+                    bid: u.bid?.id ?? '',
+                    bname: u.bid?.name ?? ''
                 };
                 if (u.admin) {
                     result.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);

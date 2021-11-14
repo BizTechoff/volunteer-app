@@ -1,8 +1,17 @@
 <div class="full-page">
     <div class="header" style="padding-bottom: 10px;">
-        <button mat-mini-fab (click)="this.refresh()">
-            <mat-icon>refresh</mat-icon>
-        </button>
+        <div style="display: flex; flex-direction: row">
+            <div style="display: flex; flex-direction: row; justify-content: flex-start;">
+                <button mat-mini-fab (click)="this.refresh()">
+                    <mat-icon>refresh</mat-icon>
+                </button>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: flex-end;">
+                <button mat-mini-fab (click)="this.openActivity()">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+        </div>
     </div>
     <div class="grow-item">
 
@@ -12,28 +21,33 @@
                 <mat-card style="margin: 7px;">
                     <mat-card-title>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                        
-                                <button mat-mini-fab color="primary" [title]="terms.edit" (click)="openActivity(a)">
-                                    <mat-icon>edit</mat-icon>
-                                </button> 
-                            {{ a?.tid?.name }} 
-                         
-                        <span *ngIf="this.showClosedActivitySign(a)">
-                            <h2 style="width: 70px; background: darkblue; color: white; transform: rotate(45deg); display: inline-block">{{ a.status.caption }}</h2>
-                        </span>
-                        
-                        <div style="display: flex; flex-direction: row; justify-content: end;">
-                        <button mat-mini-fab color="primary" [title]="a?.tid?.mobile!" (click)="this.call(a?.tid?.mobile!)">
-                            <mat-icon>call</mat-icon>
-                        </button> 
-                        <button style="margin-right: 10px;" mat-mini-fab color="primary" [title]='a?.tid?.address' (click)="this.openWaze(a?.tid?.address!)">
-                            <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
-                            <img src="./assets/waze.svg">
-                        </button> 
-                        <button style="margin-right: 10px;" mat-mini-fab color="primary" [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
-                            <mat-icon>photo</mat-icon>
-                        </button>
-                        </div>
+
+                            <button mat-mini-fab color="primary" [title]="terms.edit" (click)="openActivity(a)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            {{ a?.tid?.name }}
+
+                            <span *ngIf="this.showClosedActivitySign(a)">
+                                <h2
+                                    style="width: 70px; background: darkblue; color: white; transform: rotate(45deg); display: inline-block">
+                                    {{ a.status.caption }}</h2>
+                            </span>
+
+                            <div style="display: flex; flex-direction: row; justify-content: end;">
+                                <button mat-mini-fab color="primary" [title]="a?.tid?.mobile!"
+                                    (click)="this.call(a?.tid?.mobile!)">
+                                    <mat-icon>call</mat-icon>
+                                </button>
+                                <button style="margin-right: 10px;" mat-mini-fab color="primary"
+                                    [title]='a?.tid?.address' (click)="this.openWaze(a?.tid?.address!)">
+                                    <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
+                                    <img src="./assets/waze.svg">
+                                </button>
+                                <button style="margin-right: 10px;" mat-mini-fab color="primary"
+                                    [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
+                                    <mat-icon>photo</mat-icon>
+                                </button>
+                            </div>
                         </div>
                     </mat-card-title>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
@@ -51,22 +65,25 @@
 
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;">
                             <div>
-                                {{ a.purpose.caption }}
+                                {{ a.purposes }}
                             </div>
                             <div>
                                 {{ a.purposeDesc? a.purposeDesc : '(אין תיאור)' }}
                             </div>
                             <div>
-                                {{ a.remark? a.remark :  '(אין סיכום פגישה)' }}
+                                {{ a.remark? a.remark : '(אין סיכום פגישה)' }}
                             </div>
                         </div>
                     </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
-                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_start)' *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_start)'
+                            *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
                             style="margin-top: 7px; background: blue; color: white;">התחלתי</button>
-                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'
+                            *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: green; color: white;">סיימתי</button>
-                        <button (click)='this.setNextStatus(a, this.ActivityStatus.problem)' *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.problem)'
+                            *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: red; color: white;">ישנה
                             בעיה</button>
                     </div>

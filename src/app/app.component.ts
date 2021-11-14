@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
     return false;
   } 
  
-  async getUserAuthName() {
+  getUserAuthName() {
     let result = 'לא מורשה';
     if (this.remult.user.roles.find(r => r === Roles.admin)) {
       result = 'אדמין';
@@ -84,11 +84,11 @@ export class AppComponent implements OnInit {
     }
     else if (this.remult.user.roles.find(r => r === Roles.manager)) {
       let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
-      result = 'מנהל סניף ' + name;
-    } 
+      result = 'מנהל ב' + this.remult.user.bname;
+    }
     else if (this.remult.user.roles.find(r => r === Roles.volunteer)) {
       let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
-      result = 'מתנדב בסניף ' + name;
+      result = 'מתנדב ב' + this.remult.user.bname;
     }
     return result;
   }

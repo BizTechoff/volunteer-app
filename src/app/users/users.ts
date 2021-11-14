@@ -7,7 +7,7 @@ import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
 import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
-import { CommaSeparatedStringArrayField } from "../core/tenant/tenant";
+import { CommaSeparatedStringArrayField, Tenant } from "../core/tenant/tenant";
 import { terms } from "../terms";
 import { Roles } from './roles';
 
@@ -23,7 +23,7 @@ export class Langs {
     static getOptions() {
         let op = new ValueListValueConverter(Langs).getOptions();
         return op;
-    }
+    } 
     static fromString(str: string) {
         // console.log(str);
         let split = str.toString().split(',');
@@ -117,6 +117,7 @@ export class Langs {
             if (!(remult.isAllowed(Roles.board)))// all
             {
                 if (!remult.isAllowed(Roles.manager)) {
+                    //@@@@@@@@@@@2
                     return active.and(user.id.isEqualTo(remult.user.id));//volunteer only himself
                 }
                 return active.and(user.bid!.contains(remult.user.bid));//manager only his branch
@@ -179,7 +180,7 @@ export class Users extends IdEntity {
         allowNull: true
     })
     bid?: Branch;
-
+  
     @Field({
         validate: [StringRequiredValidation, Validators.unique],
         caption: terms.username
@@ -227,14 +228,13 @@ export class Users extends IdEntity {
     })
     birthday!: Date;
 
-    @Field({
-        caption: terms.tenant
-    })
-    defTid: string = '';
+    
+    @Field(options => options.valueType = Tenant, { caption: terms.tenant })
+    defTid!: Tenant;
 
     @Field({ includeInApi: false })
     password: string = '';
-
+ 
     @Field({
         allowApiUpdate: false
     })

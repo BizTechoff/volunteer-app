@@ -40,7 +40,7 @@ export class ActivitiesListComponent implements OnInit {
         _.date,
         _.fh,
         _.th,
-        _.purpose,
+        _.purposes,
         _.purposeDesc,
         _.remark,
         _.created,

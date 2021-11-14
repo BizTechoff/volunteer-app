@@ -1,0 +1,11 @@
+<div class="full-page">
+    <div class="header"></div>
+    <div *ngIf="this.allActivityPurpose" class="ng-container">
+        <div *ngFor="let l of this.allActivityPurpose">
+            <mat-checkbox [(ngModel)]="l.c"> {{ l.l.caption }} </mat-checkbox>
+        </div>
+    </div>
+    <div class="footer">
+        <button mat-raised-button color="accent" (click)="this.close()">{{this.terms.continue}}</button>
+    </div>
+</div> 
