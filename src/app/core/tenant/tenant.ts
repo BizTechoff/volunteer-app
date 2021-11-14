@@ -4,9 +4,10 @@ import { ValueListValueConverter } from "remult/valueConverters";
 import { DateRequiredValidation, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
 import { SelectTenantComponentComponent } from "../../common/select-tenant-component/select-tenant-component.component";
+import { UserIdName } from "../../common/types";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
-import { Langs } from "../../users/users";
+import { Langs, Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 
 
@@ -35,6 +36,42 @@ export function CommaSeparatedStringArrayField<entityType = any>(
             toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
             fromDb: x => x ? Langs.fromString(x.toString()) : []
         }
+    }, ...options);
+}
+
+export function CommaSeparatedStringArrayFieldUsersAsString<entityType = any>(
+    ...options: (FieldOptions<entityType, UserIdName[]> |
+        ((options: FieldOptions<entityType, UserIdName[]>, remult: Remult) => void))[]) {
+    return Field({
+        displayValue: (r, x) => {
+            return x && x.length > 0 ? x.map(i => i.name.trim()).join(', ') : '';
+        }//,
+        // valueConverter: {
+        //     toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
+        //     fromDb: x => x ? x.split(',') : []
+        // }
+    }, ...options);
+}
+
+export function CommaSeparatedStringArrayFieldUsers<Tenant>(
+    ...options: (FieldOptions<Tenant, Users[]> |
+        ((options: FieldOptions<Tenant, Users[]>, remult: Remult) => void))[]) {
+    return Field({
+        displayValue: (r, x) => {
+            return x && x.length > 0 ? x.map(i => i.name.trim()).join(', ') : '';
+        },
+        valueConverter: {
+            toDb: x => x ? x.map(u => u.id).join(',') : undefined,
+            fromDb: x => x ? Users.fromString(x.toString()) : []
+        }
+        // valueConverter: {
+        //     toDb: x => '[moti]',// x?  ['e6eb8880-ff9d-4d63-8221-2a5e2dd54916'].map(i => i).join(',') : '',
+        //     fromDb: x => []// x ? Users.fromString(x.toString()) : [] as Users[]
+        // }
+        // // valueConverter: {
+        //     toDb: x => '[moti]',// x?  ['e6eb8880-ff9d-4d63-8221-2a5e2dd54916'].map(i => i).join(',') : '',
+        //     fromDb: x => [] as Users[]// x ? Users.fromString(x.toString()) : [] as Users[]
+        // }
     }, ...options);
 }
 
@@ -83,6 +120,16 @@ export function CommaSeparatedStringArrayField<entityType = any>(
             }
             return active;// all
         };
+        options.saving = (tnt) => {
+            if (isBackend()) {
+                console.log('Tenant Saving: ', tnt.defVids.length);
+            }
+        };
+        options.saved = (tnt) => {
+            if (isBackend()) {
+                console.log('Tenant Saved: ', tnt.defVids.length);
+            }
+        }
         // options.deleting = async (tnt) => {
         //     let found = await remult.repo(Activity).findFirst(_ => _.tid.isEqualTo(tnt.id));
 
@@ -96,7 +143,7 @@ export function CommaSeparatedStringArrayField<entityType = any>(
     })
 export class Tenant extends IdEntity {
 
-    constructor(private remult: Remult) {
+    constructor(private remult: Remult) {//, private dialog: DialogService) {
         super();
     }
 
@@ -145,13 +192,16 @@ export class Tenant extends IdEntity {
     @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
     birthday!: Date;
 
-    @DataControl<Tenant,string[]>({
-        click: () => {},
+    @DataControl<Tenant, Users[]>({
+        click: () => { },
         clickIcon: 'search'
+        // click: async (r, v) => await r.openVolunteers()
     })
-    @Field({ caption: terms.associatedVolunteers })
-    defVids: string[] = [];
-
+    // @CommaSeparatedStringArrayFieldUsers<Tenant>({ caption: terms.associatedVolunteers })
+    @CommaSeparatedStringArrayFieldUsersAsString<Tenant>({caption: terms.associatedVolunteers})
+    //defVids: Users[] = [] as Users[];
+    defVids: UserIdName[] = [] as UserIdName[];
+  
     calcAge() {
         let result = 0;
         if (this.birthday && this.birthday.getFullYear() > 1900) {
@@ -160,5 +210,24 @@ export class Tenant extends IdEntity {
         }
         return result;
     }
+
+    // async openVolunteers() {
+    //     let t: Tenant = this;
+    //     let bidOk = (t && t.bid && t.bid.id && t.bid.id.length > 0)!;
+    //     if (bidOk) {
+    //         let volids = await openDialog(VolunteersAssignmentComponent,
+    //             input => input.args = {
+    //                 bid: t.bid,
+    //                 aid: '',
+    //                 tname: t.name,
+    //                 langs: t.langs,// this.t.langs, 
+    //                 vids: t.defVids
+    //             },
+    //             output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);
+    //     }
+    //     else {
+    //         await this.dialog.error(terms.mustSetBidForThisAction);
+    //     }
+    // }
 
 }

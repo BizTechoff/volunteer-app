@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { DataControl, GridSettings } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { FILTER_IGNORE } from '../../../common/globals';
+import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Langs, Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
@@ -13,16 +14,15 @@ import { Branch } from '../../branch/branch';
   styleUrls: ['./volunteers-assignment.component.scss']
 })
 export class VolunteersAssignmentComponent implements OnInit {
- 
+
   args: {
     bid: Branch,
     aid: string,
     tname: string,
     langs: Langs[],
     changed?: boolean,
-    vids: string[],
-    volids?: Users[]
-  } = { bid: undefined!, aid: '', tname: '', langs: [], changed: false, vids: [], volids: [] as Users[] };
+    vids: UserIdName[]
+  } = { bid: undefined!, aid: '', tname: '', langs: [], changed: false, vids: [] as UserIdName[] };
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForTenantNameHere}` })
   search: string = ''
@@ -53,13 +53,17 @@ export class VolunteersAssignmentComponent implements OnInit {
 
   async ngOnInit() {
     this.lgDesc = this.args.langs.map(_ => _.caption).join(', ');
-    this.args.volids = [];
-    if (this.args.vids && this.args.vids.length > 0) {
-      let vids = await this.remult.repo(Users).find({
-        where: u => u.id.isIn(this.args.vids)
-      });
-      if (vids && vids.length > 0) {
-        this.volunteers.selectedRows.push(...vids);
+    if (!this.args.vids) {
+      throw '!this.args.vids';
+    }
+    if (this.args.vids.length > 0) {
+      console.log('this.args.vids', this.args.vids);
+      let ids = this.args.vids.map(x => x.id);
+      if (ids.length > 0) {
+        let us = await this.remult.repo(Users).find({
+          where: row => row.id.isIn(ids)
+        });
+        this.volunteers.selectedRows.push(...us);
       }
     }
   }
@@ -70,11 +74,14 @@ export class VolunteersAssignmentComponent implements OnInit {
 
   select() {
     this.args.changed = true;
-    this.args.vids.splice(0);
+    if (this.args.vids.length > 0) {
+      this.args.vids.splice(0);
+    }
     // this.args.volids.splice(0);
     for (const u of this.volunteers.selectedRows) {
-      this.args.vids.push(u.id);
+      this.args.vids.push({ id: u.id, name: u.name });
       // this.args.volids.push(u);
+      console.log(this.args.vids);
     }
     this.win.close();
   }

@@ -60,6 +60,12 @@ export class VolunteersListComponent implements OnInit {
         },
         {
           visible: (_) => !_.isNew(),
+          textInMenu: terms.transferVolunteer,
+          icon: 'reply',
+          click: async (_) => await this.transferVolunteer(_)
+        },
+        { 
+          visible: (_) => !_.isNew(),
           textInMenu: terms.deleteVolunteer,
           icon: 'delete',//,
           // click: async (_) => await this.addTenant(_)
@@ -80,6 +86,10 @@ export class VolunteersListComponent implements OnInit {
   async refresh() {
     await this.volunteers.reloadData();
   }
+
+  async transferVolunteer(v: Users) {
+
+  } 
 
   async showActivities(user: Users) {
     return true;

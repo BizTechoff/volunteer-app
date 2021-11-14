@@ -35,8 +35,8 @@ export class Langs {
             if (found) {
                 result.push(found);
             }
-        });
-        return result;
+        }); 
+        return result; 
     }
 
 }
@@ -116,11 +116,12 @@ export class Langs {
             let active = FILTER_IGNORE;// user.active.isEqualTo(true);
             if (!(remult.isAllowed(Roles.board)))// all
             {
-                if (!remult.isAllowed(Roles.manager)) {
-                    //@@@@@@@@@@@2
-                    return active.and(user.id.isEqualTo(remult.user.id));//volunteer only himself
-                }
-                return active.and(user.bid!.contains(remult.user.bid));//manager only his branch
+                return active.and(user.bid!.contains(remult.user.bid));
+                // if (!remult.isAllowed(Roles.manager)) {
+                //     //@@@@@@@@@@@2
+                //     return active.and(user.id.isEqualTo(remult.user.id));//volunteer only himself
+                // }
+                // return active.and(user.bid!.contains(remult.user.bid));//manager only his branch
             }
             return active;
         };
@@ -161,13 +162,13 @@ export class Users extends IdEntity {
     //     where: _ => _.u!.isEqualTo(this)
     // })
 
-    static async fromString(str: string, remult?: Remult) {
+    static fromString(str: string, remult?: Remult) {
         // console.log(str);
         let split = str.toString().split(',');
         // console.log(split);
         let result = [] as Users[];
-        split.forEach(async l => {
-            let found = await remult?.repo(Users).findId(l);
+        split.forEach(async id => {
+            let found = await remult?.repo(Users).findId(id);
             if (found) {
                 result.push(found);
             }

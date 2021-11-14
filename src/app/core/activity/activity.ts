@@ -1,13 +1,14 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { EntityRequiredValidation, FILTER_IGNORE, TimeRequireValidator } from "../../common/globals";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
+import { UserIdName } from "../../common/types";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
-import { Tenant } from "../tenant/tenant";
+import { CommaSeparatedStringArrayFieldUsersAsString, Tenant } from "../tenant/tenant";
 
 
 export function CommaSeparatedStringArrayFieldPurpose<entityType = any>(
@@ -24,19 +25,19 @@ export function CommaSeparatedStringArrayFieldPurpose<entityType = any>(
     }, ...options);
 }
 
-export function CommaSeparatedStringArrayField<entityType = any>(
-    ...options: (FieldOptions<entityType, Users[]> |
-        ((options: FieldOptions<entityType, Users[]>, remult: Remult) => void))[]) {
-    return Field({
-        displayValue: (r, x) => {
-            return x ? x.map(i => i.name).join(', ').trim() : '';
-        },
-        valueConverter: {
-            toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
-            // fromDb: x => x ? Users.fromString(x.toString(), remult!) : []
-        }
-    }, ...options);
-}
+// export function CommaSeparatedStringArrayField<entityType = any>(
+//     ...options: (FieldOptions<entityType, Users[]> |
+//         ((options: FieldOptions<entityType, Users[]>, remult: Remult) => void))[]) {
+//     return Field({
+//         displayValue: (r, x) => {
+//             return x ? x.map(i => i.name).join(', ').trim() : '';
+//         },
+//         valueConverter: {
+//             toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
+//             fromDb: x => x ? Users.fromString(x.toString(), remult!) : []
+//         }
+//     }, ...options);
+// }
 
 @DataControl({
     // valueList: async remult => DeliveryStatus.getOptions(remult)
@@ -68,8 +69,8 @@ export class ActivityPurpose {
         // console.log(split);
         let result = [] as ActivityPurpose[];
         let options = ActivityPurpose.getOptions();
-        split.forEach(l => {
-            let found = options.find(_ => _.id === parseInt(l));
+        split.forEach(id => {
+            let found = options.find(_ => _.id === parseInt(id));
             if (found) {
                 result.push(found);
             }
@@ -145,6 +146,14 @@ export class ActivityStatus {
         ];
     }
 
+    static lastStatuses() {
+        return [
+            ActivityStatus.success,
+            ActivityStatus.problem,
+            ActivityStatus.cancel
+        ];
+    }
+
     static inProgressStatuses() {
         return [
             ActivityStatus.w4_end
@@ -170,8 +179,8 @@ export class ActivityGeneralStatus {
 
 @Entity<Activity>('activities',
     {
-        allowApiInsert: Roles.manager,
-        allowApiDelete: Roles.manager,
+        allowApiInsert: Allow.authenticated,
+        allowApiDelete: Allow.authenticated,
         allowApiUpdate: Allow.authenticated,
         allowApiRead: Allow.authenticated,
         defaultOrderBy: (_) => [_.date.descending(), _.fh, _.status]
@@ -190,29 +199,42 @@ export class ActivityGeneralStatus {
                 if (!validId) {
                     act.bid = undefined!;
                 }
-            }
-        };
-        options.saving = async (act) => {
-            if (isBackend()) {
-                if (act.$.date.valueChanged() || act.$.fh.valueChanged() || act.$.th.valueChanged()) {
+                // Check conflicts with volunteers OR tenant
+                if (act.$.vids.valueChanged() || act.$.tid.valueChanged() || act.$.date.valueChanged() || act.$.fh.valueChanged() || act.$.th.valueChanged()) {
                     let conflicts = [] as Activity[];
+                    let error = '';
                     for await (const a of remult.repo(Activity).iterate({
                         where: (_) => _.date.isEqualTo(act.date)
                             .and(_.fh.isLessOrEqualTo(act.th))
                             .and(_.th.isGreaterOrEqualTo(act.fh))
-                            .and(_.status.isDifferentFrom(ActivityStatus.cancel))
+                            .and(_.status.isNotIn(ActivityStatus.closeStatuses()))
                     })) {//if _.tid === act.tid || _.vids equalsAny act.vids
                         if (!a.isNew()) {
                             if (a.id === act.id) {
                                 continue;//same record has current checked.
                             }
                         }
-                        conflicts.push(a);
+                        if (a.tid.id === act.tid.id) {
+                            // same tenant
+                            conflicts.push(a);
+                            error = terms.sameDateAndTimes + ' ' + terms.tenant;
+                        }
+                        if (error.length == 0) {
+                            if (Activity.hasIntersuct(act.vids, a.vids)) {
+                                //same volunteers
+                                conflicts.push(a);
+                                error = terms.sameDateAndTimes + ' ' + terms.volunteers;
+                            }
+                        }
                     }
                     if (conflicts.length > 0) {
-                        throw terms.sameDateAndTimes;
+                        throw error;
                     }
                 }
+            }
+        };
+        options.saving = async (act) => {
+            if (isBackend()) {
                 if (act._.isNew()) {
                     act.created = new Date();
                     act.createdBy = await remult.repo(Users).findId(remult.user.id);
@@ -228,9 +250,30 @@ export class Activity extends IdEntity {
 
     constructor(private remult: Remult) { super(); }
 
+    static hasIntersuct(us1: UserIdName[], us2: UserIdName[]) {
+        if (!us1) {
+            us1 = [] as UserIdName[];
+        }
+        if (!us2) {
+            us2 = [] as UserIdName[];
+        }
+        for (let i = 0; i < us2.length; ++i) {
+            if (us1.find(_ => _.id === us2[i].id)) {
+                return true;
+            }
+        };
+        return false;
+    }
+
     // vols = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
     //     where: _ => _.a!.isEqualTo(this)
     // })
+
+    @Field({})
+    started!: Date;
+
+    @Field({})
+    ended!: Date;
 
     @Field({
         caption: terms.branch, validate: EntityRequiredValidation
@@ -263,14 +306,14 @@ export class Activity extends IdEntity {
     //         a.bid = '888';
     //     }
     // })
-    @Field(options => options.valueType = Tenant, { caption: terms.tenant })
+    @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required })
     // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
     //@Field({ caption: terms.tenant })
     tid!: Tenant;
 
     //@CommaSeparatedStringArrayField<Users>({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
-    @Field({ caption: terms.volunteers })
-    vids: string[] = [];
+    @CommaSeparatedStringArrayFieldUsersAsString({ caption: terms.volunteers })
+    vids: UserIdName[] = [];
 
     // @Field({ caption: terms.volunteers })
     // // volids = new OneToMany(this.remult.repo(Users), {
@@ -291,7 +334,7 @@ export class Activity extends IdEntity {
     @Field({ caption: terms.status })
     status: ActivityStatus = ActivityStatus.w4_assign;
 
-    @Field({ caption: terms.remark })
+    @Field({ caption: terms.commentAndSummary })
     remark: string = '';
 
     @Field({ caption: terms.createdBy })

@@ -75,13 +75,16 @@
                             </div>
                         </div>
                     </div>
+                    <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: flex-start;">
+                        משתתפים: {{ this.getVolunteers(a) }}
+                    </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
                         <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_start)'
                             *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
-                            style="margin-top: 7px; background: blue; color: white;">התחלתי</button>
+                            style="margin-top: 7px; background: blue; color: white;"> {{ a.vids.length > 1 ? 'התחלנו' : 'התחלתי' }} </button>
                         <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'
                             *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
-                            style="margin-top: 7px; background: green; color: white;">סיימתי</button>
+                            style="margin-top: 7px; background: green; color: white;"> {{ a.vids.length > 1 ? 'סיימנו' : 'סיימתי' }} </button>
                         <button (click)='this.setNextStatus(a, this.ActivityStatus.problem)'
                             *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: red; color: white;">ישנה

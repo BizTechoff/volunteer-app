@@ -4,10 +4,9 @@ import { DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
-import { EmailSvc } from '../../../common/utils';
+import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
-import { Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
@@ -35,7 +34,7 @@ export class ActivityDetailsComponent implements OnInit {
   fields = new DataAreaSettings({});
   images: Photo[] = [];
   terms = terms;
-  lastVids = [] as string[];
+  lastVids = [] as UserIdName[];
   // @Field({ caption: terms.branch })
   // bid: string = '';
   get $() { return getFields(this, this.remult) };
@@ -85,16 +84,17 @@ export class ActivityDetailsComponent implements OnInit {
         purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
         fh: '14:00',
-        th: '16:00'
+        th: '16:00',
+        vids: [{ id: this.remult.user.id, name: this.remult.user.name }]
       });
     }
     this.top = new DataAreaSettings({
       fields: () => [
         [
           { field: this.activity.$.bid, visible: (r, v) => this.isBoard() },
-          { field: this.activity.$.status, visible: (r, v) => !this.activity.isNew()}, //, readonly: true  },//, readonly: true }
+          { field: this.activity.$.status, visible: (r, v) => !this.activity.isNew() }, //, readonly: true  },//, readonly: true }
         ]
-      ] 
+      ]
     })
     this.fields = new DataAreaSettings({
       fields: () => [
@@ -105,7 +105,7 @@ export class ActivityDetailsComponent implements OnInit {
         this.activity.$.purposeDesc,
         this.activity.$.date,
         [this.activity.$.fh, this.activity.$.th],
-        { field: this.activity.$.remark, caption: terms.commentAndSummary }
+        this.activity.$.remark
       ]
     });
   }
@@ -132,7 +132,7 @@ export class ActivityDetailsComponent implements OnInit {
           vids: this.activity.vids//,
           // volids: this.activity.volids
         },
-        output => output ? (output.args.changed ? output.args.volids : undefined) : undefined);
+        output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);
 
       if (volids) {
         if (volids.length > 0) {
@@ -156,40 +156,55 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   async saveAndClose() {
-    await this.activity.save();
-    this.args.changed = true;
-    this.args.aid = this.activity.id;
-    // await this.sendEmails();
-    this.close();
+    let found = false;
+    this.activity.vids.forEach(v => {
+      if (v.id === this.remult.user.id) {
+        found = true;
+      }
+    });
+    if (!found) {
+      this.activity.vids.push({ id: this.remult.user.id, name: this.remult.user.name });
+    }
+
+     {
+      await this.activity.save();
+      this.args.changed = true;
+      this.args.aid = this.activity.id;
+      // await this.sendEmails();
+      this.close();
+    }
   }
   // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
   close() {
     this.win.close();
   }
 
+  async CheckConflictsVolenteersOrTenant() {
+    return false;
+  }
+
   async sendEmails() {
     if (this.lastVids !== this.activity.vids) {
       let yes = await this.dialog.yesNoQuestion('האם לשלוח אימייל למתנדבים');
       if (yes) {
-        this.lastVids.forEach(async id => {
-          let u = await this.remult.repo(Users).findId(id);
+        this.lastVids.forEach(async u => {
           if (u) {
-            let text = '';
-            let email = u.email;
-            if (u.clickedLink) {
-              // send update mail
-              text = 'עדכון למייל קיים בין המתנדב לדייר';
-            }
-            else {
-              //send new mail
-              text = terms.voulnteerNewAssign
-                .replace('!name!', this.activity.tid.name)
-                .replace('!date!', this.activity.date.toLocaleDateString())
-                .replace('!from!', this.activity.fh)
-                .replace('!to!', this.activity.th)
-                .replace('!address!', this.activity.tid.address);
-            }
-            await EmailSvc.SendEmail(email, text);
+            // let text = '';
+            // let email = u.email;
+            // if (u.clickedLink) {
+            //   // send update mail
+            //   text = 'עדכון למייל קיים בין המתנדב לדייר';
+            // }
+            // else {
+            //   //send new mail
+            //   text = terms.voulnteerNewAssign
+            //     .replace('!name!', this.activity.tid.name)
+            //     .replace('!date!', this.activity.date.toLocaleDateString())
+            //     .replace('!from!', this.activity.fh)
+            //     .replace('!to!', this.activity.th)
+            //     .replace('!address!', this.activity.tid.address);
+            // }
+            // await EmailSvc.SendEmail(email, text);
           }
         });// this.lastVids, this.activity.vids)
       }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
 import { Remult } from 'remult';
+import { InputAreaComponent } from '../../../common/input-area/input-area.component';
+import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Langs, Users } from '../../../users/users';
 import { Activity, ActivityStatus } from '../../activity/activity';
@@ -34,7 +36,7 @@ export class VolunteerActivitiesComponent implements OnInit {
     if (changes) {
       await this.refresh();
     }
-  } 
+  }
 
   async openPhotosAlbum(a: Activity) {
     let changes = await openDialog(PhotosAlbumComponent,
@@ -57,7 +59,8 @@ export class VolunteerActivitiesComponent implements OnInit {
       this.refreshing = true;
       let as = [] as Activity[];
       for await (const a of this.remult.repo(Activity).iterate({
-        where: row => row.vids.contains(this.remult.user.id)
+        where: row => row.status.isNotIn([this.AcitivityStatus.cancel])
+          .and(row.vids.contains(this.remult.user.id))
       })) {
         await a.$.tid.load();
         as.push(a);
@@ -66,6 +69,11 @@ export class VolunteerActivitiesComponent implements OnInit {
       this.activities.push(...as);
       this.refreshing = false;
     }
+  }
+
+  getVolunteers(a: Activity) {
+    let voids = a.vids && a.vids.length > 0 ? a.vids : [] as UserIdName[];
+    return voids.map(v => v.id === this.remult.user.id ? terms.you : v.name).join(', ');
   }
 
   getLang(langs: Langs[]) {
@@ -84,7 +92,15 @@ export class VolunteerActivitiesComponent implements OnInit {
     if (next !== a.status) {
       a.status = next;
       await a.save();
-    }
+      if (ActivityStatus.lastStatuses().find(s => s === a.status)) {
+        let changed = await openDialog(InputAreaComponent,
+          _ => _.args = {
+            title:  terms.thankYou,
+            fields: () => [a.$.remark],
+            ok: async () => { await a.save(); }
+          })  
+      } 
+    } 
   }
 
   openWaze(address: string) {
