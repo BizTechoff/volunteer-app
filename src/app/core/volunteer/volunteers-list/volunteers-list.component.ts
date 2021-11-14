@@ -75,12 +75,16 @@ export class VolunteersListComponent implements OnInit {
   );
 
   constructor(private remult: Remult) { }
-
+ 
   ngOnInit(): void {
   }
-
+ 
   isBoard() {
     return this.remult.isAllowed(Roles.board);
+  }
+
+  isDonor() {
+    return this.remult.isAllowed(Roles.donor);
   }
 
   async refresh() {

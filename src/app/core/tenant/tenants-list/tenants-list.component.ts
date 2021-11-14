@@ -129,6 +129,10 @@ export class TenantsListComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
 
+  isDonor() {
+    return this.remult.isAllowed(Roles.donor);
+  }
+
 
   @Field({ caption: terms.age })
   age: number = 0;
