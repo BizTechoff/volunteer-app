@@ -47,6 +47,12 @@ export class VolunteerActivitiesComponent implements OnInit {
     }
   }
 
+  isToday(a:Activity){
+    let today = new Date();
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return a.date.getTime() === today.getTime();
+  }
+
   showClosedActivitySign(a: Activity) {
     return !ActivityStatus.openStatuses().find(s => s === a.status)!;
   }
@@ -90,17 +96,35 @@ export class VolunteerActivitiesComponent implements OnInit {
       next = status;
     }
     if (next !== a.status) {
+      if (ActivityStatus.w4_start === a.status) {
+        a.started = new Date();
+        let changed = await openDialog(InputAreaComponent,
+          _ => _.args = {
+            title: terms.thankYou,
+            fields: () => [a.$.started],
+            ok: async () => {  }
+          })
+      }
+      else if (ActivityStatus.w4_end === a.status) {
+        a.ended = new Date();
+        let changed = await openDialog(InputAreaComponent,
+          _ => _.args = {
+            title: terms.thankYou,
+            fields: () => [a.$.ended],
+            ok: async () => {  }
+          })
+      }
       a.status = next;
       await a.save();
       if (ActivityStatus.lastStatuses().find(s => s === a.status)) {
         let changed = await openDialog(InputAreaComponent,
           _ => _.args = {
-            title:  terms.thankYou,
+            title: terms.thankYou,
             fields: () => [a.$.remark],
             ok: async () => { await a.save(); }
-          })  
-      } 
-    } 
+          })
+      }
+    }
   }
 
   openWaze(address: string) {

@@ -183,10 +183,10 @@ export class ActivityGeneralStatus {
         allowApiDelete: Allow.authenticated,
         allowApiUpdate: Allow.authenticated,
         allowApiRead: Allow.authenticated,
-        defaultOrderBy: (_) => [_.date.descending(), _.fh, _.status]
+        defaultOrderBy: (_) => [_.date, _.fh, _.status]
     },
     (options, remult) => {
-        options.apiPrefilter = async (act) => {
+        options.apiPrefilter = (act) => {
             let result = FILTER_IGNORE;
             if (!remult.isAllowed(Roles.board)) {
                 return act.bid.contains(remult.user.bid);
@@ -207,7 +207,7 @@ export class ActivityGeneralStatus {
                         where: (_) => _.date.isEqualTo(act.date)
                             .and(_.fh.isLessOrEqualTo(act.th))
                             .and(_.th.isGreaterOrEqualTo(act.fh))
-                            .and(_.status.isNotIn(ActivityStatus.closeStatuses()))
+                            .and(_.status.isNotIn([ActivityStatus.cancel]))
                     })) {//if _.tid === act.tid || _.vids equalsAny act.vids
                         if (!a.isNew()) {
                             if (a.id === act.id) {
@@ -313,7 +313,7 @@ export class Activity extends IdEntity {
 
     //@CommaSeparatedStringArrayField<Users>({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
     @CommaSeparatedStringArrayFieldUsersAsString({ caption: terms.volunteers })
-    vids: UserIdName[] = [];
+    vids: UserIdName[] = [] as UserIdName[];
 
     // @Field({ caption: terms.volunteers })
     // // volids = new OneToMany(this.remult.repo(Users), {

@@ -215,7 +215,7 @@ export class CurrentStateComponent implements OnInit {
 
       // By Purpose
       a.purposes.forEach(p => {
-        let foundPurpose = this.activitiesByPurpose.find(itm => itm.purpose === p);
+        let foundPurpose = this.activitiesByPurpose.find(itm => itm.purpose.id === p.id);
         if (!foundPurpose) {
           foundPurpose = { branch: a.bid, purpose: p, count: 0 };
           this.activitiesByPurpose.push(foundPurpose);

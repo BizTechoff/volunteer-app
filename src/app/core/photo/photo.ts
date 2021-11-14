@@ -1,8 +1,10 @@
 import { DataControl } from "@remult/angular";
 import { Allow, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
+import { FILTER_IGNORE } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 
 
@@ -22,14 +24,21 @@ export class ActiveStatus {
         allowApiRead: Allow.authenticated
     },
     (options, remult) => {
+        options.apiPrefilter = (p) => {
+            let result = FILTER_IGNORE;
+            if (!remult.isAllowed(Roles.board)) {
+                result = p.bid.contains(remult.user.bid);
+            }
+            return result;
+        };  
         options.saving = async (act) => {
             if (isBackend()) {
                 if (act._.isNew()) {
                     act.created = new Date();
-                    act.createdBy = remult.user.id;
+                    act.createdBy = await remult.repo(Users).findId(remult.user.id);
                 }
             }
-        }
+        };
     })
 export class Photo extends IdEntity {
 
@@ -44,10 +53,10 @@ export class Photo extends IdEntity {
 
     @Field({ caption: terms.status })
     status: ActiveStatus = ActiveStatus.on;
- 
+
     @Field({ caption: terms.desc })
     title: string = '';
- 
+
     @Field({ caption: terms.link })
     link: string = '';
 
@@ -55,7 +64,7 @@ export class Photo extends IdEntity {
     data: string = '';
 
     @Field({ caption: terms.createdBy })
-    createdBy: string = '';
+    createdBy!: Users;
 
     @Field({ caption: terms.created })
     created: Date = new Date();

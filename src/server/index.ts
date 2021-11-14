@@ -11,6 +11,7 @@ import * as helmet from 'helmet';
 import * as jwt from 'express-jwt';
 import * as compression from 'compression';
 import './send-email';
+import './aws'
  
 //import '../app/app.module';
 import '../app/app-routing.module';

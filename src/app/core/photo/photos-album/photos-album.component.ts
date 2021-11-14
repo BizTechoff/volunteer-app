@@ -1,10 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { getFields, Remult } from 'remult';
+import { BackendMethod, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
+// import * as AWS from 'aws-sdk';
+// import * as fs from 'fs';
+// import { uploadFile } from '../../../../server/aws';
 
 @Component({
   selector: 'app-photos-album',
@@ -63,12 +66,90 @@ export class PhotosAlbumComponent implements OnInit {
     return this.args.entityId && this.args.entityId.length > 0;
   }
 
+  // @BackendMethod({allowed: true})
+  // static uploadToAws(fileName:string){
+  //   uploadFile(fileName);
+  // }
+
   async onFileInput(e: any) {
+    
+ 
+    // for (let index = 0; index < e.target.files.length; index++) {
+    //   const file = e.target.files[index];
+    //   let f: File = file;
+    //   PhotosAlbumComponent.uploadToAws(f.name);
+    // }
+   
+
+// s3.createBucket(params, function(err, data) {
+//     if (err) console.log(err, err.stack);
+//     else console.log('Bucket Created Successfully', data.Location);
+// }); 
     let changed = this.loadFiles(e.target.files);
     // if (changed) {
     //   await this.refresh();
     // }
   }
+//   private async loadFiles(files: any) {
+//     for (let index = 0; index < files.length; index++) {
+//       const file = files[index];
+//       let f: File = file;
+//       // console.log(f);
+//       // f.lastModified;
+//       // f.name;
+//       // f.size;
+//       // f.type;
+//       // f.webkitRelativePath;
+//       await new Promise((res) => {
+        
+//     // Read content from the file
+//     const fileContent = fs.readFileSync(f.name);
+
+//     // Setting up S3 upload parameters
+//     const params = {
+//         Bucket: 'eshel-bucket',
+//         Key: 'cat.jpg', // File name you want to save as in S3
+//         Body: fileContent
+//     };
+
+//     // Uploading files to the bucket
+//     s3.upload(params, function(err, data) {
+//         if (err) {
+//             throw err;
+//         }
+//         console.log(`File uploaded successfully. ${data.Location}`);
+//     });
+// };
+//         });
+//         // fileReader.readAsDataURL(f);
+//       // });
+//     }
+//   }
+
+  // private uploadFile(fileName: string){
+  //   //https://stackabuse.com/uploading-files-to-aws-s3-with-node-js/
+  //   // const AWS = require('aws-sdk');
+  //   // const fs = require('fs');
+  //   const s3 = new AWS.S3({
+  //     accessKeyId: 'AKIA4V2A4TLTQ5RLQQ7M',
+  //     secretAccessKey: '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'
+  // });
+  // const fileContent = fs.readFileSync(fileName);
+  // const params = {
+  //   Bucket: 'eshel-bucket',
+  //       Key: fileName, // File name you want to save as in S3
+  //       Body: fileContent
+  //   // CreateBucketConfiguration: {
+  //   //     // Set your region here
+  //   //     LocationConstraint: "us-east-1"
+  //   };
+  //   s3.upload(params, (err: Error, data:AWS.S3.ManagedUpload.SendData) => {
+  //     if (err) {
+  //         throw err; 
+  //     }
+  //     console.log(`File uploaded successfully. ${data.Location}`);
+  // });
+  // }
 
   private async loadFiles(files: any) {
     for (let index = 0; index < files.length; index++) {

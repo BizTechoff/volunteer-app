@@ -59,6 +59,10 @@ export class ActivityDetailsComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
 
+  isManager() {
+    return this.remult.isAllowed(Roles.manager);
+  }
+
   async retrieve() {
     let validId = this.args.aid && this.args.aid.length > 0;
     if (validId) {
@@ -84,22 +88,32 @@ export class ActivityDetailsComponent implements OnInit {
         purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
         fh: '14:00',
-        th: '16:00',
-        vids: [{ id: this.remult.user.id, name: this.remult.user.name }]
+        th: '16:00'
       });
+
+      if (!this.activity.vids) {
+        this.activity.vids = [] as UserIdName[];
+      }
+      this.addCurrentUserToVids();
+
     }
     this.top = new DataAreaSettings({
       fields: () => [
         [
           { field: this.activity.$.bid, visible: (r, v) => this.isBoard() },
-          { field: this.activity.$.status, visible: (r, v) => !this.activity.isNew() }, //, readonly: true  },//, readonly: true }
+          { field: this.activity.$.status, visible: (r, v) => false },// !this.activity.isNew(), readonly: true }, //, readonly: true  },//, readonly: true }
         ]
       ]
     })
     this.fields = new DataAreaSettings({
       fields: () => [
         { field: this.activity.$.tid, clickIcon: 'search', click: async () => await this.openTenants() },//, readonly: true },
-        { field: this.activity.$.vids, clickIcon: 'search', click: async () => await this.openAssignment() },
+        {
+          field: this.activity.$.vids,
+          readonly: () => this.activity.tid && this.activity.tid.id && this.activity.tid.id.length > 0 ? false : true,
+          clickIcon: 'search',
+          click: async () => await this.openAssignment()
+        },//, displayValue: () => {return this.activity.$.vids && this.activity.$.vids.value ? this.activity.$.vids.value.map(i => i.name).join(', ').trim() : '';} },
         // { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
         this.activity.$.purposes,
         this.activity.$.purposeDesc,
@@ -134,11 +148,10 @@ export class ActivityDetailsComponent implements OnInit {
         },
         output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);
 
-      if (volids) {
-        if (volids.length > 0) {
-          this.activity.status = ActivityStatus.w4_start;
-        }
-        // await this.refresh();
+
+      this.addCurrentUserToVids();
+      if (this.activity.status === ActivityStatus.w4_assign) {
+        this.activity.status = ActivityStatus.w4_start;
       }
     }
     else {
@@ -155,24 +168,30 @@ export class ActivityDetailsComponent implements OnInit {
     }
   }
 
-  async saveAndClose() {
+  addCurrentUserToVids() {
     let found = false;
-    this.activity.vids.forEach(v => {
-      if (v.id === this.remult.user.id) {
-        found = true;
+    if (!this.isManager()) {
+      this.activity.vids.forEach(v => {
+        if (v.id === this.remult.user.id) {
+          found = true;
+        }
+      });
+      if (!found) {
+        this.activity.vids.push({ id: this.remult.user.id, name: this.remult.user.name });
       }
-    });
-    if (!found) {
-      this.activity.vids.push({ id: this.remult.user.id, name: this.remult.user.name });
+    }
+  }
+
+  async saveAndClose() {
+    if (this.activity.status === ActivityStatus.w4_assign) {
+      this.activity.status = ActivityStatus.w4_start;
     }
 
-     {
-      await this.activity.save();
-      this.args.changed = true;
-      this.args.aid = this.activity.id;
-      // await this.sendEmails();
-      this.close();
-    }
+    await this.activity.save();
+    this.args.changed = true;
+    this.args.aid = this.activity.id;
+    // await this.sendEmails();
+    this.close();
   }
   // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
   close() {

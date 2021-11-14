@@ -3,7 +3,7 @@ import { Branch } from "./core/branch/branch";
 export const terms = {
     thankYou: 'תודה לך!',
     pleaseTellUsWhatGoingOn:'הערות וסיכום פעילות',
-    you: 'את\ה',
+    you: 'את/ה',
     transferVolunteer:'העברת מתנדב לסניף אחר',
     transferTenant: 'העברת דייר לסניף אחר',
     notVolunteersForCurrentTenant:'לא שוייכו מתנדבים לדייר זה, האם לסגור את החלון בכל זאת?',

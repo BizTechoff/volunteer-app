@@ -43,6 +43,7 @@ import { SelectReferrerComponent } from './common/select-referrer/select-referre
 import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
 import { SelectBranchComponent } from './common/select-branch/select-branch.component';
 import { SelectPurposesComponent } from './common/select-purposes/select-purposes.component';
+import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
 
 @NgModule({
   declarations: [
@@ -68,7 +69,8 @@ import { SelectPurposesComponent } from './common/select-purposes/select-purpose
     SelectReferrerComponent,
     BranchesListComponent,
     SelectBranchComponent,
-    SelectPurposesComponent
+    SelectPurposesComponent,
+    PhotosAlbumBranchComponent
   ],
   imports: [
     BrowserModule,

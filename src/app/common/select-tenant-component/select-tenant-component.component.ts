@@ -41,7 +41,7 @@ export class SelectTenantComponentComponent implements OnInit {
         // if there is a search value, search by it
         // t.langs.isIn([this.langs])
         t.active.isEqualTo(true)
-          .and(t.defVids.contains(this.remult.user.id))//@@@@@@@@@@@2
+          .and(this.isManager() ? FILTER_IGNORE : t.defVids.contains(this.remult.user.id))//@@@@@@@@@@@2
           .and(this.isBoard() ? FILTER_IGNORE : t.bid.isEqualTo(this.args.bid))
           .and(
             this.searchString ? t.name.contains(this.searchString)
@@ -62,6 +62,9 @@ export class SelectTenantComponentComponent implements OnInit {
   }
   isBoard() {
     return this.remult.isAllowed(Roles.board);
+  }
+  isManager() {
+    return this.remult.isAllowed(Roles.manager);
   }
   async create() {
     let t = this.remult.repo(Tenant).create();

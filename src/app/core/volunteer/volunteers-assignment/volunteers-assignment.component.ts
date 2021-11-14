@@ -54,7 +54,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   async ngOnInit() {
     this.lgDesc = this.args.langs.map(_ => _.caption).join(', ');
     if (!this.args.vids) {
-      throw '!this.args.vids';
+      this.args.vids = [] as UserIdName[];
     }
     if (this.args.vids.length > 0) {
       console.log('this.args.vids', this.args.vids);

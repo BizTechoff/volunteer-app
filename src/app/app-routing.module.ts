@@ -19,6 +19,7 @@ import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/vo
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
 import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
 import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.component';
+import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
   
 const defaultRoute = terms.home;
 const routes: Routes = [
@@ -28,11 +29,11 @@ const routes: Routes = [
   { path: terms.tenants, component: TenantsListComponent, canActivate: [ManagerGuard] },
   { path: terms.volunteers, component: VolunteersListComponent, canActivate: [ManagerGuard] },
   { path: terms.dailyActivityReport, component: ActivityDailyComponent, canActivate: [ManagerGuard] },
-  // { path: terms.photoAlbum, component: PhotosAlbumComponent, canActivate: [ManagerGuard] },
-  { path: terms.branches, component: BranchesListComponent, canActivate: [AdminGuard] },
-  { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
   { path: terms.myActivities, component: VolunteerActivitiesComponent, canActivate: [OnlyVolunteerGuard] },
   { path: terms.personalInfo, component: VolunteerDetailsComponent, canActivate: [OnlyVolunteerGuard] },
+  { path: terms.photoAlbum, component: PhotosAlbumBranchComponent, canActivate: [VolunteerGuard] },
+  { path: terms.branches, component: BranchesListComponent, canActivate: [AdminGuard] },
+  { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
   { path: '**', redirectTo: '/'+defaultRoute, pathMatch: 'full' }
 
 ];

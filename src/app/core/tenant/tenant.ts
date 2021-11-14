@@ -194,7 +194,8 @@ export class Tenant extends IdEntity {
 
     @DataControl<Tenant, Users[]>({
         click: () => { },
-        clickIcon: 'search'
+        clickIcon: 'search'//,
+        // getValue: (r,v) => {return v && v.value ? v.value.map(i => i.name).join(', ').trim() : '';}
         // click: async (r, v) => await r.openVolunteers()
     })
     // @CommaSeparatedStringArrayFieldUsers<Tenant>({ caption: terms.associatedVolunteers })

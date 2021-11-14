@@ -22,7 +22,7 @@
                     <mat-card-title>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
 
-                            <button mat-mini-fab color="primary" [title]="terms.edit" (click)="openActivity(a)">
+                            <button *ngIf="!this.showClosedActivitySign(a)" mat-mini-fab color="primary" [title]="terms.edit" (click)="openActivity(a)">
                                 <mat-icon>edit</mat-icon>
                             </button>
                             {{ a?.tid?.name }}
@@ -79,9 +79,10 @@
                         משתתפים: {{ this.getVolunteers(a) }}
                     </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
-                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_start)'
+                        <button [disabled]="!this.isToday(a)" (click)='this.setNextStatus(a, this.ActivityStatus.w4_start)'
                             *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
-                            style="margin-top: 7px; background: blue; color: white;"> {{ a.vids.length > 1 ? 'התחלנו' : 'התחלתי' }} </button>
+                            [style.background]='this.isToday(a)? "blue" : "gray"'
+                            style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? 'התחלנו' : 'התחלתי' }} </button>
                         <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'
                             *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: green; color: white;"> {{ a.vids.length > 1 ? 'סיימנו' : 'סיימתי' }} </button>
