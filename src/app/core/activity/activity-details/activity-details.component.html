@@ -13,12 +13,17 @@
                     <!-- {{ terms.saveAndClose }} -->
                     <mat-icon>camera</mat-icon>
                 </button>
-                <button *ngIf="!this.isDonor()" mat-flat-button color="primary" style="height: 35px;" (click)='saveAndClose()'>
+                <button *ngIf="!this.isDonor()" mat-flat-button color="primary" style="height: 35px;"
+                    (click)='saveAndClose()'>
                     {{ terms.saveAndClose }}
                 </button>
             </div>
         </div>
 
+        <div *ngIf="this.isShowDeliveredFoodToShabat()"
+            style="display: flex; flex-direction: row; justify-content: end;">
+            <mat-checkbox>מסרתי לדייר את האוכל לשבת </mat-checkbox>
+        </div>
         <data-area [settings]='this.top'></data-area>
 
 

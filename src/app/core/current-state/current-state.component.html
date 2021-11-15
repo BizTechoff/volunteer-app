@@ -6,7 +6,7 @@
             </button>
             <data-control *ngIf="this.isBoard()" style="width: 100%;" [field]="this.$.branch!"></data-control>
         </div>
-    </div>
+    </div> 
     <div class="grow-item">
         <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-around; flex-wrap: wrap;">
             <div style="display: block; width:350px;">
@@ -49,10 +49,10 @@
                     [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
                 </canvas>
             </div> -->
-        </div>
+        </div>  
     </div>
     <div class="footer" style="margin: 1em;">
         <span> נכון ל: {{ this.refreshedTime }} </span>
-        <!-- <button (click)='this.sendEmail()'>Send Email</button> -->
+        <button (click)='this.sendEmail()'>Send Email</button>
     </div>
 </div>

@@ -67,6 +67,14 @@ export class ActivityDetailsComponent implements OnInit {
     return this.remult.isAllowed(Roles.manager);
   }
 
+  isShowDeliveredFoodToShabat(){
+    return this.activity && 
+    !this.activity.isNew() && 
+    this.activity.date && 
+    // ActivityStatus.inProgressStatuses().includes( this.activity.status) &&
+    [3,4].includes(this.activity.date.getDay());//יום רביעי וחמישי
+  }
+
   async retrieve() {
     let validId = this.args.aid && this.args.aid.length > 0;
     if (validId) {
