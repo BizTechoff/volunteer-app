@@ -44,6 +44,7 @@ import { BranchesListComponent } from './core/branch/branches-list/branches-list
 import { SelectBranchComponent } from './common/select-branch/select-branch.component';
 import { SelectPurposesComponent } from './common/select-purposes/select-purposes.component';
 import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
+import { UserLoginComponent } from './users/user-login/user-login.component';
 
 @NgModule({
   declarations: [
@@ -70,7 +71,8 @@ import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/pho
     BranchesListComponent,
     SelectBranchComponent,
     SelectPurposesComponent,
-    PhotosAlbumBranchComponent
+    PhotosAlbumBranchComponent,
+    UserLoginComponent
   ],
   imports: [
     BrowserModule,
@@ -96,6 +98,7 @@ import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/pho
   providers: [DialogService, AdminGuard, DonorGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
-    SelectVolunteersComponent, SelectTenantComponentComponent, SelectLangsComponent]//, SelectReferrerComponent]
+    SelectVolunteersComponent, SelectTenantComponentComponent, SelectLangsComponent,
+    UserLoginComponent]//, SelectReferrerComponent]
 })
 export class AppModule { }

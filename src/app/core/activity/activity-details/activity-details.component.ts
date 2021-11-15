@@ -59,6 +59,10 @@ export class ActivityDetailsComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
 
+  isDonor() {
+    return this.remult.isAllowed(Roles.donor);
+  }
+
   isManager() {
     return this.remult.isAllowed(Roles.manager);
   }
@@ -150,8 +154,10 @@ export class ActivityDetailsComponent implements OnInit {
 
 
       this.addCurrentUserToVids();
-      if (this.activity.status === ActivityStatus.w4_assign) {
-        this.activity.status = ActivityStatus.w4_start;
+      if (this.activity.vids.length > 0) {
+        if (this.activity.status === ActivityStatus.w4_assign) {
+          this.activity.status = ActivityStatus.w4_start;
+        }
       }
     }
     else {
@@ -183,8 +189,10 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   async saveAndClose() {
-    if (this.activity.status === ActivityStatus.w4_assign) {
-      this.activity.status = ActivityStatus.w4_start;
+    if (this.activity.vids.length > 0) {
+      if (this.activity.status === ActivityStatus.w4_assign) {
+        this.activity.status = ActivityStatus.w4_start;
+      }
     }
 
     await this.activity.save();

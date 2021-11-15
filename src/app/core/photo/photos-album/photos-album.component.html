@@ -2,7 +2,7 @@
     <div class="header"></div>
     <div class="ng-container">
         <div>
-            <button title='{{ this.terms.uploadPhoto }}' mat-button *ngIf="this.photos.length < 25">
+            <button *ngIf="!this.isDonor()" title='{{ this.terms.uploadPhoto }}' mat-button>
                 <label for="uploadImage" style="display: flex; align-items: center;">
                     <mat-icon>add</mat-icon>
                     <mat-icon>photo_camera</mat-icon>

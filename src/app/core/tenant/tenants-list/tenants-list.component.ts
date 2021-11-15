@@ -7,7 +7,6 @@ import { InputAreaComponent } from '../../../common/input-area/input-area.compon
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
-import { Users } from '../../../users/users';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
@@ -34,14 +33,14 @@ export class TenantsListComponent implements OnInit {
       allowCrud: false,
       numOfColumnsInGrid: 10,
       columnSettings: t => [
-        t.referrer,
         { field: t.bid, visible: (r, v) => this.isBoard() },
+        t.referrer,
         t.name,
+        t.defVids,
         t.mobile,
         t.address,
         t.birthday,
-        t.langs,
-        t.defVids],
+        t.langs],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -69,19 +68,19 @@ export class TenantsListComponent implements OnInit {
           click: async (_) => await this.showActivities(_)
         },
         {
-          visible: (_) => !_.isNew(),
+          visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.addActivity,
           icon: 'add',
           click: async (_) => await this.openActivity(_)
         },
         {
-          visible: (_) => !_.isNew(),
+          visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.transferTenant,
           icon: 'reply',
           click: async (_) => await this.transferTenant(_)
         },
         {
-          visible: (_) => !_.isNew(),
+          visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.deleteTenant,
           icon: 'delete',//,
           // click: async (_) => await this.addTenant(_)
@@ -157,8 +156,8 @@ export class TenantsListComponent implements OnInit {
       _ => _.args = {
         title: title,
         fields: () => [
-          t!.$.referrer,
           { field: t!.$.bid, visible: (r, v) => this.isBoard() },
+          t!.$.referrer,
           t!.$.name,
           t!.$.mobile,
           t!.$.address,
@@ -172,7 +171,9 @@ export class TenantsListComponent implements OnInit {
           return await this.canSaveAndClose(t);
         },
         ok: async () => {
-          await t!.save();
+          if (!this.isDonor()) {
+            await t!.save();
+          }
         }
       },
       _ => _ ? _.ok : false);
@@ -201,12 +202,12 @@ export class TenantsListComponent implements OnInit {
       // t.defVids.splice(0);
       // let u = await this.remult.repo(Users).findFirst({ useCache: false });
       // t.defVids.push(u);
-      if(!t.defVids){
+      if (!t.defVids) {
         t.defVids = [] as UserIdName[];
-      } 
+      }
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
-          bid: t.bid, 
+          bid: t.bid,
           aid: '',
           tname: t.name,
           langs: t.langs,// this.t.langs, 

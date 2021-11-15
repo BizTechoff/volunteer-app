@@ -1,6 +1,8 @@
 import { Branch } from "./core/branch/branch";
 
 export const terms = {
+    passwordSentToYourEmail: 'סיסמא נשלחה לאמייל !email! ברגע זה',
+    forgotPassword:'שכחתי סיסמא',
     thankYou: 'תודה לך!',
     pleaseTellUsWhatGoingOn:'הערות וסיכום פעילות',
     you: 'את/ה',

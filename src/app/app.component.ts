@@ -9,6 +9,7 @@ import { InputAreaComponent } from './common/input-area/input-area.component';
 import { Branch } from './core/branch/branch';
 import { terms } from './terms';
 import { Roles } from './users/roles';
+import { UserLoginComponent } from './users/user-login/user-login.component';
 import { PasswordControl, Users } from './users/users';
 
 @Component({
@@ -33,18 +34,25 @@ export class AppComponent implements OnInit {
 
   forgotPassword = false;
   async signIn() {
-    let user = new InputField<string>({ caption: terms.username });
-    let password = new PasswordControl();
-    openDialog(InputAreaComponent, i => i.args = {
-      title: terms.signIn,
-      fields: () => [
-        user,
-        password
-      ],
-      ok: async () => {
-        this.auth.signIn(user.value, password.value);
-      }
-    });
+    await openDialog(UserLoginComponent);
+    // let changes = await openDialog(UserLoginComponent);
+    //   _ => _.args = { bid: this.activity.bid, entityId: this.activity.id },
+    //   _ => _ ? _.args.changed : false);
+    // if (changes) {
+    //   // await this.refresh();
+    // } 
+    // let user = new InputField<string>({ caption: terms.username });
+    // let password = new PasswordControl();
+    // openDialog(InputAreaComponent, i => i.args = {
+    //   title: terms.signIn,
+    //   fields: () => [
+    //     user,
+    //     password
+    //   ],
+    //   ok: async () => {
+    //     this.auth.signIn(user.value, password.value);
+    //   }
+    // });
   }
  
   usersCount = 0;
@@ -79,6 +87,9 @@ export class AppComponent implements OnInit {
     if (this.remult.user.roles.find(r => r === Roles.admin)) {
       result = 'אדמין';
     }
+    else if (this.remult.user.roles.find(r => r === Roles.donor)) {
+      result = 'תורם'; 
+    }
     else if (this.remult.user.roles.find(r => r === Roles.board)) {
       result = 'הנהלה'; 
     }
@@ -108,7 +119,7 @@ export class AppComponent implements OnInit {
         user.$.mobile,
         password,
         confirmPassword
-      ],
+      ], 
       ok: async () => {
         if (password.value != confirmPassword.value) {
           confirmPassword.error = terms.doesNotMatchPassword;

@@ -193,60 +193,65 @@ export class CurrentStateComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
 
+  isRefreshing = false;
   async refresh() {
-    this.activitiesByStatus = [];
-    this.activitiesByPurpose = [];
-    this.activitiesByWeekDay = [];
-    this.activitiesByDayPeriods = [];
-    this.activitiesByReferrer = [];
-    var options = { hour12: false };
-    // console.log(date.toLocaleString('en-US', options));
-    this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
-    for await (const a of this.remult.repo(Activity).iterate({
-      where: row => this.branch ? row.bid.isEqualTo(this.branch) : FILTER_IGNORE
-    })) {
-      // By Staus
-      let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
-      if (!foundStatus) {
-        foundStatus = { branch: a.bid, status: a.status, count: 0 };
-        this.activitiesByStatus.push(foundStatus);
-      }
-      ++foundStatus.count;
-
-      // By Purpose
-      a.purposes.forEach(p => {
-        let foundPurpose = this.activitiesByPurpose.find(itm => itm.purpose.id === p.id);
-        if (!foundPurpose) {
-          foundPurpose = { branch: a.bid, purpose: p, count: 0 };
-          this.activitiesByPurpose.push(foundPurpose);
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.activitiesByStatus = [];
+      this.activitiesByPurpose = [];
+      this.activitiesByWeekDay = [];
+      this.activitiesByDayPeriods = [];
+      this.activitiesByReferrer = [];
+      var options = { hour12: false };
+      // console.log(date.toLocaleString('en-US', options));
+      this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
+      for await (const a of this.remult.repo(Activity).iterate({
+        where: row => this.branch ? row.bid.isEqualTo(this.branch) : FILTER_IGNORE
+      })) {
+        // By Staus
+        let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
+        if (!foundStatus) {
+          foundStatus = { branch: a.bid, status: a.status, count: 0 };
+          this.activitiesByStatus.push(foundStatus);
         }
-        ++foundPurpose.count;
-      });
+        ++foundStatus.count;
 
- 
-      // By Purpose
-      let foundDayPeriod = this.activitiesByDayPeriods.find(itm => itm.period === a.period());
-      if (!foundDayPeriod) {
-        foundDayPeriod = { branch: a.bid, period: a.period(), count: 0 };
-        this.activitiesByDayPeriods.push(foundDayPeriod);
+        // By Purpose
+        a.purposes.forEach(p => {
+          let foundPurpose = this.activitiesByPurpose.find(itm => itm.purpose.id === p.id);
+          if (!foundPurpose) {
+            foundPurpose = { branch: a.bid, purpose: p, count: 0 };
+            this.activitiesByPurpose.push(foundPurpose);
+          }
+          ++foundPurpose.count;
+        });
+
+
+        // By Purpose
+        let foundDayPeriod = this.activitiesByDayPeriods.find(itm => itm.period === a.period());
+        if (!foundDayPeriod) {
+          foundDayPeriod = { branch: a.bid, period: a.period(), count: 0 };
+          this.activitiesByDayPeriods.push(foundDayPeriod);
+        }
+        ++foundDayPeriod.count;
+
+        // By Purpose
+        let foundDayWeekDay = this.activitiesByWeekDay.find(itm => itm.day === a.date.getDay());
+        if (!foundDayWeekDay) {
+          foundDayWeekDay = { branch: a.bid, day: a.date.getDay(), count: 0 };
+          this.activitiesByWeekDay.push(foundDayWeekDay);
+        }
+        ++foundDayWeekDay.count;
+
+        // By Purpose
+        // let referrer = this.activitiesByReferrer.find(itm => itm.referrer === a.tid.referrer);
+        // if (!referrer) {
+        //   referrer = { branch: a.bid, referrer: a.tid.referrer, count: 0 };
+        //   this.activitiesByReferrer.push(referrer);
+        // }
+        // ++referrer.count;
+      this.isRefreshing = false;
       }
-      ++foundDayPeriod.count;
-
-      // By Purpose
-      let foundDayWeekDay = this.activitiesByWeekDay.find(itm => itm.day === a.date.getDay());
-      if (!foundDayWeekDay) {
-        foundDayWeekDay = { branch: a.bid, day: a.date.getDay(), count: 0 };
-        this.activitiesByWeekDay.push(foundDayWeekDay);
-      }
-      ++foundDayWeekDay.count;
-
-      // By Purpose
-      // let referrer = this.activitiesByReferrer.find(itm => itm.referrer === a.tid.referrer);
-      // if (!referrer) {
-      //   referrer = { branch: a.bid, referrer: a.tid.referrer, count: 0 };
-      //   this.activitiesByReferrer.push(referrer);
-      // }
-      // ++referrer.count;
     }
 
     this.activitiesByStatus.sort((a1, a2) => a1.status.id - a2.status.id);

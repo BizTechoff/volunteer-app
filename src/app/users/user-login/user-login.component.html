@@ -1,0 +1,15 @@
+<div class="full-page">
+    <div class="header"></div>
+    <div>
+        <data-area [settings]="area"></data-area>
+        <button *ngIf="this.userName.value" mat-flat-button (click)="this.frogotPassword()"> {{ terms.forgotPassword }} </button>
+    </div>
+    <div class="footer">
+        <button mat-raised-button (click)="this.signIn()" color='accent' style="margin-left: 15px;">
+            {{ terms.signIn }}
+        </button>
+        <button mat-raised-button (click)="this.close()">
+            {{ terms.cancel }}
+        </button>
+    </div>
+</div>

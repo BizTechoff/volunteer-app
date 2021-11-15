@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { BackendMethod, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
+import { Roles } from '../../../users/roles';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
 // import * as AWS from 'aws-sdk';
@@ -30,9 +31,13 @@ export class PhotosAlbumComponent implements OnInit {
   // @Field({ caption: terms.branch })
   // bid: string = '';
   get $() { return getFields(this, this.remult) };
-
+ 
   constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) { }
 
+
+  isDonor() {
+    return this.remult.isAllowed(Roles.donor);
+  }
   async ngOnInit() {
     if (!this.args) {
       this.args = { bid: undefined!, entityId: '', changed: false };
@@ -107,7 +112,7 @@ export class PhotosAlbumComponent implements OnInit {
 
 //     // Setting up S3 upload parameters
 //     const params = {
-//         Bucket: 'eshel-bucket',
+//         Bucket: '',
 //         Key: 'cat.jpg', // File name you want to save as in S3
 //         Body: fileContent
 //     };
@@ -131,12 +136,12 @@ export class PhotosAlbumComponent implements OnInit {
   //   // const AWS = require('aws-sdk');
   //   // const fs = require('fs');
   //   const s3 = new AWS.S3({
-  //     accessKeyId: 'AKIA4V2A4TLTQ5RLQQ7M',
-  //     secretAccessKey: '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'
+  //     accessKeyId: '',
+  //     secretAccessKey: ''
   // });
   // const fileContent = fs.readFileSync(fileName);
   // const params = {
-  //   Bucket: 'eshel-bucket',
+  //   Bucket: '',
   //       Key: fileName, // File name you want to save as in S3
   //       Body: fileContent
   //   // CreateBucketConfiguration: {

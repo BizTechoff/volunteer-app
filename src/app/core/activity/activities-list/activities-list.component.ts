@@ -5,6 +5,7 @@ import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
+import { Branch } from '../../branch/branch';
 import { Activity, ActivityGeneralStatus, ActivityStatus } from '../activity';
 import { ActivityDetailsComponent } from '../activity-details/activity-details.component';
 
@@ -20,26 +21,27 @@ export class ActivitiesListComponent implements OnInit {
   @DataControl<ActivitiesListComponent, ActivityGeneralStatus>({ valueChange: async (r, v) => await r.refresh() })
   @Field({ caption: terms.status })
   status: ActivityGeneralStatus = ActivityGeneralStatus.opens;
+  @DataControl<ActivitiesListComponent, Branch>({ valueChange: async (r, v) => await r.refresh() })
   @Field({ caption: terms.branch })
-  bid: string = '';
+  bid?: Branch;
   activities: GridSettings<Activity> = new GridSettings<Activity>(
     this.remult.repo(Activity),
     {
       where: _ => _.status.isIn(this.status.statuses)
-        .and(this.bid && this.bid.length > 0 && this.bid !== '0' ? _.bid.contains(this.bid) : FILTER_IGNORE)
+        .and(this.bid ? _.bid.isEqualTo(this.bid) : FILTER_IGNORE)
         .and(this.isBoard() ? FILTER_IGNORE : _.bid.contains(this.remult.user.bid)),
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
       numOfColumnsInGrid: 20,
       columnSettings: _ => [
-        { field: _.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
+        { field: _.bid, visible: (r, v) => this.isBoard() },
         _.tid,
         _.vids,
         // _.volids,
         _.status,
         _.date,
         _.fh,
-        _.th,
+        _.th,  
         _.purposes,
         _.purposeDesc,
         _.remark,
@@ -56,7 +58,7 @@ export class ActivitiesListComponent implements OnInit {
       ],
       rowButtons: [
         {
-          visible: (_) => !_.isNew(),
+          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor),
           textInMenu: terms.addActivityToCurrentTenant,
           icon: 'add',
           click: async (_) => await this.addActivityToCurrentTenant(_)
@@ -68,7 +70,7 @@ export class ActivitiesListComponent implements OnInit {
           click: async (_) => await this.showActivityDetails(_)
         },
         {
-          visible: (_) => !_.isNew(),
+          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor),
           textInMenu: terms.cancelActivity,
           icon: 'cancel',
           click: async (_) => await this.cancelActivity(_)
@@ -87,6 +89,7 @@ export class ActivitiesListComponent implements OnInit {
   }
 
   async refresh() {
+    console.log('refresh');
     await this.activities.reloadData();
   }
 

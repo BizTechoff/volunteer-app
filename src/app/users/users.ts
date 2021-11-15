@@ -92,7 +92,7 @@ export class Langs {
     }
 })
 @Entity<Users>("Users", {
-    allowApiRead: Allow.authenticated,
+    allowApiRead: true,
     allowApiUpdate: Allow.authenticated,
     allowApiDelete: Roles.admin,
     allowApiInsert: Roles.manager,
@@ -136,10 +136,13 @@ export class Langs {
                     user.bid!._.error = user.$.bid!.metadata.caption + ': ' + terms.requiredField;
                 }
             }
-        }
+        } 
         options.saving = async (user) => {
             if (isBackend()) {
                 if (user._.isNew()) {
+                    await user.hashAndSetPassword(
+                        process.env.DEFAULT_PASSWORD!
+                    );
                     user.createDate = new Date();
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
@@ -150,6 +153,13 @@ export class Langs {
                 }
             }
         };
+        // options.saved =  async (user) => {
+        //     if(isBackend()){
+        //         if(user.isNew()){
+        //             this.res();
+        //         }
+        //     }
+        // };
     }
 )
 export class Users extends IdEntity {
@@ -287,7 +297,7 @@ export class Users extends IdEntity {
     }
     async passwordMatches(password: string) {
         return !this.password || (await import('password-hash')).verify(password, this.password);
-    }
+    } 
     @BackendMethod({ allowed: true })
     async create(password: string = '') {
         // console.log(this);

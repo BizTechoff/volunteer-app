@@ -13,7 +13,7 @@ import { Branch } from '../../branch/branch';
   selector: 'app-volunteers-list',
   templateUrl: './volunteers-list.component.html',
   styleUrls: ['./volunteers-list.component.scss']
-})
+}) 
 export class VolunteersListComponent implements OnInit {
 
   @DataControl<VolunteersListComponent>({ valueChange: async (r) => await r.refresh() })
@@ -51,21 +51,21 @@ export class VolunteersListComponent implements OnInit {
         {
           textInMenu: terms.volunteerDetails,
           icon: 'edit',
-          click: async (u) => await this.addVolunteer(u)
+          click: async (u) => await this.addVolunteer(u.id)
         },
-        {
+        { 
           //  visible: (v) => { return  this.showActivities(v)},
           textInMenu: terms.showActivities,
           icon: 'list'
         },
         {
-          visible: (_) => !_.isNew(),
+          visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.transferVolunteer,
           icon: 'reply',
           click: async (_) => await this.transferVolunteer(_)
         },
-        { 
-          visible: (_) => !_.isNew(),
+        {
+          visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.deleteVolunteer,
           icon: 'delete',//,
           // click: async (_) => await this.addTenant(_)
@@ -75,10 +75,10 @@ export class VolunteersListComponent implements OnInit {
   );
 
   constructor(private remult: Remult) { }
- 
+
   ngOnInit(): void {
   }
- 
+
   isBoard() {
     return this.remult.isAllowed(Roles.board);
   }
@@ -93,13 +93,19 @@ export class VolunteersListComponent implements OnInit {
 
   async transferVolunteer(v: Users) {
 
-  } 
+  }
 
   async showActivities(user: Users) {
     return true;
   }
 
-  async addVolunteer(u?: Users) {
+  async addVolunteer(vid: string) {
+    let isNew = false;
+    let title = terms.tenantDetails;
+    let u!: Users;
+    if (vid && vid.length > 0) {
+      u = await this.remult.repo(Users).findId(vid, { useCache: false });
+    }
     if (!u) {
       u = this.remult.repo(Users).create();
       u.volunteer = true;
@@ -117,7 +123,9 @@ export class VolunteersListComponent implements OnInit {
           u!.$.email,
           { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
         ],
-        ok: async () => { await (u!.isNew() ? u!.create() : u!.save()); }
+        ok: async () => {
+          if (!this.isDonor()) { await (u!.isNew() ? u!.create() : u!.save()); }
+        }
       },
       _ => _ ? _.ok : false);
     if (changed) {

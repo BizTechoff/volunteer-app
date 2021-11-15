@@ -1,7 +1,7 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
-import { EntityRequiredValidation, FILTER_IGNORE, TimeRequireValidator } from "../../common/globals";
+import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, PurposeRequiredValidation, TimeRequireValidator } from "../../common/globals";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
 import { terms } from "../../terms";
@@ -250,6 +250,12 @@ export class Activity extends IdEntity {
 
     constructor(private remult: Remult) { super(); }
 
+     
+
+  isBoard() {
+    return this.remult.isAllowed(Roles.board)?true:false;
+  }
+
     static hasIntersuct(us1: UserIdName[], us2: UserIdName[]) {
         if (!us1) {
             us1 = [] as UserIdName[];
@@ -293,11 +299,11 @@ export class Activity extends IdEntity {
             })
         }
     })
-    @CommaSeparatedStringArrayFieldPurpose<Tenant>({ caption: terms.purpose })
+    @CommaSeparatedStringArrayFieldPurpose<Tenant>({ caption: terms.purpose, validate: PurposeRequiredValidation })
     // @Field({ caption: terms.purpose })
     purposes: ActivityPurpose[] = [ActivityPurpose.friendly];
 
-    @Field({ caption: terms.desc })
+    @Field({ caption: terms.desc }) 
     purposeDesc: string = '';
 
     // @DataControl<Tenant>({ האם הוא מחובר למזהה של היישות? היכן אמור להיות הקליק לבחירה מרשימה
@@ -306,7 +312,7 @@ export class Activity extends IdEntity {
     //         a.bid = '888';
     //     }
     // })
-    @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required })
+    @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required.withMessage(terms.requiredField) })
     // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
     //@Field({ caption: terms.tenant })
     tid!: Tenant;
@@ -322,7 +328,7 @@ export class Activity extends IdEntity {
     // // @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
     // volids: Users[] = [] as Users[];
 
-    @DateOnlyField({ caption: terms.date })
+    @DateOnlyField({ caption: terms.date, validate: DateRequiredValidation })
     date: Date = new Date();
 
     @Field({ caption: terms.fromHour, inputType: 'time', validate: TimeRequireValidator })

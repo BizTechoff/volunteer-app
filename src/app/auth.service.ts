@@ -42,7 +42,7 @@ export class AuthService {
                     result.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);
                 }
                 else if (u.donor) {
-                    result.roles.push(Roles.board, Roles.manager, Roles.volunteer);
+                    result.roles.push(Roles.donor, Roles.board, Roles.manager, Roles.volunteer);
                 }
                 else if (u.board) {
                     result.roles.push(Roles.board, Roles.manager, Roles.volunteer);
