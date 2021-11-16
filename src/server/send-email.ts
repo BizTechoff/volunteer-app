@@ -1,11 +1,9 @@
-import { DatePipe, formatDate } from '@angular/common';
 import { createTransport } from 'nodemailer';
 import * as Mail from 'nodemailer/lib/mailer';
-//import * as nodemailer from 'nodemailer'
 import { Remult } from 'remult';
 import { EmailSvc } from '../app/common/utils';
-//  
-EmailSvc.sendMail = async (subject: string, message: string, email: string, remult: Remult) => {
+ 
+EmailSvc.sendMail = async (to: string, subject: string, message: string, link: string, remult: Remult) => {
 
     var transporter = createTransport({
         service: 'gmail',
@@ -18,38 +16,27 @@ EmailSvc.sendMail = async (subject: string, message: string, email: string, remu
         }
     });
 
-    let today = new Date();
-    let date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 14, 15);
-    let date1 = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 16, 0);
-    let fh = '14:15';
-    let th = '16:00';
-    let dtStart = formatDate(date, 'yyyyDDmmTHHmm', 'en-US')
-
-    const datepipe: DatePipe = new DatePipe('en-US');
-    let fDate = datepipe.transform(date, 'yyyyMMddTHHmmssZ')!;
-    let tDate = datepipe.transform(date1, 'yyyyMMddTHHmmssZ')!;
-    let newLine = '%0D%0A';
-    let title = 'תואמה לך פעילות עם דייר';
-    let location = 'קרני יהודה 23 תל אביב';
-    let details = 'היי מתנדב אנא לחץ כאן להוספת הפעילות ליומן';
- 
-    let query = `https://calendar.google.com/calendar/u/0/r/eventedit?`;
-    query += `text=${encodeURI(title)}`;
-    query += `&dates=${fDate}/${tDate}`;
-    query += `&location=${encodeURI(location)}`;
-    query += `&details=${encodeURI(details)}`;
-    query += `&trp=true`;
-    query += `&sf=true`;
-    query += `&output=xml#f`;
-
-    console.log(query);
+    let body = `<div align="right">
+                    <p>${message}</p>
+                    <p>!link!</p>
+                    <br>
+                    <p>,בברכה
+                        <br>
+                        אשל ירושלים
+                    </p>
+                    </div>`;
+    let toCalndar = '';
+    if (link && link.length > 0) {
+        toCalndar = `<a href=${link}>לחץ כאן להוספה ליומן</a>`;
+    };
+    body = body.replace('!link!', toCalndar);
 
     var mailOptions: Mail.Options = {
         from: process.env.ADMIN_GMAIL_MAIL,
-        to: process.env.ADMIN_GMAIL_MAIL,
-        subject: 'TX!! Got New Activity With Tenant',
+        to: to,
+        subject: subject,
         date: new Date(),
-        html: `<div align="right"><a href=${query}>לחץ כאן להוספה ליומן</a></div>`
+        html: body
     };
     new Promise((res, rej) => {
         transporter.sendMail(mailOptions, function (error: any, info: { response: string; }) {

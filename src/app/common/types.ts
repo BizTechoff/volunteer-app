@@ -1,6 +1,8 @@
 export interface UserIdName{
     id: string,
-    name: string
+    name: string//,
+    // email: string,
+    // sent: boolean
 }
  
 export interface PhotoDetails{

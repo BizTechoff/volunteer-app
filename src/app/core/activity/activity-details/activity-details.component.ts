@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, openDialog } from '@remult/angular';
@@ -5,9 +6,12 @@ import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
 import { UserIdName } from '../../../common/types';
+import { EmailSvc } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
+import { Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
+import { NotificationActivity, NotificationsTypes } from '../../notification/notifications-list/notification';
 import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
@@ -67,12 +71,12 @@ export class ActivityDetailsComponent implements OnInit {
     return this.remult.isAllowed(Roles.manager);
   }
 
-  isShowDeliveredFoodToShabat(){
-    return this.activity && 
-    !this.activity.isNew() && 
-    this.activity.date && 
-    // ActivityStatus.inProgressStatuses().includes( this.activity.status) &&
-    [3,4].includes(this.activity.date.getDay());//יום רביעי וחמישי
+  isShowDeliveredFoodToShabat() {
+    return this.activity &&
+      !this.activity.isNew() &&
+      this.activity.date &&
+      // ActivityStatus.inProgressStatuses().includes( this.activity.status) &&
+      [3, 4].includes(this.activity.date.getDay());//יום רביעי וחמישי
   }
 
   async retrieve() {
@@ -122,6 +126,8 @@ export class ActivityDetailsComponent implements OnInit {
         { field: this.activity.$.tid, clickIcon: 'search', click: async () => await this.openTenants() },//, readonly: true },
         {
           field: this.activity.$.vids,
+          hideDataOnInput: true,
+          getValue: (x, col) => col.displayValue,
           readonly: () => this.activity.tid && this.activity.tid.id && this.activity.tid.id.length > 0 ? false : true,
           clickIcon: 'search',
           click: async () => await this.openAssignment()
@@ -202,11 +208,12 @@ export class ActivityDetailsComponent implements OnInit {
         this.activity.status = ActivityStatus.w4_start;
       }
     }
-
+    // console.log('isnew',this.activity.isNew());
     await this.activity.save();
+    // console.log('isnew',this.activity.isNew());
     this.args.changed = true;
     this.args.aid = this.activity.id;
-    // await this.sendEmails();
+    await this.sendEmails();
     this.close();
   }
   // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
@@ -219,31 +226,102 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   async sendEmails() {
-    if (this.lastVids !== this.activity.vids) {
-      let yes = await this.dialog.yesNoQuestion('האם לשלוח אימייל למתנדבים');
+    console.log('1');
+    let emails: { uid: string, name: string, email: string, type: NotificationsTypes }[] =
+      [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
+
+    console.log('2');
+    // get volunteers that already sent email, to cancel them.
+    let vols = await this.remult.repo(NotificationActivity).find({
+      where: row => row.activity.isEqualTo(this.activity)
+        .and(row.sentAssigned.isEqualTo(true))
+    });
+
+    console.log('3');
+    let removed = 0;
+    // for each one, send cancel if not in current-volunteers.
+    vols.forEach(async v => {
+      let f = this.activity.vids.find(itm => itm.id === v.id);
+      if (!f) {
+        let u = await this.remult.repo(Users).findId(v.id);
+        emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailCancelAssign });
+        ++removed;
+      }
+    });
+
+    console.log('4-', this.activity.vids.length);
+    console.log(emails);
+    let added = 0;
+
+    for (const v of this.activity.vids) {
+      console.log('4.1', v.name);
+      let u = await this.remult.repo(Users).findId(v.id);
+      let f = emails.find(itm => itm.email === u.email);
+      if (f) {
+        console.log('4.2', v.name);
+        let i = emails.indexOf(f);
+        emails.splice(i, 1);//dont send again.
+        --removed;
+        // f.type = NotificationsTypes.EmailAssign;
+      }
+      else {
+        console.log('4.3', v.name);
+        emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailAssign });
+        ++added;
+      }
+      console.log('4.4', v.name);
+    }
+    console.log('5', emails.length);
+
+    if (emails.length > 0) {
+      console.log('6');
+      // console.log('emails', emails);
+      // console.log('11111');
+
+      let message = `האם לשלוח אמייל` +
+        `\n` +
+        (removed > 0 ? `ל- ${removed} מתנדבים לגבי ביטול השתתפותם בפעילות` : '') +
+        `\n` +
+        (added > 0 ? (added > 0 ? 'ו' : '') + `ל- ${added} מתנדבים זימון השתתפות בפעילות` : '');
+      // console.log('message', message);
+
+      console.log('7');
+      // console.log('22222');
+      let yes = await this.dialog.yesNoQuestion(message);
       if (yes) {
-        this.lastVids.forEach(async u => {
-          if (u) {
-            // let text = '';
-            // let email = u.email;
-            // if (u.clickedLink) {
-            //   // send update mail
-            //   text = 'עדכון למייל קיים בין המתנדב לדייר';
-            // }
-            // else {
-            //   //send new mail
-            //   text = terms.voulnteerNewAssign
-            //     .replace('!name!', this.activity.tid.name)
-            //     .replace('!date!', this.activity.date.toLocaleDateString())
-            //     .replace('!from!', this.activity.fh)
-            //     .replace('!to!', this.activity.th)
-            //     .replace('!address!', this.activity.tid.address);
-            // }
-            // await EmailSvc.SendEmail(email, text);
+        console.log('8');
+        for (const e of emails) {
+          let ok = await this.sendMail(e.email, e.name, e.type);
+          if (ok) {
+            // let u = await this.remult.repo(Users).findId(e.uid);
+            // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
+            // n.
           }
-        });// this.lastVids, this.activity.vids)
+        }
       }
     }
+    console.log('99');
+  }
+
+  async sendMail(email: string, name: string, type: NotificationsTypes) {
+    let message = type.text
+      .replace('!name!', this.activity.tid.name)
+      .replace('!date!', this.activity.date.toLocaleDateString())
+      .replace('!from!', this.activity.fh)
+      .replace('!to!', this.activity.th)
+      .replace('!address!', this.activity.tid.address);
+
+    const datepipe: DatePipe = new DatePipe('en-US');//yyyyMMddTHHmmssZ
+    let fdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.fh.replace(':', '') + '00Z';
+    let tdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.th.replace(':', '') + '00Z';
+    let link = type.link
+      .replace('!title!', encodeURI(type.subject))
+      .replace('!fDate!', fdate)
+      .replace('!tDate!', tdate)
+      .replace('!location!', encodeURI(this.activity.tid.address))
+      .replace('!details!', encodeURI('תודה!'));
+
+    return await EmailSvc.SendEmail(email, type.subject, message, link);
   }
 
   async addPhoto() {

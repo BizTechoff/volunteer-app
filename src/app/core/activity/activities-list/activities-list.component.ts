@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl, GridSettings, openDialog } from '@remult/angular';
+import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
@@ -33,22 +33,7 @@ export class ActivitiesListComponent implements OnInit {
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
       numOfColumnsInGrid: 20,
-      columnSettings: _ => [
-        { field: _.bid, visible: (r, v) => this.isBoard() },
-        _.tid,
-        _.vids,
-        // _.volids,
-        _.status,
-        _.date,
-        _.fh,
-        _.th,  
-        _.purposes,
-        _.purposeDesc,
-        _.remark,
-        _.created,
-        _.createdBy,
-        _.modifiedBy,
-        _.modified],
+      
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -62,7 +47,7 @@ export class ActivitiesListComponent implements OnInit {
           textInMenu: terms.addActivityToCurrentTenant,
           icon: 'add',
           click: async (_) => await this.addActivityToCurrentTenant(_)
-        },
+        }, 
         {
           visible: (_) => !_.isNew(),
           textInMenu: terms.activityDetails,

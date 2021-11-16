@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControl } from '@remult/angular';
 import { ChartOptions, ChartType } from 'chart.js';
+import { link } from 'fs';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { BackendMethod, Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
@@ -250,7 +251,7 @@ export class CurrentStateComponent implements OnInit {
         //   this.activitiesByReferrer.push(referrer);
         // }
         // ++referrer.count;
-      this.isRefreshing = false;
+        this.isRefreshing = false;
       }
     }
 
@@ -379,12 +380,12 @@ export class CurrentStateComponent implements OnInit {
   }
 
   async sendEmail() {
-    let ok = await CurrentStateComponent.TestSendEmail('noam.honig@gmail.com', 'Welcome Volunteer');
-    this.dialog.info('Sent Status: ' + ok);
+    let ok = await CurrentStateComponent.TestSendEmail('noam.honig@gmail.com', 'Welcome Volunteer', 'test', '');
+    this.dialog.info(`שליחת מייל ${ok ? 'הצליחה' : 'נכשלה'}`);
   }
   @BackendMethod({ allowed: true })
-  static async TestSendEmail(to: string, text: string, remult?: Remult) {
-    return await EmailSvc.sendMail("test email", text, to, remult!);
+  static async TestSendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
+    return await EmailSvc.sendMail(to, subject, text, link, remult!);
   }
 
 }

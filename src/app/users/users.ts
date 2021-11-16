@@ -1,6 +1,6 @@
 
 import { DataControl, InputField, openDialog } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, Filter, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
@@ -23,7 +23,7 @@ export class Langs {
     static getOptions() {
         let op = new ValueListValueConverter(Langs).getOptions();
         return op;
-    } 
+    }
     static fromString(str: string) {
         // console.log(str);
         let split = str.toString().split(',');
@@ -35,8 +35,8 @@ export class Langs {
             if (found) {
                 result.push(found);
             }
-        }); 
-        return result; 
+        });
+        return result;
     }
 
 }
@@ -114,6 +114,8 @@ export class Langs {
         // ];
         options.apiPrefilter = (user) => {
             let active = FILTER_IGNORE;// user.active.isEqualTo(true);
+            if (!remult.authenticated())
+                return user.id.isEqualTo("-1");
             if (!(remult.isAllowed(Roles.board)))// all
             {
                 return active.and(user.bid!.contains(remult.user.bid));
@@ -136,7 +138,7 @@ export class Langs {
                     user.bid!._.error = user.$.bid!.metadata.caption + ': ' + terms.requiredField;
                 }
             }
-        } 
+        }
         options.saving = async (user) => {
             if (isBackend()) {
                 if (user._.isNew()) {
@@ -191,9 +193,12 @@ export class Users extends IdEntity {
         allowNull: true
     })
     bid?: Branch;
-  
+
     @Field({
-        validate: [StringRequiredValidation, Validators.unique],
+        validate: [StringRequiredValidation, (e, c) => {
+            if (isBackend())
+                Validators.unique(e, c)
+        }],
         caption: terms.username
     })
     name: string = '';
@@ -239,13 +244,13 @@ export class Users extends IdEntity {
     })
     birthday!: Date;
 
-    
+
     @Field(options => options.valueType = Tenant, { caption: terms.tenant })
     defTid!: Tenant;
 
     @Field({ includeInApi: false })
     password: string = '';
- 
+
     @Field({
         allowApiUpdate: false
     })
@@ -297,7 +302,7 @@ export class Users extends IdEntity {
     }
     async passwordMatches(password: string) {
         return !this.password || (await import('password-hash')).verify(password, this.password);
-    } 
+    }
     @BackendMethod({ allowed: true })
     async create(password: string = '') {
         // console.log(this);

@@ -250,11 +250,11 @@ export class Activity extends IdEntity {
 
     constructor(private remult: Remult) { super(); }
 
-     
 
-  isBoard() {
-    return this.remult.isAllowed(Roles.board)?true:false;
-  }
+
+    isBoard() {
+        return this.remult.isAllowed(Roles.board) ? true : false;
+    }
 
     static hasIntersuct(us1: UserIdName[], us2: UserIdName[]) {
         if (!us1) {
@@ -303,7 +303,7 @@ export class Activity extends IdEntity {
     // @Field({ caption: terms.purpose })
     purposes: ActivityPurpose[] = [ActivityPurpose.friendly];
 
-    @Field({ caption: terms.desc }) 
+    @Field({ caption: terms.desc })
     purposeDesc: string = '';
 
     // @DataControl<Tenant>({ האם הוא מחובר למזהה של היישות? היכן אמור להיות הקליק לבחירה מרשימה
@@ -328,7 +328,10 @@ export class Activity extends IdEntity {
     // // @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
     // volids: Users[] = [] as Users[];
 
-    @DateOnlyField({ caption: terms.date, validate: DateRequiredValidation })
+    @DateOnlyField({
+        caption: terms.date, validate: DateRequiredValidation, displayValue: (_,x) =>
+            x?.toLocaleDateString()
+    })
     date: Date = new Date();
 
     @Field({ caption: terms.fromHour, inputType: 'time', validate: TimeRequireValidator })

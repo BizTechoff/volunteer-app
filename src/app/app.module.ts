@@ -45,6 +45,7 @@ import { SelectBranchComponent } from './common/select-branch/select-branch.comp
 import { SelectPurposesComponent } from './common/select-purposes/select-purposes.component';
 import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
 import { UserLoginComponent } from './users/user-login/user-login.component';
+import { NotificationsListComponent } from './core/notification/notifications-list/notifications-list.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,8 @@ import { UserLoginComponent } from './users/user-login/user-login.component';
     SelectBranchComponent,
     SelectPurposesComponent,
     PhotosAlbumBranchComponent,
-    UserLoginComponent
+    UserLoginComponent,
+    NotificationsListComponent
   ],
   imports: [
     BrowserModule,

@@ -79,7 +79,7 @@ export class VolunteersAssignmentComponent implements OnInit {
     }
     // this.args.volids.splice(0);
     for (const u of this.volunteers.selectedRows) {
-      this.args.vids.push({ id: u.id, name: u.name });
+      this.args.vids.push({ id: u.id, name: u.name });//, email: u.email, sent: false });
       // this.args.volids.push(u);
       console.log(this.args.vids);
     }

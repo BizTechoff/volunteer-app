@@ -1,31 +1,41 @@
-import { Branch } from "./core/branch/branch";
 
 export const terms = {
+    volunteerCalndarLink: `https://calendar.google.com/calendar/u/0/r/eventedit?` +
+        `text=!title!` +
+        `&dates=!fDate!/!tDate!` +
+        `&location=!location!` +
+        `&details=!details!` +
+        `&trp=true` +
+        `&sf=true` +
+        `&output=xml#f`,
+    voulnteerNewAssignSubject: 'תואמה לך פעילות',
+    voulnteerCancelAssignSubject: 'ביטול פעילות שתואמה לך',
     passwordSentToYourEmail: 'סיסמא נשלחה לאמייל !email! ברגע זה',
-    forgotPassword:'שכחתי סיסמא',
+    forgotPassword: 'שכחתי סיסמא',
     thankYou: 'תודה לך!',
-    pleaseTellUsWhatGoingOn:'הערות וסיכום פעילות',
+    pleaseTellUsWhatGoingOn: 'הערות וסיכום פעילות',
     you: 'את/ה',
-    transferVolunteer:'העברת מתנדב לסניף אחר',
+    transferVolunteer: 'העברת מתנדב לסניף אחר',
     transferTenant: 'העברת דייר לסניף אחר',
-    notVolunteersForCurrentTenant:'לא שוייכו מתנדבים לדייר זה, האם לסגור את החלון בכל זאת?',
-    associatedVolunteers:'מתנדבים משוייכים',
-    edit: 'עריכה', 
+    notVolunteersForCurrentTenant: 'לא שוייכו מתנדבים לדייר זה, האם לסגור את החלון בכל זאת?',
+    associatedVolunteers: 'מתנדבים משוייכים',
+    edit: 'עריכה',
     public: 'שתף באלבום הסניף',
     wrongPassword: 'סיסמא שגויה',
-    save: 'שמור', 
+    save: 'שמור',
     age: 'גיל',
     continue: 'המשך',
     openPhotosAlbum: 'פתח אלבום תמונות',
     linkClicked: 'לינק נלחץ',
     voulnteerNewAssign: 'נקבעה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
+    voulnteerCancelAssign: 'בוטלה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     referrer: 'גורם מפנה',
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
     removeImage: 'הסרת תמונה',
     noPhotosOfYoursTogether: 'לא הועלו תמונות שלכם יחד',
-    created: 'נוצר',
+    created: 'נוצר ב',
     createdBy: 'נוצר ע"י',
-    modified: 'עודכן',
+    modified: 'עודכן ב',
     modifiedBy: 'עודכן ע"י',
     uploadPhoto: 'העלאת תמונה',
     unpoladYoursPhotosTogether: 'העלו תמונות שלכם יחד',
@@ -138,7 +148,7 @@ export const terms = {
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות'
-} 
+}
 declare module 'remult' {
     export interface UserInfo {
         bid: string;
