@@ -154,7 +154,7 @@ export class TenantsListComponent implements OnInit {
     console.log(t);
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
-        title: title,
+        title: title + (this.isDonor() ? ' (לקריאה בלבד)' : ''),
         fields: () => [
           { field: t!.$.bid, visible: (r, v) => this.isBoard() },
           t!.$.referrer,

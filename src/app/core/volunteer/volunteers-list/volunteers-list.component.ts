@@ -13,7 +13,7 @@ import { Branch } from '../../branch/branch';
   selector: 'app-volunteers-list',
   templateUrl: './volunteers-list.component.html',
   styleUrls: ['./volunteers-list.component.scss']
-}) 
+})
 export class VolunteersListComponent implements OnInit {
 
   @DataControl<VolunteersListComponent>({ valueChange: async (r) => await r.refresh() })
@@ -53,7 +53,7 @@ export class VolunteersListComponent implements OnInit {
           icon: 'edit',
           click: async (u) => await this.addVolunteer(u.id)
         },
-        { 
+        {
           //  visible: (v) => { return  this.showActivities(v)},
           textInMenu: terms.showActivities,
           icon: 'list'
@@ -113,7 +113,7 @@ export class VolunteersListComponent implements OnInit {
     }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
-        title: u!.isNew() ? terms.addVolunteer : terms.volunteerDetails,
+        title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? ' (לקריאה בלבד)' : ''),
         fields: () => [
           { field: u!.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
           { field: u!.$.name, caption: terms.name },

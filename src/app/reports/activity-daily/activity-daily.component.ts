@@ -19,6 +19,7 @@ export class ActivityDailyComponent implements OnInit {
       columnSettings: (_) => [
         _.tid,
         _.vids,
+        _.status,
         _.remark
       ],
       gridButtons: [
