@@ -37,10 +37,10 @@ export class TenantsListComponent implements OnInit {
         t.referrer,
         t.name,
         t.defVids,
-        t.mobile,
+        t.langs,
         t.address,
-        t.birthday,
-        t.langs],
+        t.mobile,
+        t.birthday],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,

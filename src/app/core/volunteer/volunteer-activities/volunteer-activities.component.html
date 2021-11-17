@@ -59,13 +59,13 @@
                                 {{ a.fh }} - {{ a.th }}
                             </div>
                             <div>
-                                שפות: {{ this.getLang(a.tid.langs) }}
+                                שפות: {{ this.getLang(a) }}
                             </div>
                         </div>
   
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;">
                             <div>
-                                {{ a.purposes }}
+                                {{ getPurposes(a) }}
                             </div>
                             <div>
                                 {{ a.purposeDesc? a.purposeDesc : '(אין תיאור)' }}

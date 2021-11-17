@@ -271,20 +271,32 @@ export class Activity extends IdEntity {
         return false;
     }
 
-    // vols = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
-    //     where: _ => _.a!.isEqualTo(this)
-    // })
-
-    @Field({})
-    started!: Date;
-
-    @Field({})
-    ended!: Date;
-
     @Field({
         caption: terms.branch, validate: EntityRequiredValidation
     })
     bid!: Branch;
+    
+    @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required.withMessage(terms.requiredField) })
+    // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
+    //@Field({ caption: terms.tenant })
+    tid!: Tenant;
+
+    //@CommaSeparatedStringArrayField<Users>({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
+    @CommaSeparatedStringArrayFieldUsersAsString({ caption: terms.volunteers })
+    vids: UserIdName[] = [] as UserIdName[];
+
+    @Field({ caption: terms.status })
+    status: ActivityStatus = ActivityStatus.w4_assign;
+
+    @DateOnlyField({
+        caption: terms.date, validate: DateRequiredValidation, displayValue: (_,x) =>
+            x?.toLocaleDateString()
+    })
+    date: Date = new Date();
+
+    // vols = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
+    //     where: _ => _.a!.isEqualTo(this)
+    // })
 
     @DataControl<Tenant, ActivityPurpose[]>({
         hideDataOnInput: true,
@@ -299,7 +311,7 @@ export class Activity extends IdEntity {
             })
         }
     })
-    @CommaSeparatedStringArrayFieldPurpose<Tenant>({ caption: terms.purpose, validate: PurposeRequiredValidation })
+    @CommaSeparatedStringArrayFieldPurpose<Tenant>({ caption: terms.purpose,  validate: PurposeRequiredValidation })
     // @Field({ caption: terms.purpose })
     purposes: ActivityPurpose[] = [ActivityPurpose.friendly];
 
@@ -312,14 +324,6 @@ export class Activity extends IdEntity {
     //         a.bid = '888';
     //     }
     // })
-    @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required.withMessage(terms.requiredField) })
-    // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
-    //@Field({ caption: terms.tenant })
-    tid!: Tenant;
-
-    //@CommaSeparatedStringArrayField<Users>({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
-    @CommaSeparatedStringArrayFieldUsersAsString({ caption: terms.volunteers })
-    vids: UserIdName[] = [] as UserIdName[];
 
     // @Field({ caption: terms.volunteers })
     // // volids = new OneToMany(this.remult.repo(Users), {
@@ -328,23 +332,20 @@ export class Activity extends IdEntity {
     // // @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
     // volids: Users[] = [] as Users[];
 
-    @DateOnlyField({
-        caption: terms.date, validate: DateRequiredValidation, displayValue: (_,x) =>
-            x?.toLocaleDateString()
-    })
-    date: Date = new Date();
-
     @Field({ caption: terms.fromHour, inputType: 'time', validate: TimeRequireValidator })
     fh: string = '00:00';
 
     @Field({ caption: terms.toHour, inputType: 'time', validate: TimeRequireValidator })
     th: string = '00:00';
 
-    @Field({ caption: terms.status })
-    status: ActivityStatus = ActivityStatus.w4_assign;
-
     @Field({ caption: terms.commentAndSummary })
     remark: string = '';
+
+    @Field({})
+    started!: Date;
+
+    @Field({})
+    ended!: Date;
 
     @Field({ caption: terms.createdBy })
     createdBy!: Users;

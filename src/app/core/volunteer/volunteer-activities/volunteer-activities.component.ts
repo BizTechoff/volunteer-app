@@ -4,7 +4,7 @@ import { Remult } from 'remult';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
-import { Langs, Users } from '../../../users/users';
+import { Users } from '../../../users/users';
 import { Activity, ActivityStatus } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
@@ -47,7 +47,7 @@ export class VolunteerActivitiesComponent implements OnInit {
     }
   }
 
-  isToday(a:Activity){
+  isToday(a: Activity) {
     let today = new Date();
     today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     return a.date.getTime() === today.getTime();
@@ -76,16 +76,24 @@ export class VolunteerActivitiesComponent implements OnInit {
       this.refreshing = false;
     }
   }
+ 
+  getPurposes(a: Activity) {
+    let result = 'לא צויינו מטרות';
+    if (a && a.purposes && a.purposes.length > 0) {
+      result = a.purposes.map(l => l.caption).join(', ');
+    }
+    return result;
+  }
 
   getVolunteers(a: Activity) {
     let voids = a.vids && a.vids.length > 0 ? a.vids : [] as UserIdName[];
     return voids.map(v => v.id === this.remult.user.id ? terms.you : v.name).join(', ');
   }
 
-  getLang(langs: Langs[]) {
+  getLang(a: Activity) {
     let result = 'לא צויינו';
-    if (langs && langs.length > 0) {
-      result = langs.map(l => l.caption).join(', ');
+    if (a && a.tid && a.tid.langs && a.tid.langs.length > 0) {
+      result = a.tid.langs.map(l => l.caption).join(', ');
     }
     return result;
   }
@@ -102,7 +110,7 @@ export class VolunteerActivitiesComponent implements OnInit {
           _ => _.args = {
             title: terms.thankYou,
             fields: () => [a.$.started],
-            ok: async () => {  }
+            ok: async () => { }
           })
       }
       else if (ActivityStatus.w4_end === a.status) {
@@ -111,7 +119,7 @@ export class VolunteerActivitiesComponent implements OnInit {
           _ => _.args = {
             title: terms.thankYou,
             fields: () => [a.$.ended],
-            ok: async () => {  }
+            ok: async () => { }
           })
       }
       a.status = next;
