@@ -1,27 +1,25 @@
-import { NotAuthenticatedGuard, RemultModule } from '@remult/angular';
-import { NgModule, ErrorHandler } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { HomeComponent } from './home/home.component';
- 
- 
-import { UsersComponent } from './users/users.component';
-import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
-import { ShowDialogOnErrorErrorHandler } from './common/dialog';
+import { ErrorHandler, NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
+import { NotAuthenticatedGuard, RemultModule } from '@remult/angular';
 import { AuthService } from './auth.service';
-import { terms } from './terms';
-import { CurrentStateComponent } from './core/current-state/current-state.component';
-import { TenantsListComponent } from './core/tenant/tenants-list/tenants-list.component';
-import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
+import { ShowDialogOnErrorErrorHandler } from './common/dialog';
 import { ActivitiesListComponent } from './core/activity/activities-list/activities-list.component';
+import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
+import { CurrentStateComponent } from './core/current-state/current-state.component';
+import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
+import { TenantsListComponent } from './core/tenant/tenants-list/tenants-list.component';
 import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
 import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/volunteer-details.component';
+import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
+import { HomeComponent } from './home/home.component';
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
-import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
-import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.component';
-import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
-import { CalendarComponent } from './core/current-state/calendar/calendar.component';
-  
+import { terms } from './terms';
+import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
+import { UsersComponent } from './users/users.component';
+
+
+
 const defaultRoute = terms.home;
 const routes: Routes = [
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
@@ -36,10 +34,10 @@ const routes: Routes = [
   { path: terms.photoAlbum, component: PhotosAlbumBranchComponent, canActivate: [VolunteerGuard] },
   { path: terms.branches, component: BranchesListComponent, canActivate: [AdminGuard] },
   { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
-  { path: '**', redirectTo: '/'+defaultRoute, pathMatch: 'full' }
+  { path: '**', redirectTo: '/' + defaultRoute, pathMatch: 'full' }
 
 ];
- 
+
 @NgModule({
   imports: [RouterModule.forRoot(routes),
     RemultModule,
