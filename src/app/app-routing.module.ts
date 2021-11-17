@@ -20,10 +20,12 @@ import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.
 import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
 import { PhotosAlbumComponent } from './core/photo/photos-album/photos-album.component';
 import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
+import { CalendarComponent } from './core/current-state/calendar/calendar.component';
   
 const defaultRoute = terms.home;
 const routes: Routes = [
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
+  // { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerGuard] },
   { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerGuard] },
   { path: terms.activities, component: ActivitiesListComponent, canActivate: [ManagerGuard] },
   { path: terms.tenants, component: TenantsListComponent, canActivate: [ManagerGuard] },

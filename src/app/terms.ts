@@ -1,5 +1,6 @@
 
 export const terms = {
+    // `https://calendar.google.com/calendar/ical/biztechoff.app%40gmail.com/public/basic.ics?`
     volunteerCalndarLink: `https://calendar.google.com/calendar/u/0/r/eventedit?` +
         `text=!title!` +
         `&dates=!fDate!/!tDate!` +
@@ -104,6 +105,7 @@ export const terms = {
     volunteerApp: 'פעילות התנדבותית',
     currentStatus: 'סטטוס נוכחי',
     currentState: 'מצב נוכחי',
+    calendar: 'יומן פעילות',
     activities: 'פעילויות',
     tenants: 'דיירים',
     fromHour: 'משעה',

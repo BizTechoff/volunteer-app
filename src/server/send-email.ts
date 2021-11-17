@@ -30,13 +30,21 @@ EmailSvc.sendMail = async (to: string, subject: string, message: string, link: s
         toCalndar = `<a href=${link}>לחץ כאן להוספה ליומן</a>`;
     };
     body = body.replace('!link!', toCalndar);
-
+console.log('from,to,cc',process.env.ADMIN_GMAIL_MAIL,to,process.env.ADMIN_GMAIL_MAIL);
     var mailOptions: Mail.Options = {
         from: process.env.ADMIN_GMAIL_MAIL,
         to: to,
+        cc: process.env.ADMIN_GMAIL_MAIL,
+        // att
+        // attendees: [to, process.env.ADMIN_GMAIL_MAIL!],
         subject: subject,
-        date: new Date(),
-        html: body
+        date: new Date(), 
+        html: body//, 
+    //     icalEvent: {
+    //         filename: 'invite.ics',
+    // method: 'REQUEST',
+    // content: body
+    //     }
     };
     new Promise((res, rej) => {
         transporter.sendMail(mailOptions, function (error: any, info: { response: string; }) {

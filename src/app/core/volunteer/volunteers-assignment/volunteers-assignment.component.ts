@@ -36,7 +36,7 @@ export class VolunteersAssignmentComponent implements OnInit {
         .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
       allowSelection: true,
-      columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs],
+      columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs, u.email],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,

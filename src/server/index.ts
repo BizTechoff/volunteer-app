@@ -20,7 +20,7 @@ import { getJwtTokenSignKey } from '../app/auth.service';
 async function startup() {
     config(); //loads the configuration from the .env file
     let dataProvider: DataProvider | undefined;
-
+  
     // use json db for dev, and postgres for production
     if (process.env.USE_PROGRESQL || !process.env.DEV_MODE) {//if you want to use postgres for development - change this if to be if(true)
         const pool = new Pool({

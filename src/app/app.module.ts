@@ -46,6 +46,7 @@ import { SelectPurposesComponent } from './common/select-purposes/select-purpose
 import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
 import { UserLoginComponent } from './users/user-login/user-login.component';
 import { NotificationsListComponent } from './core/notification/notifications-list/notifications-list.component';
+import { CalendarComponent } from './core/current-state/calendar/calendar.component';
 
 @NgModule({
   declarations: [
@@ -74,7 +75,8 @@ import { NotificationsListComponent } from './core/notification/notifications-li
     SelectPurposesComponent,
     PhotosAlbumBranchComponent,
     UserLoginComponent,
-    NotificationsListComponent
+    NotificationsListComponent,
+    CalendarComponent
   ],
   imports: [
     BrowserModule,
