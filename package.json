@@ -31,6 +31,7 @@
     "express": "^4.16.4",
     "express-jwt": "^6.0.0",
     "helmet": "^4.6.0",
+    "ics": "^2.31.0",
     "jsonwebtoken": "^8.5.1",
     "ng2-charts": "^2.4.3",
     "nodemailer": "^6.7.0",

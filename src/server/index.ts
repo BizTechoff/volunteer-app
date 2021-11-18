@@ -26,14 +26,14 @@ async function startup() {
         const pool = new Pool({
             connectionString: process.env.DATABASE_URL,
             ssl: process.env.DEV_MODE ? false : { rejectUnauthorized: false }// use ssl in production but not in development. the `rejectUnauthorized: false`  is required for deployment to heroku etc...
-        });
+        }); 
         let database = new SqlDatabase(new PostgresDataProvider(pool));
         var remult = new Remult();
         remult.setDataProvider(database);
         await verifyStructureOfAllEntities(database, remult);
         dataProvider = database;
     }
-
+ 
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());

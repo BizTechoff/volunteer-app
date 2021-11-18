@@ -121,7 +121,7 @@ export class ActivityDetailsComponent implements OnInit {
           f.push(this.activity.$.status);
         }
         return f;
-      } 
+      }
     })
     this.fields = new DataAreaSettings({
       fields: () => [
@@ -160,8 +160,8 @@ export class ActivityDetailsComponent implements OnInit {
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
           bid: this.activity.bid,
-          aid: this.activity.id, 
-          tenant:this.activity.tid,
+          aid: this.activity.id,
+          tenant: this.activity.tid,
           tname: this.activity.tid.name,
           langs: this.activity.tid?.langs,// this.t.langs, 
           vids: this.activity.vids//, 
@@ -294,7 +294,7 @@ export class ActivityDetailsComponent implements OnInit {
       if (yes) {
         console.log('8');
         for (const e of emails) {
-          let ok = await this.sendMail(e.email, e.name, e.type);
+          let ok = await this.sendMail(e.email, e.type);
           if (ok) {
             // let u = await this.remult.repo(Users).findId(e.uid);
             // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
@@ -306,7 +306,7 @@ export class ActivityDetailsComponent implements OnInit {
     console.log('99');
   }
 
-  async sendMail(email: string, name: string, type: NotificationsTypes) {
+  async sendMail(email: string, type: NotificationsTypes) {
     let message = type.text
       .replace('!name!', this.activity.tid.name)
       .replace('!date!', this.activity.date.toLocaleDateString())
@@ -323,8 +323,9 @@ export class ActivityDetailsComponent implements OnInit {
       .replace('!tDate!', tdate)
       .replace('!location!', encodeURI(this.activity.tid.address))
       .replace('!details!', encodeURI('תודה!'));
+    let subject = type.subject.replace('!tname!', this.activity.tid.name);
 
-    return await EmailSvc.SendEmail(email, type.subject, message, link);
+    return await EmailSvc.SendEmail(email, subject, message, link);
   }
 
   async addPhoto() {

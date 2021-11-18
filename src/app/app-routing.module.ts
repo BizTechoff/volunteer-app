@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { ShowDialogOnErrorErrorHandler } from './common/dialog';
 import { ActivitiesListComponent } from './core/activity/activities-list/activities-list.component';
 import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
+import { CalendarComponent } from './core/current-state/calendar/calendar.component';
 import { CurrentStateComponent } from './core/current-state/current-state.component';
 import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
 import { TenantsListComponent } from './core/tenant/tenants-list/tenants-list.component';
@@ -24,7 +25,7 @@ import { UsersComponent } from './users/users.component';
 const defaultRoute = terms.home;
 const routes: Routes = [ 
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
-  // { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerGuard] },
+  { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerGuard] },
   { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerGuard] },
   { path: terms.activities, component: ActivitiesListComponent, canActivate: [ManagerGuard] },
   { path: terms.tenants, component: TenantsListComponent, canActivate: [ManagerGuard] },
@@ -38,7 +39,7 @@ const routes: Routes = [
   { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
   { path: '**', redirectTo: '/' + defaultRoute, pathMatch: 'full' }
 
-];
+]; 
 
 @NgModule({
   imports: [RouterModule.forRoot(routes),

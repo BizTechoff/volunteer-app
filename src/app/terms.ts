@@ -14,7 +14,7 @@ export const terms = {
         `&trp=true` +
         `&sf=true` +
         `&output=xml#f`,
-    voulnteerNewAssignSubject: 'תואמה לך פעילות',
+    voulnteerNewAssignSubject: 'תואמה לך פעילות עם הדייר: !tname!',
     voulnteerCancelAssignSubject: 'ביטול פעילות שתואמה לך',
     passwordSentToYourEmail: 'סיסמא נשלחה לאמייל !email! ברגע זה',
     forgotPassword: 'שכחתי סיסמא',

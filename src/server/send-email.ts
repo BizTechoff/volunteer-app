@@ -2,7 +2,8 @@ import { createTransport } from 'nodemailer';
 import * as Mail from 'nodemailer/lib/mailer';
 import { Remult } from 'remult';
 import { EmailSvc } from '../app/common/utils';
- 
+import * as ics2 from 'ics'
+
 EmailSvc.sendMail = async (to: string, subject: string, message: string, link: string, remult: Remult) => {
 
     var transporter = createTransport({
@@ -26,25 +27,26 @@ EmailSvc.sendMail = async (to: string, subject: string, message: string, link: s
                     </p>
                     </div>`;
     let toCalndar = '';
-    if (link && link.length > 0) {
-        toCalndar = `<a href=${link}>לחץ כאן להוספה ליומן</a>`;
-    };
+    // if (link && link.length > 0) {
+    //     toCalndar = `<a href=${link}>לחץ כאן להוספה ליומן</a>`;
+    // };
     body = body.replace('!link!', toCalndar);
-console.log('from,to,cc',process.env.ADMIN_GMAIL_MAIL,to,process.env.ADMIN_GMAIL_MAIL);
+    let content = buildICS(subject);
+
     var mailOptions: Mail.Options = {
-        from: process.env.ADMIN_GMAIL_MAIL,
+        from: `אשל מתנדבים <${process.env.ADMIN_GMAIL_MAIL}>`,//'Sender Name <sender@server.com>'
         to: to,
         cc: process.env.ADMIN_GMAIL_MAIL,
         // att
         // attendees: [to, process.env.ADMIN_GMAIL_MAIL!],
         subject: subject,
-        date: new Date(), 
-        html: body//, 
-    //     icalEvent: {
-    //         filename: 'invite.ics',
-    // method: 'REQUEST',
-    // content: body
-    //     }
+        date: new Date(),
+        html: body,
+        icalEvent: {
+            filename: 'invite.ics',
+            method: 'REQUEST',//PUBLISH
+            content: content
+        }
     };
     new Promise((res, rej) => {
         transporter.sendMail(mailOptions, function (error: any, info: { response: string; }) {
@@ -61,6 +63,69 @@ console.log('from,to,cc',process.env.ADMIN_GMAIL_MAIL,to,process.env.ADMIN_GMAIL
     });
     return true;
 
+}
+
+function buildICS(title: string) {//date:Date,fh:string,th:string, tilte:string,) {
+    let content = '';
+    const ics = require('ics')
+    const { writeFileSync } = require('fs');
+ics2.createEvent
+    const event = {
+        start: [2021, 11, 18, 16, 16],
+        duration: { hours: 0, minutes: 27 },
+        title: title,// terms.voulnteerNewAssignSubject.replace('!tname!',tname),
+        description: 'Annual 10-kilometer run in Boulder, Colorado',
+        location: 'Folsom Field, University of Colorado (finish line)',
+        url: 'http://www.bolderboulder.com/',
+        geo: { lat: 40.0095, lon: 105.2669 },
+        categories: ['10k races', 'Memorial Day Weekend', 'Boulder CO'],
+        status: 'CONFIRMED', 
+        busyStatus: 'BUSY',
+        organizer: { name: 'Admin', email: 'Race@BolderBOULDER.com' },
+        attendees: [
+            { name: 'Orit Drukman App', email: 'oritdru@gmail.com', rsvp: true, partstat: 'ACCEPTED', role: 'REQ-PARTICIPANT'},
+            { name: 'Brittany Seaton', email: 'brittany@example2.org', rsvp: true, dir: 'https://linkedin.com/in/brittanyseaton', role: 'OPT-PARTICIPANT' }
+        ]
+    }
+
+    ics.createEvent(event, (error: any, value: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        content = value;
+        console.log(value);
+        // writeFileSync(`${__dirname}/meeting.ics`, value)
+    });
+
+    return content;
+
+
+    // BEGIN:VCALENDAR
+    // VERSION:2.0
+    // CALSCALE:GREGORIAN
+    // PRODID:adamgibbons/ics
+    // METHOD:PUBLISH
+    // X-PUBLISHED-TTL:PT1H
+    // BEGIN:VEVENT
+    // UID:d9e5e080-d25e-11e8-806a-e73a41d3e47b
+    // SUMMARY:Bolder Boulder
+    // DTSTAMP:20181017T204900Z
+    // DTSTART:20180530T043000Z
+    // DESCRIPTION:Annual 10-kilometer run in Boulder\, Colorado
+    // X-MICROSOFT-CDO-BUSYSTATUS:BUSY
+    // URL:http://www.bolderboulder.com/
+    // GEO:40.0095;105.2669
+    // LOCATION:Folsom Field, University of Colorado (finish line)
+    // STATUS:CONFIRMED
+    // CATEGORIES:10k races,Memorial Day Weekend,Boulder CO
+    // ORGANIZER;CN=Admin:mailto:Race@BolderBOULDER.com
+    // ATTENDEE;RSVP=TRUE;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=Adam Gibbons:mailto:adam@example.com
+    // ATTENDEE;RSVP=FALSE;ROLE=OPT-PARTICIPANT;DIR=https://linkedin.com/in/brittanyseaton;CN=Brittany
+    //   Seaton:mailto:brittany@example2.org
+    // DURATION:PT6H30M
+    // END:VEVENT
+    // END:VCALENDAR
 }
 
 //https://stackoverflow.com/questions/10488831/link-to-add-to-google-calendar
