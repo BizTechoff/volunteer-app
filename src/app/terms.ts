@@ -73,7 +73,7 @@ export const terms = {
     endSuccess: 'הסתיימו בהצלחה',
     problems: 'בעיות',
     invalidBranch: 'סניף אינו תקין',
-    appVersion: '2021.11.18.0',
+    appVersion: '2021.11.18.1',
     defaultVolunteers: 'מתנדבים ברירת מחדל',
     appDesc: 'אפליקציה לניהול מפגשי התנדבות',
     addVolunteer: 'הוספת מתנדב',

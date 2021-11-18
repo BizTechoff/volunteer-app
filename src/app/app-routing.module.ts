@@ -20,8 +20,8 @@ import { terms } from './terms';
 import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
 import { UsersComponent } from './users/users.component';
 
-
-
+ 
+ 
 const defaultRoute = terms.home;
 const routes: Routes = [ 
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },

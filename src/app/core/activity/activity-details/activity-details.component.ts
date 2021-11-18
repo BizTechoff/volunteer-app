@@ -192,7 +192,7 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   addCurrentUserToVids() {
-    let found = false;
+    let found = false; 
     if (!this.isManager()) {
       this.activity.vids.forEach(v => {
         if (v.id === this.remult.user.id) {
