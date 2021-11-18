@@ -52,7 +52,7 @@ export class TenantsListComponent implements OnInit {
         {
           visible: (_) => !_.isNew(),
           textInMenu: terms.associatedVolunteers,
-          icon: 'search',
+          icon: 'groups',
           click: async (_) => await this.assignVolunteers(_)
         },
         {
@@ -99,7 +99,28 @@ export class TenantsListComponent implements OnInit {
   }
 
   async assignVolunteers(t: Tenant) {
-
+    let bidOk = (t && t.bid && t.bid.id && t.bid.id.length > 0)!;
+    if (bidOk) {
+      // t.defVids.splice(0);
+      // let u = await this.remult.repo(Users).findFirst({ useCache: false });
+      // t.defVids.push(u);
+      if (!t.defVids) {
+        t.defVids = [] as UserIdName[];
+      }
+      let volids = await openDialog(VolunteersAssignmentComponent,
+        input => input.args = {
+          bid: t.bid,
+          aid: '',
+          tenant: t,
+          tname: t.name,
+          langs: t.langs,// this.t.langs, 
+          vids: t.defVids
+        },
+        output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);
+    }
+    else {
+      await this.dialog.error(terms.mustSetBidForThisAction);
+    }
   }
 
   async transferTenant(t: Tenant) {
@@ -132,10 +153,6 @@ export class TenantsListComponent implements OnInit {
     return this.remult.isAllowed(Roles.donor);
   }
 
-
-  @Field({ caption: terms.age })
-  age: number = 0;
-
   async addTenant(tid: string) {
     let isNew = false;
     let title = terms.tenantDetails;
@@ -154,7 +171,7 @@ export class TenantsListComponent implements OnInit {
     console.log(t);
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
-        title: title + (this.isDonor() ? ' (לקריאה בלבד)' : ''),
+        title: title + (this.isDonor() ? '<mat-icon>block</mat-icon> (לקריאה בלבד)' : ''),
         fields: () => [
           { field: t!.$.bid, visible: (r, v) => this.isBoard() },
           t!.$.referrer,
@@ -162,8 +179,8 @@ export class TenantsListComponent implements OnInit {
           t!.$.mobile,
           t!.$.address,
           [
-            { field: t!.$.birthday, valueChange: (r, v) => { this.age = t!.calcAge(); } },
-            { field: this.$.age, width: '60', readonly: true }
+            { field: t!.$.birthday },
+            { field: t!.$.age, width: '60', readonly: true }
           ],
           t!.$.langs,
           { field: t!.$.defVids, click: async () => await this.openVolunteers(t!) }],
@@ -209,6 +226,7 @@ export class TenantsListComponent implements OnInit {
         input => input.args = {
           bid: t.bid,
           aid: '',
+          tenant: t,
           tname: t.name,
           langs: t.langs,// this.t.langs, 
           vids: t.defVids

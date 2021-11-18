@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
+import { DataControl, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
@@ -33,7 +33,7 @@ export class ActivitiesListComponent implements OnInit {
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
       numOfColumnsInGrid: 20,
-      
+
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -43,11 +43,23 @@ export class ActivitiesListComponent implements OnInit {
       ],
       rowButtons: [
         {
+          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor) && _.status === ActivityStatus.w4_start,
+          textInMenu: terms.markAsStarted,
+          icon: 'check',
+          click: async (_) => await this.markActivityAs(_, _.status.next()!)
+        },
+        {
+          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor) && _.status === ActivityStatus.w4_end,
+          textInMenu: terms.markAsEnded,
+          icon: 'done_all',
+          click: async (_) => await this.markActivityAs(_, _.status.next()!)
+        },
+        {
           visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor),
           textInMenu: terms.addActivityToCurrentTenant,
           icon: 'add',
           click: async (_) => await this.addActivityToCurrentTenant(_)
-        }, 
+        },
         {
           visible: (_) => !_.isNew(),
           textInMenu: terms.activityDetails,
@@ -67,6 +79,15 @@ export class ActivitiesListComponent implements OnInit {
   constructor(private remult: Remult, private dialog: DialogService) { }
 
   ngOnInit(): void {
+  }
+
+  async markActivityAs(a: Activity, status: ActivityStatus) {
+    let yes = await this.dialog.yesNoQuestion(terms.doYouSureMarkActivityAs.replace('!status!', status.caption));
+    if (yes) {
+      a.status = status;
+      await a.save();
+      await this.refresh();
+    }
   }
 
   isBoard() {

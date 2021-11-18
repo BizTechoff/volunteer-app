@@ -118,10 +118,10 @@ export class ActivityStatus {
     static w4_start = new ActivityStatus(2, 'ממתין להתחלה', () => ActivityStatus.w4_end);
     static w4_end = new ActivityStatus(3, 'ממתין לסיום', () => ActivityStatus.success);
     static success = new ActivityStatus(4, 'הסתיים בהצלחה', () => undefined);
-    static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined);
+    static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined, 'red');
     static cancel = new ActivityStatus(6, 'בוטל', () => undefined);
-
-    constructor(public id: number, public caption: string, public next: () => ActivityStatus | undefined) { }
+     
+    constructor(public id: number, public caption: string, public next: () => ActivityStatus | undefined, public color:string = 'darkblue') { }
     // id:number;
 
 
@@ -311,9 +311,9 @@ export class Activity extends IdEntity {
             })
         }
     })
-    @CommaSeparatedStringArrayFieldPurpose<Tenant>({ caption: terms.purpose,  validate: PurposeRequiredValidation })
+    @CommaSeparatedStringArrayFieldPurpose<Activity>({ caption: terms.purpose,  validate: PurposeRequiredValidation })
     // @Field({ caption: terms.purpose })
-    purposes: ActivityPurpose[] = [ActivityPurpose.friendly];
+    purposes: ActivityPurpose[] = [];//ActivityPurpose.friendly];
 
     @Field({ caption: terms.desc })
     purposeDesc: string = '';

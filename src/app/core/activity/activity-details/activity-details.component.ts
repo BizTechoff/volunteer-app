@@ -114,12 +114,14 @@ export class ActivityDetailsComponent implements OnInit {
 
     }
     this.top = new DataAreaSettings({
-      fields: () => [
-        [
-          { field: this.activity.$.bid, visible: (r, v) => this.isBoard() },
-          { field: this.activity.$.status, visible: (r, v) => false },// !this.activity.isNew(), readonly: true }, //, readonly: true  },//, readonly: true }
-        ]
-      ]
+      fields: () => {
+        let f = [];
+        f.push(this.activity.$.bid);
+        if (this.isManager()) {
+          f.push(this.activity.$.status);
+        }
+        return f;
+      } 
     })
     this.fields = new DataAreaSettings({
       fields: () => [
@@ -158,10 +160,11 @@ export class ActivityDetailsComponent implements OnInit {
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
           bid: this.activity.bid,
-          aid: this.activity.id,
+          aid: this.activity.id, 
+          tenant:this.activity.tid,
           tname: this.activity.tid.name,
           langs: this.activity.tid?.langs,// this.t.langs, 
-          vids: this.activity.vids//,
+          vids: this.activity.vids//, 
           // volids: this.activity.volids
         },
         output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);

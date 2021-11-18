@@ -33,7 +33,7 @@ async function startup() {
         await verifyStructureOfAllEntities(database, remult);
         dataProvider = database;
     }
- 
+
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());

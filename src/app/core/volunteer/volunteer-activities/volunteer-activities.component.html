@@ -21,15 +21,18 @@
                 <mat-card style="margin: 7px;">
                     <mat-card-title>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <div style="display: flex; flex-direction: row; justify-content: start;">
 
-                            <button *ngIf="!this.showClosedActivitySign(a)" mat-mini-fab color="primary" [title]="terms.edit" (click)="openActivity(a)">
-                                <mat-icon>edit</mat-icon>
-                            </button>
-                            {{ a?.tid?.name }}
+                                <button *ngIf="!this.showClosedActivitySign(a)" mat-mini-fab color="primary"
+                                    [title]="terms.edit" (click)="openActivity(a)">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                               <p style="margin-top: 10px; margin-right: 5px;"> {{ a?.tid?.name }}</p>
+                            </div>
 
                             <span *ngIf="this.showClosedActivitySign(a)">
-                                <h2
-                                    style="width: 70px; background: darkblue; color: white; transform: rotate(45deg); display: inline-block">
+                                <h2 style="width: 70px; color: white; transform: rotate(45deg); display: inline-block;;"
+                                    [style.background]='a.status.color'>
                                     {{ a.status.caption }}</h2>
                             </span>
 
@@ -62,7 +65,7 @@
                                 שפות: {{ this.getLang(a) }}
                             </div>
                         </div>
-  
+
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;">
                             <div>
                                 {{ getPurposes(a) }}
@@ -79,13 +82,21 @@
                         משתתפים: {{ this.getVolunteers(a) }}
                     </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
-                        <button [disabled]="!this.isToday(a)" (click)='this.setNextStatus(a, this.ActivityStatus.w4_start)'
+                        <button [disabled]="this.isFuture(a)" (click)='this.setNextStatus(a, a.status.next()!)'
                             *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
-                            [style.background]='this.isToday(a)? "blue" : "gray"'
-                            style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? 'התחלנו' : 'התחלתי' }} </button>
-                        <button (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'
+                            [style.background]='this.isFuture(a)? "gray" : "blue"'
+                            style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? 'התחלנו' : 'התחלתי' }}
+                        </button>
+                        <button [disabled]="this.isFuture(a)"
+                            (click)='this.setNextStatus(a, this.ActivityStatus.problem)'
+                            *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
+                            [style.background]='this.isFuture(a)? "gray" : "blue"'
+                            style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? 'לא אגיע הפעם' : 'לא אגיע
+                            הפעם' }} </button>
+                        <button (click)='this.setNextStatus(a, a.status.next()!)'
                             *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
-                            style="margin-top: 7px; background: green; color: white;"> {{ a.vids.length > 1 ? 'סיימנו' : 'סיימתי' }} </button>
+                            style="margin-top: 7px; background: green; color: white;"> {{ a.vids.length > 1 ? 'סיימנו' :
+                            'סיימתי' }} </button>
                         <button (click)='this.setNextStatus(a, this.ActivityStatus.problem)'
                             *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: red; color: white;">ישנה

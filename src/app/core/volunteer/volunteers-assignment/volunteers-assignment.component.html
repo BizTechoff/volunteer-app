@@ -6,6 +6,14 @@
                     <strong> {{ this.args.tname }} (שפות: {{ this.lgDesc }})</strong>
                 </h4>
             </div>
+            <div style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
+                <mat-checkbox [checked]="!!this.filterBtTenantLangs" (change)="checkedChanged($event)">
+                    {{ terms.filterBtTenantLangs }} 
+                </mat-checkbox>
+                <!-- <mat-checkbox (change)="this.filterBtTenantLangs()" [(ngModel)]='this.filterBtTenantLangs'> {{ terms.filterBtTenantLangs }} </mat-checkbox> -->
+                <!-- <data-control [field]="this.$.filterBtTenantLangs"></data-control>
+                <data-area [settings]="this.filterBtTenantLangsArea"></data-area> -->
+            </div>
             <div style="display: flex; flex-direction: row; justify-content: space-between; ">
                 <div style="width: 100%;">
                     <data-control [field]='this.$.search'></data-control>

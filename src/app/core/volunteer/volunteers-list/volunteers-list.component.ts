@@ -59,6 +59,11 @@ export class VolunteersListComponent implements OnInit {
           icon: 'list'
         },
         {
+          //  visible: (v) => { return  this.showActivities(v)},
+          textInMenu: terms.showAssignTenants,
+          icon: 'assignment_ind'
+        },
+        {
           visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.transferVolunteer,
           icon: 'reply',
@@ -113,15 +118,15 @@ export class VolunteersListComponent implements OnInit {
     }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
-        title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? ' (לקריאה בלבד)' : ''),
+        title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? '<mat-icon>block</mat-icon> (לקריאה בלבד)' : ''),
         fields: () => [
           { field: u!.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
           { field: u!.$.name, caption: terms.name },
           u!.$.mobile,
           u!.$.langs,
           u!.$.birthday,
-          u!.$.email,
-          { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
+          u!.$.email//,
+          // { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
         ],
         ok: async () => {
           if (!this.isDonor()) { await (u!.isNew() ? u!.create() : u!.save()); }

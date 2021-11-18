@@ -1,5 +1,5 @@
 import { EntityBase, FieldRef, Filter, IdEntity } from "remult";
-import { ActivityPurpose } from "../core/activity/activity";
+import { Activity, ActivityPurpose } from "../core/activity/activity";
 import { terms } from "../terms";
 
 export const FILTER_IGNORE: Filter = new Filter(x => { return true; });
@@ -18,9 +18,9 @@ export const EntityRequiredValidation = (_: any, col: FieldRef<any, IdEntity>) =
         col.error = terms.requiredField;
 }
  
-export const PurposeRequiredValidation = (_: any, col: FieldRef<any, ActivityPurpose[]>) => {
+export const PurposeRequiredValidation = (_: Activity, col: FieldRef<Activity, ActivityPurpose[]>) => {
     let ok = col.value && col.value.length > 0 ? true : false;
-    if (!ok!)
+    if (!_.isNew() && !ok!) 
         col.error = terms.requiredField;
 }
 

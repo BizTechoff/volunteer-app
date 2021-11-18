@@ -1,5 +1,10 @@
 
 export const terms = {
+    doYouSureMarkActivityAs:'האם לסמן פעילות כ!status!',
+    showAssignTenants:'דיירים משוייכים',
+    mustCloseOldActivities:'לא ניתן להקים פעילות חדשה כל עוד קיימת פעילות ישנה (!date!) שלא נסגרה עדיין',
+    markAsStarted: 'סמן כפעילות שהתחילה',
+    markAsEnded: 'סמן כפעילות שהסתיימה',
     // `https://calendar.google.com/calendar/ical/biztechoff.app%40gmail.com/public/basic.ics?`
     volunteerCalndarLink: `https://calendar.google.com/calendar/u/0/r/eventedit?` +
         `text=!title!` +
@@ -147,14 +152,16 @@ export const terms = {
     home: 'ברוכים הבאים',
     userAccounts: 'משתמשים',
     myActivities: 'הפעילויות שלי',
+    myTenants: 'הדיירים שלי',
+    filterBtTenantLangs:'רק מי שדובר בשפת הדייר',
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות'
 }
-declare module 'remult' {
+declare module 'remult' { 
     export interface UserInfo {
         bid: string;
         bname: string;
     }
-}
-
+} 
+ 

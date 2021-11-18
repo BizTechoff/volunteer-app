@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
 import { Remult } from 'remult';
+import { DialogService } from '../../../common/dialog';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { UserIdName } from '../../../common/types';
+import { DateUtils } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Users } from '../../../users/users';
 import { Activity, ActivityStatus } from '../../activity/activity';
@@ -18,7 +20,7 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   activities = [] as Activity[];
   volunteer!: Users;
-  constructor(private remult: Remult) { }
+  constructor(private remult: Remult, private dialog: DialogService) { }
 
   terms = terms;
   AcitivityStatus = ActivityStatus;
@@ -30,6 +32,18 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   async openActivity(act?: Activity) {
     let id = act && act.id && act.id.length > 0 ? act.id : '';
+    if (id.length == 0) { // request to create new activity
+      let today = new Date();
+      today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      for (const a of this.activities) {
+        if (a.date < today) {
+          if (ActivityStatus.openStatuses().includes(a.status)) {
+            await this.dialog.error(terms.mustCloseOldActivities.replace('!date!', DateUtils.toDateString(a.date)));
+            return;
+          }
+        }
+      }
+    }
     let changes = await openDialog(ActivityDetailsComponent,
       input => input.args = { bid: this.volunteer.bid, aid: id },
       output => output ? output.args.changed : false);
@@ -47,10 +61,11 @@ export class VolunteerActivitiesComponent implements OnInit {
     }
   }
 
-  isToday(a: Activity) {
+  isFuture(a: Activity) {
     let today = new Date();
-    today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    return a.date.getTime() === today.getTime();
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+    return a.date.getTime() > today.getTime();
+    //return a.date.getTime() === today.getTime();
   }
 
   showClosedActivitySign(a: Activity) {
@@ -76,7 +91,7 @@ export class VolunteerActivitiesComponent implements OnInit {
       this.refreshing = false;
     }
   }
- 
+
   getPurposes(a: Activity) {
     let result = 'לא צויינו מטרות';
     if (a && a.purposes && a.purposes.length > 0) {
@@ -99,39 +114,33 @@ export class VolunteerActivitiesComponent implements OnInit {
   }
 
   async setNextStatus(a: Activity, status: ActivityStatus) {
-    let next = a.status.next();
-    if (!next) {
-      next = status;
+    if (ActivityStatus.w4_start === a.status) {
+      a.started = new Date();
+      let changed = await openDialog(InputAreaComponent,
+        _ => _.args = {
+          title: terms.thankYou,
+          fields: () => [a.$.started],
+          ok: async () => { }
+        })
     }
-    if (next !== a.status) {
-      if (ActivityStatus.w4_start === a.status) {
-        a.started = new Date();
-        let changed = await openDialog(InputAreaComponent,
-          _ => _.args = {
-            title: terms.thankYou,
-            fields: () => [a.$.started],
-            ok: async () => { }
-          })
-      }
-      else if (ActivityStatus.w4_end === a.status) {
-        a.ended = new Date();
-        let changed = await openDialog(InputAreaComponent,
-          _ => _.args = {
-            title: terms.thankYou,
-            fields: () => [a.$.ended],
-            ok: async () => { }
-          })
-      }
-      a.status = next;
-      await a.save();
-      if (ActivityStatus.lastStatuses().find(s => s === a.status)) {
-        let changed = await openDialog(InputAreaComponent,
-          _ => _.args = {
-            title: terms.thankYou,
-            fields: () => [a.$.remark],
-            ok: async () => { await a.save(); }
-          })
-      }
+    else if (ActivityStatus.w4_end === a.status) {
+      a.ended = new Date();
+      let changed = await openDialog(InputAreaComponent,
+        _ => _.args = {
+          title: terms.thankYou,
+          fields: () => [a.$.ended],
+          ok: async () => { }
+        })
+    }
+    a.status = status;
+    await a.save();
+    if (ActivityStatus.lastStatuses().find(s => s === a.status)) {
+      let changed = await openDialog(InputAreaComponent,
+        _ => _.args = {
+          title: terms.thankYou,
+          fields: () => [a.$.remark],
+          ok: async () => { await a.save(); }
+        })
     }
   }
 

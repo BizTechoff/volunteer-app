@@ -29,7 +29,8 @@ export function CommaSeparatedStringArrayField<entityType = any>(
     ...options: (FieldOptions<entityType, Langs[]> |
         ((options: FieldOptions<entityType, Langs[]>, remult: Remult) => void))[]) {
     return Field({
-        displayValue: (r, x) => {
+
+        displayValue: (_, x) => {
             return x ? x.map(i => i.caption).join(', ').trim() : '';
         },
         valueConverter: {
@@ -189,27 +190,35 @@ export class Tenant extends IdEntity {
     @Field({ caption: terms.active })
     active: boolean = true;
 
+    @DataControl<Tenant, Date>({
+        valueChange: (r, _) => { r.calcAge(); }
+    })
     @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
     birthday!: Date;
 
+    @Field({ caption: terms.age })
+    age: number = 0;
+
     @DataControl<Tenant, Users[]>({
         click: () => { },
-        clickIcon: 'search'//,
+        clickIcon: 'search',
+        hideDataOnInput: true,
+        getValue: (r, v) => { return v.displayValue; }
         // getValue: (r,v) => {return v && v.value ? v.value.map(i => i.name).join(', ').trim() : '';}
         // click: async (r, v) => await r.openVolunteers()
     })
     // @CommaSeparatedStringArrayFieldUsers<Tenant>({ caption: terms.associatedVolunteers })
-    @CommaSeparatedStringArrayFieldUsersAsString<Tenant>({caption: terms.associatedVolunteers})
+    @CommaSeparatedStringArrayFieldUsersAsString<Tenant>({ caption: terms.associatedVolunteers })
     //defVids: Users[] = [] as Users[];
     defVids: UserIdName[] = [] as UserIdName[];
-  
+
     calcAge() {
         let result = 0;
         if (this.birthday && this.birthday.getFullYear() > 1900) {
             let today = new Date();
             result = Math.max(1, today.getFullYear() - this.birthday.getFullYear());
         }
-        return result;
+        this.age = result;
     }
 
     // async openVolunteers() {
