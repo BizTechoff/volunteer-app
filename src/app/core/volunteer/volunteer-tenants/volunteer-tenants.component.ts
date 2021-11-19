@@ -19,6 +19,7 @@ export class VolunteerTenantsComponent implements OnInit {
       where: row => row.defVids.contains(this.remult.user.id),
       columnSettings: row =>[
         row.name,
+        // row.defVids,
         row.age,
         row.mobile,
         row.langs,

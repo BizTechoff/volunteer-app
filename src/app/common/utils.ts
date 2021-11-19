@@ -7,7 +7,7 @@ export class EmailSvc {
     @BackendMethod({ allowed: true })
     static async SendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
         return await EmailSvc.sendMail(to, subject, text, link, remult!);
-    }
+    } 
 }
 export class DateUtils {
 

@@ -44,7 +44,7 @@ export function CommaSeparatedStringArrayFieldUsersAsString<entityType = any>(
     ...options: (FieldOptions<entityType, UserIdName[]> |
         ((options: FieldOptions<entityType, UserIdName[]>, remult: Remult) => void))[]) {
     return Field({
-        displayValue: (r, x) => {
+        displayValue: (r, x) => {//(i.id === this.remult.user.id ? 'את\ה' : i.name)
             return x && x.length > 0 ? x.map(i => i.name.trim()).join(', ') : '';
         }//,
         // valueConverter: {
@@ -196,6 +196,10 @@ export class Tenant extends IdEntity {
     @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
     birthday!: Date;
 
+    @DataControl<Tenant, number>({
+        width: '60', 
+        readonly: true
+    })
     @Field({ caption: terms.age })
     age: number = 0;
 

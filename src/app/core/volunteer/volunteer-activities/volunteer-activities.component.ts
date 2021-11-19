@@ -20,6 +20,7 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   activities = [] as Activity[];
   volunteer!: Users;
+  userMessage = terms.loadingYourActivities;
   constructor(private remult: Remult, private dialog: DialogService) { }
 
   terms = terms;
@@ -77,6 +78,7 @@ export class VolunteerActivitiesComponent implements OnInit {
   refreshing = false;
   async refresh() {
     if (!this.refreshing) {
+      this.userMessage = terms.loadingYourActivities;
       this.refreshing = true;
       let as = [] as Activity[];
       for await (const a of this.remult.repo(Activity).iterate({
@@ -89,6 +91,10 @@ export class VolunteerActivitiesComponent implements OnInit {
       this.activities.splice(0);
       this.activities.push(...as);
       this.refreshing = false;
+    }
+    if(this.activities.length == 0)
+    {
+      this.userMessage = terms.volunteerNoActivities;
     }
   }
 

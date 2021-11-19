@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl, GridSettings, openDialog } from '@remult/angular';
+import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
@@ -33,13 +33,29 @@ export class VolunteersListComponent implements OnInit {
       allowCrud: false,
       // allowSelection: true,
       numOfColumnsInGrid: 10,
-      columnSettings: _ => [
-        { field: _.bid, caption: 'סניף' },
-        { field: _.name, caption: 'שם' },
-        _.langs,
-        _.mobile,
-        _.birthday,
-        { field: _.defTid, caption: terms.defaultTenant },],
+      columnSettings: u => {
+        let f = [] as DataControlInfo<Users>[];
+        if (this.isBoard()) {
+          f.push(u.bid!);
+        }
+        f.push(
+          { field: u.name, caption: terms.name },
+          u.mobile,
+          u.langs,
+          u.age,
+          u.birthday,
+          u.email
+        );
+        return f;
+      }, //[
+      // { field: _.bid, caption: 'סניף' },
+      // { field: _.name, caption: 'שם' },
+      // _.langs,
+      // _.mobile,
+      // _.email,
+      // _.birthday//,
+      // { field: _.defTid, caption: terms.defaultTenant },
+      // ],
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -124,7 +140,10 @@ export class VolunteersListComponent implements OnInit {
           { field: u!.$.name, caption: terms.name },
           u!.$.mobile,
           u!.$.langs,
-          u!.$.birthday,
+          [  
+            u!.$.birthday,
+            { field: u!.$.age, width: '60', visible: (r, v) => this.remult.isAllowed(Roles.manager) },
+          ],
           u!.$.email//,
           // { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
         ],

@@ -54,7 +54,7 @@ export class VolunteersAssignmentComponent implements OnInit {
         .and(u.bid!.isEqualTo(this.args.bid))
         .and(this.filterBtTenantLangs ? this.contains(u.langs, this.args.langs) : FILTER_IGNORE)
         .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE)
-        .and(this.isManager() ? FILTER_IGNORE : u.id.isIn(this.args.tenant.defVids.map(x=>x.id))),
+        .and(u.id.isIn(this.args.tenant.defVids.map(x=>x.id))),//this.isManager() ? FILTER_IGNORE : 
       allowCrud: false,
       allowSelection: true,
       columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs, u.email],

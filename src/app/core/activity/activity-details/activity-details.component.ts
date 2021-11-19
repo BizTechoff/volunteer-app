@@ -116,7 +116,9 @@ export class ActivityDetailsComponent implements OnInit {
     this.top = new DataAreaSettings({
       fields: () => {
         let f = [];
-        f.push(this.activity.$.bid);
+        if (this.isBoard()) {
+          f.push(this.activity.$.bid);
+        }
         if (this.isManager()) {
           f.push(this.activity.$.status);
         }
@@ -192,7 +194,7 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   addCurrentUserToVids() {
-    let found = false; 
+    let found = false;
     if (!this.isManager()) {
       this.activity.vids.forEach(v => {
         if (v.id === this.remult.user.id) {

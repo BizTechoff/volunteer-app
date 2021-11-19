@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl, GridSettings, openDialog } from '@remult/angular';
+import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
@@ -32,15 +32,35 @@ export class TenantsListComponent implements OnInit {
         .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
       allowCrud: false,
       numOfColumnsInGrid: 10,
-      columnSettings: t => [
-        { field: t.bid, visible: (r, v) => this.isBoard() },
-        t.referrer,
-        t.name,
-        t.defVids,
-        t.langs,
-        t.address,
-        t.mobile,
-        t.birthday],
+      columnSettings: t => {
+
+        let f = [] as DataControlInfo<Tenant>[];
+        if (this.isBoard()) {
+          f.push(t.bid!);
+        }
+        f.push(
+          t.name,
+          t.defVids,
+          t.langs,
+          t.age,
+          t.mobile,
+          t.address,
+          t.referrer,
+          t.birthday
+          // t.email
+        );
+        return f;
+      }
+      // [
+      //   { field: t.bid, visible: (r, v) => this.isBoard() },
+      //   t.referrer,
+      //   t.name,
+      //   t.defVids,
+      //   t.langs,
+      //   t.address,
+      //   t.mobile,
+      //   t.birthday]
+      ,
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -172,18 +192,36 @@ export class TenantsListComponent implements OnInit {
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: title + (this.isDonor() ? '<mat-icon>block</mat-icon> (לקריאה בלבד)' : ''),
-        fields: () => [
-          { field: t!.$.bid, visible: (r, v) => this.isBoard() },
-          t!.$.referrer,
-          t!.$.name,
-          t!.$.mobile,
-          t!.$.address,
-          [
-            { field: t!.$.birthday },
-            { field: t!.$.age, width: '60', readonly: true }
-          ],
-          t!.$.langs,
-          { field: t!.$.defVids, click: async () => await this.openVolunteers(t!) }],
+        fields: () => {
+          let f = [];
+          if (this.isBoard()) {
+            f.push(t.$.bid);
+          }
+          f.push(
+            t.$.referrer,
+            t.$.name,
+            t.$.mobile,
+            t.$.address,
+            [t.$.birthday,
+            t.$.age],
+            t.$.langs,
+            { field: t!.$.defVids, click: async () => await this.openVolunteers(t!) }
+          );
+          return f;
+        }
+        // [
+        //   { field: t!.$.bid, visible: (r, v) => this.isBoard() },
+        //   t!.$.referrer,
+        //   t!.$.name,
+        //   t!.$.mobile,
+        //   t!.$.address,
+        //   [
+        //     { field: t!.$.birthday },
+        //     { field: t!.$.age, width: '60', readonly: true }
+        //   ],
+        //   t!.$.langs,
+        //   { field: t!.$.defVids, click: async () => await this.openVolunteers(t!) }]
+        ,
         validate: async () => {
           return await this.canSaveAndClose(t);
         },

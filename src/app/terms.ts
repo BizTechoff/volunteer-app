@@ -1,5 +1,7 @@
 
-export const terms = {
+export const terms = { 
+    canNotComeToActivityThisTime: 'לא אוכל להגיע',
+    loadingYourActivities:'מחפש פעילויות..',
     doYouSureMarkActivityAs:'האם לסמן פעילות כ!status!',
     showAssignTenants:'דיירים משוייכים',
     mustCloseOldActivities:'לא ניתן להקים פעילות חדשה כל עוד קיימת פעילות ישנה (!date!) שלא נסגרה עדיין',
@@ -153,7 +155,7 @@ export const terms = {
     userAccounts: 'משתמשים',
     myActivities: 'הפעילויות שלי',
     myTenants: 'הדיירים שלי',
-    filterBtTenantLangs:'רק מי שדובר בשפת הדייר',
+    filterBtTenantLangs:'הצג רק מי שדובר בשפת הדייר',
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות'

@@ -42,4 +42,7 @@ export class Branch extends IdEntity {
     @Field({ caption: terms.address, validate: StringRequiredValidation })
     address: string = '';
 
+    @Field({ caption: terms.email })//, validate: StringRequiredValidation
+    email: string = '';
+
 }

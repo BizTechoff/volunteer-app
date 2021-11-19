@@ -231,7 +231,7 @@ export class Users extends IdEntity {
     mobile: string = '';
 
     @Field({
-        // validate: [Validators.required, Validators.unique],
+        validate: [Validators.required],//, Validators.unique],
         caption: terms.email
     })
     email: string = '';
@@ -239,11 +239,16 @@ export class Users extends IdEntity {
     @Field({ caption: terms.linkClicked })
     clickedLink: boolean = false;
 
+    @DataControl<Users, Date>({
+        valueChange: (r, _) => { r.calcAge(); }
+    })
     @DateOnlyField({
         caption: terms.birthday
     })
     birthday!: Date;
 
+    @Field({ caption: terms.age })
+    age: number = 0;
 
     @Field(options => options.valueType = Tenant, { caption: terms.tenant })
     defTid!: Tenant;
@@ -289,6 +294,16 @@ export class Users extends IdEntity {
     @Field({ caption: terms.active })
     active: boolean = true;
 
+    
+
+    calcAge() {
+        let result = 0;
+        if (this.birthday && this.birthday.getFullYear() > 1900) {
+            let today = new Date();
+            result = Math.max(1, today.getFullYear() - this.birthday.getFullYear());
+        }
+        this.age = result;
+    }
 
     hasValidBranch() {
         let result = true;
