@@ -1,12 +1,11 @@
-import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
-import { UserIdName } from '../../../common/types';
-import { EmailSvc } from '../../../common/utils';
+import { AttendeeRequest, CalendarRequest, UserIdName } from '../../../common/types';
+import { DateUtils, EmailSvc } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
@@ -298,8 +297,15 @@ export class ActivityDetailsComponent implements OnInit {
       let yes = await this.dialog.yesNoQuestion(message);
       if (yes) {
         console.log('8');
+        let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
         for (const e of emails) {
-          let ok = await this.sendMail(e.email, e.type);
+          users.push({
+            name: e.name,
+            email: e.email
+          });
+        }
+        for (const e of emails) {
+          let ok = await this.sendMail(e.email, e.type, users);
           if (ok) {
             // let u = await this.remult.repo(Users).findId(e.uid);
             // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
@@ -311,26 +317,95 @@ export class ActivityDetailsComponent implements OnInit {
     console.log('99');
   }
 
-  async sendMail(email: string, type: NotificationsTypes) {
-    let message = type.text
+  async sendMail(email: string, type: NotificationsTypes, users: { name: string, email: string }[]) {
+    let u = await this.remult.repo(Users).findId(this.remult.user.id);
+    let b = await this.remult.repo(Branch).findId(this.activity.bid.id);
+
+    if (!users) {
+      users = [] as { name: string, email: string }[];
+    }
+    let attendees = [] as AttendeeRequest[];
+    for (const u of users) {
+      attendees.push(
+        {
+          name: u.name,
+          email: u.email,
+          rsvp: true,
+          partstat: 'ACCEPTED',
+          role: 'OPT-PARTICIPANT'
+        });
+    };
+
+    let subject = terms.voulnteerNewAssignSubject
+      .replace('!tname!', this.activity.tid.name);
+    let html = terms.voulnteerNewAssign
       .replace('!name!', this.activity.tid.name)
-      .replace('!date!', this.activity.date.toLocaleDateString())
+      .replace('!date!', DateUtils.toDateString(this.activity.date))
       .replace('!from!', this.activity.fh)
       .replace('!to!', this.activity.th)
       .replace('!address!', this.activity.tid.address);
+    // let start
+    // let split = this.activity.fh.split(':');
+    // if(split.length > 0){
 
-    const datepipe: DatePipe = new DatePipe('en-US');//yyyyMMddTHHmmssZ
-    let fdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.fh.replace(':', '') + '00Z';
-    let tdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.th.replace(':', '') + '00Z';
-    let link = type.link
-      .replace('!title!', encodeURI(type.subject))
-      .replace('!fDate!', fdate)
-      .replace('!tDate!', tdate)
-      .replace('!location!', encodeURI(this.activity.tid.address))
-      .replace('!details!', encodeURI('תודה!'));
-    let subject = type.subject.replace('!tname!', this.activity.tid.name);
+    // }
+    // if (this.remult.isAllowed(Roles.))
+    let req: CalendarRequest = {
+      sender: b.email,
+      email: {
+        from: b.email,
+        to: email,
+        cc: '',
+        subject: subject,
+        html: html
+      },
+      ics: {
+        title: subject,
+        description: html,
+        location: this.activity.tid.address,
+        url: '',// 'bit.ly/eshel-app',
+        start: {
+          year: this.activity.date.getFullYear(),
+          month: this.activity.date.getMonth(),
+          day: this.activity.date.getDate(),
+          hours: parseInt(this.activity.fh.split(':')[0]),
+          minutes: parseInt(this.activity.fh.split(':')[1])
+        },
+        duration: {
+          hours: parseInt(this.activity.th.split(':')[0]) - parseInt(this.activity.fh.split(':')[0]),
+          minutes: parseInt(this.activity.th.split(':')[1]) - parseInt(this.activity.fh.split(':')[1])
+        },
+        status: 'CONFIRMED',
+        busyStatus: 'BUSY',
+        organizer: {
+          name: u.name,
+          email: this.isManager() ? b.email : u.email
+        },
+        attendees: attendees
+      }
+    };
 
-    return await EmailSvc.SendEmail(email, subject, message, link);
+    return await EmailSvc.SendEmail2(req);
+
+    // let message = type.text
+    //   .replace('!name!', this.activity.tid.name)
+    //   .replace('!date!', this.activity.date.toLocaleDateString())
+    //   .replace('!from!', this.activity.fh)
+    //   .replace('!to!', this.activity.th)
+    //   .replace('!address!', this.activity.tid.address);
+
+    // const datepipe: DatePipe = new DatePipe('en-US');//yyyyMMddTHHmmssZ
+    // let fdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.fh.replace(':', '') + '00Z';
+    // let tdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.th.replace(':', '') + '00Z';
+    // let link = type.link
+    //   .replace('!title!', encodeURI(type.subject))
+    //   .replace('!fDate!', fdate)
+    //   .replace('!tDate!', tdate)
+    //   .replace('!location!', encodeURI(this.activity.tid.address))
+    //   .replace('!details!', encodeURI('תודה!'));
+    // let subject = type.subject.replace('!tname!', this.activity.tid.name);
+
+    // return await EmailSvc.SendEmail(email, subject, message, link);
   }
 
   async addPhoto() {

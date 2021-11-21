@@ -4,6 +4,7 @@ import * as ics2 from 'ics';
 import { createTransport } from 'nodemailer';
 import * as Mail from 'nodemailer/lib/mailer';
 import { Remult } from 'remult';
+import { CalendarRequest, IcsRequest } from '../app/common/types';
 import { EmailSvc } from '../app/common/utils';
 
 // EmailSvc.sendMail = async (to: string, subject: string, message: string, link: string, remult: Remult) => {
@@ -74,6 +75,50 @@ import { EmailSvc } from '../app/common/utils';
 //     //   });
 // }
 //maxAttendees
+EmailSvc.sendMail2 = async (req: CalendarRequest) => {
+    console.log(req);
+    var transporter = createTransport({
+        service: 'gmail',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+            user: req.sender,
+            pass: process.env.ADMIN_GMAIL_PASS
+        }
+    });
+
+    let content = buildICS(req.ics);
+    // let content = buildICS2('eashel from original');
+
+    var mailOptions: Mail.Options = {
+        from: `אשל מתנדבים <${req.sender}>`,//'Sender Name <sender@server.com>'
+        to: req.email.to,
+        // cc: req.sender,
+        subject: req.email.subject,
+        date: new Date(),
+        html: req.email.html,
+        icalEvent: {
+            filename: 'invite.ics',
+            method: 'REQUEST',//PUBLISH
+            content: content
+        }
+    };
+    new Promise((res, rej) => {
+        transporter.sendMail(mailOptions, function (error: any, info: { response: string; }) {
+            if (error) {
+                // console.log('mail.error');
+                console.log(error);
+                rej(error);
+            } else {
+                // console.log('mail.ok');
+                res(true);
+                console.log('Email sent: ' + info.response);
+            }
+        });
+    });
+    return true;
+}
 EmailSvc.sendMail = async (to: string, subject: string, message: string, link: string, remult: Remult) => {
 
     var transporter = createTransport({
@@ -101,7 +146,7 @@ EmailSvc.sendMail = async (to: string, subject: string, message: string, link: s
     //     toCalndar = `<a href=${link}>לחץ כאן להוספה ליומן</a>`;
     // };
     body = body.replace('!link!', toCalndar);
-    let content = buildICS(subject);
+    let content = '';// buildICS(subject);
 
     var mailOptions: Mail.Options = {
         from: `אשל מתנדבים <${process.env.ADMIN_GMAIL_MAIL}>`,//'Sender Name <sender@server.com>'
@@ -135,7 +180,45 @@ EmailSvc.sendMail = async (to: string, subject: string, message: string, link: s
 
 }
 
-function buildICS(title: string) {//date:Date,fh:string,th:string, tilte:string,) {
+function buildICS(req: IcsRequest) {//date:Date,fh:string,th:string, tilte:string,) {
+    let content = '';
+    const ics = require('ics')
+    const { writeFileSync } = require('fs');
+    ics2.createEvent
+    const event = {
+        start: [req.start.year, req.start.month, req.start.day, req.start.hours, req.start.minutes],
+        duration: { hours: req.duration.hours, minutes: req.duration.minutes },
+        title: req.title,// terms.voulnteerNewAssignSubject.replace('!tname!',tname),
+        description: req.description,
+        location: req.location,
+        // url: req.url,
+        geo: { lat: 31.7860672, lon: 35.2233429 },
+        // categories: ['EshelVolunteers'],
+        status: 'CONFIRMED',
+        busyStatus: 'BUSY',
+        organizer: { name: 'אשל ירושלים', email: process.env.ADMIN_GMAIL_MAIL },
+        //organizer: { name: req.organizer.name, email: req.organizer.email },
+        attendees: req.attendees
+        // [ 
+        //     { name: 'Orit Drukman App', email: 'oritdru@gmail.com', rsvp: true, partstat: 'ACCEPTED', role: 'REQ-PARTICIPANT' },
+        //     { name: 'GX App', email: 'gxbreaker@gmail.com', rsvp: true, dir: 'https://linkedin.com/in/brittanyseaton', role: 'OPT-PARTICIPANT' }
+        // ]
+    }
+
+    ics.createEvent(event, (error: any, value: any) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+        content = value;
+        console.log(value);
+        // writeFileSync(`${__dirname}/meeting.ics`, value)
+    });
+
+    return content;
+}
+
+function buildICS2(title: string) {//date:Date,fh:string,th:string, tilte:string,) {
     let content = '';
     const ics = require('ics')
     const { writeFileSync } = require('fs');

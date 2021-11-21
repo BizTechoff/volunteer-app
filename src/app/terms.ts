@@ -75,7 +75,6 @@ export const terms = {
     endSuccess: 'הסתיימו בהצלחה',
     problems: 'בעיות',
     invalidBranch: 'סניף אינו תקין',
-    appVersion: '2021.11.21.0',
     defaultVolunteers: 'מתנדבים ברירת מחדל',
     appDesc: 'אפליקציה לניהול מפגשי התנדבות',
     addVolunteer: 'הוספת מתנדב',
@@ -158,7 +157,8 @@ export const terms = {
     filterBtTenantLangs:'הצג רק מי שדובר בשפת הדייר',
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
-    signOut: 'התנתקות'
+    signOut: 'התנתקות',
+    appVersion: '2021.11.21.1'
 }
 declare module 'remult' { 
     export interface UserInfo {
