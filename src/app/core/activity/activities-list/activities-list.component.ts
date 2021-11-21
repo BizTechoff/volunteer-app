@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl, GridSettings, openDialog } from '@remult/angular';
+import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
@@ -33,7 +33,34 @@ export class ActivitiesListComponent implements OnInit {
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
       numOfColumnsInGrid: 20,
+      columnSettings: a => {
 
+        let f = [] as DataControlInfo<Activity>[];
+        if (this.isBoard()) {
+          f.push(a.bid!);
+        }
+        f.push(
+          a.tid,
+          a.vids,
+          a.status,
+          a.date,
+          a.purposes,
+          a.purposeDesc,
+          a.fh,
+          a.th,
+          a.remark,
+          a.createdBy,
+          a.created,
+          a.modifiedBy,
+          a.modified//,
+          // a.assigned,
+          // a.started,
+          // a.ended,
+          // a.canceled,
+          // a.problemed
+        );
+        return f;
+      },
       gridButtons: [
         {
           textInMenu: () => terms.refresh,

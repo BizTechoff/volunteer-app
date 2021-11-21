@@ -196,7 +196,7 @@ function buildICS(req: IcsRequest) {//date:Date,fh:string,th:string, tilte:strin
         // categories: ['EshelVolunteers'],
         status: 'CONFIRMED',
         busyStatus: 'BUSY',
-        organizer: { name: 'אשל ירושלים', email: process.env.ADMIN_GMAIL_MAIL },
+        organizer: { name: 'אשל אשדוד', email: process.env.ADMIN_GMAIL_MAIL },
         //organizer: { name: req.organizer.name, email: req.organizer.email },
         attendees: req.attendees
         // [ 
