@@ -117,7 +117,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
             let active = FILTER_IGNORE;// tnt.active.isEqualTo(true);
             if (!(remult.isAllowed(Roles.board)))//manager|volunteer
             {
-                return active.and(tnt.bid.contains(remult.user.bid));//only same branch
+                return tnt.bid.contains(remult.user.bid);//only same branch
             }
             return active;// all
         };

@@ -208,13 +208,16 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   async saveAndClose() {
+    let alreadySaved = false;
     if (this.activity.vids.length > 0) {
       if (this.activity.status === ActivityStatus.w4_assign) {
-        this.activity.status = ActivityStatus.w4_start;
+        await this.activity.status.onChanging(this.activity, ActivityStatus.w4_start);
+        alreadySaved = true;
       }
     }
-    // console.log('isnew',this.activity.isNew());
-    await this.activity.save();
+    if (!alreadySaved) {
+      await this.activity.save();
+    }
     // console.log('isnew',this.activity.isNew());
     this.args.changed = true;
     this.args.aid = this.activity.id;

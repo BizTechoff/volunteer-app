@@ -118,7 +118,7 @@ export class Langs {
                 return user.id.isEqualTo("-1");
             if (!(remult.isAllowed(Roles.board)))// all
             {
-                return active.and(user.bid!.contains(remult.user.bid));
+                return user.bid!.contains(remult.user.bid);
                 // if (!remult.isAllowed(Roles.manager)) {
                 //     //@@@@@@@@@@@2
                 //     return active.and(user.id.isEqualTo(remult.user.id));//volunteer only himself
@@ -223,7 +223,7 @@ export class Users extends IdEntity {
     })
     @CommaSeparatedStringArrayField<Users>({ caption: terms.langs })
     langs: Langs[] = [Langs.hebrew];
-
+ 
     @Field({
         validate: [StringRequiredValidation, Validators.unique],
         caption: terms.mobile

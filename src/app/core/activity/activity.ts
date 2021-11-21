@@ -1,7 +1,8 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
-import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, PurposeRequiredValidation, TimeRequireValidator } from "../../common/globals";
+import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, TimeRequireValidator } from "../../common/globals";
+import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
 import { terms } from "../../terms";
@@ -10,6 +11,15 @@ import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 import { CommaSeparatedStringArrayFieldUsersAsString, Tenant } from "../tenant/tenant";
 
+ 
+export const PurposeRequiredValidation = (ent: Activity, col: FieldRef<Activity, ActivityPurpose[]>) => {
+    let ok = col.value && col.value.length > 0 ? true : false;
+    if (!ok!) {
+        if (!ent.isNew() && ent.status === ActivityStatus.w4_end) {
+            col.error = terms.requiredField;
+        }
+    }
+}
 
 export function CommaSeparatedStringArrayFieldPurpose<entityType = any>(
     ...options: (FieldOptions<entityType, ActivityPurpose[]> |
@@ -114,14 +124,63 @@ export class ActivityDayPeriod {
 })
 export class ActivityStatus {
     // static none = new ActivityStatus(0, 'ללא');
-    static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ', () => ActivityStatus.w4_start);
-    static w4_start = new ActivityStatus(2, 'ממתין להתחלה', () => ActivityStatus.w4_end);
-    static w4_end = new ActivityStatus(3, 'ממתין לסיום', () => ActivityStatus.success);
-    static success = new ActivityStatus(4, 'הסתיים בהצלחה', () => undefined);
-    static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined, 'red');
-    static cancel = new ActivityStatus(6, 'בוטל', () => undefined);
-     
-    constructor(public id: number, public caption: string, public next: () => ActivityStatus | undefined, public color:string = 'darkblue') { }
+    static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ',
+        async (a, to) => {//t=the new status
+            if (to === ActivityStatus.w4_start) {
+                a.assigned = new Date();
+                a.status = to;
+                await a.save();
+                // sendEmail(a, New-Assigned);
+            }
+            else if (to === ActivityStatus.cancel) {
+                a.canceled = new Date();
+                a.status = to;
+                await a.save();
+                await ActivityStatus.showOnlySummary(a);
+                // sendEmail(a, Canceled-Assigned);
+            } else return;
+        });
+    static w4_start = new ActivityStatus(2, 'ממתין להתחלה',
+        async (a, to) => {//t=the new status
+            if (to === ActivityStatus.w4_end) {
+                a.started = new Date();
+                a.status = to;
+                await a.save();
+                await ActivityStatus.showAfterStarted(a);
+                // sendEmail(a, Started);
+            }
+            else if (to === ActivityStatus.cancel) {
+                a.canceled = new Date();
+                a.status = to;
+                await a.save();
+                await ActivityStatus.showOnlySummary(a);
+                // sendEmail(a, Canceled-Assigned);
+            } else return;
+            await a.save();
+        });
+    static w4_end = new ActivityStatus(3, 'ממתין לסיום',
+        async (a, to) => {//t=the new status
+            if (to === ActivityStatus.success) {
+                a.ended = new Date();
+                a.status = to;
+                await a.save();
+                await ActivityStatus.showOnlySummary(a);
+                // sendEmail(a, Success/Ended);
+            }
+            else if (to === ActivityStatus.problem) {
+                a.problemed = new Date();
+                a.status = to;
+                await a.save();
+                await ActivityStatus.showOnlySummary(a);
+                // sendEmail(a, Problem);
+            } else return;
+            await a.save();
+        });
+    static success = new ActivityStatus(4, 'הסתיים בהצלחה', () => undefined!, 'green');
+    static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined!, 'red');
+    static cancel = new ActivityStatus(6, 'בוטל', () => undefined!, 'gray');
+
+    constructor(public id: number, public caption: string, public onChanging: (a: Activity, to: ActivityStatus) => Promise<void>, public color: string = 'darkblue') { }
     // id:number;
 
 
@@ -141,29 +200,50 @@ export class ActivityStatus {
 
     static closeStatuses() {
         return [
-            ActivityStatus.success,
-            ActivityStatus.cancel
-        ];
-    }
-
-    static lastStatuses() {
-        return [
-            ActivityStatus.success,
-            ActivityStatus.problem,
-            ActivityStatus.cancel
-        ];
-    }
-
-    static inProgressStatuses() {
-        return [
-            ActivityStatus.w4_end
+            ActivityStatus.success//,
+            // ActivityStatus.problem,
+            // ActivityStatus.cancel
         ];
     }
 
     static problemStatuses() {
         return [
-            ActivityStatus.problem
+            ActivityStatus.problem,
+            ActivityStatus.cancel
         ];
+    }
+
+
+
+    static async showAfterStarted(a: Activity) {
+        let changed = await openDialog(InputAreaComponent,
+            _ => _.args = {
+                title: terms.thankYou,
+                fields: () => [a.$.started],
+                ok: async () => { }
+            });
+    }
+
+    static async showAfterEndedAndSummary(a: Activity) {
+        let changed = await openDialog(InputAreaComponent,
+            _ => _.args = {
+                title: terms.thankYou,
+                fields: () => [a.$.ended, a.$.remark],
+                ok: async () => { }
+            });
+    }
+
+    static async showOnlySummary(a: Activity) {
+        let changed = await openDialog(InputAreaComponent,
+            _ => _.args = {
+                title: terms.thankYou,
+                fields: () => [a.$.remark],
+                ok: async () => { }
+            });
+    }
+
+    async sendEmails() {
+
     }
 }
 
@@ -275,7 +355,7 @@ export class Activity extends IdEntity {
         caption: terms.branch, validate: EntityRequiredValidation
     })
     bid!: Branch;
-    
+
     @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required.withMessage(terms.requiredField) })
     // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
     //@Field({ caption: terms.tenant })
@@ -289,7 +369,7 @@ export class Activity extends IdEntity {
     status: ActivityStatus = ActivityStatus.w4_assign;
 
     @DateOnlyField({
-        caption: terms.date, validate: DateRequiredValidation, displayValue: (_,x) =>
+        caption: terms.date, validate: DateRequiredValidation, displayValue: (_, x) =>
             x?.toLocaleDateString()
     })
     date: Date = new Date();
@@ -311,7 +391,7 @@ export class Activity extends IdEntity {
             })
         }
     })
-    @CommaSeparatedStringArrayFieldPurpose<Activity>({ caption: terms.purpose,  validate: PurposeRequiredValidation })
+    @CommaSeparatedStringArrayFieldPurpose<Activity>({ caption: terms.purpose, validate: PurposeRequiredValidation })
     // @Field({ caption: terms.purpose })
     purposes: ActivityPurpose[] = [];//ActivityPurpose.friendly];
 
@@ -342,10 +422,19 @@ export class Activity extends IdEntity {
     remark: string = '';
 
     @Field({})
+    assigned!: Date;
+
+    @Field({})
     started!: Date;
 
     @Field({})
     ended!: Date;
+
+    @Field({})
+    canceled!: Date;
+
+    @Field({})
+    problemed!: Date;
 
     @Field({ caption: terms.createdBy })
     createdBy!: Users;

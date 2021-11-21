@@ -31,7 +31,7 @@ export class UserLoginComponent implements OnInit {
   }
 
   async signIn() {
-    await this.auth.signIn(this.userName.value, this.password.value);
+    await this.auth.signIn(this.userName.value.trim(), this.password.value);
     this.close();
   }
 

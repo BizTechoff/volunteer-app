@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
-import { Remult } from 'remult';
+import { FieldRef, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { UserIdName } from '../../../common/types';
@@ -64,9 +64,13 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   isFuture(a: Activity) {
     let today = new Date();
-    today = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
-    return a.date.getTime() > today.getTime();
-    //return a.date.getTime() === today.getTime();
+    let todayOnlyDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    let result = a.date.getTime() > todayOnlyDate.getTime();
+    if (result)//check also times
+    {
+
+    }
+    return result;
   }
 
   showClosedActivitySign(a: Activity) {
@@ -92,8 +96,7 @@ export class VolunteerActivitiesComponent implements OnInit {
       this.activities.push(...as);
       this.refreshing = false;
     }
-    if(this.activities.length == 0)
-    {
+    if (this.activities.length == 0) {
       this.userMessage = terms.volunteerNoActivities;
     }
   }
@@ -119,35 +122,8 @@ export class VolunteerActivitiesComponent implements OnInit {
     return result;
   }
 
-  async setNextStatus(a: Activity, status: ActivityStatus) {
-    if (ActivityStatus.w4_start === a.status) {
-      a.started = new Date();
-      let changed = await openDialog(InputAreaComponent,
-        _ => _.args = {
-          title: terms.thankYou,
-          fields: () => [a.$.started],
-          ok: async () => { }
-        })
-    }
-    else if (ActivityStatus.w4_end === a.status) {
-      a.ended = new Date();
-      let changed = await openDialog(InputAreaComponent,
-        _ => _.args = {
-          title: terms.thankYou,
-          fields: () => [a.$.ended],
-          ok: async () => { }
-        })
-    }
-    a.status = status;
-    await a.save();
-    if (ActivityStatus.lastStatuses().find(s => s === a.status)) {
-      let changed = await openDialog(InputAreaComponent,
-        _ => _.args = {
-          title: terms.thankYou,
-          fields: () => [a.$.remark],
-          ok: async () => { await a.save(); }
-        })
-    }
+  async setNextStatus(a: Activity, toStatus: ActivityStatus) {
+    await a.status.onChanging(a, toStatus);
   }
 
   openWaze(address: string) {

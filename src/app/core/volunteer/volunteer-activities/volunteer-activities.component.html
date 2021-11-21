@@ -31,7 +31,7 @@
                             </div>
 
                             <span *ngIf="this.showClosedActivitySign(a)">
-                                <h2 style="width: 70px; color: white; transform: rotate(45deg); display: inline-block;;"
+                                <h2 style="width: 70px; color: white; border-radius: 10%; text-align: center; transform: rotate(45deg); display: inline-block;;"
                                     [style.background]='a.status.color'>
                                     {{ a.status.caption }}</h2>
                             </span>
@@ -82,19 +82,17 @@
                         משתתפים: {{ this.getVolunteers(a) }}
                     </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
-                        <button [disabled]="this.isFuture(a)" (click)='this.setNextStatus(a, a.status.next()!)'
+                        <button [disabled]="this.isFuture(a)" (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'
                             *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
                             [style.background]='this.isFuture(a)? "gray" : "blue"'
                             style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? 'התחלנו' : 'התחלתי' }}
                         </button>
-                        <!-- [disabled]="this.isFuture(a)" -->
-                        <!-- [style.background]='this.isFuture(a)? "gray" : "blue"' -->
-                        <button  
-                            (click)='this.setNextStatus(a, this.ActivityStatus.problem)'
+                        <button 
+                            (click)='this.setNextStatus(a, this.ActivityStatus.cancel)'
                             *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
                             [style.background]='"blue"'
                             style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? terms.canNotComeToActivityThisTime :terms.canNotComeToActivityThisTime}} </button>
-                        <button (click)='this.setNextStatus(a, a.status.next()!)'
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.success)'
                             *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: green; color: white;"> {{ a.vids.length > 1 ? 'סיימנו' :
                             'סיימתי' }} </button>

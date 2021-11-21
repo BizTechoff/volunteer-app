@@ -46,13 +46,13 @@ export class ActivitiesListComponent implements OnInit {
           visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor) && _.status === ActivityStatus.w4_start,
           textInMenu: terms.markAsStarted,
           icon: 'check',
-          click: async (_) => await this.markActivityAs(_, _.status.next()!)
+          click: async (_) => await this.markActivityAs(_, ActivityStatus.w4_end)
         },
         {
           visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor) && _.status === ActivityStatus.w4_end,
           textInMenu: terms.markAsEnded,
           icon: 'done_all',
-          click: async (_) => await this.markActivityAs(_, _.status.next()!)
+          click: async (_) => await this.markActivityAs(_, ActivityStatus.success)
         },
         {
           visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor),
