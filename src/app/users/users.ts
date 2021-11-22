@@ -1,6 +1,6 @@
 
 import { DataControl, InputField, openDialog } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, Filter, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
@@ -91,54 +91,44 @@ export class Langs {
         })
     }
 })
-@Entity<Users>("Users", {
-    allowApiRead: true,
-    allowApiUpdate: Allow.authenticated,
-    allowApiDelete: Roles.admin,
-    allowApiInsert: Roles.manager,
-    defaultOrderBy: (user) => [
-        user.admin.descending(),
-        user.donor.descending(),
-        user.board.descending(),
-        user.manager.descending(),
-        user.bid ? user.bid.descending() : user.manager.descending(),
-        user.name
-    ]
-},
+@Entity<Users>(
+    "Users",
+    {
+        allowApiRead: true,
+        allowApiUpdate: Allow.authenticated,
+        allowApiDelete: Roles.admin,
+        allowApiInsert: Roles.manager,
+        defaultOrderBy: (user) => [
+            user.admin.descending(),
+            user.donor.descending(),
+            user.board.descending(),
+            user.manager.descending(),
+            user.bid ? user.bid.descending() : user.manager.descending(),
+            user.name
+        ]
+    },
     (options, remult) => {
-        // options.defaultOrderBy = (user) => [
-        //     user.admin.descending(),
-        //     user.board.descending(),
-        //     user.manager.descending(),
-        //     user.name
-        // ];
         options.apiPrefilter = (user) => {
-            let active = FILTER_IGNORE;// user.active.isEqualTo(true);
+            let active = FILTER_IGNORE;
             if (!remult.authenticated())
                 return user.id.isEqualTo("-1");
-            if (!(remult.isAllowed(Roles.board)))// all
-            {
+            if (!(remult.isAllowed(Roles.board))) {
                 return user.bid!.contains(remult.user.bid);
-                // if (!remult.isAllowed(Roles.manager)) {
-                //     //@@@@@@@@@@@2
-                //     return active.and(user.id.isEqualTo(remult.user.id));//volunteer only himself
-                // }
-                // return active.and(user.bid!.contains(remult.user.bid));//manager only his branch
             }
             return active;
         };
         options.validation = async (user) => {
             let ok = true;
-            if (user.manager || user.volunteer) {//manager | volunteer
+            if (user.manager || user.volunteer) {
                 if (!user.bid) {
                     throw user.$.bid!.metadata.caption + ': ' + terms.requiredField;
                 }
                 ok &&= (user.bid.id && user.bid.id.length > 0 ? true : false);
                 if (!ok!) {
-                    user.bid!._.error = user.$.bid!.metadata.caption + ': ' + terms.requiredField;
+                    user.bid._.error = user.$.bid!.metadata.caption + ': ' + terms.requiredField;
                 }
             }
-        }
+        };
         options.saving = async (user) => {
             if (isBackend()) {
                 if (user._.isNew()) {
@@ -151,23 +141,19 @@ export class Langs {
                 }
                 if (user.admin || user.donor || user.board) {
                     user.bid = undefined;
-                    console.log(' user.bid = undefined');
                 }
             }
         };
-        // options.saved =  async (user) => {
-        //     if(isBackend()){
-        //         if(user.isNew()){
-        //             this.res();
-        //         }
-        //     }
-        // };
     }
 )
 export class Users extends IdEntity {
 
     constructor(private remult: Remult) {
         super();
+    }
+
+    isManager() {
+        return this.remult.isAllowed(Roles.manager);
     }
 
     // activities = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
@@ -195,18 +181,18 @@ export class Users extends IdEntity {
     bid?: Branch;
 
     @Field({
-        validate: [StringRequiredValidation, (e, c) => {
-            if (isBackend())
-                Validators.unique(e, c)
-        }],
-        caption: terms.username
+        caption: terms.username,
+        validate: [
+            StringRequiredValidation,
+            (e, c) => {
+                if (isBackend())
+                    Validators.unique(e, c)
+            }]
     })
     name: string = '';
 
-    @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
-    numOfActivities: number = 0;
-
-
+    // @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
+    // numOfActivities: number = 0;
 
     @DataControl<Users, Langs[]>({
         hideDataOnInput: true,
@@ -223,16 +209,22 @@ export class Users extends IdEntity {
     })
     @CommaSeparatedStringArrayField<Users>({ caption: terms.langs })
     langs: Langs[] = [Langs.hebrew];
- 
+
     @Field({
         validate: [StringRequiredValidation, Validators.unique],
         caption: terms.mobile
     })
     mobile: string = '';
 
-    @Field({
-        validate: [Validators.required],//, Validators.unique],
-        caption: terms.email
+    @Field<Users, string>({
+        caption: terms.email,
+        validate: [(e, c) => {
+            // if (isBackend()) {
+                if (e.volunteer) {
+                    Validators.required(e, c, terms.requiredField)
+                }
+            // }
+        }]
     })
     email: string = '';
 
@@ -294,7 +286,7 @@ export class Users extends IdEntity {
     @Field({ caption: terms.active })
     active: boolean = true;
 
-    
+
 
     calcAge() {
         let result = 0;
