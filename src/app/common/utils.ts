@@ -5,7 +5,7 @@ import { CalendarRequest } from "./types";
 export class EmailSvc {
     static sendMail: (email: string, subject: string, message: string, link: string, remult: Remult) => Promise<boolean>;
     static sendMail2: (req: CalendarRequest) => Promise<boolean>;
-
+ 
     @BackendMethod({ allowed: true })
     static async SendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
         return await EmailSvc.sendMail(to, subject, text, link, remult!);

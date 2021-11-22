@@ -31,7 +31,7 @@ export interface OrganizerRequest {
     name: string,
     email: string
 }
-
+ 
 export interface AttendeeRequest {
     name: string,
     email: string,
