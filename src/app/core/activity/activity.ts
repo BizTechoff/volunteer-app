@@ -15,7 +15,7 @@ import { CommaSeparatedStringArrayFieldUsersAsString, Tenant } from "../tenant/t
 export const PurposeRequiredValidation = (ent: Activity, col: FieldRef<Activity, ActivityPurpose[]>) => {
     let ok = col.value && col.value.length > 0 ? true : false;
     if (!ok!) {
-        if (!ent.isNew() && ent.status === ActivityStatus.w4_end) {
+        if (!ent.isNew() && ent.status === ActivityStatus.success) {
             col.error = terms.requiredField;
         }
     }

@@ -136,10 +136,10 @@ export class ActivityDetailsComponent implements OnInit {
           click: async () => await this.openAssignment()
         },//, displayValue: () => {return this.activity.$.vids && this.activity.$.vids.value ? this.activity.$.vids.value.map(i => i.name).join(', ').trim() : '';} },
         // { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
-        this.activity.$.purposes,
-        this.activity.$.purposeDesc,
         this.activity.$.date,
         [this.activity.$.fh, this.activity.$.th],
+        this.activity.$.purposes,
+        this.activity.$.purposeDesc,
         this.activity.$.remark
       ]
     });
