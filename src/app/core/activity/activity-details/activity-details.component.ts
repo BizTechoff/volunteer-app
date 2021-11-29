@@ -70,6 +70,10 @@ export class ActivityDetailsComponent implements OnInit {
     return this.remult.isAllowed(Roles.manager);
   }
 
+  isOnlyVolunteer() {
+    return this.remult.isAllowed(Roles.volunteer) && this.remult.user.roles.length == 1;
+  }
+
   isShowDeliveredFoodToShabat() {
     return this.activity &&
       !this.activity.isNew() &&
@@ -159,8 +163,10 @@ export class ActivityDetailsComponent implements OnInit {
     let bidOk = (this.activity.bid && this.activity.bid.id && this.activity.bid.id.length > 0)!;
     if (bidOk) {
       let explicit = [] as UserIdName[];
-      for (const v of this.activity.tid.defVids) {
-        explicit.push({ id: v.id, name: v.name });
+      if (this.isOnlyVolunteer()) {
+        for (const v of this.activity.tid.defVids) {
+          explicit.push({ id: v.id, name: v.name });
+        }
       }
       let selected = [] as UserIdName[];
       for (const v of this.activity.vids) {

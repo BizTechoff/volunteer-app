@@ -3,6 +3,7 @@ import { DataControl, GridSettings } from '@remult/angular';
 import { DateOnlyField, getFields, Remult } from 'remult';
 import { Activity } from '../../core/activity/activity';
 import { terms } from '../../terms';
+import { Roles } from '../../users/roles';
 
 @Component({
   selector: 'app-activity-daily',
@@ -16,12 +17,17 @@ export class ActivityDailyComponent implements OnInit {
     {
       where: row => row.date.isEqualTo(this.selectedDate),
       allowCrud: false,
-      columnSettings: (_) => [
-        _.tid,
-        _.vids,
-        _.status,
-        _.remark
-      ],
+      columnSettings: (_) => {
+        let f = [];
+        if (this.isBoard()) {
+          f.push(_.bid);
+        }
+        f.push(_.tid,
+          _.vids,
+          _.status,
+          _.remark);
+        return f;
+      },
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -40,6 +46,10 @@ export class ActivityDailyComponent implements OnInit {
 
   terms = terms;
   get $() { return getFields(this, this.remult) };
+
+  isBoard() {
+    return this.remult.isAllowed(Roles.board);
+  }
 
   @DataControl<ActivityDailyComponent>({ valueChange: async (r, v) => { await r.refresh(); } })
   @DateOnlyField({ caption: terms.selectDate })
@@ -60,15 +70,15 @@ export class ActivityDailyComponent implements OnInit {
     let data = '';
     data = '<html><head><title></title></head><body>'
     '<table border="1" cellpadding="1">'
-              '<tr>'
-              '<th></th>'
-              '</tr>'
-              'DATA'
-              '<tr>'
-              '<td></td>'
-              '</tr>'
-          '</table>'
-          '</body><html>';
+    '<tr>'
+    '<th></th>'
+    '</tr>'
+    'DATA'
+    '<tr>'
+    '<td></td>'
+    '</tr>'
+    '</table>'
+    '</body><html>';
     var newWin = window.open();
     newWin!.document.write(data);
     newWin!.print();

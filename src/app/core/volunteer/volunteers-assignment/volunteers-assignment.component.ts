@@ -54,17 +54,33 @@ export class VolunteersAssignmentComponent implements OnInit {
   constructor(private remult: Remult, private win: MatDialogRef<any>) {
     this.volunteers = new GridSettings<Users>(this.remult.repo(Users),
       {
-        where: u => u.volunteer.isEqualTo(true)
-          .and(this.filterBtTenantLangs ? this.contains(u.langs, this.args.langs) : FILTER_IGNORE)
-          .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE)
-          .and(this.args.explicit && this.args.explicit.length > 0
-            ? u.id.isIn(this.args.explicit.map(x => x.id))
-            : u.bid!.isEqualTo(this.args.branch))
+        where: u => {
+          let result = FILTER_IGNORE;
+          result = result.and(u.volunteer.isEqualTo(true));
+          if (this.filterBtTenantLangs) {
+            result = result.and(this.contains(u.langs, this.args.langs));
+          }
+          if (this.search) {
+            result = result.and(u.name.contains(this.search));
+          }
+          if (this.args.explicit && this.args.explicit.length > 0) {
+            result = result.and(u.id.isIn(this.args.explicit.map(x => x.id)));
+          }
+          else {
+            result = result.and(u.bid!.isEqualTo(this.args.branch));
+          }
+          return result;
+        },
+        // .and(this.filterBtTenantLangs ? this.contains(u.langs, this.args.langs) : FILTER_IGNORE)
+        // .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE)
+        // .and(this.args.explicit && this.args.explicit.length > 0
+        //   ? u.id.isIn(this.args.explicit.map(x => x.id))
+        //   : u.bid!.isEqualTo(this.args.branch))
         // מסקנה: כשמשבצים לדייר להציג את כל הסניף
         // שמתנדב משבץ חברים או כשמנהל משבץ מתנדבים
         // רק למי שמשובצים לו מתנדבים?
         // פעם בא כשיוך לדייר ופעם כשיוך לפעילות!?
-        ,//this.isManager() ? FILTER_IGNORE : 
+        //this.isManager() ? FILTER_IGNORE : 
         allowCrud: false,
         allowSelection: true,
         columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs, u.email],
