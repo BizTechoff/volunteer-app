@@ -17,7 +17,7 @@ export class VolunteerTenantsComponent implements OnInit {
     this.remult.repo(Tenant),
     {
       where: row => row.defVids.contains(this.remult.user.id),
-      columnSettings: row =>[
+      columnSettings: row => [
         row.name,
         // row.defVids,
         row.age,
@@ -41,8 +41,9 @@ export class VolunteerTenantsComponent implements OnInit {
         }
       ]
     });
+  userMessage = terms.loadingYourTenants;
   constructor(private remult: Remult) { }
-
+  terms = terms;
   async ngOnInit() {
     await this.refresh();
   }
@@ -52,7 +53,29 @@ export class VolunteerTenantsComponent implements OnInit {
   }
 
   async refresh() {
+    this.userMessage = terms.loadingYourTenants;
     this.tenants.reloadData();
+    if (this.tenants.items.length == 0) {
+      this.userMessage = terms.volunteerNoTenants;
+    }
+  }
+
+  getLang(a: Tenant) {
+    let result = 'לא צויינו';
+    if (a && a.langs.length > 0) {
+      result = a.langs.map(l => l.caption).join(', ');
+    }
+    return result;
+  }
+
+  openWaze(address: string) {
+    let url = `waze://?q=${encodeURI(address)}&navigate=yes`;
+    window.open(url, '_blank');
+  }
+
+  call(mobile: string) {
+    let url = `tel:${mobile}`;
+    window.open(url, '_blank');
   }
 
   async openActivity(tnt: Tenant) {

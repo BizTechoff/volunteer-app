@@ -1,7 +1,61 @@
 <div class="full-page">
     <div class="header"></div>
     <div class="grow-item">
-        <data-grid [settings]="this.tenants"></data-grid>
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <h1 *ngIf="this.tenants && this.tenants.items.length == 0"> {{ this.userMessage }} </h1>
+            <ng-container *ngFor='let a of this.tenants.items'>
+                <mat-card style="margin: 7px;">
+                    <mat-card-title>
+                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                            <div style="display: flex; flex-direction: row; justify-content: start;">
+ 
+                                <button mat-mini-fab color="accent"
+                                    [title]="terms.addActivity" (click)="openActivity(a)">
+                                    <mat-icon>add</mat-icon>
+                                </button>
+                               <p style="margin-top: 10px; margin-right: 5px;"> {{ a.name }} </p>
+                            </div>
+                            <!-- <div style="display: flex; flex-direction: row; justify-content: end;">
+                                <button mat-mini-fab color="primary" [title]="a.mobile!"
+                                    (click)="this.call(a.mobile!)">
+                                    <mat-icon>call</mat-icon>
+                                </button>
+                                <button style="margin-right: 10px;" mat-mini-fab color="primary"
+                                    [title]='a.address' (click)="this.openWaze(a.address!)">
+                                    <img src="./assets/waze.svg">
+                                </button>
+                                <button style="margin-right: 10px;" mat-mini-fab color="primary"
+                                    [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
+                                    <mat-icon>photo</mat-icon>
+                                </button>
+                            </div> -->
+                        </div>
+                    </mat-card-title>
+                    <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
+                        <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-start;">
+                            <div>
+                                {{ a.birthday | date:'dd.MM.yyyy' }} (גיל: {{a.age }})
+                            </div>
+                            <div>
+                                שפות: {{ this.getLang(a) }}
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;">
+                            <div>
+                                <span style="color: blue;" (click)="this.call(a.mobile!)"><u> {{ a.mobile }} </u></span>
+                                <!-- <mat-icon>call</mat-icon> -->
+                                <!-- <button style="color: blue;" mat-flat-button (click)="this.call(a.mobile!)"><u> {{ a.mobile }} </u></button> -->
+                            </div>
+                            <div>
+                                <span style="color: blue;" (click)="this.openWaze(a.address!)"><u> {{ a.address }} </u></span>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card>
+            </ng-container>
+        </div>
+        <!-- <data-grid [settings]="this.tenants"></data-grid> -->
     </div>
     <div class="footer"></div>
 </div>

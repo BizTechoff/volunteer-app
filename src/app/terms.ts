@@ -2,6 +2,7 @@
 export const terms = {
     canNotComeToActivityThisTime: 'לא אוכל להגיע',
     loadingYourActivities: 'מחפש פעילויות..',
+    loadingYourTenants: 'מחפש דיירים..',
     doYouSureMarkActivityAs: 'האם לסמן פעילות כ!status!',
     showAssignTenants: 'דיירים משוייכים',
     mustCloseOldActivities: 'לא ניתן להקים פעילות חדשה כל עוד קיימת פעילות ישנה (!date!) שלא נסגרה עדיין',
@@ -39,8 +40,9 @@ export const terms = {
     voulnteerNewAssign: 'נקבעה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerUpdateAssign: 'עודכנה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerCancelAssign: 'בוטלה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
-    referrer: 'גורם מפנה',
+    referrer: 'גורם מפנה', 
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
+    volunteerNoTenants: 'תודה לך! לא שוייכו לך עדיין דיירים',
     removeImage: 'הסרת תמונה',
     noPhotosOfYoursTogether: 'לא הועלו תמונות שלכם יחד',
     created: 'נוצר ב',
