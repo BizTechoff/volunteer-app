@@ -11,7 +11,7 @@ import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 import { CommaSeparatedStringArrayFieldUsersAsString, Tenant } from "../tenant/tenant";
 
- 
+
 export const PurposeRequiredValidation = (ent: Activity, col: FieldRef<Activity, ActivityPurpose[]>) => {
     let ok = col.value && col.value.length > 0 ? true : false;
     if (!ok!) {
@@ -125,7 +125,7 @@ export class ActivityDayPeriod {
 export class ActivityStatus {
     // static none = new ActivityStatus(0, 'ללא');
     static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ',
-        async (a, to) => {//t=the new status
+        async (a, to, uid) => {//t=the new status
             if (to === ActivityStatus.w4_start) {
                 a.assigned = new Date();
                 a.status = to;
@@ -141,7 +141,7 @@ export class ActivityStatus {
             } else return;
         });
     static w4_start = new ActivityStatus(2, 'ממתין להתחלה',
-        async (a, to) => {//t=the new status
+        async (a, to, uid) => {//t=the new status
             if (to === ActivityStatus.w4_end) {
                 a.started = new Date();
                 a.status = to;
@@ -151,7 +151,17 @@ export class ActivityStatus {
             }
             else if (to === ActivityStatus.cancel) {
                 a.canceled = new Date();
-                a.status = to;
+                if (a.vids.length > 1) {
+                    //remove only yourself
+                    let f = a.vids.find(itm => itm.id === uid);
+                    if (f) {
+                        let i = a.vids.indexOf(f);
+                        a.vids.splice(i, 1);
+                    }
+                }
+                else {// its only you here
+                    a.status = to;
+                }
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
                 // sendEmail(a, Canceled-Assigned);
@@ -159,7 +169,7 @@ export class ActivityStatus {
             await a.save();
         });
     static w4_end = new ActivityStatus(3, 'ממתין לסיום',
-        async (a, to) => {//t=the new status
+        async (a, to, uid) => {//t=the new status
             if (to === ActivityStatus.success) {
                 a.ended = new Date();
                 a.status = to;
@@ -180,7 +190,7 @@ export class ActivityStatus {
     static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined!, 'red');
     static cancel = new ActivityStatus(6, 'בוטל', () => undefined!, 'gray');
 
-    constructor(public id: number, public caption: string, public onChanging: (a: Activity, to: ActivityStatus) => Promise<void>, public color: string = 'darkblue') { }
+    constructor(public id: number, public caption: string, public onChanging: (a: Activity, to: ActivityStatus, uid: string) => Promise<void>, public color: string = 'darkblue') { }
     // id:number;
 
 

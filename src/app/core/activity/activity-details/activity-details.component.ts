@@ -225,7 +225,7 @@ export class ActivityDetailsComponent implements OnInit {
     let alreadySaved = false;
     if (this.activity.vids.length > 0) {
       if (this.activity.status === ActivityStatus.w4_assign) {
-        await this.activity.status.onChanging(this.activity, ActivityStatus.w4_start);
+        await this.activity.status.onChanging(this.activity, ActivityStatus.w4_start, this.remult.user.id);
         alreadySaved = true;
       }
     }

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
-import { FieldRef, Remult } from 'remult';
+import { Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { UserIdName } from '../../../common/types';
 import { DateUtils } from '../../../common/utils';
 import { terms } from '../../../terms';
@@ -123,7 +122,7 @@ export class VolunteerActivitiesComponent implements OnInit {
   }
 
   async setNextStatus(a: Activity, toStatus: ActivityStatus) {
-    await a.status.onChanging(a, toStatus);
+    await a.status.onChanging(a, toStatus, this.remult.user.id);
   }
 
   openWaze(address: string) {
