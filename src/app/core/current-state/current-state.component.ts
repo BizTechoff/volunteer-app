@@ -19,7 +19,7 @@ import { Referrer } from '../tenant/tenant';
   styleUrls: ['./current-state.component.scss']
 })
 export class CurrentStateComponent implements OnInit {
-
+ 
   terms = terms;
   get $() { return getFields(this, this.remult) };
 
@@ -378,14 +378,14 @@ export class CurrentStateComponent implements OnInit {
     this.dialog.error(list);
     // this.dialog.info('פתיחת רשימה לסטטוסים מסוג: ' + status.caption + ' בסניף: ' + bid)
   }
-
-  async sendEmail() {
-    let ok = await CurrentStateComponent.TestSendEmail('noam.honig@gmail.com', 'Welcome Volunteer', 'test', '');
-    this.dialog.info(`שליחת מייל ${ok ? 'הצליחה' : 'נכשלה'}`);
-  }
-  @BackendMethod({ allowed: true })
-  static async TestSendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
-    return await EmailSvc.sendMail(to, subject, text, link, remult!);
-  }
-
-}
+ 
+  // async sendEmail() {
+  //   let ok = await CurrentStateComponent.TestSendEmail('noam.honig@gmail.com', 'Welcome Volunteer', 'test', '');
+  //   this.dialog.info(`שליחת מייל ${ok ? 'הצליחה' : 'נכשלה'}`);
+  // }
+  // @BackendMethod({ allowed: true })
+  // static async TestSendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
+  //   return await EmailSvc.sendMail(to, subject, text, link, remult!);
+  // } 
+ 
+} 

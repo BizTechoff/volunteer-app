@@ -4,7 +4,8 @@ import { Users } from "../../../users/users";
 import { Activity } from "../../activity/activity";
 
 export class NotificationsTypes {
-    static EmailAssign = new NotificationsTypes(1, 'assign', terms.voulnteerNewAssignSubject, terms.voulnteerNewAssign);
+    static EmailNewAssign = new NotificationsTypes(1, 'new-assign', terms.voulnteerNewAssignSubject, terms.voulnteerNewAssign);
+    static EmailUpdateAssign = new NotificationsTypes(1, 'update-assign', terms.voulnteerUpdateAssignSubject, terms.voulnteerUpdateAssign);
     static EmailCancelAssign = new NotificationsTypes(1, 'cancel-assign', terms.voulnteerCancelAssignSubject, terms.voulnteerCancelAssign);
     constructor(public id: number, public caption: string, public subject: string, public text: string, public link = terms.volunteerCalndarLink) { }
 }

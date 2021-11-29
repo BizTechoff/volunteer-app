@@ -173,7 +173,7 @@ export class Users extends IdEntity {
         });
         return result;
     }
-
+ 
     @Field({
         caption: terms.branch,
         allowNull: true

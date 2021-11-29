@@ -127,17 +127,25 @@ export class TenantsListComponent implements OnInit {
       if (!t.defVids) {
         t.defVids = [] as UserIdName[];
       }
+      
+      let selected = [] as UserIdName[];
+      for (const v of  t.defVids) {
+        selected.push({id:v.id, name: v.name});
+      }
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
-          bid: t.bid,
-          aid: '',
-          tenant: t,
-          tname: t.name,
+          branch: t.bid,
+          explicit: [],
+          title: t.name,
           langs: t.langs,// this.t.langs, 
-          vids: t.defVids
-        },
-        output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);
-    }
+          selected: t.defVids
+        }, 
+        output => output && output.args && output.args.changed ? output.args.selected: undefined);
+        if(volids){
+          t.defVids.splice(0);
+          t.defVids.push(...volids);
+        }
+      }
     else {
       await this.dialog.error(terms.mustSetBidForThisAction);
     }
@@ -205,7 +213,7 @@ export class TenantsListComponent implements OnInit {
             [t.$.birthday,
             t.$.age],
             t.$.langs,
-            { field: t!.$.defVids, click: async () => await this.openVolunteers(t!) }
+            { field: t!.$.defVids, click: async () => await this.assignVolunteers(t!) }
           );
           return f;
         }
@@ -249,31 +257,6 @@ export class TenantsListComponent implements OnInit {
       result = await this.dialog.yesNoQuestion(terms.notVolunteersForCurrentTenant);
     }
     return result;
-  }
-
-  async openVolunteers(t: Tenant) {
-    let bidOk = (t && t.bid && t.bid.id && t.bid.id.length > 0)!;
-    if (bidOk) {
-      // t.defVids.splice(0);
-      // let u = await this.remult.repo(Users).findFirst({ useCache: false });
-      // t.defVids.push(u);
-      if (!t.defVids) {
-        t.defVids = [] as UserIdName[];
-      }
-      let volids = await openDialog(VolunteersAssignmentComponent,
-        input => input.args = {
-          bid: t.bid,
-          aid: '',
-          tenant: t,
-          tname: t.name,
-          langs: t.langs,// this.t.langs, 
-          vids: t.defVids
-        },
-        output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);
-    }
-    else {
-      await this.dialog.error(terms.mustSetBidForThisAction);
-    }
   }
 
 }

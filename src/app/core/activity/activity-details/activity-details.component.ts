@@ -158,18 +158,27 @@ export class ActivityDetailsComponent implements OnInit {
 
     let bidOk = (this.activity.bid && this.activity.bid.id && this.activity.bid.id.length > 0)!;
     if (bidOk) {
+      let explicit = [] as UserIdName[];
+      for (const v of this.activity.tid.defVids) {
+        explicit.push({ id: v.id, name: v.name });
+      }
+      let selected = [] as UserIdName[];
+      for (const v of this.activity.vids) {
+        selected.push({ id: v.id, name: v.name });
+      }
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
-          bid: this.activity.bid,
-          aid: this.activity.id,
-          tenant: this.activity.tid,
-          tname: this.activity.tid.name,
+          branch: this.activity.bid,
+          explicit: explicit,
+          title: this.activity.tid.name,
           langs: this.activity.tid?.langs,// this.t.langs, 
-          vids: this.activity.vids//, 
-          // volids: this.activity.volids
+          selected: selected
         },
-        output => output ? (output.args.changed ? output.args.vids : undefined) : undefined);
-
+        output => output && output.args && output.args.changed ? output.args.selected : undefined);
+      if (volids) {
+        this.activity.vids.splice(0);
+        this.activity.vids.push(...volids);
+      }
 
       this.addCurrentUserToVids();
       if (this.activity.vids.length > 0) {
@@ -273,7 +282,7 @@ export class ActivityDetailsComponent implements OnInit {
       }
       else {
         console.log('4.3', v.name);
-        emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailAssign });
+        emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailNewAssign });
         ++added;
       }
       console.log('4.4', v.name);
@@ -385,7 +394,8 @@ export class ActivityDetailsComponent implements OnInit {
       }
     };
 
-    return await EmailSvc.SendEmail2(req);
+    return await EmailSvc.SendEmail(req);//sendToCalendar(req);
+    // return await EmailSvc.SendEmail(req);
 
     // let message = type.text
     //   .replace('!name!', this.activity.tid.name)

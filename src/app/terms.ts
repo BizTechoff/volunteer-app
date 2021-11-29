@@ -1,10 +1,10 @@
 
-export const terms = { 
+export const terms = {
     canNotComeToActivityThisTime: 'לא אוכל להגיע',
-    loadingYourActivities:'מחפש פעילויות..',
-    doYouSureMarkActivityAs:'האם לסמן פעילות כ!status!',
-    showAssignTenants:'דיירים משוייכים',
-    mustCloseOldActivities:'לא ניתן להקים פעילות חדשה כל עוד קיימת פעילות ישנה (!date!) שלא נסגרה עדיין',
+    loadingYourActivities: 'מחפש פעילויות..',
+    doYouSureMarkActivityAs: 'האם לסמן פעילות כ!status!',
+    showAssignTenants: 'דיירים משוייכים',
+    mustCloseOldActivities: 'לא ניתן להקים פעילות חדשה כל עוד קיימת פעילות ישנה (!date!) שלא נסגרה עדיין',
     markAsStarted: 'סמן כפעילות שהתחילה',
     markAsEnded: 'סמן כפעילות שהסתיימה',
     // `https://calendar.google.com/calendar/ical/biztechoff.app%40gmail.com/public/basic.ics?`
@@ -17,7 +17,8 @@ export const terms = {
         `&sf=true` +
         `&output=xml#f`,
     voulnteerNewAssignSubject: 'תואמה לך פעילות עם הדייר: !tname!',
-    voulnteerCancelAssignSubject: 'ביטול פעילות שתואמה לך',
+    voulnteerUpdateAssignSubject: 'עודכנה לך פעילות עם הדייר: !tname!',
+    voulnteerCancelAssignSubject: 'בוטלה לך פעילות עם הדייר: !tname!',
     passwordSentToYourEmail: 'סיסמא נשלחה לאמייל !email! ברגע זה',
     forgotPassword: 'שכחתי סיסמא',
     thankYou: 'תודה לך!',
@@ -36,6 +37,7 @@ export const terms = {
     openPhotosAlbum: 'פתח אלבום תמונות',
     linkClicked: 'לינק נלחץ',
     voulnteerNewAssign: 'נקבעה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
+    voulnteerUpdateAssign: 'עודכנה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerCancelAssign: 'בוטלה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     referrer: 'גורם מפנה',
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
@@ -79,7 +81,7 @@ export const terms = {
     appDesc: 'אפליקציה לניהול מפגשי התנדבות',
     addVolunteer: 'הוספת מתנדב',
     requiredField: 'שדה חובה',
-    donor: 'תורם', 
+    donor: 'תורם',
     addBranch: 'הוספת סניף',
     addTenant: 'הוספת דייר',
     addActivity: 'הוספת פעילות',
@@ -154,16 +156,16 @@ export const terms = {
     userAccounts: 'משתמשים',
     myActivities: 'הפעילויות שלי',
     myTenants: 'הדיירים שלי',
-    filterBtTenantLangs:'הצג רק מי שדובר בשפת הדייר',
+    filterBtTenantLangs: 'הצג רק מי שדובר בשפת הדייר',
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     appVersion: '2021.11.22.0'
-} 
-declare module 'remult' { 
+}
+declare module 'remult' {
     export interface UserInfo {
         bid: string;
         bname: string;
     }
-} 
- 
+}
+

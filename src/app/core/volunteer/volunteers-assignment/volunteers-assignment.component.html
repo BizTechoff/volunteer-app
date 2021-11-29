@@ -3,7 +3,7 @@
         <div style="display: flex; flex-direction: column; justify-content: space-between; ">
             <div style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
                 <h4>{{ 'שיבוץ מתנדבים ל:' }}
-                    <strong> {{ this.args.tname }} (שפות: {{ this.lgDesc }})</strong>
+                    <strong> {{ this.args.title }} (שפות: {{ this.lgDesc }})</strong>
                 </h4>
             </div>
             <div style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class='grow-item'>
-        <data-grid [settings]="this.volunteers"></data-grid>
+        <data-grid *ngIf="this.volunteers" [settings]="this.volunteers"></data-grid>
     </div>
     <div class="footer">
         {{ this.terms.selected }}: {{ this.volunteers.selectedRows.length }} {{ this.terms.volunteers }}
