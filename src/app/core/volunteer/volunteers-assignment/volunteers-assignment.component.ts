@@ -52,6 +52,8 @@ export class VolunteersAssignmentComponent implements OnInit {
   volunteers: GridSettings<Users>;
 
   constructor(private remult: Remult, private win: MatDialogRef<any>) {
+    console.log('this.args.explicit',this.args.explicit);
+    
     this.volunteers = new GridSettings<Users>(this.remult.repo(Users),
       {
         where: u => {
@@ -63,7 +65,7 @@ export class VolunteersAssignmentComponent implements OnInit {
           if (this.search) {
             result = result.and(u.name.contains(this.search));
           }
-          if (this.args.explicit && this.args.explicit.length > 0) {
+          if (this.args.explicit) {
             result = result.and(u.id.isIn(this.args.explicit.map(x => x.id)));
           }
           else {

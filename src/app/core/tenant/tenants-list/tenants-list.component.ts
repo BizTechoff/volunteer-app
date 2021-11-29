@@ -136,7 +136,7 @@ export class TenantsListComponent implements OnInit {
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
           branch: t.bid,
-          explicit: [],
+          explicit: undefined!,
           title: t.name,
           langs: t.langs,// this.t.langs, 
           selected: t.defVids

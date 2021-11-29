@@ -167,6 +167,9 @@ export class ActivityDetailsComponent implements OnInit {
         for (const v of this.activity.tid.defVids) {
           explicit.push({ id: v.id, name: v.name });
         }
+        // if(explicit.length == 0){
+        //   explicit = undefined!;
+        // }
       // }
       let selected = [] as UserIdName[];
       for (const v of this.activity.vids) {
@@ -402,8 +405,8 @@ export class ActivityDetailsComponent implements OnInit {
       }
     };
 
-    return await EmailSvc.SendEmail(req);//sendToCalendar(req);
-    // return await EmailSvc.SendEmail(req);
+    // return await EmailSvc.SendEmail(req);//sendToCalendar(req);
+    return await EmailSvc.sendToCalendar(req);
 
     // let message = type.text
     //   .replace('!name!', this.activity.tid.name)

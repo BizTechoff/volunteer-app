@@ -8,11 +8,12 @@
         </div> 
     </div>
     <div class="grow-item">
-        <iframe *ngIf="this.selectedCalendarId.includes('haifa')" id="calendar"
+        <iframe id="calendar" *ngIf="this.selectedCalendarId.includes('haifa')" src="https://calendar.google.com/calendar/embed?src=eshel.app.haifa%40gmail.com&ctz=Asia%2FJerusalem" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+        <!-- <iframe id="calendar"
             src="https://calendar.google.com/calendar/embed?src=eshel.app.haifa%40gmail.com&ctz=Asia%2FJerusalem"
             style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
         <iframe *ngIf="this.selectedCalendarId.includes('hulon')" src="https://calendar.google.com/calendar/embed?src=eshel.app.hulon%40gmail.com&ctz=Asia%2FJerusalem"
-            style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+            style="border: 0" width="100%" height="600" frameborder="0" scrolling="no"></iframe> -->
     </div>
     <div class="footer"></div>
 </div>
