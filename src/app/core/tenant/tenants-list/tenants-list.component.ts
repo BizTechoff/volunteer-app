@@ -145,6 +145,8 @@ export class TenantsListComponent implements OnInit {
       if (volids) {
         t.defVids.splice(0);
         t.defVids.push(...volids);
+        await t.save();
+        await this.refresh();
       }
     }
     else {
