@@ -432,6 +432,15 @@ export class Activity extends IdEntity {
     remark: string = '';
 
     @Field({})
+    called!: Date;
+
+    @Field({})
+    wazed!: Date;
+
+    @Field({})
+    photoed!: Date;
+
+    @Field({})
     assigned!: Date;
 
     @Field({})

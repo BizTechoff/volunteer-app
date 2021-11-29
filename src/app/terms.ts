@@ -162,7 +162,7 @@ export const terms = {
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
-    appVersion: '2021.11.29.0'
+    appVersion: '2021.11.29.1'
 }
 declare module 'remult' {
     export interface UserInfo {

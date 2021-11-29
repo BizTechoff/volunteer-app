@@ -49,7 +49,7 @@ import { NotificationsListComponent } from './core/notification/notifications-li
 import { CalendarComponent } from './core/current-state/calendar/calendar.component';
 import { VolunteerTenantsComponent } from './core/volunteer/volunteer-tenants/volunteer-tenants.component';
 
-@NgModule({
+@NgModule({ 
   declarations: [
     AppComponent,
     UsersComponent,

@@ -53,13 +53,15 @@ export class VolunteerActivitiesComponent implements OnInit {
   }
 
   async openPhotosAlbum(a: Activity) {
+    a.photoed = new Date();
+    await a.save(); 
     let changes = await openDialog(PhotosAlbumComponent,
       _ => _.args = { bid: a.bid, entityId: a.id },
       _ => _ ? _.args.changed : false);
     if (changes) {
       // await this.refresh();
     }
-  }
+  } 
 
   isFuture(a: Activity) {
     let today = new Date();
@@ -125,14 +127,24 @@ export class VolunteerActivitiesComponent implements OnInit {
     await a.status.onChanging(a, toStatus, this.remult.user.id);
   }
 
-  openWaze(address: string) {
-    let url = `waze://?q=${encodeURI(address)}&navigate=yes`;
-    window.open(url, '_blank');
+  async openWaze(a: Activity) {
+    let address = a?.tid?.address;
+    if (address) {
+      a.wazed = new Date();
+      await a.save();
+      let url = `waze://?q=${encodeURI(address)}&navigate=yes`;
+      window.open(url, '_blank');
+    }
   }
 
-  call(mobile: string) {
-    let url = `tel:${mobile}`;
-    window.open(url, '_blank');
+  async call(a: Activity) {
+    let mobile = a?.tid?.mobile;
+    if (mobile) {
+      a.called = new Date();
+      await a.save();
+      let url = `tel:${mobile}`;
+      window.open(url, '_blank');
+    }
   }
 
 }

@@ -373,15 +373,17 @@ export class ActivityDetailsComponent implements OnInit {
         cc: '',
         subject: subject,
         html: html
-      },
-      ics: {
-        title: subject,
+      }, 
+      ics: { 
+        aid: this.activity.id,
+        sequence: 2,// new Date().getTime(),
+        title: subject, 
         description: html,
         location: this.activity.tid.address,
         url: '',// 'bit.ly/eshel-app',
-        start: {
+        start: { 
           year: this.activity.date.getFullYear(),
-          month: this.activity.date.getMonth(),
+          month: this.activity.date.getMonth()+1,
           day: this.activity.date.getDate(),
           hours: parseInt(this.activity.fh.split(':')[0]),
           minutes: parseInt(this.activity.fh.split(':')[1])

@@ -41,6 +41,8 @@ export interface AttendeeRequest {
 }
 
 export interface IcsRequest {
+    aid: string,
+    sequence: number,
     title: string,
     description: string,
     location: string,

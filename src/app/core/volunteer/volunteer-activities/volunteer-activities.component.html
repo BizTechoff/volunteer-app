@@ -38,11 +38,11 @@
 
                             <div style="display: flex; flex-direction: row; justify-content: end;">
                                 <button mat-mini-fab color="primary" [title]="a?.tid?.mobile!"
-                                    (click)="this.call(a?.tid?.mobile!)">
+                                    (click)="this.call(a)">
                                     <mat-icon>call</mat-icon>
-                                </button>
+                                </button> 
                                 <button style="margin-right: 10px;" mat-mini-fab color="primary"
-                                    [title]='a?.tid?.address' (click)="this.openWaze(a?.tid?.address!)">
+                                    [title]='a?.tid?.address' (click)="this.openWaze(a)">
                                     <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
                                     <img src="./assets/waze.svg">
                                 </button>

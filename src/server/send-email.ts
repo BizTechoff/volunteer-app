@@ -53,7 +53,9 @@ function buildICS(req: IcsRequest) {//date:Date,fh:string,th:string, tilte:strin
     const ics = require('ics')
     const { writeFileSync } = require('fs');
     // ics2.createEvent
-    const event = {
+    const event = {  
+        uid: req.aid,
+        sequence: req.sequence,
         start: [req.start.year, req.start.month, req.start.day, req.start.hours, req.start.minutes],
         duration: { hours: req.duration.hours, minutes: req.duration.minutes },
         title: req.title,// terms.voulnteerNewAssignSubject.replace('!tname!',tname),
