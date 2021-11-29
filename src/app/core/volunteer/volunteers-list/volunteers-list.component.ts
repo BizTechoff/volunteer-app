@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
+import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
+import { Activity } from '../../activity/activity';
 import { Branch } from '../../branch/branch';
 
 @Component({
@@ -69,33 +71,33 @@ export class VolunteersListComponent implements OnInit {
           icon: 'edit',
           click: async (u) => await this.addVolunteer(u.id)
         },
-        {
-          //  visible: (v) => { return  this.showActivities(v)},
-          textInMenu: terms.showActivities,
-          icon: 'list'
-        },
-        {
-          //  visible: (v) => { return  this.showActivities(v)},
-          textInMenu: terms.showAssignTenants,
-          icon: 'assignment_ind'
-        },
-        {
-          visible: (_) => !_.isNew() && !this.isDonor(),
-          textInMenu: terms.transferVolunteer,
-          icon: 'reply',
-          click: async (_) => await this.transferVolunteer(_)
-        },
+        // {
+        //   //  visible: (v) => { return  this.showActivities(v)},
+        //   textInMenu: terms.showActivities,
+        //   icon: 'list'
+        // },
+        // {
+        //   //  visible: (v) => { return  this.showActivities(v)},
+        //   textInMenu: terms.showAssignTenants,
+        //   icon: 'assignment_ind'
+        // },
+        // {
+        //   visible: (_) => !_.isNew() && !this.isDonor(),
+        //   textInMenu: terms.transferVolunteer,
+        //   icon: 'reply',
+        //   click: async (_) => await this.transferVolunteer(_)
+        // },
         {
           visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.deleteVolunteer,
           icon: 'delete',//,
-          // click: async (_) => await this.addTenant(_)
+          click: async (_) => await this.deleteVolunteer(_)
         }
       ]
     }
   );
 
-  constructor(private remult: Remult) { }
+  constructor(private remult: Remult, private dialog: DialogService) { }
 
   ngOnInit(): void {
   }
@@ -120,6 +122,21 @@ export class VolunteersListComponent implements OnInit {
     return true;
   }
 
+  async deleteVolunteer(u: Users) {
+    let yes = await this.dialog.confirmDelete(terms.volunteer);
+    if (yes) {
+      let count = await this.remult.repo(Activity).count(row => row.vids.contains(u.id));
+      if (count > 0) {
+        this.dialog.error('לא ניתן למחוק מתנדב עם פעילויות');
+      }
+      else {
+        await u.delete();
+        this.dialog.info('המתנדב נמחק בהצלחה');
+        await this.refresh();
+      }
+    }
+  }
+
   async addVolunteer(vid: string) {
     let isNew = false;
     let title = terms.tenantDetails;
@@ -140,7 +157,7 @@ export class VolunteersListComponent implements OnInit {
           { field: u!.$.name, caption: terms.name },
           u!.$.mobile,
           u!.$.langs,
-          [  
+          [
             u!.$.birthday,
             { field: u!.$.age, width: '60', visible: (r, v) => this.remult.isAllowed(Roles.manager) },
           ],

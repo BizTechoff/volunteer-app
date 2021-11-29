@@ -10,7 +10,7 @@
       <button mat-flat-button color="primary" (click)="signIn()">{{terms.signIn}}</button>
     </ng-container>
     <ng-container *ngIf="remult.authenticated()">
-      <button mat-flat-button color="primary" [matMenuTriggerFor]="menu">
+      <button style="word-wrap: break-word;" mat-flat-button color="primary" [matMenuTriggerFor]="menu">
         {{remult.user.name}} ({{ this.getUserAuthName()}})
       </button>
       <mat-menu #menu="matMenu">

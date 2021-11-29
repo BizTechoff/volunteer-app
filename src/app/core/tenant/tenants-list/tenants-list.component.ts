@@ -7,6 +7,7 @@ import { InputAreaComponent } from '../../../common/input-area/input-area.compon
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
+import { Activity } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
@@ -76,34 +77,34 @@ export class TenantsListComponent implements OnInit {
           click: async (_) => await this.assignVolunteers(_)
         },
         {
-          visible: (_) => !_.isNew(),
-          textInMenu: terms.tenantDetails,
-          icon: 'edit',
-          click: async (_) => await this.addTenant(_.id)
-        },
-        {
-          visible: (_) => !_.isNew(),
-          textInMenu: terms.showActivities,
-          icon: 'list',
-          click: async (_) => await this.showActivities(_)
-        },
-        {
           visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.addActivity,
           icon: 'add',
           click: async (_) => await this.openActivity(_)
         },
         {
-          visible: (_) => !_.isNew() && !this.isDonor(),
-          textInMenu: terms.transferTenant,
-          icon: 'reply',
-          click: async (_) => await this.transferTenant(_)
+          visible: (_) => !_.isNew(),
+          textInMenu: terms.tenantDetails,
+          icon: 'edit',
+          click: async (_) => await this.addTenant(_.id)
         },
+        // {
+        //   visible: (_) => !_.isNew(),
+        //   textInMenu: terms.showActivities,
+        //   icon: 'list',
+        //   click: async (_) => await this.showActivities(_)
+        // },
+        // {
+        //   visible: (_) => !_.isNew() && !this.isDonor(),
+        //   textInMenu: terms.transferTenant,
+        //   icon: 'reply',
+        //   click: async (_) => await this.transferTenant(_)
+        // },
         {
           visible: (_) => !_.isNew() && !this.isDonor(),
           textInMenu: terms.deleteTenant,
           icon: 'delete',//,
-          // click: async (_) => await this.addTenant(_)
+          click: async (_) => await this.deleteTenant(_)
         }
       ]
     }
@@ -127,10 +128,10 @@ export class TenantsListComponent implements OnInit {
       if (!t.defVids) {
         t.defVids = [] as UserIdName[];
       }
-      
+
       let selected = [] as UserIdName[];
-      for (const v of  t.defVids) {
-        selected.push({id:v.id, name: v.name});
+      for (const v of t.defVids) {
+        selected.push({ id: v.id, name: v.name });
       }
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
@@ -139,13 +140,13 @@ export class TenantsListComponent implements OnInit {
           title: t.name,
           langs: t.langs,// this.t.langs, 
           selected: t.defVids
-        }, 
-        output => output && output.args && output.args.changed ? output.args.selected: undefined);
-        if(volids){
-          t.defVids.splice(0);
-          t.defVids.push(...volids);
-        }
+        },
+        output => output && output.args && output.args.changed ? output.args.selected : undefined);
+      if (volids) {
+        t.defVids.splice(0);
+        t.defVids.push(...volids);
       }
+    }
     else {
       await this.dialog.error(terms.mustSetBidForThisAction);
     }
@@ -179,6 +180,21 @@ export class TenantsListComponent implements OnInit {
 
   isDonor() {
     return this.remult.isAllowed(Roles.donor);
+  }
+
+  async deleteTenant(t: Tenant) {
+    let yes = await this.dialog.confirmDelete(terms.tenant);
+    if (yes) {
+      let count = await this.remult.repo(Activity).count(row => row.tid.isEqualTo(t));
+      if(count > 0){
+        this.dialog.error('לא ניתן למחוק דייר עם פעילויות');
+      }
+      else{
+        await t.delete();
+        this.dialog.info('הדייר נמחק בהצלחה');
+        await this.refresh();
+      }
+    }
   }
 
   async addTenant(tid: string) {
