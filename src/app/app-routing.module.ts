@@ -21,7 +21,7 @@ import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuar
 import { UsersComponent } from './users/users.component';
 
  
- 
+
 const defaultRoute = terms.home;
 const routes: Routes = [ 
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
