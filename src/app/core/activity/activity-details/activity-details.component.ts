@@ -163,11 +163,11 @@ export class ActivityDetailsComponent implements OnInit {
     let bidOk = (this.activity.bid && this.activity.bid.id && this.activity.bid.id.length > 0)!;
     if (bidOk) {
       let explicit = [] as UserIdName[];
-      if (this.isOnlyVolunteer()) {
+      // if (this.isOnlyVolunteer()) {
         for (const v of this.activity.tid.defVids) {
           explicit.push({ id: v.id, name: v.name });
         }
-      }
+      // }
       let selected = [] as UserIdName[];
       for (const v of this.activity.vids) {
         selected.push({ id: v.id, name: v.name });
