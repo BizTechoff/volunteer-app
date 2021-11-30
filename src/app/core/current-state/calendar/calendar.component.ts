@@ -12,21 +12,15 @@ import { Branch } from '../../branch/branch';
 })
 export class CalendarComponent implements OnInit {
 
-  
+
   iframe = document.getElementById('calendar') as HTMLIFrameElement;
-  haifa = 'https://calendar.google.com/calendar/embed?src=eshel.app.haifa%40gmail.com&ctz=Asia%2FJerusalem';
-  branchCalendarsIds:{id:string, src:string}[] = [
-    {id:'eshel.app.haifa@gmail.com',src:'https://calendar.google.com/calendar/embed?src=eshel.app.haifa%40gmail.com&ctz=Asia%2FJerusalem'},
-    {id:'eshel.app.hulon@gmail.com',src:'https://calendar.google.com/calendar/embed?src=eshel.app.haifa%40gmail.com&ctz=Asia%2FJerusalem'}
-  ];
-  selectedCalendarId = 'eshel.app.haifa@gmail.com';
-  @DataControl<CalendarComponent>({ valueChange: async (r, v) => 
-    console.log(11111) })
-  @Field({ caption: terms.branch }) 
-  branch?: Branch = undefined;
-  
+  SelectedCalendarFrame = '';
+  @DataControl<CalendarComponent>({ valueChange: async (r, v) => await r.refresh() })
+  @Field({ caption: terms.branch })
+  branch?: Branch = null!;
+
   constructor(private remult: Remult) { }
-  
+
   terms = terms;
   get $() { return getFields(this, this.remult) };
 
@@ -34,17 +28,34 @@ export class CalendarComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    
+    let b = await this.remult.repo(Branch).findId(this.remult.user.bid);
+    if (b) {
+      this.branch = b;
+    }
+    // await this.refresh();
     // var footer1 = document.getElementById("subscribe-id")!;
     // footer1.style.display = "none";//.setProperty('display','none');
+  } 
+
+  selectedCalendarFrame(email:string){
+
+    return true;
   }
 
-  async refresh(){
-    if(this.branch){
-      this.selectedCalendarId = this.branch.id;
-      console.log(this.selectedCalendarId);
-    }
-    // this.iframe.src = this.iframe.src;
+  async refresh() {
+    console.log('from refresh');
+    
+    // if (this.branch) {
+    //   // this.selectedCalendarFrame = this.branch.frame;
+    //   this.SelectedCalendarFrame = this.branch.email;
+    //   window.location.reload();
+    //   // if (this.iframe.contentWindow) {
+    //   //   this.iframe.innerHTML
+    //   //   this.iframe.contentWindow.location.reload();
+    //   // }
+    // }
   }
 
 }

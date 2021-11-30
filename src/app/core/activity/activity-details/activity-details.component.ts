@@ -164,12 +164,12 @@ export class ActivityDetailsComponent implements OnInit {
     if (bidOk) {
       let explicit = [] as UserIdName[];
       // if (this.isOnlyVolunteer()) {
-        for (const v of this.activity.tid.defVids) {
-          explicit.push({ id: v.id, name: v.name });
-        }
-        // if(explicit.length == 0){
-        //   explicit = undefined!;
-        // }
+      for (const v of this.activity.tid.defVids) {
+        explicit.push({ id: v.id, name: v.name });
+      }
+      // if(explicit.length == 0){
+      //   explicit = undefined!;
+      // }
       // }
       let selected = [] as UserIdName[];
       for (const v of this.activity.vids) {
@@ -251,18 +251,18 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   async sendEmails() {
-    console.log('1');
+    // console.log('1');
     let emails: { uid: string, name: string, email: string, type: NotificationsTypes }[] =
       [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
 
-    console.log('2');
+    // console.log('2');
     // get volunteers that already sent email, to cancel them.
     let vols = await this.remult.repo(NotificationActivity).find({
       where: row => row.activity.isEqualTo(this.activity)
         .and(row.sentAssigned.isEqualTo(true))
     });
 
-    console.log('3');
+    // console.log('3');
     let removed = 0;
     // for each one, send cancel if not in current-volunteers.
     vols.forEach(async v => {
@@ -274,32 +274,32 @@ export class ActivityDetailsComponent implements OnInit {
       }
     });
 
-    console.log('4-', this.activity.vids.length);
-    console.log(emails);
+    // console.log('4-', this.activity.vids.length);
+    // console.log(emails);
     let added = 0;
 
     for (const v of this.activity.vids) {
-      console.log('4.1', v.name);
+      // console.log('4.1', v.name);
       let u = await this.remult.repo(Users).findId(v.id);
       let f = emails.find(itm => itm.email === u.email);
       if (f) {
-        console.log('4.2', v.name);
+        // console.log('4.2', v.name);
         let i = emails.indexOf(f);
         emails.splice(i, 1);//dont send again.
         --removed;
         // f.type = NotificationsTypes.EmailAssign;
       }
       else {
-        console.log('4.3', v.name);
+        // console.log('4.3', v.name);
         emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailNewAssign });
         ++added;
       }
-      console.log('4.4', v.name);
+      // console.log('4.4', v.name);
     }
-    console.log('5', emails.length);
+    // console.log('5', emails.length);
 
     if (emails.length > 0) {
-      console.log('6');
+      // console.log('6');
       // console.log('emails', emails);
       // console.log('11111');
 
@@ -310,11 +310,11 @@ export class ActivityDetailsComponent implements OnInit {
         (added > 0 ? (added > 0 ? 'ו' : '') + `ל- ${added} מתנדבים זימון השתתפות בפעילות` : '');
       // console.log('message', message);
 
-      console.log('7');
+      // console.log('7');
       // console.log('22222');
       let yes = await this.dialog.yesNoQuestion(message);
       if (yes) {
-        console.log('8');
+        // console.log('8');
         let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
         for (const e of emails) {
           users.push({
@@ -332,7 +332,7 @@ export class ActivityDetailsComponent implements OnInit {
         }
       }
     }
-    console.log('99');
+    // console.log('99');
   }
 
   async sendMail(email: string, type: NotificationsTypes, users: { name: string, email: string }[]) {
@@ -354,9 +354,19 @@ export class ActivityDetailsComponent implements OnInit {
         });
     };
 
+    let vidsNames = '';
+    if (this.activity.vids.length > 1) {
+      vidsNames = `לכם (${this.activity.$.vids.displayValue})`;
+    }
+    else if (this.activity.vids.length === 1) {
+      vidsNames = `לך (${this.activity.$.vids.displayValue})`;
+    }
     let subject = terms.voulnteerNewAssignSubject
       .replace('!tname!', this.activity.tid.name);
     let html = terms.voulnteerNewAssign
+      .replace('!vnames!', vidsNames)
+      .replace('!branch!', b.name)
+      .replace('!purposeDesc!', this.activity.purposeDesc)
       .replace('!name!', this.activity.tid.name)
       .replace('!date!', DateUtils.toDateString(this.activity.date))
       .replace('!from!', this.activity.fh)
@@ -376,17 +386,18 @@ export class ActivityDetailsComponent implements OnInit {
         cc: '',
         subject: subject,
         html: html
-      }, 
-      ics: { 
+      },
+      ics: {
         aid: this.activity.id,
+        color: b.color,
         sequence: 2,// new Date().getTime(),
-        title: subject, 
+        title: subject,
         description: html,
         location: this.activity.tid.address,
         url: '',// 'bit.ly/eshel-app',
-        start: { 
+        start: {
           year: this.activity.date.getFullYear(),
-          month: this.activity.date.getMonth()+1,
+          month: this.activity.date.getMonth() + 1,
           day: this.activity.date.getDate(),
           hours: parseInt(this.activity.fh.split(':')[0]),
           minutes: parseInt(this.activity.fh.split(':')[1])
@@ -398,8 +409,8 @@ export class ActivityDetailsComponent implements OnInit {
         status: 'CONFIRMED',
         busyStatus: 'BUSY',
         organizer: {
-          name: u.name,
-          email: this.isManager() ? b.email : u.email
+          displayName: b.name, //u.name
+          email: b.email // this.isManager() ? b.email : u.email
         },
         attendees: attendees
       }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GridSettings } from '@remult/angular';
+import { DataControlInfo, GridSettings } from '@remult/angular';
 import { Remult } from 'remult';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -15,6 +15,14 @@ export class BranchesListComponent implements OnInit {
   branches = new GridSettings(this.remult.repo(Branch),
     {
       allowCrud: this.remult.isAllowed(Roles.admin),
+      columnSettings: row => {
+        let f = [] as DataControlInfo<Branch>[];
+        f.push(row.name, row.address)
+        if (this.isAdmin()) {
+          f.push(row.email, row.color, row.frame);
+        }
+        return f;
+      },
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
@@ -26,6 +34,10 @@ export class BranchesListComponent implements OnInit {
   );
 
   constructor(private remult: Remult) { }
+
+  isAdmin() {
+    return this.remult.isAllowed(Roles.admin);
+  }
 
   ngOnInit(): void {
   }

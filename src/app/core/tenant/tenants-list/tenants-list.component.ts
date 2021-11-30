@@ -214,7 +214,7 @@ export class TenantsListComponent implements OnInit {
         t.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
       }
     }
-    console.log(t);
+    // console.log(t);
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         title: title + (this.isDonor() ? '<mat-icon>block</mat-icon> (לקריאה בלבד)' : ''),

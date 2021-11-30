@@ -1,6 +1,6 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, Entity, Field, IdEntity } from "remult";
-import { FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
+import { ColorNumberValidator, EmailValidator, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
@@ -42,7 +42,17 @@ export class Branch extends IdEntity {
     @Field({ caption: terms.address, validate: StringRequiredValidation })
     address: string = '';
 
-    @Field({ caption: terms.email })//, validate: StringRequiredValidation
+    @Field({ caption: terms.email, validate: EmailValidator })
     email: string = '';
+
+    @Field({ caption: terms.color, validate: ColorNumberValidator })
+    color: number = 1;
+
+    @Field({ caption: terms.frame })
+    frame: string = '';
+
+    isBranch(name:string){
+        return this.email.includes(name);
+    }
 
 }

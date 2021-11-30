@@ -28,10 +28,10 @@ export interface DurationRequest {
 }
 
 export interface OrganizerRequest {
-    name: string,
+    displayName: string,
     email: string
 }
- 
+
 export interface AttendeeRequest {
     name: string,
     email: string,
@@ -42,6 +42,7 @@ export interface AttendeeRequest {
 
 export interface IcsRequest {
     aid: string,
+    color: number,
     sequence: number,
     title: string,
     description: string,
@@ -67,4 +68,14 @@ export interface CalendarRequest {
     sender: string,
     email: EmailRequest,
     ics: IcsRequest
+}
+
+export interface CalendarClient {
+    name: string,
+    display: string,
+    client: {
+        id: string,
+        secret: string,
+        token: string//refreshToken
+    }
 }

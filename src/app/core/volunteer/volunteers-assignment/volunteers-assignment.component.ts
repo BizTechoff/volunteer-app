@@ -49,11 +49,28 @@ export class VolunteersAssignmentComponent implements OnInit {
     fields: () => [this.$.filterBtTenantLangs]
   });
   lgDesc = '';
-  volunteers: GridSettings<Users>;
+  volunteers: GridSettings<Users> = undefined!;
 
   constructor(private remult: Remult, private win: MatDialogRef<any>) {
-    console.log('this.args.explicit',this.args.explicit);
-    
+  }
+
+  get $() { return getFields(this, this.remult) };
+  terms = terms;
+
+  isManager() {
+    return this.remult.isAllowed(Roles.manager);
+  }
+
+  async ngOnInit() {
+    this.lgDesc = this.args.langs.map(_ => _.caption).join(', ');
+    if (!this.args.selected) {
+      this.args.selected = [] as UserIdName[];
+    }
+    await this.initGrid();
+    await this.refresh();
+  }
+   
+  async initGrid(){
     this.volunteers = new GridSettings<Users>(this.remult.repo(Users),
       {
         where: u => {
@@ -94,23 +111,6 @@ export class VolunteersAssignmentComponent implements OnInit {
           }
         ],
       });
-  }
-
-  get $() { return getFields(this, this.remult) };
-  terms = terms;
-
-  isManager() {
-    return this.remult.isAllowed(Roles.manager);
-  }
-
-  async ngOnInit() {
-    this.lgDesc = this.args.langs.map(_ => _.caption).join(', ');
-    if (!this.args.selected) {
-      this.args.selected = [] as UserIdName[];
-    }
-    await this.refresh();
-    await this.refresh();
-    // this.volunteers.selectedChanged = (u) => { this.setSelected(); };
   }
 
   async refresh() {

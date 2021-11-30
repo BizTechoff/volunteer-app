@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControl } from '@remult/angular';
 import { ChartOptions, ChartType } from 'chart.js';
-import { link } from 'fs';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
-import { BackendMethod, Field, getFields, Remult } from 'remult';
+import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
 import { FILTER_IGNORE } from '../../common/globals';
-import { EmailSvc } from '../../common/utils';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
@@ -19,13 +17,8 @@ import { Referrer } from '../tenant/tenant';
   styleUrls: ['./current-state.component.scss']
 })
 export class CurrentStateComponent implements OnInit {
- 
-  terms = terms;
-  get $() { return getFields(this, this.remult) };
 
-  @DataControl<CurrentStateComponent>({ valueChange: async (r, v) => await r.refresh() })
-  @Field({ caption: terms.branch })
-  branch?: Branch = undefined;
+  
 
   // colors = {
   //   blue2: '36a2eb'
@@ -182,12 +175,27 @@ export class CurrentStateComponent implements OnInit {
   activitiesByWeekDay: { branch: Branch, day: number, count: number }[] = [];
   activitiesByReferrer: { branch: Branch, referrer: Referrer, count: number }[] = [];
 
+  @DataControl<CurrentStateComponent>({ valueChange: async (r, v) => await r.refresh() })
+  @Field({ caption: terms.branch })
+  branch?: Branch = null!;
+
   constructor(private remult: Remult, private dialog: DialogService) {
 
   }
 
+  terms = terms;
+  get $() { return getFields(this, this.remult) };
+
   async ngOnInit() {
+    let b = await this.remult.repo(Branch).findId(this.remult.user.bid);
+    if (b) {
+      this.branch = b;
+    }
     await this.refresh();
+    // else{
+    //   await this.refresh();
+    // }
+    // await this.refresh();
   }
 
   isBoard() {
@@ -340,7 +348,7 @@ export class CurrentStateComponent implements OnInit {
     }
 
     for (const a of this.activitiesByWeekDay) {
-      if (a.day >= 6) {
+      if (a.day >= 6) {// ללא שבת
         continue;
       }
       let label = 'יום ' + this.weekDays[a.day] + ` (${a.count})`;
@@ -378,7 +386,7 @@ export class CurrentStateComponent implements OnInit {
     this.dialog.error(list);
     // this.dialog.info('פתיחת רשימה לסטטוסים מסוג: ' + status.caption + ' בסניף: ' + bid)
   }
- 
+
   // async sendEmail() {
   //   let ok = await CurrentStateComponent.TestSendEmail('noam.honig@gmail.com', 'Welcome Volunteer', 'test', '');
   //   this.dialog.info(`שליחת מייל ${ok ? 'הצליחה' : 'נכשלה'}`);
@@ -387,5 +395,5 @@ export class CurrentStateComponent implements OnInit {
   // static async TestSendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
   //   return await EmailSvc.sendMail(to, subject, text, link, remult!);
   // } 
- 
-} 
+
+}

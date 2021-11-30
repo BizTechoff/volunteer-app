@@ -3,145 +3,45 @@
 // https://www.nylas.com/blog/integrate-google-calendar-api
 
 import { calendar_v3, google } from 'googleapis';
-import { CalendarRequest, DateRequest } from '../app/common/types';
+import { CalendarClient, CalendarRequest, DateRequest } from '../app/common/types';
 import { EmailSvc } from '../app/common/utils';
-// 
 
-// import { calendar_v3 } from "googleapis";
 
 EmailSvc.sendCalendar = async (req: CalendarRequest) => {
-    // const {google} = require('googleapis');
-    // require('dotenv').config();
-
-    // Provide the required configuration
-    const CREDENTIALS = JSON.parse(process.env.CALENDAR_CREDENTIALS_GET_HESED_HAIFA_SERVICE!);
-    const calendarId = process.env.CALENDAR_ID_GET_HESED_HAIFA;
+    console.debug('send-calendar', req);
     const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
 
+    let data = JSON.parse(process.env.CALENDAR_BRANCHES!);
+    let branches: CalendarClient[] = [] as CalendarClient[];
+    branches.push(...data);
+ 
+    let found = branches.find(b => req.sender.includes(b.name));
+    if (!found) {
+        console.debug(`אימייל הסניף ${req.sender} אינו מוגדר במערכת`);
+        return false;
+    }
+ 
     const auth = new google.auth.OAuth2(
         {
-            clientId: process.env.GOOGLE_CALENDAR_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CALENDAR_CLIENT_SECRET//,
-            // redirectUri : process.env.GOOGLE_CALENDAR_REDIRECT_URL
+            clientId: found.client.id,
+            clientSecret: found.client.secret
         });
 
     auth.setCredentials({
         scope: SCOPE,
-        refresh_token: process.env.GOOGLE_CALENDAR_REFRESH_TOKEN
+        refresh_token: found.client.token
     })
-
-    // Google calendar API settings
-    const calendar = google.calendar({ version: "v3", auth: auth });
-    // Insert new event to Google Calendar
-    const insertEvent = async (event: calendar_v3.Schema$Event) => {
-
-        try {
-            let response = await calendar.events.insert({
-                calendarId: 'primary',
-                requestBody: event,
-                sendNotifications: true,
-                sendUpdates: 'all'
-            });
-
-            if (response['status'] == 200 && response['statusText'] === 'OK') {
-                return 1;
-            } else {
-                return 0;
-            }
-        } catch (error) {
-            console.log(`Error at insertEvent --> ${error}`);
-            return 0;
-        }
-    };
-
-    const updateEvent = async (event: calendar_v3.Schema$Event) => {
-
-        try {
-            let response = await calendar.events.update({
-                eventId: iCalId2Id(req.ics.aid),// req.ics.aid,
-                calendarId: 'primary',
-                requestBody: event,
-                sendNotifications: true,
-                sendUpdates: 'all'
-            });
-
-            if (response['status'] == 200 && response['statusText'] === 'OK') {
-                return 1;
-            } else {
-                return 0;
-            }
-        } catch (error) {
-            console.log(`Error at updateEvent --> ${error}`);
-            return 0;
-        }
-    };
-
-    const getEvent = async (): Promise<calendar_v3.Schema$Event | undefined> => {
-
-        // let result: calendar_v3.Schema$Event;
-        try {
-            let response = await calendar.events.get({
-                eventId: req.ics.aid,
-                calendarId: 'primary'
-            });
-
-            if (response['status'] == 200 && response['statusText'] === 'OK') {
-                console.log(response);
-
-                return response.data;
-            } else {
-                console.log(`Error Status: ${response['status']}`);
-
-            }
-        } catch (error) {
-            console.log(`Error at getEvent --> ${error}`);
-        }
-        return undefined;
-    };
-
-    const listEvent = async () => {
-        let result = 0;
-        // let result: calendar_v3.Schema$Event;
-        try {
-            let response = await calendar.events.list({
-                calendarId: 'primary',
-                iCalUID: req.ics.aid
-            });
-
-            console.log(`listEvent.status: ${response['status']}`);
-            if (response['status'] == 200 && response['statusText'] === 'OK') {
-
-                if (response.data.items) {
-                    result = response.data.items.length;
-                    console.log(`response.data.items.length: ${response.data.items.length}`);
-                    for (const itm of response.data.items) {
-                        console.log(itm);
-                    }
-                }
-                else {
-                    console.log(`Found No items`);
-
-                }
-            } else {
-                console.log(`Error Status: ${response['status']}`);
-
-            }
-        } catch (error) {
-            console.log(`Error at listEvent --> ${error}`);
-        }
-        return result;
-    };
 
     let start = dateTimeForCalander(req.ics.start);
     let calc = req.ics.start;
     calc.hours += req.ics.duration.hours;
     calc.minutes += req.ics.duration.minutes;
     let end = dateTimeForCalander(calc);
-    console.log('start', start);
-    console.log('end', end);
-    console.log('eventid', req.ics.aid);
-    console.log('iCalId2Id(req.ics.aid)', iCalId2Id(req.ics.aid));
 
+    let organizer = {
+        email: req.ics.organizer.email,
+        displayName: req.ics.organizer.displayName
+    };// calendar_v3.Schema$Event.organizer
     let attendees = [] as calendar_v3.Schema$EventAttendee[];
     for (const a of req.ics.attendees) {
         attendees.push({
@@ -151,8 +51,8 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
     }
 
     let event: calendar_v3.Schema$Event = {
-        summary: `אשל: פעילות עם הדייר יצחק`,
-        description: `קניות שבועיות`,
+        summary: req.ics.title,
+        description: req.ics.description,
         start: {
             'dateTime': start,
             'timeZone': 'Asia/Jerusalem'
@@ -164,7 +64,8 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
         location: req.ics.location,
         id: iCalId2Id(req.ics.aid),
         // iCalUID: req.ics.aid,
-        colorId: '4',
+        colorId: req.ics.color + '',
+        organizer: organizer,
         attendees: attendees,
         visibility: 'public',
         reminders: {
@@ -179,25 +80,12 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
     // let count = await listEvent();
     // console.log('count', count);
 
-    if (!await insertEvent(event)) {
-        await updateEvent(event);
+    // Google calendar API settings
+    const calendar = google.calendar({ version: "v3", auth: auth });
+
+    if (!await insertEvent(calendar, req.ics.aid, event)) {
+        await updateEvent(calendar, req.ics.aid, event);
     }
-
-    // if (count) {
-    //     await updateEvent(event);
-    // }
-    // else {
-    //     await insertEvent(event);
-    // }
-    // let exists = await getEvent();
-    // console.log(exists);
-
-    // if (exists) {
-    //     await updateEvent(event);
-    // }
-    // else{
-    // await insertEvent(event);
-    // }
 
     return true;
 }
@@ -246,134 +134,105 @@ function dateTimeForCalander(date: DateRequest) {
     return newDateTime;
 };
 
+async function insertEvent(calendar: calendar_v3.Calendar, aid: string, event: calendar_v3.Schema$Event) {
 
+    try {
+        let response = await calendar.events.insert({
+            calendarId: 'primary',
+            requestBody: event,
+            sendNotifications: true,
+            sendUpdates: 'all'
+        });
 
-// let attendees = [] as calendar_v3.Schema$EventAttendee[];
-// for (const a of req.ics.attendees) {
-//     attendees.push({
-//         displayName: a.name,
-//         email: a.email
-//     });
-// }
+        if (response['status'] == 200 && response['statusText'] === 'OK') {
+            console.debug('Insert Event', 'OK');
+            return 1;
+        } else {
+            console.debug('Insert Event Error', response['status']);
+            return 0;
+        }
+    } catch (error) {
+        console.debug(`Error at insertEvent --> ${error}`);
+        return 0;
+    }
+};
 
-// calendar.freebusy.query(
-//     {
-//      requestBody:{
-//          timeMin: start,
-//          timeMax: end,
-//          items: [{id: 'primary'}]
-//      }
-//     },
-//      (err, res)=>{
-//          if(err){
-//              return console.log(err);
-//          }
-//          const attr = res?.data.calendars!.primary.busy;//if not busy
-//          if(attr?.length === 0){
-//              console.log('Not busy')
-//          }
-//          else{
-//             console.log('Busy')
-//          }
-//      }
-// );
+async function updateEvent(calendar: calendar_v3.Calendar, aid: string, event: calendar_v3.Schema$Event) {
 
-// const auth = new google.auth.OAuth2(
-//     {
-//         clientId: CREDENTIALS.web.client_id,
-//         clientSecret: CREDENTIALS.web.client_secret//,
-//         // redirectUri: CREDENTIALS.web.auth_uri
-//     });
+    try {
+        let response = await calendar.events.update({
+            eventId: iCalId2Id(aid),
+            calendarId: 'primary',
+            requestBody: event,
+            sendNotifications: true,
+            sendUpdates: 'all'
+        });
 
-// const auth = new google.auth.getClient(
-//     { 
-//         clientId: CREDENTIALS.web.client_id,
-//         clientSecret: CREDENTIALS.web.client_secret//,
-//         // redirectUri: CREDENTIALS.web.auth_uri
-//     });
-// const auth = google.auth.getClient({
-//     clientOptions: {
-//         key: process.env.GOOGLE_CALENDAR_API_KEY,
-//         clientId: process.env.GOOGLE_CALENDAR_CLIENT_ID,
-//         clientSecret: process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
-//         scopes: 'https://www.googleapis.com/auth/calendar'
-//     },
-//     projectId: process.env.GOOGLE_CALENDAR_PROJECT_ID
-// });
-// const auth = new google.auth.JWT(
-//     CREDENTIALS.client_email,
-//     undefined,
-//     CREDENTIALS.private_key,
-//     SCOPES
-//     // ,'eshel.app.haifa@gmail.com'
-// );
+        if (response['status'] == 200 && response['statusText'] === 'OK') {
+            console.debug('Update Event', 'OK');
+            return 1;
+        } else {
+            console.debug('Update Event Error', response['status']);
+            return 0;
+        }
+    } catch (error) {
+        console.debug(`Error at updateEvent --> ${error}`);
+        return 0;
+    }
+};
 
-// Your TIMEOFFSET Offset
-// const TIMEOFFSET = '+02:00';
+async function getEvent(calendar: calendar_v3.Calendar, aid: string): Promise<calendar_v3.Schema$Event | undefined> {
 
-// Get date-time string for calender
+    // let result: calendar_v3.Schema$Event;
+    try {
+        let response = await calendar.events.get({
+            eventId: aid,
+            calendarId: 'primary'
+        });
 
+        if (response['status'] == 200 && response['statusText'] === 'OK') {
+            console.log(response);
 
+            return response.data;
+        } else {
+            console.log(`Error Status: ${response['status']}`);
 
-// insertEventToGoogleCalendar();
-// Get all the events between two dates
-// const getEvents = async (dateTimeStart, dateTimeEnd) => {
+        }
+    } catch (error) {
+        console.log(`Error at getEvent --> ${error}`);
+    }
+    return undefined;
+};
 
-//     try {
-//         let response = await calendar.events.list({
-//             auth: auth,
-//             calendarId: calendarId,
-//             timeMin: dateTimeStart,
-//             timeMax: dateTimeEnd,
-//             timeZone: 'Asia/Kolkata'
-//         });
+async function listEvent(calendar: calendar_v3.Calendar, aid: string) {
+    let result = 0;
+    // let result: calendar_v3.Schema$Event;
+    try {
+        let response = await calendar.events.list({
+            calendarId: 'primary',
+            iCalUID: aid
+        });
 
-//         let items = response['data']['items'];
-//         return items;
-//     } catch (error) {
-//         console.log(`Error at getEvents --> ${error}`);
-//         return 0;
-//     }
-// };
+        console.log(`listEvent.status: ${response['status']}`);
+        if (response['status'] == 200 && response['statusText'] === 'OK') {
 
-// let start = '2020-10-03T00:00:00.000Z';
-// let end = '2020-10-04T00:00:00.000Z';
+            if (response.data.items) {
+                result = response.data.items.length;
+                console.log(`response.data.items.length: ${response.data.items.length}`);
+                for (const itm of response.data.items) {
+                    console.log(itm);
+                }
+            }
+            else {
+                console.log(`Found No items`);
 
-// getEvents(start, end)
-//     .then((res) => {
-//         console.log(res);
-//     })
-//     .catch((err) => {
-//         console.log(err);
-//     });
+            }
+        } else {
+            console.log(`Error Status: ${response['status']}`);
 
-// Delete an event from eventID
-// const deleteEvent = async (eventId) => {
-
-//     try {
-//         let response = await calendar.events.delete({
-//             auth: auth,
-//             calendarId: calendarId,
-//             eventId: eventId
-//         });
-
-//         if (response.data === '') {
-//             return 1;
-//         } else {
-//             return 0;
-//         }
-//     } catch (error) {
-//         console.log(`Error at deleteEvent --> ${error}`);
-//         return 0;
-//     }
-// };
-
-let eventId = 'hkkdmeseuhhpagc862rfg6nvq4';
-
-// deleteEvent(eventId)
-//     .then((res) => {
-//         console.log(res);
-//     })
-//     .catch((err) => {
-//         console.log(err);
-//     });
+        }
+    } catch (error) {
+        console.log(`Error at listEvent --> ${error}`);
+    }
+    return result;
+};
