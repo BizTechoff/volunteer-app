@@ -312,7 +312,7 @@ export class ActivityDetailsComponent implements OnInit {
 
       // console.log('7');
       // console.log('22222');
-      let yes = await this.dialog.yesNoQuestion(message);
+      let yes = true;// await this.dialog.yesNoQuestion(message);
       if (yes) {
         // console.log('8');
         let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
