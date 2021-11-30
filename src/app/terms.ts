@@ -23,7 +23,7 @@ export const terms = {
         `&trp=true` +
         `&sf=true` +
         `&output=xml#f`,
-    voulnteerNewAssignSubject: 'תואמה לך פעילות עם הדייר !tname!',
+    voulnteerNewAssignSubject: '!branch!: תואמה לך פעילות עם הדייר !tname!',
     // voulnteerNewAssignSubject: 'תואמה לך פעילות עם הדייר: !tname!',
     voulnteerUpdateAssignSubject: 'עודכנה לך פעילות עם הדייר: !tname!',
     voulnteerCancelAssignSubject: 'בוטלה לך פעילות עם הדייר: !tname!',
@@ -44,7 +44,7 @@ export const terms = {
     continue: 'המשך',
     openPhotosAlbum: 'פתח אלבום תמונות',
     linkClicked: 'לינק נלחץ',
-    voulnteerNewAssign: 'תודה על התנדבותך ב!branch!! נקבעה !vnames! פעילות בנושא: `!purposeDesc!` עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
+    voulnteerNewAssign: 'תודה על התנדבותך! תואמה !vnames! פעילות בנושא: `!purposeDesc!` עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerUpdateAssign: 'עודכנה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerCancelAssign: 'בוטלה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     referrer: 'גורם מפנה', 
@@ -172,7 +172,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError:'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.11.29.1'
+    appVersion: '2021.11.30.0'
 } 
 declare module 'remult' {
     export interface UserInfo {

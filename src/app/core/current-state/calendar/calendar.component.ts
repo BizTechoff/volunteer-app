@@ -46,7 +46,10 @@ export class CalendarComponent implements OnInit {
 
   async refresh() {
     console.log('from refresh');
-    
+    window?.location?.reload();
+    // let t = this.branch;
+    // this.branch  = null!;
+    // this.branch = 
     // if (this.branch) {
     //   // this.selectedCalendarFrame = this.branch.frame;
     //   this.SelectedCalendarFrame = this.branch.email;

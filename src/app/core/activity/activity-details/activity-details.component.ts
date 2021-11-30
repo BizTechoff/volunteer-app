@@ -362,10 +362,10 @@ export class ActivityDetailsComponent implements OnInit {
       vidsNames = `לך (${this.activity.$.vids.displayValue})`;
     }
     let subject = terms.voulnteerNewAssignSubject
-      .replace('!tname!', this.activity.tid.name);
+      .replace('!tname!', this.activity.tid.name)
+      .replace('!branch!', b.name);
     let html = terms.voulnteerNewAssign
       .replace('!vnames!', vidsNames)
-      .replace('!branch!', b.name)
       .replace('!purposeDesc!', this.activity.purposeDesc)
       .replace('!name!', this.activity.tid.name)
       .replace('!date!', DateUtils.toDateString(this.activity.date))
