@@ -4,7 +4,7 @@ import { DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { OnlyVolunteerEditActivity } from '../../../common/globals';
-import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
+import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { AttendeeRequest, CalendarRequest, UserIdName } from '../../../common/types';
 import { DateUtils, EmailSvc } from '../../../common/utils';
 import { terms } from '../../../terms';
@@ -158,7 +158,7 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   async openTenants() {
-    await openDialog(SelectTenantComponentComponent, x => x.args = {
+    await openDialog(SelectTenantComponent, x => x.args = {
       bid: this.activity.bid,
       onSelect: t => {
         if (this.activity.tid.id !== t.id) {

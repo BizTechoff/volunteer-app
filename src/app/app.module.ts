@@ -21,7 +21,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
-import { SelectTenantComponentComponent } from './common/select-tenant-component/select-tenant-component.component';
 import { YesNoQuestionComponent } from './common/yes-no-question/yes-no-question.component';
 import { ActivitiesListComponent } from './core/activity/activities-list/activities-list.component';
 import { ActivityDetailsComponent } from './core/activity/activity-details/activity-details.component';
@@ -48,7 +47,8 @@ import { UserLoginComponent } from './users/user-login/user-login.component';
 import { NotificationsListComponent } from './core/notification/notifications-list/notifications-list.component';
 import { CalendarComponent } from './core/current-state/calendar/calendar.component';
 import { VolunteerTenantsComponent } from './core/volunteer/volunteer-tenants/volunteer-tenants.component';
-import { SafePipeModule } from 'safe-pipe'
+import { SafePipeModule } from 'safe-pipe';
+import { SelectTenantComponent } from './common/select-tenant/select-tenant.component'
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -67,7 +67,6 @@ import { SafePipeModule } from 'safe-pipe'
     ActivityDailyComponent,
     VolunteersAssignmentComponent,
     PhotosAlbumComponent,
-    SelectTenantComponentComponent,
     SelectVolunteersComponent,
     SelectLangsComponent,
     SelectReferrerComponent,
@@ -78,7 +77,8 @@ import { SafePipeModule } from 'safe-pipe'
     UserLoginComponent,
     NotificationsListComponent,
     CalendarComponent,
-    VolunteerTenantsComponent
+    VolunteerTenantsComponent,
+    SelectTenantComponent
   ],
   imports: [
     BrowserModule,
@@ -105,7 +105,7 @@ import { SafePipeModule } from 'safe-pipe'
   providers: [DialogService, AdminGuard, DonorGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
-    SelectVolunteersComponent, SelectTenantComponentComponent, SelectLangsComponent,
+    SelectVolunteersComponent, SelectTenantComponent, SelectLangsComponent,
     UserLoginComponent]//, SelectReferrerComponent]
 })
 export class AppModule { }

@@ -11,11 +11,11 @@ import { FILTER_IGNORE } from '../globals';
 import { InputAreaComponent } from '../input-area/input-area.component';
 
 @Component({
-  selector: 'app-select-tenant-component',
-  templateUrl: './select-tenant-component.component.html',
-  styleUrls: ['./select-tenant-component.component.scss']
+  selector: 'app-select-tenant',
+  templateUrl: './select-tenant.component.html',
+  styleUrls: ['./select-tenant.component.scss']
 })
-export class SelectTenantComponentComponent implements OnInit {
+export class SelectTenantComponent implements OnInit {
   searchString = '';
   langs = [Langs.russian];
   options = [

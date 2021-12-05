@@ -36,9 +36,9 @@ export class VolunteersAssignmentComponent implements OnInit {
   } = { branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[] };
 
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
-  @Field({ caption: `${terms.serachForTenantNameHere}` })
+  @Field({ caption: `${terms.serachForVolunteerHere}` })
   search: string = ''
-
+ 
   @DataControl<VolunteersAssignmentComponent>({
     valueChange: async (r, _) => { await r.refresh(); }
   })

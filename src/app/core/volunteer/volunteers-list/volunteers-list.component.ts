@@ -4,7 +4,7 @@ import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE } from '../../../common/globals';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
-import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
+import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
@@ -175,7 +175,7 @@ export class VolunteersListComponent implements OnInit {
   }
 
   async openTenants(u: Users) {
-    await openDialog(SelectTenantComponentComponent, x => x.args = {
+    await openDialog(SelectTenantComponent, x => x.args = {
       bid: u.bid!,
       onSelect: t => u.defTid = t,
       title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',

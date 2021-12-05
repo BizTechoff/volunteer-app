@@ -1,9 +1,9 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DateRequiredValidation, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
-import { SelectTenantComponentComponent } from "../../common/select-tenant-component/select-tenant-component.component";
+import { SelectTenantComponent } from "../../common/select-tenant/select-tenant.component";
 import { UserIdName } from "../../common/types";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
@@ -70,7 +70,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
     clickIcon: 'search',
     getValue: (_, f) => f.value?.name,
     click: async (_, f) => {
-        await openDialog(SelectTenantComponentComponent,
+        await openDialog(SelectTenantComponent,
             x => x.args = {
                 title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
                 bid: f.value.bid,
