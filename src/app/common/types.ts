@@ -66,7 +66,7 @@ export interface EmailRequest {
 
 export interface CalendarRequest {
     sender: string,
-    email: EmailRequest,
+    email?: EmailRequest,
     ics: IcsRequest
 }
 

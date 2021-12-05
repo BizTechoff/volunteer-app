@@ -217,7 +217,7 @@ export class TenantsListComponent implements OnInit {
     // console.log(t);
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
-        title: title + (this.isDonor() ? '<mat-icon>block</mat-icon> (לקריאה בלבד)' : ''),
+        title: title + (this.isDonor() ? '(לקריאה בלבד)' : ''),
         fields: () => {
           let f = [];
           if (this.isBoard()) {

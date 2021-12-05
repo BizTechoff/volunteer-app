@@ -146,7 +146,7 @@ export class ActivitiesListComponent implements OnInit {
   }
 
   private async cancelActivity(act: Activity) {
-    act.status = ActivityStatus.cancel;
+    act.status.onChanging(act, ActivityStatus.cancel, null!);
     await act.save();
     await this.refresh();
   }

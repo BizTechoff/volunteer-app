@@ -13,7 +13,7 @@
                     <!-- {{ terms.saveAndClose }} -->
                     <mat-icon>photo_camera</mat-icon>
                 </button>
-                <button *ngIf="!this.isDonor()" mat-flat-button color="primary" style="height: 35px;"
+                <button *ngIf="this.isAllowEdit()" mat-flat-button color="primary" style="height: 35px;"
                     (click)='saveAndClose()'>
                     {{ terms.saveAndClose }}
                 </button>

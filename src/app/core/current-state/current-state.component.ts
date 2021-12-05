@@ -50,11 +50,12 @@ export class CurrentStateComponent implements OnInit {
     // onClick: (event: MouseEvent, legendItem: any) => {
     //   // this.openActivitiesByStatuses()
     //   return false;
-    // },
+    // },//type PositionType = 'left' | 'right' | 'top' | 'bottom' | 'chartArea';
     title: { text: terms.activitiesByStatuses, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: 12 },
+    layout: { padding: {left: +28} },
     legend: {
+      // align: 'start',
       rtl: true,
       textDirection: 'rtl',
       position: 'right',
@@ -73,7 +74,7 @@ export class CurrentStateComponent implements OnInit {
     // },
     title: { text: terms.activitiesByDayPeriods, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: 12 },
+    // layout: { padding: 12 },
     legend: {
       rtl: true,
       textDirection: 'rtl',
@@ -93,7 +94,7 @@ export class CurrentStateComponent implements OnInit {
     // },
     title: { text: terms.activitiesByReferrer, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: 12 },
+    // layout: { padding: 12 },
     legend: {
       rtl: true,
       textDirection: 'rtl',
@@ -110,7 +111,7 @@ export class CurrentStateComponent implements OnInit {
     responsive: true,
     title: { text: terms.activitiesByPurpose, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: 12 },
+    // layout: { padding: 12 },
     legend: {
       rtl: true,
       textDirection: 'rtl',
@@ -127,7 +128,7 @@ export class CurrentStateComponent implements OnInit {
     responsive: true,
     title: { text: terms.activitiesByWeekDay, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: 12 },
+    // layout: { padding: 12 },
     legend: {
       rtl: true,
       textDirection: 'rtl',
@@ -167,7 +168,7 @@ export class CurrentStateComponent implements OnInit {
 
   refreshedTime = '00:00';
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-  maxLabelLength = 25;
+  maxLabelLength = 0;
 
   activitiesByStatus: { branch: Branch, status: ActivityStatus, count: number }[] = [];
   activitiesByPurpose: { branch: Branch, purpose: ActivityPurpose, count: number }[] = [];
@@ -310,12 +311,12 @@ export class CurrentStateComponent implements OnInit {
     this.pieChartDataReferrer = [];
 
     for (const a of this.activitiesByStatus) {
-      let label = a.status.caption;
-      if (a.status === ActivityStatus.problem) {
-        label = label;
-      }
+      let label = a.status.caption;//.replace('ממתין', 'לא');
+      // if (a.status === ActivityStatus.problem) {
+      //   label = label;
+      // }
       label += ` (${a.count})`;
-      this.pieChartLabelsStatuses.push(label.padEnd(20));
+      this.pieChartLabelsStatuses.push(label.padEnd(this.maxLabelLength));
       this.pieChartDataStatuses.push(a.count);
     }
 
@@ -324,7 +325,7 @@ export class CurrentStateComponent implements OnInit {
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsPurposes.push(label.padEnd(20));
+      this.pieChartLabelsPurposes.push(label.padEnd(this.maxLabelLength));
       this.pieChartDataPurposes.push(a.count);
     }
     // (this.pieChartColors[0].backgroundColor as string[]).push(...this.colors2);
@@ -334,7 +335,7 @@ export class CurrentStateComponent implements OnInit {
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsDayPeriods.push(label.padEnd(20));
+      this.pieChartLabelsDayPeriods.push(label.padEnd(this.maxLabelLength));
       this.pieChartDataDayPeriods.push(a.count);
     }
 
@@ -343,7 +344,7 @@ export class CurrentStateComponent implements OnInit {
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsReferrer.push(label.padEnd(20));
+      this.pieChartLabelsReferrer.push(label.padEnd(this.maxLabelLength));
       this.pieChartDataReferrer.push(a.count);
     }
 
@@ -355,7 +356,7 @@ export class CurrentStateComponent implements OnInit {
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsWeekDay.push(label.padEnd(20));
+      this.pieChartLabelsWeekDay.push(label.padEnd(this.maxLabelLength));
       this.pieChartDataWeekDay.push(a.count);
     }
     // (this.pieChartColors[0].backgroundColor as string[]).push(...this.colors2);

@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BackendMethod, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
+import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Branch } from '../../branch/branch';
@@ -33,7 +34,18 @@ export class PhotosAlbumComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
  
   constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) { }
+  
 
+  isAllowEdit(){
+    if(this.isDonor() || (OnlyVolunteerEditActivity && this.isManager())){
+      return false;
+    }
+    return true;
+  }
+
+  isManager() {
+    return this.remult.isAllowed(Roles.manager);
+  }
 
   isDonor() {
     return this.remult.isAllowed(Roles.donor);

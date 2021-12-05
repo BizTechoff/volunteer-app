@@ -81,9 +81,9 @@ export class UsersComponent implements OnInit {
           }
         }
       },
-      { field: users.mobile },//, width: '100'
       { field: users.bid, caption: terms.branch },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
-      { field: users.email }
+      { field: users.email },
+      { field: users.mobile }//, width: '100'
     ],
     gridButtons: [
       {

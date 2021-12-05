@@ -1,9 +1,9 @@
 import { FieldRef, Filter, IdEntity } from "remult";
 import { terms } from "../terms";
-
+ 
 export const FILTER_IGNORE: Filter = new Filter(x => { return true; });
 export const FILTER_RESTRICT: Filter = new Filter(x => { return false; });
-
+export const OnlyVolunteerEditActivity = true;
 
 export const DateRequiredValidation = (_: any, col: FieldRef<any, Date>) => {
     let ok = col.value && col.value.getFullYear() > 1900 ? true : false;
@@ -33,16 +33,13 @@ export const TimeRequireValidator = (_: any, col: FieldRef<any, string>) => {
         col.error = terms.requiredField;
 }
 
-export const ColorNumberValidator = (_: any, col: FieldRef<any, string>) => {
+export const ColorNumberValidator = (_: any, col: FieldRef<any, number>) => {
     // console.log(col.value);
-    let ok = col.value && col.value.trim().length > 0 ? true : false;
-    if (ok) {
-        let v = parseInt(col.value);
-        ok &&= (v >= 0 && v <= 11);
-        {
-
-        }
-    }
+    let ok = col && col.value >= 0 && col.value <= 11 ? true : false;
+    // if (ok) {
+    //     // let v = parseInt(col.value);
+    //     ok &&= (v >= 0 && v <= 11);
+    // }
     if (!ok!)
         col.error = terms.colorRangeError.replace('!min!', '1').replace('!max!', '11');
 }

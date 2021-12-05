@@ -1,26 +1,100 @@
 import { DatePipe } from "@angular/common";
 import { BackendMethod, Remult } from "remult";
-import { CalendarRequest } from "./types";
- 
+import { Activity } from "../core/activity/activity";
+import { terms } from "../terms";
+import { Users } from "../users/users";
+import { AttendeeRequest, CalendarRequest, IcsRequest } from "./types";
+
 export class EmailSvc {
+    static toCalendarService: (sender: string, req: IcsRequest) => Promise<boolean>;
     static sendCalendar: (req: CalendarRequest) => Promise<boolean>;
     static sendMail: (req: CalendarRequest) => Promise<boolean>;
-    // static sendMail: (email: string, subject: string, message: string, link: string, remult: Remult) => Promise<boolean>;
-    // static sendMail2: (req: CalendarRequest) => Promise<boolean>;
- 
-    // @BackendMethod({ allowed: true })
-    // static async SendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
-    //     return await EmailSvc.sendMail(to, subject, text, link, remult!);
-    // }
-    
+
     @BackendMethod({ allowed: true })
     static async SendEmail(req: CalendarRequest) {
         return await EmailSvc.sendMail(req);
-    } 
+    }
     @BackendMethod({ allowed: true })
     static async sendToCalendar(req: CalendarRequest) {
         return await EmailSvc.sendCalendar(req);
-    } 
+    }
+    @BackendMethod({ allowed: true })
+    static async toCalendar(aid: string, remult?: Remult) {
+        let a = await remult!.repo(Activity).findId(aid);
+        if (!a) {
+            console.debug(`toCalendar.aid(${aid}) NOT found`);
+            return false;
+        }
+        let vidsNames = '';
+        if (a.vids.length > 1) {
+            vidsNames = `לכם (${a.$.vids.displayValue})`;
+        }
+        else if (a.vids.length === 1) {
+            vidsNames = `לך (${a.$.vids.displayValue})`;
+        }
+        else if (a.vids.length === 0) {
+            // cancel the event
+        }
+        let title = terms.voulnteerNewAssignSubject
+            .replace('!tname!', a.tid.name)
+            .replace('!branch!', a.bid.name);
+        let html = terms.voulnteerNewAssign
+            .replace('!vnames!', vidsNames)
+            .replace('!purposeDesc!', a.purposeDesc)
+            .replace('!name!', a.tid.name)
+            .replace('!date!', DateUtils.toDateString(a.date))
+            .replace('!from!', a.fh)
+            .replace('!to!', a.th)
+            .replace('!address!', a.tid.address);
+
+        let attendees = [] as AttendeeRequest[];
+        for (const v of a.vids) {
+            let u = await remult!.repo(Users).findId(v.id);
+            attendees.push(
+                {
+                    name: u.name,
+                    email: u.email,
+                    rsvp: true,
+                    partstat: 'ACCEPTED',
+                    role: 'OPT-PARTICIPANT'
+                });
+        };
+
+        let req: IcsRequest = {
+            aid: a.id,
+            color: a.bid.color,
+            sequence: 2,// new Date().getTime(),
+            title: title,
+            description: html,
+            location: a.tid.address,
+            url: '',// 'bit.ly/eshel-app',
+            start: {
+                year: a.date.getFullYear(),
+                month: a.date.getMonth() + 1,
+                day: a.date.getDate(),
+                hours: parseInt(a.fh.split(':')[0]),
+                minutes: parseInt(a.fh.split(':')[1])
+            },
+            duration: {
+                hours: parseInt(a.th.split(':')[0]) - parseInt(a.fh.split(':')[0]),
+                minutes: parseInt(a.th.split(':')[1]) - parseInt(a.fh.split(':')[1])
+            },
+            status: 'CONFIRMED',
+            busyStatus: 'BUSY',
+            organizer: {
+                displayName: a.bid.name, //u.name
+                email: a.bid.email // this.isManager() ? b.email : u.email
+            },
+            attendees: attendees
+        };
+
+
+        return await EmailSvc.toCalendarService(a.bid.email, req);
+        // { sender: a.bid.email, req: req}););
+    }
+
+    buildEmail() { }
+    buildEevent() { }
 }
 export class DateUtils {
 

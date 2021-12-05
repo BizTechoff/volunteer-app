@@ -19,6 +19,12 @@ EmailSvc.sendMail = async (req: CalendarRequest) => {
     let content = buildICS(req.ics);
     // let content = buildICS2('eashel from original');
 
+    if (!req.email) {
+        req.email = { from: '', to: '', cc: '', subject: '', html: '' };
+        console.log('No Email Details, Could NOT send email.');
+        return false;
+    }
+
     var mailOptions: Mail.Options = {
         from: `אשל מתנדבים <${process.env.ADMIN_GMAIL_MAIL}>`,//'Sender Name <sender@server.com>'
         to: req.email.to,
@@ -87,4 +93,3 @@ function buildICS(req: IcsRequest) {//date:Date,fh:string,th:string, tilte:strin
 
     return content;
 }
- 

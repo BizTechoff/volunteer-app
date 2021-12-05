@@ -130,14 +130,14 @@ export class ActivityStatus {
                 a.assigned = new Date();
                 a.status = to;
                 await a.save();
-                // sendEmail(a, New-Assigned);
+                // sendEmail(a, insertToCalendar);
             }
             else if (to === ActivityStatus.cancel) {
                 a.canceled = new Date();
                 a.status = to;
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
-                // sendEmail(a, Canceled-Assigned);
+                // sendEmail(a, deleteFromCalendar);
             } else return;
         });
     static w4_start = new ActivityStatus(2, 'ממתין להתחלה',
@@ -147,11 +147,16 @@ export class ActivityStatus {
                 a.status = to;
                 await a.save();
                 await ActivityStatus.showAfterStarted(a);
-                // sendEmail(a, Started);
+            }
+            else if (to === ActivityStatus.w4_assign) {
+                a.assigned = new Date();
+                a.status = to;
+                await a.save();
+                // sendEmail(a, deleteFromCalendar);
             }
             else if (to === ActivityStatus.cancel) {
                 a.canceled = new Date();
-                if (a.vids.length > 1) {
+                if (uid && a.vids.length > 1) {
                     //remove only yourself
                     let f = a.vids.find(itm => itm.id === uid);
                     if (f) {
@@ -164,7 +169,7 @@ export class ActivityStatus {
                 }
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
-                // sendEmail(a, Canceled-Assigned);
+                // sendEmail(a, updateCalendar);
             } else return;
             await a.save();
         });
@@ -175,14 +180,12 @@ export class ActivityStatus {
                 a.status = to;
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
-                // sendEmail(a, Success/Ended);
             }
             else if (to === ActivityStatus.problem) {
                 a.problemed = new Date();
                 a.status = to;
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
-                // sendEmail(a, Problem);
             } else return;
             await a.save();
         });
@@ -308,12 +311,14 @@ export class ActivityGeneralStatus {
                             // same tenant
                             conflicts.push(a);
                             error = terms.sameDateAndTimes + ' ' + terms.tenant;
+                            act.$.tid.error = terms.sameDateAndTimes + ' ' + terms.tenant;
                         }
                         if (error.length == 0) {
                             if (Activity.hasIntersuct(act.vids, a.vids)) {
                                 //same volunteers
                                 conflicts.push(a);
                                 error = terms.sameDateAndTimes + ' ' + terms.volunteers;
+                                act.$.vids.error = terms.sameDateAndTimes + ' ' + terms.volunteers;
                             }
                         }
                     }
@@ -366,6 +371,11 @@ export class Activity extends IdEntity {
     })
     bid!: Branch;
 
+    // @DataControl<Activity, Tenant>({
+    //     valueChange: (r, v) => { r.vids.splice(0);
+    //     console.log('@DataControl<Activity, Tenant>.');
+    //      }
+    // })
     @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required.withMessage(terms.requiredField) })
     // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
     //@Field({ caption: terms.tenant })

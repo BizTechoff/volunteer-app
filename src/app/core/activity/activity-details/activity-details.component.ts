@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
+import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { SelectTenantComponentComponent } from '../../../common/select-tenant-component/select-tenant-component.component';
 import { AttendeeRequest, CalendarRequest, UserIdName } from '../../../common/types';
 import { DateUtils, EmailSvc } from '../../../common/utils';
@@ -56,6 +57,13 @@ export class ActivityDetailsComponent implements OnInit {
     }
     this.args.changed = false;
     await this.retrieve();
+  }
+
+  isAllowEdit() {
+    if (this.isDonor() || (OnlyVolunteerEditActivity && this.isManager())) {
+      return false;
+    }
+    return true;
   }
 
   isBoard() {
@@ -152,7 +160,12 @@ export class ActivityDetailsComponent implements OnInit {
   async openTenants() {
     await openDialog(SelectTenantComponentComponent, x => x.args = {
       bid: this.activity.bid,
-      onSelect: t => this.activity.tid = t,
+      onSelect: t => {
+        if (this.activity.tid.id !== t.id) {
+          this.activity.tid = t;
+          this.activity.vids.splice(0);
+        }
+      },
       title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
       tenantLangs: []
     });
@@ -232,13 +245,18 @@ export class ActivityDetailsComponent implements OnInit {
         alreadySaved = true;
       }
     }
+    else {
+      await this.activity.status.onChanging(this.activity, ActivityStatus.w4_assign, this.remult.user.id);
+      alreadySaved = true;
+    }
     if (!alreadySaved) {
       await this.activity.save();
     }
     // console.log('isnew',this.activity.isNew());
     this.args.changed = true;
     this.args.aid = this.activity.id;
-    await this.sendEmails();
+    // let success = await EmailSvc.toCalendar(this.activity.id);
+    let success = await this.sendEmails();
     this.close();
   }
   // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
@@ -296,54 +314,62 @@ export class ActivityDetailsComponent implements OnInit {
       }
       // console.log('4.4', v.name);
     }
+
+    return await this.sendMail(emails);
     // console.log('5', emails.length);
 
-    if (emails.length > 0) {
-      // console.log('6');
-      // console.log('emails', emails);
-      // console.log('11111');
+    // if (emails.length > 0) {
+    // console.log('6');
+    // console.log('emails', emails);
+    // console.log('11111');
 
-      let message = `האם לשלוח אמייל` +
-        `\n` +
-        (removed > 0 ? `ל- ${removed} מתנדבים לגבי ביטול השתתפותם בפעילות` : '') +
-        `\n` +
-        (added > 0 ? (added > 0 ? 'ו' : '') + `ל- ${added} מתנדבים זימון השתתפות בפעילות` : '');
-      // console.log('message', message);
+    // let message = `האם לשלוח אמייל` +
+    //   `\n` +
+    //   (removed > 0 ? `ל- ${removed} מתנדבים לגבי ביטול השתתפותם בפעילות` : '') +
+    //   `\n` +
+    //   (added > 0 ? (added > 0 ? 'ו' : '') + `ל- ${added} מתנדבים זימון השתתפות בפעילות` : '');
+    // console.log('message', message);
 
-      // console.log('7');
-      // console.log('22222');
-      let yes = true;// await this.dialog.yesNoQuestion(message);
-      if (yes) {
-        // console.log('8');
-        let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
-        for (const e of emails) {
-          users.push({
-            name: e.name,
-            email: e.email
-          });
-        }
-        for (const e of emails) {
-          let ok = await this.sendMail(e.email, e.type, users);
-          if (ok) {
-            // let u = await this.remult.repo(Users).findId(e.uid);
-            // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
-            // n.
-          }
-        }
-      }
-    }
-    // console.log('99');
+    // console.log('7');
+    // console.log('22222');
+    // let yes = true;// await this.dialog.yesNoQuestion(message);
+    // if (yes) {
+    // console.log('8');
+    // let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
+    // for (const e of emails) {
+    //   users.push({
+    //     name: e.name,
+    //     email: e.email
+    //   });
+    // }
+    // for (const e of emails) {
+    // let ok = await this.sendMail(emails);
+    // if (ok) {
+    //   // let u = await this.remult.repo(Users).findId(e.uid);
+    //   // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
+    //   // n.
+    // }
+    // }
+    // }
+    // }
+    // else{
+    //   // send cancel
+    //   let req: CalendarRequest;
+    // return await EmailSvc.sendToCalendar(req);
+    // }
   }
 
-  async sendMail(email: string, type: NotificationsTypes, users: { name: string, email: string }[]) {
-    let u = await this.remult.repo(Users).findId(this.remult.user.id);
-    let b = await this.remult.repo(Branch).findId(this.activity.bid.id);
+  async sendMail(emails: { uid: string, name: string, email: string, type: NotificationsTypes }[]) {
+    // console.log('this.activity.bid.id', this.activity.bid.id, this.activity.bid.name, this.activity.bid.email, this.activity.bid.color);
 
-    if (!users) {
-      users = [] as { name: string, email: string }[];
+    // async sendMail(email: string, type: NotificationsTypes, users: { name: string, email: string }[]) {
+    // let b = await this.remult.repo(Branch).findId(this.activity.bid.id);
+    let b = this.activity.bid;
+    if (!emails) {
+      emails = [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
     }
     let attendees = [] as AttendeeRequest[];
-    for (const u of users) {
+    for (const u of emails) {
       attendees.push(
         {
           name: u.name,
@@ -382,7 +408,7 @@ export class ActivityDetailsComponent implements OnInit {
       sender: b.email,
       email: {
         from: b.email,
-        to: email,
+        to: emails.map(e => e.email).join(','),
         cc: '',
         subject: subject,
         html: html

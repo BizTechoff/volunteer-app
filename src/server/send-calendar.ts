@@ -14,13 +14,13 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
     let data = JSON.parse(process.env.CALENDAR_BRANCHES!);
     let branches: CalendarClient[] = [] as CalendarClient[];
     branches.push(...data);
- 
+
     let found = branches.find(b => req.sender.includes(b.name));
     if (!found) {
         console.debug(`אימייל הסניף ${req.sender} אינו מוגדר במערכת`);
         return false;
     }
- 
+
     const auth = new google.auth.OAuth2(
         {
             clientId: found.client.id,
@@ -32,16 +32,7 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
         refresh_token: found.client.token
     })
 
-    let start = dateTimeForCalander(req.ics.start);
-    let calc = req.ics.start;
-    calc.hours += req.ics.duration.hours;
-    calc.minutes += req.ics.duration.minutes;
-    let end = dateTimeForCalander(calc);
-
-    let organizer = {
-        email: req.ics.organizer.email,
-        displayName: req.ics.organizer.displayName
-    };// calendar_v3.Schema$Event.organizer
+    const calendar = google.calendar({ version: "v3", auth: auth });
     let attendees = [] as calendar_v3.Schema$EventAttendee[];
     for (const a of req.ics.attendees) {
         attendees.push({
@@ -50,89 +41,54 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
         });
     }
 
-    let event: calendar_v3.Schema$Event = {
-        summary: req.ics.title,
-        description: req.ics.description,
-        start: {
-            'dateTime': start,
-            'timeZone': 'Asia/Jerusalem'
-        },
-        end: {
-            'dateTime': end,
-            'timeZone': 'Asia/Jerusalem'
-        },
-        location: req.ics.location,
-        id: iCalId2Id(req.ics.aid),
-        // iCalUID: req.ics.aid,
-        colorId: req.ics.color + '',
-        organizer: organizer,
-        attendees: attendees,
-        visibility: 'public',
-        reminders: {
-            useDefault: false,
-            overrides: [
-                { method: 'email', minutes: 24 * 60 },//day before
-                { method: 'popup', minutes: 120 }//2 hours before
-            ]
+    if (attendees.length > 0) {
+        let start = dateTimeForCalander(req.ics.start);
+        let calc = req.ics.start;
+        calc.hours += req.ics.duration.hours;
+        calc.minutes += req.ics.duration.minutes;
+        let end = dateTimeForCalander(calc);
+
+        let organizer = {
+            email: req.ics.organizer.email,
+            displayName: req.ics.organizer.displayName
+        };// calendar_v3.Schema$Event.organizer
+
+        let event: calendar_v3.Schema$Event = {
+            summary: req.ics.title,
+            description: req.ics.description,
+            start: {
+                'dateTime': start,
+                'timeZone': 'Asia/Jerusalem'
+            },
+            end: {
+                'dateTime': end,
+                'timeZone': 'Asia/Jerusalem'
+            },
+            location: req.ics.location,
+            id: iCalId2Id(req.ics.aid),
+            // iCalUID: req.ics.aid,
+            colorId: req.ics.color + '',
+            organizer: organizer,
+            attendees: attendees,
+            visibility: 'public',
+            reminders: {
+                useDefault: false,
+                overrides: [
+                    { method: 'email', minutes: 24 * 60 },//day before
+                    { method: 'popup', minutes: 120 }//2 hours before
+                ]
+            }
+        };
+        if (!await insertEvent(calendar, req.ics.aid, event)) {
+            await updateEvent(calendar, req.ics.aid, event);
         }
-    };
-
-    // let count = await listEvent();
-    // console.log('count', count);
-
-    // Google calendar API settings
-    const calendar = google.calendar({ version: "v3", auth: auth });
-
-    if (!await insertEvent(calendar, req.ics.aid, event)) {
-        await updateEvent(calendar, req.ics.aid, event);
+    }
+    else {
+        await deleteEvent(calendar, req.ics.aid);
     }
 
     return true;
 }
-
-function iCalId2Id(aid: string) {
-    let result = '';
-    let invalid = ['-', 'w', 'x', 'y', 'z'];
-    for (const c of aid.trim()) {
-        if (!invalid.includes(c)) {
-            result += c;
-        }
-    }
-    return result;
-}
-
-function dateTimeForCalander(date: DateRequest) {
-    const TIMEOFFSET = '+02:00';
-
-    let year = date.year;
-    let month = date.month;
-    let m = month + '';
-    if (month < 10) {
-        m = `0${month}`;
-    }
-    let day = date.day;
-    let d = day + '';
-    if (day < 10) {
-        d = `0${day}`;
-    }
-    let hour = date.hours;
-    let h = hour + '';
-    let h2 = hour + 1 + '';
-    if (hour < 10) {
-        h = `0${hour}`;
-        if (hour < 9) {
-            h2 = `0${hour}`;
-        }
-    }
-    let minute = date.minutes;
-    let min = minute + '';
-    if (minute < 10) {
-        min = `0${minute}`;
-    }
-
-    let newDateTime = `${year}-${m}-${d}T${h}:${min}:00.000${TIMEOFFSET}`;
-    return newDateTime;
-};
 
 async function insertEvent(calendar: calendar_v3.Calendar, aid: string, event: calendar_v3.Schema$Event) {
 
@@ -177,6 +133,29 @@ async function updateEvent(calendar: calendar_v3.Calendar, aid: string, event: c
         }
     } catch (error) {
         console.debug(`Error at updateEvent --> ${error}`);
+        return 0;
+    }
+};
+
+async function deleteEvent(calendar: calendar_v3.Calendar, aid: string) {
+
+    try {
+        let response = await calendar.events.delete({
+            eventId: iCalId2Id(aid),
+            calendarId: 'primary',
+            sendNotifications: true,
+            sendUpdates: 'all'
+        });
+
+        if (response['status'] == 200 && response['statusText'] === 'OK') {
+            console.debug('Delete Event', 'OK');
+            return 1;
+        } else {
+            console.debug('Delete Event Error', response['status']);
+            return 0;
+        }
+    } catch (error) {
+        console.debug(`Error at deleteEvent --> ${error}`);
         return 0;
     }
 };
@@ -236,3 +215,61 @@ async function listEvent(calendar: calendar_v3.Calendar, aid: string) {
     }
     return result;
 };
+
+
+function iCalId2Id(aid: string) {
+    let result = '';
+    let invalid = ['-', 'w', 'x', 'y', 'z'];
+    for (const c of aid.trim()) {
+        if (!invalid.includes(c)) {
+            result += c;
+        }
+    }
+    return result;
+}
+
+function dateTimeForCalander(date: DateRequest) {
+    const TIMEOFFSET = '+02:00';
+
+    let year = date.year;
+    let month = date.month;
+    let m = month + '';
+    if (month < 10) {
+        m = `0${month}`;
+    }
+    let day = date.day;
+    let d = day + '';
+    if (day < 10) {
+        d = `0${day}`;
+    }
+    let hour = date.hours;
+    let h = hour + '';
+    let h2 = hour + 1 + '';
+    if (hour < 10) {
+        h = `0${hour}`;
+        if (hour < 9) {
+            h2 = `0${hour}`;
+        }
+    }
+    let minute = date.minutes;
+    let min = minute + '';
+    if (minute < 10) {
+        min = `0${minute}`;
+    }
+
+    let newDateTime = `${year}-${m}-${d}T${h}:${min}:00.000${TIMEOFFSET}`;
+    return newDateTime;
+};
+
+    // let count = await listEvent();
+    // console.log('count', count);
+
+    // Google calendar API settings
+    // const calendar = google.calendar({ version: "v3", auth: auth });
+
+    // if(attendees.length === 0){
+    //     await deleteEvent(calendar, req.ics.aid);
+    // }
+    // else if (!await insertEvent(calendar, req.ics.aid, event)) {
+    //     await updateEvent(calendar, req.ics.aid, event);
+    // }

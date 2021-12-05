@@ -57,6 +57,10 @@ export class VolunteersAssignmentComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
   terms = terms;
 
+  isDonor() {
+    return this.remult.isAllowed(Roles.donor);
+  }
+
   isManager() {
     return this.remult.isAllowed(Roles.manager);
   }

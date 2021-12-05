@@ -151,7 +151,7 @@ export class VolunteersListComponent implements OnInit {
     }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
-        title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? '<mat-icon>block</mat-icon> (לקריאה בלבד)' : ''),
+        title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? '(לקריאה בלבד)' : ''),
         fields: () => [
           { field: u!.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
           { field: u!.$.name, caption: terms.name },
