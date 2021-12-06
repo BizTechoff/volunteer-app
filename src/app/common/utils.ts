@@ -7,19 +7,20 @@ import { AttendeeRequest, CalendarRequest, IcsRequest } from "./types";
 
 export class EmailSvc {
     static toCalendarService: (sender: string, req: IcsRequest) => Promise<boolean>;
-    static sendCalendar: (req: CalendarRequest) => Promise<boolean>;
+    // static sendCalendar: (req: CalendarRequest) => Promise<boolean>;
     static sendMail: (req: CalendarRequest) => Promise<boolean>;
 
     @BackendMethod({ allowed: true })
     static async SendEmail(req: CalendarRequest) {
         return await EmailSvc.sendMail(req);
     }
-    @BackendMethod({ allowed: true })
-    static async sendToCalendar(req: CalendarRequest) {
-        return await EmailSvc.sendCalendar(req);
-    }
+    // @BackendMethod({ allowed: true })
+    // static async sendToCalendar(req: CalendarRequest) {
+    //     return await EmailSvc.sendCalendar(req);
+    // } 
     @BackendMethod({ allowed: true })
     static async toCalendar(aid: string, remult?: Remult) {
+        // console.log('from cancel - toCalendar 2')
         let a = await remult!.repo(Activity).findId(aid);
         if (!a) {
             console.debug(`toCalendar.aid(${aid}) NOT found`);

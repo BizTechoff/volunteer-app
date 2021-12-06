@@ -5,6 +5,7 @@ import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, TimeRe
 import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
+import { EmailSvc } from "../../common/utils";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
@@ -137,6 +138,7 @@ export class ActivityStatus {
                 a.status = to;
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
+                let success = await EmailSvc.toCalendar(a.id);
                 // sendEmail(a, deleteFromCalendar);
             } else return;
         });
@@ -156,22 +158,24 @@ export class ActivityStatus {
             }
             else if (to === ActivityStatus.cancel) {
                 a.canceled = new Date();
-                if (uid && a.vids.length > 1) {
-                    //remove only yourself
+                if (a.vids) {
                     let f = a.vids.find(itm => itm.id === uid);
                     if (f) {
                         let i = a.vids.indexOf(f);
                         a.vids.splice(i, 1);
                     }
-                }
-                else {// its only you here
-                    a.status = to;
+                    if (a.vids.length == 0) {// its only you here
+                        a.status = to;
+                    }
                 }
                 await a.save();
+                // console.log('after save', a.vids);
                 await ActivityStatus.showOnlySummary(a);
+                // console.log('from cancel - toCalendar 1')
+                let success = await EmailSvc.toCalendar(a.id);
                 // sendEmail(a, updateCalendar);
             } else return;
-            await a.save();
+            // await a.save();
         });
     static w4_end = new ActivityStatus(3, 'ממתין לסיום',
         async (a, to, uid) => {//t=the new status
@@ -187,7 +191,7 @@ export class ActivityStatus {
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
             } else return;
-            await a.save();
+            // await a.save();
         });
     static success = new ActivityStatus(4, 'הסתיים בהצלחה', () => undefined!, 'green');
     static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined!, 'red');

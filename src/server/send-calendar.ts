@@ -3,21 +3,20 @@
 // https://www.nylas.com/blog/integrate-google-calendar-api
 
 import { calendar_v3, google } from 'googleapis';
-import { CalendarClient, CalendarRequest, DateRequest } from '../app/common/types';
+import { CalendarClient, CalendarRequest, DateRequest, IcsRequest } from '../app/common/types';
 import { EmailSvc } from '../app/common/utils';
 
-
-EmailSvc.sendCalendar = async (req: CalendarRequest) => {
+EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
     console.debug('send-calendar', req);
     const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
-
+ 
     let data = JSON.parse(process.env.CALENDAR_BRANCHES!);
     let branches: CalendarClient[] = [] as CalendarClient[];
     branches.push(...data);
 
-    let found = branches.find(b => req.sender.includes(b.name));
+    let found = branches.find(b => sender.includes(b.name));
     if (!found) {
-        console.debug(`אימייל הסניף ${req.sender} אינו מוגדר במערכת`);
+        console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
         return false;
     }
 
@@ -34,7 +33,7 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
 
     const calendar = google.calendar({ version: "v3", auth: auth });
     let attendees = [] as calendar_v3.Schema$EventAttendee[];
-    for (const a of req.ics.attendees) {
+    for (const a of req.attendees) {
         attendees.push({
             email: a.email,
             displayName: a.name
@@ -42,20 +41,20 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
     }
 
     if (attendees.length > 0) {
-        let start = dateTimeForCalander(req.ics.start);
-        let calc = req.ics.start;
-        calc.hours += req.ics.duration.hours;
-        calc.minutes += req.ics.duration.minutes;
+        let start = dateTimeForCalander(req.start);
+        let calc = req.start;
+        calc.hours += req.duration.hours;
+        calc.minutes += req.duration.minutes;
         let end = dateTimeForCalander(calc);
 
         let organizer = {
-            email: req.ics.organizer.email,
-            displayName: req.ics.organizer.displayName
+            email: req.organizer.email,
+            displayName: req.organizer.displayName
         };// calendar_v3.Schema$Event.organizer
 
         let event: calendar_v3.Schema$Event = {
-            summary: req.ics.title,
-            description: req.ics.description,
+            summary: req.title,
+            description: req.description,
             start: {
                 'dateTime': start,
                 'timeZone': 'Asia/Jerusalem'
@@ -64,10 +63,10 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
                 'dateTime': end,
                 'timeZone': 'Asia/Jerusalem'
             },
-            location: req.ics.location,
-            id: iCalId2Id(req.ics.aid),
+            location: req.location,
+            id: iCalId2Id(req.aid),
             // iCalUID: req.ics.aid,
-            colorId: req.ics.color + '',
+            colorId: req.color + '',
             organizer: organizer,
             attendees: attendees,
             visibility: 'public',
@@ -79,16 +78,99 @@ EmailSvc.sendCalendar = async (req: CalendarRequest) => {
                 ]
             }
         };
-        if (!await insertEvent(calendar, req.ics.aid, event)) {
-            await updateEvent(calendar, req.ics.aid, event);
+        if (!await insertEvent(calendar, req.aid, event)) {
+            await updateEvent(calendar, req.aid, event);
         }
     }
     else {
-        await deleteEvent(calendar, req.ics.aid);
+        await deleteEvent(calendar, req.aid);
     }
 
     return true;
 }
+
+// EmailSvc.sendCalendar = async (req: CalendarRequest) => {
+//     console.debug('send-calendar', req);
+//     const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
+
+//     let data = JSON.parse(process.env.CALENDAR_BRANCHES!);
+//     let branches: CalendarClient[] = [] as CalendarClient[];
+//     branches.push(...data);
+
+//     let found = branches.find(b => req.sender.includes(b.name));
+//     if (!found) {
+//         console.debug(`אימייל הסניף ${req.sender} אינו מוגדר במערכת`);
+//         return false;
+//     }
+
+//     const auth = new google.auth.OAuth2(
+//         {
+//             clientId: found.client.id,
+//             clientSecret: found.client.secret
+//         });
+
+//     auth.setCredentials({
+//         scope: SCOPE,
+//         refresh_token: found.client.token
+//     })
+
+//     const calendar = google.calendar({ version: "v3", auth: auth });
+//     let attendees = [] as calendar_v3.Schema$EventAttendee[];
+//     for (const a of req.ics.attendees) {
+//         attendees.push({
+//             email: a.email,
+//             displayName: a.name
+//         });
+//     }
+
+//     if (attendees.length > 0) {
+//         let start = dateTimeForCalander(req.ics.start);
+//         let calc = req.ics.start;
+//         calc.hours += req.ics.duration.hours;
+//         calc.minutes += req.ics.duration.minutes;
+//         let end = dateTimeForCalander(calc);
+
+//         let organizer = {
+//             email: req.ics.organizer.email,
+//             displayName: req.ics.organizer.displayName
+//         };// calendar_v3.Schema$Event.organizer
+
+//         let event: calendar_v3.Schema$Event = {
+//             summary: req.ics.title,
+//             description: req.ics.description,
+//             start: {
+//                 'dateTime': start,
+//                 'timeZone': 'Asia/Jerusalem'
+//             },
+//             end: {
+//                 'dateTime': end,
+//                 'timeZone': 'Asia/Jerusalem'
+//             },
+//             location: req.ics.location,
+//             id: iCalId2Id(req.ics.aid),
+//             // iCalUID: req.ics.aid,
+//             colorId: req.ics.color + '',
+//             organizer: organizer,
+//             attendees: attendees,
+//             visibility: 'public',
+//             reminders: {
+//                 useDefault: false,
+//                 overrides: [
+//                     { method: 'email', minutes: 24 * 60 },//day before
+//                     { method: 'popup', minutes: 120 }//2 hours before
+//                 ]
+//             }
+//         };
+//         if (!await insertEvent(calendar, req.ics.aid, event)) {
+//             await updateEvent(calendar, req.ics.aid, event);
+//         }
+//     }
+//     else {
+//         await deleteEvent(calendar, req.ics.aid);
+//     }
+
+//     return true;
+// }
 
 async function insertEvent(calendar: calendar_v3.Calendar, aid: string, event: calendar_v3.Schema$Event) {
 

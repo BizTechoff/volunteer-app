@@ -12,7 +12,7 @@
     <ng-container *ngIf="remult.authenticated()">
       <button style="word-wrap: break-word;" mat-flat-button color="primary" [matMenuTriggerFor]="menu">
         {{remult.user.name}} ({{ this.getUserAuthName()}})
-      </button>
+      </button> 
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="updateInfo()">{{terms.updateInfo}}</button>
         <button mat-menu-item (click)="changePassword()">{{terms.changePassword}}</button>

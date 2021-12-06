@@ -112,7 +112,7 @@ export class ActivityDetailsComponent implements OnInit {
       this.activity = this.remult.repo(Activity).create({
         bid: branch,
         tid: this.args.tid,//await this.remult.repo(Tenant).findId(this.args.tid!),
-        purposeDesc: terms.defaultPurposeDesc6,
+        // purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
         fh: '14:00',
         th: '16:00'
@@ -161,10 +161,12 @@ export class ActivityDetailsComponent implements OnInit {
     await openDialog(SelectTenantComponent, x => x.args = {
       bid: this.activity.bid,
       onSelect: t => {
-        if (this.activity.tid.id !== t.id) {
+        if (!this.activity.tid || this.activity.tid.id !== t.id) {
           this.activity.tid = t;
           this.activity.vids.splice(0);
+          this.addCurrentUserToVids();
         }
+        console.log(9);
       },
       title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
       tenantLangs: []
@@ -256,7 +258,8 @@ export class ActivityDetailsComponent implements OnInit {
     this.args.changed = true;
     this.args.aid = this.activity.id;
     // let success = await EmailSvc.toCalendar(this.activity.id);
-    let success = await this.sendEmails();
+    let success = await EmailSvc.toCalendar(this.activity.id);
+    // let success = await this.sendEmails();
     this.close();
   }
   // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
@@ -268,54 +271,54 @@ export class ActivityDetailsComponent implements OnInit {
     return false;
   }
 
-  async sendEmails() {
-    // console.log('1');
-    let emails: { uid: string, name: string, email: string, type: NotificationsTypes }[] =
-      [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
+  // async sendEmails() {
+  //   // console.log('1');
+  //   let emails: { uid: string, name: string, email: string, type: NotificationsTypes }[] =
+  //     [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
 
-    // console.log('2');
-    // get volunteers that already sent email, to cancel them.
-    let vols = await this.remult.repo(NotificationActivity).find({
-      where: row => row.activity.isEqualTo(this.activity)
-        .and(row.sentAssigned.isEqualTo(true))
-    });
+  //   // console.log('2');
+  //   // get volunteers that already sent email, to cancel them.
+  //   let vols = await this.remult.repo(NotificationActivity).find({
+  //     where: row => row.activity.isEqualTo(this.activity)
+  //       .and(row.sentAssigned.isEqualTo(true))
+  //   });
 
-    // console.log('3');
-    let removed = 0;
-    // for each one, send cancel if not in current-volunteers.
-    vols.forEach(async v => {
-      let f = this.activity.vids.find(itm => itm.id === v.id);
-      if (!f) {
-        let u = await this.remult.repo(Users).findId(v.id);
-        emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailCancelAssign });
-        ++removed;
-      }
-    });
+  //   // console.log('3');
+  //   let removed = 0;
+  //   // for each one, send cancel if not in current-volunteers.
+  //   vols.forEach(async v => {
+  //     let f = this.activity.vids.find(itm => itm.id === v.id);
+  //     if (!f) {
+  //       let u = await this.remult.repo(Users).findId(v.id);
+  //       emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailCancelAssign });
+  //       ++removed;
+  //     }
+  //   });
 
-    // console.log('4-', this.activity.vids.length);
-    // console.log(emails);
-    let added = 0;
+  //   // console.log('4-', this.activity.vids.length);
+  //   // console.log(emails);
+  //   let added = 0;
 
-    for (const v of this.activity.vids) {
-      // console.log('4.1', v.name);
-      let u = await this.remult.repo(Users).findId(v.id);
-      let f = emails.find(itm => itm.email === u.email);
-      if (f) {
-        // console.log('4.2', v.name);
-        let i = emails.indexOf(f);
-        emails.splice(i, 1);//dont send again.
-        --removed;
-        // f.type = NotificationsTypes.EmailAssign;
-      }
-      else {
-        // console.log('4.3', v.name);
-        emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailNewAssign });
-        ++added;
-      }
-      // console.log('4.4', v.name);
-    }
+  //   for (const v of this.activity.vids) {
+  //     // console.log('4.1', v.name);
+  //     let u = await this.remult.repo(Users).findId(v.id);
+  //     let f = emails.find(itm => itm.email === u.email);
+  //     if (f) {
+  //       // console.log('4.2', v.name);
+  //       let i = emails.indexOf(f);
+  //       emails.splice(i, 1);//dont send again.
+  //       --removed;
+  //       // f.type = NotificationsTypes.EmailAssign;
+  //     }
+  //     else {
+  //       // console.log('4.3', v.name);
+  //       emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailNewAssign });
+  //       ++added;
+  //     }
+  //     // console.log('4.4', v.name);
+  //   }
 
-    return await this.sendMail(emails);
+  //   return await this.sendMail(emails);
     // console.log('5', emails.length);
 
     // if (emails.length > 0) {
@@ -357,93 +360,93 @@ export class ActivityDetailsComponent implements OnInit {
     //   let req: CalendarRequest;
     // return await EmailSvc.sendToCalendar(req);
     // }
-  }
+  // }
 
-  async sendMail(emails: { uid: string, name: string, email: string, type: NotificationsTypes }[]) {
-    // console.log('this.activity.bid.id', this.activity.bid.id, this.activity.bid.name, this.activity.bid.email, this.activity.bid.color);
+  // async sendMail(emails: { uid: string, name: string, email: string, type: NotificationsTypes }[]) {
+  //   // console.log('this.activity.bid.id', this.activity.bid.id, this.activity.bid.name, this.activity.bid.email, this.activity.bid.color);
 
-    // async sendMail(email: string, type: NotificationsTypes, users: { name: string, email: string }[]) {
-    // let b = await this.remult.repo(Branch).findId(this.activity.bid.id);
-    let b = this.activity.bid;
-    if (!emails) {
-      emails = [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
-    }
-    let attendees = [] as AttendeeRequest[];
-    for (const u of emails) {
-      attendees.push(
-        {
-          name: u.name,
-          email: u.email,
-          rsvp: true,
-          partstat: 'ACCEPTED',
-          role: 'OPT-PARTICIPANT'
-        });
-    };
+  //   // async sendMail(email: string, type: NotificationsTypes, users: { name: string, email: string }[]) {
+  //   // let b = await this.remult.repo(Branch).findId(this.activity.bid.id);
+  //   let b = this.activity.bid;
+  //   if (!emails) {
+  //     emails = [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
+  //   }
+  //   let attendees = [] as AttendeeRequest[];
+  //   for (const u of emails) {
+  //     attendees.push(
+  //       {
+  //         name: u.name,
+  //         email: u.email,
+  //         rsvp: true,
+  //         partstat: 'ACCEPTED',
+  //         role: 'OPT-PARTICIPANT'
+  //       });
+  //   };
 
-    let vidsNames = '';
-    if (this.activity.vids.length > 1) {
-      vidsNames = `לכם (${this.activity.$.vids.displayValue})`;
-    }
-    else if (this.activity.vids.length === 1) {
-      vidsNames = `לך (${this.activity.$.vids.displayValue})`;
-    }
-    let subject = terms.voulnteerNewAssignSubject
-      .replace('!tname!', this.activity.tid.name)
-      .replace('!branch!', b.name);
-    let html = terms.voulnteerNewAssign
-      .replace('!vnames!', vidsNames)
-      .replace('!purposeDesc!', this.activity.purposeDesc)
-      .replace('!name!', this.activity.tid.name)
-      .replace('!date!', DateUtils.toDateString(this.activity.date))
-      .replace('!from!', this.activity.fh)
-      .replace('!to!', this.activity.th)
-      .replace('!address!', this.activity.tid.address);
-    // let start
-    // let split = this.activity.fh.split(':');
-    // if(split.length > 0){
+  //   let vidsNames = '';
+  //   if (this.activity.vids.length > 1) {
+  //     vidsNames = `לכם (${this.activity.$.vids.displayValue})`;
+  //   }
+  //   else if (this.activity.vids.length === 1) {
+  //     vidsNames = `לך (${this.activity.$.vids.displayValue})`;
+  //   }
+  //   let subject = terms.voulnteerNewAssignSubject
+  //     .replace('!tname!', this.activity.tid.name)
+  //     .replace('!branch!', b.name);
+  //   let html = terms.voulnteerNewAssign
+  //     .replace('!vnames!', vidsNames)
+  //     .replace('!purposeDesc!', this.activity.purposeDesc)
+  //     .replace('!name!', this.activity.tid.name)
+  //     .replace('!date!', DateUtils.toDateString(this.activity.date))
+  //     .replace('!from!', this.activity.fh)
+  //     .replace('!to!', this.activity.th)
+  //     .replace('!address!', this.activity.tid.address);
+  //   // let start
+  //   // let split = this.activity.fh.split(':');
+  //   // if(split.length > 0){
 
-    // }
-    // if (this.remult.isAllowed(Roles.))
-    let req: CalendarRequest = {
-      sender: b.email,
-      email: {
-        from: b.email,
-        to: emails.map(e => e.email).join(','),
-        cc: '',
-        subject: subject,
-        html: html
-      },
-      ics: {
-        aid: this.activity.id,
-        color: b.color,
-        sequence: 2,// new Date().getTime(),
-        title: subject,
-        description: html,
-        location: this.activity.tid.address,
-        url: '',// 'bit.ly/eshel-app',
-        start: {
-          year: this.activity.date.getFullYear(),
-          month: this.activity.date.getMonth() + 1,
-          day: this.activity.date.getDate(),
-          hours: parseInt(this.activity.fh.split(':')[0]),
-          minutes: parseInt(this.activity.fh.split(':')[1])
-        },
-        duration: {
-          hours: parseInt(this.activity.th.split(':')[0]) - parseInt(this.activity.fh.split(':')[0]),
-          minutes: parseInt(this.activity.th.split(':')[1]) - parseInt(this.activity.fh.split(':')[1])
-        },
-        status: 'CONFIRMED',
-        busyStatus: 'BUSY',
-        organizer: {
-          displayName: b.name, //u.name
-          email: b.email // this.isManager() ? b.email : u.email
-        },
-        attendees: attendees
-      }
-    };
+  //   // }
+  //   // if (this.remult.isAllowed(Roles.))
+  //   let req: CalendarRequest = {
+  //     sender: b.email,
+  //     email: {
+  //       from: b.email,
+  //       to: emails.map(e => e.email).join(','),
+  //       cc: '',
+  //       subject: subject,
+  //       html: html
+  //     },
+  //     ics: {
+  //       aid: this.activity.id,
+  //       color: b.color,
+  //       sequence: 2,// new Date().getTime(),
+  //       title: subject,
+  //       description: html,
+  //       location: this.activity.tid.address,
+  //       url: '',// 'bit.ly/eshel-app',
+  //       start: {
+  //         year: this.activity.date.getFullYear(),
+  //         month: this.activity.date.getMonth() + 1,
+  //         day: this.activity.date.getDate(),
+  //         hours: parseInt(this.activity.fh.split(':')[0]),
+  //         minutes: parseInt(this.activity.fh.split(':')[1])
+  //       },
+  //       duration: {
+  //         hours: parseInt(this.activity.th.split(':')[0]) - parseInt(this.activity.fh.split(':')[0]),
+  //         minutes: parseInt(this.activity.th.split(':')[1]) - parseInt(this.activity.fh.split(':')[1])
+  //       },
+  //       status: 'CONFIRMED',
+  //       busyStatus: 'BUSY',
+  //       organizer: {
+  //         displayName: b.name, //u.name
+  //         email: b.email // this.isManager() ? b.email : u.email
+  //       },
+  //       attendees: attendees
+  //     }
+  //   };
 
-    // return await EmailSvc.SendEmail(req);//sendToCalendar(req);
-    return await EmailSvc.sendToCalendar(req);
+  //   // return await EmailSvc.SendEmail(req);//sendToCalendar(req);
+  //   return await EmailSvc.sendToCalendar(req);
 
     // let message = type.text
     //   .replace('!name!', this.activity.tid.name)
@@ -464,7 +467,7 @@ export class ActivityDetailsComponent implements OnInit {
     // let subject = type.subject.replace('!tname!', this.activity.tid.name);
 
     // return await EmailSvc.SendEmail(email, subject, message, link);
-  }
+  // }
 
   async addPhoto() {
 

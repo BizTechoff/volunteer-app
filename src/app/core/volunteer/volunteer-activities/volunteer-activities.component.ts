@@ -31,8 +31,11 @@ export class VolunteerActivitiesComponent implements OnInit {
   }
 
   async openActivity(act?: Activity) {
+    // console.log(6);
+    
     let id = act && act.id && act.id.length > 0 ? act.id : '';
     if (id.length == 0) { // request to create new activity
+      // console.log(77);
       let today = new Date();
       today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       for (const a of this.activities) {
@@ -125,6 +128,7 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   async setNextStatus(a: Activity, toStatus: ActivityStatus) {
     await a.status.onChanging(a, toStatus, this.remult.user.id);
+    await this.refresh();
   }
 
   async openWaze(a: Activity) {

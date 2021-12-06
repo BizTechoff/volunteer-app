@@ -45,7 +45,7 @@ export class CalendarComponent implements OnInit {
   }
 
   async refresh() {
-    console.log('from refresh');
+    // console.log('from refresh');
     window?.location?.reload();
     // let t = this.branch;
     // this.branch  = null!;

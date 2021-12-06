@@ -3,7 +3,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, DataControl, GridSettings } from '@remult/angular';
 import { ContainsFilterFactory, Field, getFields, Remult } from 'remult';
-import { FILTER_IGNORE } from '../../../common/globals';
+import { FILTER_IGNORE, OnlyVolunteerEditActivity } from '../../../common/globals';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -57,6 +57,12 @@ export class VolunteersAssignmentComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
   terms = terms;
 
+  isAllowEdit() {
+    if (this.isDonor() || (OnlyVolunteerEditActivity && this.isManager())) {
+      return false;
+    }
+    return true;
+  }
   isDonor() {
     return this.remult.isAllowed(Roles.donor);
   }
@@ -94,16 +100,6 @@ export class VolunteersAssignmentComponent implements OnInit {
           }
           return result;
         },
-        // .and(this.filterBtTenantLangs ? this.contains(u.langs, this.args.langs) : FILTER_IGNORE)
-        // .and(this.search ? u.name.contains(this.search) : FILTER_IGNORE)
-        // .and(this.args.explicit && this.args.explicit.length > 0
-        //   ? u.id.isIn(this.args.explicit.map(x => x.id))
-        //   : u.bid!.isEqualTo(this.args.branch))
-        // מסקנה: כשמשבצים לדייר להציג את כל הסניף
-        // שמתנדב משבץ חברים או כשמנהל משבץ מתנדבים
-        // רק למי שמשובצים לו מתנדבים?
-        // פעם בא כשיוך לדייר ופעם כשיוך לפעילות!?
-        //this.isManager() ? FILTER_IGNORE : 
         allowCrud: false,
         allowSelection: true,
         columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs, u.email],
@@ -135,9 +131,13 @@ export class VolunteersAssignmentComponent implements OnInit {
   setGridSelected() {
     this.volunteers.selectedRows = [] as Users[];
     if (this.args.selected.length > 0) {
+      // console.log(1);
+      
       let ids = this.args.selected.map(x => x.id);
+      // console.log(2);
       if (ids.length > 0) {
         let items = this.volunteers.items.filter(itm => ids.includes(itm.id));
+        // console.log(3);
         if (items) {
           this.volunteers.selectedRows.push(...items);
         }

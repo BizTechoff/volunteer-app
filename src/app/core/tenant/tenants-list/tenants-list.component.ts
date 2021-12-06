@@ -76,12 +76,12 @@ export class TenantsListComponent implements OnInit {
           icon: 'groups',
           click: async (_) => await this.assignVolunteers(_)
         },
-        {
-          visible: (_) => !_.isNew() && !this.isDonor(),
-          textInMenu: terms.addActivity,
-          icon: 'add',
-          click: async (_) => await this.openActivity(_)
-        },
+        // {
+        //   visible: (_) => !_.isNew() && !this.isDonor(),
+        //   textInMenu: terms.addActivity,
+        //   icon: 'add',
+        //   click: async (_) => await this.openActivity(_)
+        // },
         {
           visible: (_) => !_.isNew(),
           textInMenu: terms.tenantDetails,
