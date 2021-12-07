@@ -192,6 +192,7 @@ export class ActivityDetailsComponent implements OnInit {
       }
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
+          allowChange: !this.isManager(),
           branch: this.activity.bid,
           explicit: explicit,
           title: this.activity.tid.name,

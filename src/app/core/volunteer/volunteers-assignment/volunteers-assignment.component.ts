@@ -27,13 +27,14 @@ export class VolunteersAssignmentComponent implements OnInit {
   }
 
   args: {
+    allowChange: boolean,
     branch: Branch,
     explicit: UserIdName[],
     langs: Langs[],
     title: string,
     selected: UserIdName[],
     changed?: boolean
-  } = { branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[] };
+  } = {allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[] };
 
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForVolunteerHere}` })
@@ -58,7 +59,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   terms = terms;
 
   isAllowEdit() {
-    if (this.isDonor() || (OnlyVolunteerEditActivity && this.isManager())) {
+    if (this.isDonor() || (OnlyVolunteerEditActivity && this.isManager() && !this.args.allowChange)) {
       return false;
     }
     return true;
