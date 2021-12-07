@@ -1,6 +1,6 @@
 
 import { DataControl, InputField, openDialog } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerField, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
@@ -244,6 +244,9 @@ export class Users extends IdEntity {
 
     @Field(options => options.valueType = Tenant, { caption: terms.tenant })
     defTid!: Tenant;
+    
+    @IntegerField({caption: terms.points})
+    points: number = 0;
 
     @Field({ includeInApi: false })
     password: string = '';

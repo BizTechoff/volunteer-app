@@ -8,4 +8,4 @@ export class ActivitiesVolunteers extends IdEntity {
     a?: Activity;
     @Field(options => options.valueType = Users)
     u?: Users;
-}
+} 

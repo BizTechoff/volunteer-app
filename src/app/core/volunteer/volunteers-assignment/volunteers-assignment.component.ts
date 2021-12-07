@@ -25,7 +25,7 @@ export class VolunteersAssignmentComponent implements OnInit {
     }
     return result;
   }
-
+ 
   args: {
     allowChange: boolean,
     branch: Branch,

@@ -4,6 +4,7 @@ import { terms } from "../terms";
 export const FILTER_IGNORE: Filter = new Filter(x => { return true; });
 export const FILTER_RESTRICT: Filter = new Filter(x => { return false; });
 export const OnlyVolunteerEditActivity = true;
+export const pointsEachSuccessActivity = 500;
 
 export const DateRequiredValidation = (_: any, col: FieldRef<any, Date>) => {
     let ok = col.value && col.value.getFullYear() > 1900 ? true : false;

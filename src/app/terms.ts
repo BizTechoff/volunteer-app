@@ -1,10 +1,11 @@
 
 export const terms = {
-    emailMiddle1LettersError:'אמצע האימייל לפחות תו אחד',
-    emailSufix3LettersError:'סיומת האימייל לפחות 3 תווים',
-    emailPrefix3LettersError:'תחילת האימייל לפחות 3 תווים',
-    missingPoint:'חסר נקודה (.) באימייל',
-    missingAt:'חסר את הסימן @ באימייל',
+    points: 'נקודות',
+    emailMiddle1LettersError: 'אמצע האימייל לפחות תו אחד',
+    emailSufix3LettersError: 'סיומת האימייל לפחות 3 תווים',
+    emailPrefix3LettersError: 'תחילת האימייל לפחות 3 תווים',
+    missingPoint: 'חסר נקודה (.) באימייל',
+    missingAt: 'חסר את הסימן @ באימייל',
     colorRangeError: 'ערכי צבעים בין !min!-!max! צבע שגוי',
     canNotComeToActivityThisTime: 'לא אוכל להגיע',
     loadingYourActivities: 'מחפש פעילויות..',
@@ -24,12 +25,12 @@ export const terms = {
         `&sf=true` +
         `&output=xml#f`,
     voulnteerNewAssignSubject: '!branch!: תואמה לך פעילות עם הדייר !tname!',
-    // voulnteerNewAssignSubject: 'תואמה לך פעילות עם הדייר: !tname!',
     voulnteerUpdateAssignSubject: 'עודכנה לך פעילות עם הדייר: !tname!',
     voulnteerCancelAssignSubject: 'בוטלה לך פעילות עם הדייר: !tname!',
     passwordSentToYourEmail: 'סיסמא נשלחה לאמייל !email! ברגע זה',
     forgotPassword: 'שכחתי סיסמא',
     thankYou: 'תודה לך!',
+    youGot200Points: 'צברת !points! נקודות',
     pleaseTellUsWhatGoingOn: 'הערות וסיכום פעילות',
     you: 'את/ה',
     transferVolunteer: 'העברת מתנדב לסניף אחר',
@@ -44,10 +45,10 @@ export const terms = {
     continue: 'המשך',
     openPhotosAlbum: 'פתח אלבום תמונות',
     linkClicked: 'לינק נלחץ',
-    voulnteerNewAssign: 'תודה על התנדבותך! תואמה !vnames! פעילות בנושא: `!purposeDesc!` עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
+    voulnteerNewAssign: 'תודה על התנדבותך! תואמה !vnames! פעילות!purposeDesc! עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerUpdateAssign: 'עודכנה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerCancelAssign: 'בוטלה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
-    referrer: 'גורם מפנה', 
+    referrer: 'גורם מפנה',
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
     volunteerNoTenants: 'תודה לך! לא שוייכו לך עדיין דיירים',
     removeImage: 'הסרת תמונה',
@@ -134,8 +135,8 @@ export const terms = {
     dailyActivityReport: 'דוח פעילות יומי',
     volunteers: 'מתנדבים',
     email: 'דוא"ל',
-    color:'צבע',
-    frame:'הטמעה',
+    color: 'צבע',
+    frame: 'הטמעה',
     photo: 'תמונה',
     active: 'פעיל',
     address: 'כתובת',
@@ -171,9 +172,9 @@ export const terms = {
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
-    emailFormatError:'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.12.07.0'
-} 
+    emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
+    appVersion: '2021.12.07.1'
+}
 declare module 'remult' {
     export interface UserInfo {
         bid: string;

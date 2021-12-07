@@ -20,7 +20,7 @@ export class BranchesListComponent implements OnInit {
         f.push(row.name, row.address)
         if (this.isAdmin()) {
           f.push(row.email, row.color, row.frame);
-        }
+        } 
         return f;
       },
       gridButtons: [

@@ -41,7 +41,7 @@ export class EmailSvc {
             .replace('!branch!', a.bid.name);
         let html = terms.voulnteerNewAssign
             .replace('!vnames!', vidsNames)
-            .replace('!purposeDesc!', a.purposeDesc)
+            .replace('!purposeDesc!', a.purposeDesc && a.purposeDesc.length > 0 ? ` בנושא: '${'`' + a.purposeDesc + '`'}'` : '')
             .replace('!name!', a.tid.name)
             .replace('!date!', DateUtils.toDateString(a.date))
             .replace('!from!', a.fh)

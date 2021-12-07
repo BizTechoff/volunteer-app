@@ -1,7 +1,7 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
-import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, TimeRequireValidator } from "../../common/globals";
+import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, pointsEachSuccessActivity, TimeRequireValidator } from "../../common/globals";
 import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
@@ -183,7 +183,7 @@ export class ActivityStatus {
                 a.ended = new Date();
                 a.status = to;
                 await a.save();
-                await ActivityStatus.showOnlySummary(a);
+                await ActivityStatus.showOnlySummary(a, pointsEachSuccessActivity);
             }
             else if (to === ActivityStatus.problem) {
                 a.problemed = new Date();
@@ -250,10 +250,10 @@ export class ActivityStatus {
             });
     }
 
-    static async showOnlySummary(a: Activity) {
+    static async showOnlySummary(a: Activity, points: number = 0) {
         let changed = await openDialog(InputAreaComponent,
             _ => _.args = {
-                title: terms.thankYou,
+                title: terms.thankYou + (points > 0 ? ' ' + terms.youGot200Points.replace('!points!', points.toString()) : ''),
                 fields: () => [a.$.remark],
                 ok: async () => { }
             });
