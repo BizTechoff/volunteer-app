@@ -109,13 +109,24 @@ export class ActivityDetailsComponent implements OnInit {
       else {
         branch = await this.remult.repo(Branch).findId(this.remult.user.bid);
       }
+      let hour = this.today.getHours();
+      let min = this.today.getMinutes();
+
+      console.log(this.today);
+      console.log(hour);
+      console.log(min);
+      
+      console.log( (hour+1).toString().padStart(2,'0') + ':' + '00');
+      
+      
+      
       this.activity = this.remult.repo(Activity).create({
         bid: branch,
         tid: this.args.tid,//await this.remult.repo(Tenant).findId(this.args.tid!),
         // purposeDesc: terms.defaultPurposeDesc6,
-        date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1),
-        fh: '14:00',
-        th: '16:00'
+        date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()),
+        fh: ((hour+1)%24).toString().padStart(2,'0') + ':' + '00',
+        th: ((hour+3)%24).toString().padStart(2,'0') + ':' + '00'
       });
 
       if (!this.activity.vids) {

@@ -3,35 +3,53 @@
 // https://www.nylas.com/blog/integrate-google-calendar-api
 
 import { calendar_v3, google } from 'googleapis';
-import { CalendarClient, CalendarRequest, DateRequest, IcsRequest } from '../app/common/types';
+import { CalendarClient, DateRequest, IcsRequest } from '../app/common/types';
 import { EmailSvc } from '../app/common/utils';
+
+function getEnvKeyFor(email: string){
+    if(email.includes('haifa')){
+        return 'CALENDAR_HAIFA'
+    }
+    if(email.includes('hulon')){
+        return 'CALENDAR_HULON'
+    }
+    if(email.includes('ness.tziyona')){
+        return 'CALENDAR_NESS_TZIYONA'
+    }
+    if(email.includes('kiryat.ono')){
+        return 'CALENDAR_KIRYAT_ONO'
+    }
+    return '';
+}
 
 EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
     console.debug('send-calendar', req);
     const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
- 
-    let data = JSON.parse(process.env.CALENDAR_BRANCHES!);
-    let branches: CalendarClient[] = [] as CalendarClient[];
-    branches.push(...data);
-
-    let found = branches.find(b => sender.includes(b.name));
-    if (!found) {
+    
+    let envKey = getEnvKeyFor(sender);
+    if (!envKey || envKey.length == 0) {
         console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
         return false;
     }
-
+    let envBranch = process.env[envKey];
+    if (!envBranch) {
+        console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
+        return false;
+    }
+    let data = JSON.parse(envBranch);
+    let branch: CalendarClient = data as CalendarClient;
+    
     const auth = new google.auth.OAuth2(
         {
-            clientId: found.client.id,
-            clientSecret: found.client.secret
+            clientId: branch.client.id,
+            clientSecret: branch.client.secret
         });
 
     auth.setCredentials({
         scope: SCOPE,
-        refresh_token: found.client.token
+        refresh_token: branch.client.token
     })
 
-    const calendar = google.calendar({ version: "v3", auth: auth });
     let attendees = [] as calendar_v3.Schema$EventAttendee[];
     for (const a of req.attendees) {
         attendees.push({
@@ -40,6 +58,8 @@ EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
         });
     }
 
+    const calendar = google.calendar({ version: "v3", auth: auth });
+    
     if (attendees.length > 0) {
         let start = dateTimeForCalander(req.start);
         let calc = req.start;
@@ -88,6 +108,8 @@ EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
 
     return true;
 }
+
+
 
 // EmailSvc.sendCalendar = async (req: CalendarRequest) => {
 //     console.debug('send-calendar', req);

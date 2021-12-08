@@ -42,11 +42,11 @@ export class VolunteersListComponent implements OnInit {
         }
         f.push(
           { field: u.name, caption: terms.name },
-          u.mobile,
           u.langs,
           u.age,
-          u.birthday,
-          u.email
+          u.email,
+          u.mobile,
+          u.birthday
         );
         return f;
       }, //[

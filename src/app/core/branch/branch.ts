@@ -23,6 +23,7 @@ import { Roles } from "../../users/roles";
     // allowApiDelete: Roles.admin,
     // allowApiUpdate: Roles.admin,
     // allowApiRead: Allow.authenticated
+    defaultOrderBy: (row) => [row.name]
 }, 
     (options, remult) => {
         options.apiPrefilter = async (b) => {
@@ -52,7 +53,10 @@ export class Branch extends IdEntity {
     frame: string = '';
 
     isBranch(name:string){
-        return this.email.includes(name);
+        let result =  this.email.includes(name);
+        // console.log('isBranch', name, result);
+        
+        return result;
     }
 
 }

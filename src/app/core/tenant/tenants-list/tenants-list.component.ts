@@ -44,8 +44,8 @@ export class TenantsListComponent implements OnInit {
           t.defVids,
           t.langs,
           t.age,
-          t.mobile,
           t.address,
+          t.mobile,
           t.referrer,
           t.birthday
           // t.email
