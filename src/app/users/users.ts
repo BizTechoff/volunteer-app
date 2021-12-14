@@ -143,7 +143,7 @@ export class Langs {
                     user.bid = undefined;
                 }
             }
-        };
+        }; 
     }
 )
 export class Users extends IdEntity {

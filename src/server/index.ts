@@ -18,6 +18,7 @@ import './aws'
 import '../app/app-routing.module';
 //import '../app/app.component';
 import { getJwtTokenSignKey } from '../app/auth.service';
+import { importDataNew } from './import-data';
 async function startup() {
     config(); //loads the configuration from the .env file
     let dataProvider: DataProvider | undefined;
@@ -54,6 +55,14 @@ async function startup() {
             res.sendStatus(500);
         }
     });
+
+    if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
+        console.time("noam")
+        var remult = new Remult();
+        remult.setDataProvider(dataProvider!);
+        importDataNew(remult).then(() => console.timeEnd("noam"));
+    }
+
     let port = process.env.PORT || 3000;
     app.listen(port);
 }

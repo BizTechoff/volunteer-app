@@ -1,5 +1,5 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DateRequiredValidation, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
@@ -92,7 +92,14 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
                 return tnt.bid.contains(remult.user.bid);
             }
             return FILTER_IGNORE;
-        };
+        };  
+        options.saving = async (user) => {
+            if (isBackend()) {
+                if (user._.isNew()) {
+                    user.createDate = new Date();
+                }
+            }
+        }; 
     })
 export class Tenant extends IdEntity {
 
@@ -160,6 +167,11 @@ export class Tenant extends IdEntity {
     })
     @CommaSeparatedStringArrayFieldUsersAsString<Tenant>({ caption: terms.associatedVolunteers })
     defVids: UserIdName[] = [] as UserIdName[];
+
+    @Field({
+        allowApiUpdate: false
+    })
+    createDate: Date = new Date();
 
     calcAge() {
         let result = 0;

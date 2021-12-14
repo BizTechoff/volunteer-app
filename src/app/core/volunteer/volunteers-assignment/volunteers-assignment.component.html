@@ -35,6 +35,6 @@
         <data-grid *ngIf="this.volunteers" [settings]="this.volunteers"></data-grid>
     </div>
     <div class="footer">
-        {{ this.terms.selected }}: {{ this.volunteers.selectedRows.length }} {{ this.terms.volunteers }}
+        <span style="background-color: rgba(250, 15, 117); color: white;">{{ this.terms.selected }}: {{ this.volunteers.selectedRows.length }} {{ this.terms.volunteers }}</span>
     </div>
 </div>
