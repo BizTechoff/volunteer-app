@@ -92,7 +92,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
                 return tnt.bid.contains(remult.user.bid);
             }
             return FILTER_IGNORE;
-        };  
+        };   
         options.saving = async (user) => {
             if (isBackend()) {
                 if (user._.isNew()) {

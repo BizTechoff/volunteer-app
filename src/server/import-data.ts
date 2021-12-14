@@ -36,7 +36,7 @@ async function seed(remult: Remult) {
         console.log("created admin");
     }
 }
-
+ 
 async function importVolunteers(remult: Remult) {
     let b = await remult.repo(Branch).findFirst({ where: row => row.name.contains(branch) });
     if (!b) {
