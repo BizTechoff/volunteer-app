@@ -18,8 +18,9 @@ export class BranchesListComponent implements OnInit {
 
   branches = new GridSettings(this.remult.repo(Branch),
     {
-      allowDelete: false,
-      allowInsert: this.remult.isAllowed(Roles.admin),
+      allowCrud: false, 
+      // allowDelete: false,
+      // allowInsert: this.remult.isAllowed(Roles.admin),
       allowUpdate: this.remult.isAllowed(Roles.admin),
       columnSettings: row => {
         let f = [] as DataControlInfo<Branch>[];
@@ -35,14 +36,14 @@ export class BranchesListComponent implements OnInit {
           icon: 'refresh', 
           click: async () => { await this.refresh(); }
         } 
-      ],
-      rowButtons: [
-        {
-          textInMenu: terms.delete,
-          icon: 'delete',
-          click: async (row) => await this.deleteBranch(row)
-        },
-      ]
+      ]//,
+      // rowButtons: [
+      //   {
+      //     textInMenu: terms.delete,
+      //     icon: 'delete',
+      //     click: async (row) => await this.deleteBranch(row)
+      //   },
+      // ]
     }
   );
 

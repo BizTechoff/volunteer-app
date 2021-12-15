@@ -25,7 +25,7 @@ export class VolunteerDetailsComponent implements OnInit {
   async refresh() {
     this.volunteer = await this.remult.repo(Users).findId(this.remult.user.id);
     this.details = new DataAreaSettings(
-      { 
+      {
         fields: () => [
           this.volunteer.$.name,
           this.volunteer.$.mobile,

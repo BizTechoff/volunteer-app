@@ -156,12 +156,12 @@ export class VolunteersListComponent implements OnInit {
           { field: u!.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
           { field: u!.$.name, caption: terms.name },
           u!.$.mobile,
-          u!.$.langs,
+          u!.$.email,
           [
             u!.$.birthday,
             { field: u!.$.age, width: '60', visible: (r, v) => this.remult.isAllowed(Roles.manager) },
           ],
-          u!.$.email//,
+          u!.$.langs//,
           // { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
         ],
         ok: async () => {

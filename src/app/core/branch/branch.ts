@@ -1,5 +1,5 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, Entity, Field, IdEntity } from "remult";
+import { Entity, Field, IdEntity } from "remult";
 import { ColorNumberValidator, EmailValidator, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
@@ -18,13 +18,16 @@ import { Roles } from "../../users/roles";
     }
 })
 @Entity<Branch>('branches', {
-    allowApiCrud : true,
+    allowApiDelete: false,
+    allowApiInsert: false,
+    allowApiUpdate: true,
+    allowApiRead: c => c.authenticated(),
     // allowApiInsert: Roles.admin,
     // allowApiDelete: Roles.admin,
     // allowApiUpdate: Roles.admin,
     // allowApiRead: Allow.authenticated
     defaultOrderBy: (row) => [row.name]
-}, 
+},
     (options, remult) => {
         options.apiPrefilter = async (b) => {
             let result = FILTER_IGNORE;
@@ -52,10 +55,10 @@ export class Branch extends IdEntity {
     @Field({ caption: terms.frame })
     frame: string = '';
 
-    isBranch(name:string){
-        let result =  this.email.includes(name);
+    isBranch(name: string) {
+        let result = this.email.includes(name);
         // console.log('isBranch', name, result);
-        
+
         return result;
     }
 
