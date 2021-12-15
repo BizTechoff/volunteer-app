@@ -84,7 +84,11 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
         allowApiInsert: [Roles.admin, Roles.manager],
         allowApiDelete: [Roles.admin, Roles.manager],
         allowApiUpdate: Allow.authenticated,
-        allowApiRead: Allow.authenticated
+        allowApiRead: Allow.authenticated,
+        defaultOrderBy: (user) => [
+            user.bid ? user.bid.descending() : user.name,
+            user.name
+        ]
     },
     async (options, remult) => {
         options.apiPrefilter = (tnt) => {
@@ -92,14 +96,19 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
                 return tnt.bid.contains(remult.user.bid);
             }
             return FILTER_IGNORE;
-        };   
-        options.saving = async (user) => {
+        };
+        options.saving = async (tenant) => {
             if (isBackend()) {
-                if (user._.isNew()) {
-                    user.createDate = new Date();
+                if (tenant._.isNew()) {
+                    tenant.created = new Date();
+                    // tenant.createdBy = await remult.repo(Users).findId(remult.user.id);
+                }  
+                else {
+                    tenant.modified = new Date();
+                    // tenant.modifiedBy = await remult.repo(Users).findId(remult.user.id);
                 }
             }
-        }; 
+        };
     })
 export class Tenant extends IdEntity {
 
@@ -171,7 +180,22 @@ export class Tenant extends IdEntity {
     @Field({
         allowApiUpdate: false
     })
-    createDate: Date = new Date();
+    created: Date = new Date();
+
+    // @Field({
+    //     allowApiUpdate: false
+    // })
+    // createdBy: Users = null!;
+
+    @Field({
+        allowApiUpdate: false
+    })
+    modified: Date = new Date();
+
+    // @Field({
+    //     allowApiUpdate: false
+    // })
+    // modifiedBy: Users = null!;
 
     calcAge() {
         let result = 0;

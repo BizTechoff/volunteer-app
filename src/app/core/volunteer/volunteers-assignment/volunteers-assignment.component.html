@@ -30,11 +30,11 @@
                 </div>  -->
             </div>
         </div>
-    </div>
+    </div> 
     <div class='grow-item'>
         <data-grid *ngIf="this.volunteers" [settings]="this.volunteers"></data-grid>
     </div>
     <div class="footer">
-        <span style="background-color: rgba(250, 15, 117); color: white;">{{ this.terms.selected }}: {{ this.volunteers.selectedRows.length }} {{ this.terms.volunteers }}</span>
+        <span style="background-color: rgba(250, 15, 117); color: white;">{{ this.terms.selected }}: {{ this.args.selected.length }} {{ this.terms.volunteers }} ({{ this.getSelectedNames() }})</span>
     </div>
 </div>

@@ -62,7 +62,7 @@ export class Photo extends IdEntity {
 
     @Field({ caption: terms.data })
     data: string = '';
-
+ 
     @Field({ caption: terms.createdBy })
     createdBy!: Users;
 

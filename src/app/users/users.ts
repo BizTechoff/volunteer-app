@@ -135,15 +135,46 @@ export class Langs {
                     await user.hashAndSetPassword(
                         process.env.DEFAULT_PASSWORD!
                     );
-                    user.createDate = new Date();
+                    user.created = new Date();
+                    // user.createdBy = await remult.repo(Users).findId(remult.user.id);
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
+                }
+                else{
+                    user.modified = new Date();
+                    // user.modifiedBy = await remult.repo(Users).findId(remult.user.id);
                 }
                 if (user.admin || user.donor || user.board) {
                     user.bid = undefined;
                 }
             }
-        }; 
+        };
+        // options.saved = async (user) => {
+        //     if (isBackend()) {
+        //         if (user.$.name.originalValue !== user.name) {
+        //             //it was changed
+        //             for await (const v of remult.repo(Tenant).iterate()) {
+        //                 if (v.defVids.length > 0) {
+        //                     let f = v.defVids.find(r => r.id === user.id);
+        //                     if (f) {
+        //                         f.name = user.name;
+        //                         await v.save();
+        //                     }
+        //                 }
+        //             }
+
+        //             for await (const a of remult.repo(Activity).iterate()) {
+        //                 if (a.vids.length > 0) {
+        //                     let f = a.vids.find(r => r.id === user.id);
+        //                     if (f) {
+        //                         f.name = user.name;
+        //                         await a.save();
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 )
 export class Users extends IdEntity {
@@ -173,7 +204,7 @@ export class Users extends IdEntity {
         });
         return result;
     }
- 
+
     @Field({
         caption: terms.branch,
         allowNull: true
@@ -220,9 +251,9 @@ export class Users extends IdEntity {
         caption: terms.email,
         validate: [(e, c) => {
             // if (isBackend()) {
-                if (e.volunteer) {
-                    Validators.required(e, c, terms.requiredField)
-                }
+            if (e.volunteer) {
+                Validators.required(e, c, terms.requiredField)
+            }
             // }
         }]
     })
@@ -244,8 +275,8 @@ export class Users extends IdEntity {
 
     @Field(options => options.valueType = Tenant, { caption: terms.tenant })
     defTid!: Tenant;
-    
-    @IntegerField({caption: terms.points})
+
+    @IntegerField({ caption: terms.points })
     points: number = 0;
 
     @Field({ includeInApi: false })
@@ -254,7 +285,22 @@ export class Users extends IdEntity {
     @Field({
         allowApiUpdate: false
     })
-    createDate: Date = new Date();
+    created: Date = new Date();
+
+    // @Field({
+    //     allowApiUpdate: false
+    // })
+    // createdBy: Users = null!;
+
+    @Field({
+        allowApiUpdate: false
+    })
+    modified: Date = new Date();
+
+    // @Field({
+    //     allowApiUpdate: false
+    // })
+    // modifiedBy: Users = null!;
 
     @Field({
         allowApiUpdate: Roles.admin,

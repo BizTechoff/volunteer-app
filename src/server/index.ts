@@ -1,24 +1,24 @@
 //import { CustomModuleLoader } from '../../../../../../repos/radweb/src/app/server/CustomModuleLoader';
 //let moduleLoader = new CustomModuleLoader('/dist-server/repos/radweb/projects/');
-import * as express from 'express';
-import { initExpress } from 'remult/server';
-import * as fs from 'fs';
-import { DataProvider, Remult, SqlDatabase } from 'remult';
-import { Pool } from 'pg';
-import { config } from 'dotenv';
-import { PostgresDataProvider, verifyStructureOfAllEntities } from 'remult/postgres';
-import * as helmet from 'helmet';
-import * as jwt from 'express-jwt';
 import * as compression from 'compression';
-import './send-email';
-import './send-calendar';
-import './aws'
-
+import { config } from 'dotenv';
+import * as express from 'express';
+import * as jwt from 'express-jwt';
+import * as fs from 'fs';
+import * as helmet from 'helmet';
+import { Pool } from 'pg';
+import { DataProvider, Remult, SqlDatabase } from 'remult';
+import { PostgresDataProvider, verifyStructureOfAllEntities } from 'remult/postgres';
+import { initExpress } from 'remult/server';
 //import '../app/app.module';
+// import '../app/users/*';
 import '../app/app-routing.module';
 //import '../app/app.component';
 import { getJwtTokenSignKey } from '../app/auth.service';
+import './aws';
 import { importDataNew } from './import-data';
+import './send-calendar';
+import './send-email';
 async function startup() {
     config(); //loads the configuration from the .env file
     let dataProvider: DataProvider | undefined;
@@ -28,14 +28,14 @@ async function startup() {
         const pool = new Pool({
             connectionString: process.env.DATABASE_URL,
             ssl: process.env.DEV_MODE ? false : { rejectUnauthorized: false }// use ssl in production but not in development. the `rejectUnauthorized: false`  is required for deployment to heroku etc...
-        }); 
+        });
         let database = new SqlDatabase(new PostgresDataProvider(pool));
         var remult = new Remult();
         remult.setDataProvider(database);
         await verifyStructureOfAllEntities(database, remult);
         dataProvider = database;
     }
- 
+
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());

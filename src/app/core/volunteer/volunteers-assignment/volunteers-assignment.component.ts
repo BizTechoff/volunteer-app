@@ -14,7 +14,7 @@ import { Branch } from '../../branch/branch';
   selector: 'app-volunteers-assignment',
   templateUrl: './volunteers-assignment.component.html',
   styleUrls: ['./volunteers-assignment.component.scss']
-})
+}) 
 export class VolunteersAssignmentComponent implements OnInit {
 
 
@@ -25,7 +25,7 @@ export class VolunteersAssignmentComponent implements OnInit {
     }
     return result;
   }
- 
+
   args: {
     allowChange: boolean,
     branch: Branch,
@@ -34,12 +34,12 @@ export class VolunteersAssignmentComponent implements OnInit {
     title: string,
     selected: UserIdName[],
     changed?: boolean
-  } = {allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[] };
+  } = { allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[] };
 
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForVolunteerHere}` })
   search: string = ''
- 
+
   @DataControl<VolunteersAssignmentComponent>({
     valueChange: async (r, _) => { await r.refresh(); }
   })
@@ -80,8 +80,8 @@ export class VolunteersAssignmentComponent implements OnInit {
     await this.initGrid();
     await this.refresh();
   }
-   
-  async initGrid(){
+
+  async initGrid() {
     this.volunteers = new GridSettings<Users>(this.remult.repo(Users),
       {
         where: u => {
@@ -102,7 +102,8 @@ export class VolunteersAssignmentComponent implements OnInit {
           return result;
         },
         allowCrud: false,
-        allowSelection: true,
+        // allowSelection: true,
+        // selectedChanged: () => {},
         columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs, u.email],
         gridButtons: [
           {
@@ -111,53 +112,55 @@ export class VolunteersAssignmentComponent implements OnInit {
             click: async () => { await this.refresh(); }
           }
         ],
+        rowButtons: [
+          {
+            visible: (row) => { return this.args.selected.find(r => r.id === row.id) ? false : true; },
+            textInMenu: () => terms.addVolunteerToTenant,
+            showInLine: true,
+            icon: 'person_add',
+            click: async (row) => { await this.addVolunteer(row); }
+          },
+          {
+            visible: (row) => { return this.args.selected.find(r => r.id === row.id) ? true : false; },
+            textInMenu: () => terms.removeVolunteerFromTenant,
+            showInLine: true,
+            icon: 'person_remove',
+            click: async (row) => { await this.removeVolunteer(row); }
+          }
+        ]
       });
+  }
+
+  getSelectedNames() {
+    return this.args.selected.map(s => s.name).join(", ");
   }
 
   async refresh() {
     await this.volunteers.reloadData();
-    this.setGridSelected();
   }
-
-  setSelected() {
-    // this.args.selected.splice(0);
-    // if (this.volunteers.selectedRows.length > 0) {
-    //   for (const v of this.volunteers.selectedRows) {
-    //     this.args.selected.push({ id: v.id, name: v.name });
-    //   } 
-    // }
-    // console.log('this.volunteers.selectedRows.length', this.volunteers.selectedRows.length);
-  }
-
-  setGridSelected() {
-    this.volunteers.selectedRows = [] as Users[];
-    if (this.args.selected.length > 0) {
-      // console.log(1);
-      
-      let ids = this.args.selected.map(x => x.id);
-      // console.log(2);
-      if (ids.length > 0) {
-        let items = this.volunteers.items.filter(itm => ids.includes(itm.id));
-        // console.log(3);
-        if (items) {
-          this.volunteers.selectedRows.push(...items);
-        }
-      }
-    }
-  }
-
-
+    
   async checkedChanged(ce: MatCheckboxChange) {
     this.filterBtTenantLangs = ce.checked;
     await this.refresh();
   }
 
+  async addVolunteer(v: Users) {
+    let f = this.args.selected.find(r => r.id === v.id);
+    if (!f) {
+      this.args.selected.push({ id: v.id, name: v.name });
+    }
+  }
+
+  async removeVolunteer(v: Users) {
+    let f = this.args.selected.find(r => r.id === v.id);
+    if (f) {
+      let index = this.args.selected.indexOf(f);
+      this.args.selected.splice(index, 1);
+    }
+  }
+
   select() {
     this.args.changed = true;
-    this.args.selected = [] as UserIdName[];
-    for (const u of this.volunteers.selectedRows) {
-      this.args.selected.push({ id: u.id, name: u.name });
-    }
     this.win.close();
   }
 

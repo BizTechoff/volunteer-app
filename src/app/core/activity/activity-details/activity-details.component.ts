@@ -208,7 +208,7 @@ export class ActivityDetailsComponent implements OnInit {
           explicit: explicit,
           title: this.activity.tid.name,
           langs: this.activity.tid?.langs,// this.t.langs, 
-          selected: selected
+          selected:  selected.map(s=>s)//clone
         },
         output => output && output.args && output.args.changed ? output.args.selected : undefined);
       if (volids) {

@@ -140,7 +140,7 @@ export class TenantsListComponent implements OnInit {
           explicit: undefined!,
           title: t.name,
           langs: t.langs,// this.t.langs, 
-          selected: t.defVids
+          selected: t.defVids.map(s=>s)//clone
         },
         output => output && output.args && output.args.changed ? output.args.selected : undefined);
       if (volids) {

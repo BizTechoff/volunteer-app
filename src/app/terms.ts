@@ -90,6 +90,8 @@ export const terms = {
     defaultVolunteers: 'מתנדבים ברירת מחדל',
     appDesc: 'אפליקציה לניהול מפגשי התנדבות',
     addVolunteer: 'הוספת מתנדב חדש',
+    addVolunteerToTenant: 'הוסף מתנדב לדייר',
+    removeVolunteerFromTenant: 'הסר מתנדב מהדייר',
     requiredField: 'שדה חובה',
     donor: 'תורם',
     addBranch: 'הוספת סניף',
@@ -173,8 +175,8 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.12.10.0'
-}
+    appVersion: '2021.12.15.0'
+} 
 declare module 'remult' {
     export interface UserInfo {
         bid: string;

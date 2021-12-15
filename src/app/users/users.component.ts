@@ -19,7 +19,7 @@ export class UsersComponent implements OnInit {
   isAdmin() {
     return this.remult.isAllowed(Roles.admin);
   }
-
+  
   users = new GridSettings(this.remult.repo(Users), {
     allowDelete: true,
     allowInsert: true,
@@ -107,6 +107,14 @@ export class UsersComponent implements OnInit {
       return await this.dialog.confirmDelete(h.name)
     },
   });
+
+  ngOnInit() {
+  }
+
+  async refresh(){
+    await this.users.reloadData();
+  }
+
   @BackendMethod({ allowed: Roles.admin })
   static async resetPassword(userId: string, remult?: Remult) {
     let u = await remult!.repo(Users).findId(userId);
@@ -115,15 +123,6 @@ export class UsersComponent implements OnInit {
       await u.updatePassword(pass!);
       await u._.save();
     }
-  }
-
-
-
-  ngOnInit() {
-  }
-
-  async refresh(){
-    await this.users.reloadData();
   }
 
 }
