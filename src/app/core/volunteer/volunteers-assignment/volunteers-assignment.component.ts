@@ -3,6 +3,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, DataControl, GridSettings } from '@remult/angular';
 import { ContainsFilterFactory, Field, getFields, Remult } from 'remult';
+import { DialogService } from '../../../common/dialog';
 import { FILTER_IGNORE, OnlyVolunteerEditActivity } from '../../../common/globals';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
@@ -14,7 +15,7 @@ import { Branch } from '../../branch/branch';
   selector: 'app-volunteers-assignment',
   templateUrl: './volunteers-assignment.component.html',
   styleUrls: ['./volunteers-assignment.component.scss']
-}) 
+})
 export class VolunteersAssignmentComponent implements OnInit {
 
 
@@ -33,8 +34,9 @@ export class VolunteersAssignmentComponent implements OnInit {
     langs: Langs[],
     title: string,
     selected: UserIdName[],
-    changed?: boolean
-  } = { allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[] };
+    changed?: boolean,
+    organizer: string /* user-id */
+  } = { allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[], organizer: '' };
 
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForVolunteerHere}` })
@@ -52,7 +54,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   lgDesc = '';
   volunteers: GridSettings<Users> = undefined!;
 
-  constructor(private remult: Remult, private win: MatDialogRef<any>) {
+  constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) {
   }
 
   get $() { return getFields(this, this.remult) };
@@ -125,7 +127,7 @@ export class VolunteersAssignmentComponent implements OnInit {
             textInMenu: () => terms.removeVolunteerFromTenant,
             showInLine: true,
             icon: 'person_remove',
-            click: async (row) => { await this.removeVolunteer(row); }
+            click: async (row) => { await this.removeVolunteer(row.id); }
           }
         ]
       });
@@ -138,7 +140,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   async refresh() {
     await this.volunteers.reloadData();
   }
-    
+
   async checkedChanged(ce: MatCheckboxChange) {
     this.filterBtTenantLangs = ce.checked;
     await this.refresh();
@@ -151,9 +153,13 @@ export class VolunteersAssignmentComponent implements OnInit {
     }
   }
 
-  async removeVolunteer(v: Users) {
-    let f = this.args.selected.find(r => r.id === v.id);
+  async removeVolunteer(uid: string) {
+    let f = this.args.selected.find(r => r.id === uid);
     if (f) {
+      if (this.args.organizer && this.args.organizer.length > 0 && f.id === this.args.organizer) {
+        this.dialog.info(terms.canNotRemoveActivityOrganizer)
+        return;
+      } 
       let index = this.args.selected.indexOf(f);
       this.args.selected.splice(index, 1);
     }

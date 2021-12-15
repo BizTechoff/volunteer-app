@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
 import { Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
+import { pointsEachSuccessActivity } from '../../../common/globals';
 import { UserIdName } from '../../../common/types';
 import { DateUtils } from '../../../common/utils';
 import { terms } from '../../../terms';
@@ -32,7 +33,7 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   async openActivity(act?: Activity) {
     // console.log(6);
-    
+
     let id = act && act.id && act.id.length > 0 ? act.id : '';
     if (id.length == 0) { // request to create new activity
       // console.log(77);
@@ -57,14 +58,14 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   async openPhotosAlbum(a: Activity) {
     a.photoed = new Date();
-    await a.save(); 
+    await a.save();
     let changes = await openDialog(PhotosAlbumComponent,
       _ => _.args = { bid: a.bid, entityId: a.id },
       _ => _ ? _.args.changed : false);
     if (changes) {
       // await this.refresh();
     }
-  } 
+  }
 
   isFuture(a: Activity) {
     let today = new Date();
@@ -91,7 +92,8 @@ export class VolunteerActivitiesComponent implements OnInit {
       let as = [] as Activity[];
       for await (const a of this.remult.repo(Activity).iterate({
         where: row => row.status.isNotIn([this.AcitivityStatus.cancel])
-          .and(row.vids.contains(this.remult.user.id))
+          .and(row.vids.contains(this.remult.user.id)),
+        orderBy: row => [row.status, row.date, row.fh, row.th]
       })) {
         await a.$.tid.load();
         as.push(a);
@@ -127,7 +129,22 @@ export class VolunteerActivitiesComponent implements OnInit {
   }
 
   async setNextStatus(a: Activity, toStatus: ActivityStatus) {
+    if (toStatus === ActivityStatus.success) {
+      if (a.purposes?.length === 0) {
+        this.dialog.info(terms.youMustEnterPurposes);
+        await this.openActivity(a);
+        return;
+      }
+    }
     await a.status.onChanging(a, toStatus, this.remult.user.id);
+    if (toStatus === ActivityStatus.success) {
+      let u = await this.remult.repo(Users).findId(this.remult.user.id);
+      if (u) {
+        u.points += pointsEachSuccessActivity;
+        await u.save();
+        this.dialog.info(terms.youGotMorePoint.replace('!points!', pointsEachSuccessActivity.toString()).replace('!sum!', u.points.toString()));
+      }
+    }
     await this.refresh();
   }
 

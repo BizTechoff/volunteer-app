@@ -251,6 +251,7 @@ export class ActivityStatus {
     }
 
     static async showOnlySummary(a: Activity, points: number = 0) {
+        
         let changed = await openDialog(InputAreaComponent,
             _ => _.args = {
                 title: terms.thankYou + (points > 0 ? ' ' + terms.youGot200Points.replace('!points!', points.toString()) : ''),

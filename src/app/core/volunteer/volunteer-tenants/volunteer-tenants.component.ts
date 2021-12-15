@@ -54,7 +54,7 @@ export class VolunteerTenantsComponent implements OnInit {
 
   async refresh() {
     this.userMessage = terms.loadingYourTenants;
-    this.tenants.reloadData();
+    await this.tenants.reloadData();
     if (this.tenants.items.length == 0) {
       this.userMessage = terms.volunteerNoTenants;
     }

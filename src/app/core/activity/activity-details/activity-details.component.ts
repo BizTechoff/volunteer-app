@@ -5,13 +5,11 @@ import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
-import { AttendeeRequest, CalendarRequest, UserIdName } from '../../../common/types';
-import { DateUtils, EmailSvc } from '../../../common/utils';
+import { UserIdName } from '../../../common/types';
+import { EmailSvc } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
-import { Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
-import { NotificationActivity, NotificationsTypes } from '../../notification/notifications-list/notification';
 import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
@@ -115,18 +113,18 @@ export class ActivityDetailsComponent implements OnInit {
       console.log(this.today);
       console.log(hour);
       console.log(min);
-      
-      console.log( (hour+1).toString().padStart(2,'0') + ':' + '00');
-      
-      
-      
+
+      console.log((hour + 1).toString().padStart(2, '0') + ':' + '00');
+
+
+
       this.activity = this.remult.repo(Activity).create({
         bid: branch,
         tid: this.args.tid,//await this.remult.repo(Tenant).findId(this.args.tid!),
         // purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()),
-        fh: ((hour+1)%24).toString().padStart(2,'0') + ':' + '00',
-        th: ((hour+3)%24).toString().padStart(2,'0') + ':' + '00'
+        fh: ((hour + 1) % 24).toString().padStart(2, '0') + ':' + '00',
+        th: ((hour + 3) % 24).toString().padStart(2, '0') + ':' + '00'
       });
 
       if (!this.activity.vids) {
@@ -208,7 +206,8 @@ export class ActivityDetailsComponent implements OnInit {
           explicit: explicit,
           title: this.activity.tid.name,
           langs: this.activity.tid?.langs,// this.t.langs, 
-          selected:  selected.map(s=>s)//clone
+          selected: selected.map(s => s),//clone
+          organizer: this.activity.isNew() ? this.remult.user.id : this.activity.createdBy?.id
         },
         output => output && output.args && output.args.changed ? output.args.selected : undefined);
       if (volids) {
@@ -331,47 +330,47 @@ export class ActivityDetailsComponent implements OnInit {
   //   }
 
   //   return await this.sendMail(emails);
-    // console.log('5', emails.length);
+  // console.log('5', emails.length);
 
-    // if (emails.length > 0) {
-    // console.log('6');
-    // console.log('emails', emails);
-    // console.log('11111');
+  // if (emails.length > 0) {
+  // console.log('6');
+  // console.log('emails', emails);
+  // console.log('11111');
 
-    // let message = `האם לשלוח אמייל` +
-    //   `\n` +
-    //   (removed > 0 ? `ל- ${removed} מתנדבים לגבי ביטול השתתפותם בפעילות` : '') +
-    //   `\n` +
-    //   (added > 0 ? (added > 0 ? 'ו' : '') + `ל- ${added} מתנדבים זימון השתתפות בפעילות` : '');
-    // console.log('message', message);
+  // let message = `האם לשלוח אמייל` +
+  //   `\n` +
+  //   (removed > 0 ? `ל- ${removed} מתנדבים לגבי ביטול השתתפותם בפעילות` : '') +
+  //   `\n` +
+  //   (added > 0 ? (added > 0 ? 'ו' : '') + `ל- ${added} מתנדבים זימון השתתפות בפעילות` : '');
+  // console.log('message', message);
 
-    // console.log('7');
-    // console.log('22222');
-    // let yes = true;// await this.dialog.yesNoQuestion(message);
-    // if (yes) {
-    // console.log('8');
-    // let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
-    // for (const e of emails) {
-    //   users.push({
-    //     name: e.name,
-    //     email: e.email
-    //   });
-    // }
-    // for (const e of emails) {
-    // let ok = await this.sendMail(emails);
-    // if (ok) {
-    //   // let u = await this.remult.repo(Users).findId(e.uid);
-    //   // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
-    //   // n.
-    // }
-    // }
-    // }
-    // }
-    // else{
-    //   // send cancel
-    //   let req: CalendarRequest;
-    // return await EmailSvc.sendToCalendar(req);
-    // }
+  // console.log('7');
+  // console.log('22222');
+  // let yes = true;// await this.dialog.yesNoQuestion(message);
+  // if (yes) {
+  // console.log('8');
+  // let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
+  // for (const e of emails) {
+  //   users.push({
+  //     name: e.name,
+  //     email: e.email
+  //   });
+  // }
+  // for (const e of emails) {
+  // let ok = await this.sendMail(emails);
+  // if (ok) {
+  //   // let u = await this.remult.repo(Users).findId(e.uid);
+  //   // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
+  //   // n.
+  // }
+  // }
+  // }
+  // }
+  // else{
+  //   // send cancel
+  //   let req: CalendarRequest;
+  // return await EmailSvc.sendToCalendar(req);
+  // }
   // }
 
   // async sendMail(emails: { uid: string, name: string, email: string, type: NotificationsTypes }[]) {
@@ -460,25 +459,25 @@ export class ActivityDetailsComponent implements OnInit {
   //   // return await EmailSvc.SendEmail(req);//sendToCalendar(req);
   //   return await EmailSvc.sendToCalendar(req);
 
-    // let message = type.text
-    //   .replace('!name!', this.activity.tid.name)
-    //   .replace('!date!', this.activity.date.toLocaleDateString())
-    //   .replace('!from!', this.activity.fh)
-    //   .replace('!to!', this.activity.th)
-    //   .replace('!address!', this.activity.tid.address);
+  // let message = type.text
+  //   .replace('!name!', this.activity.tid.name)
+  //   .replace('!date!', this.activity.date.toLocaleDateString())
+  //   .replace('!from!', this.activity.fh)
+  //   .replace('!to!', this.activity.th)
+  //   .replace('!address!', this.activity.tid.address);
 
-    // const datepipe: DatePipe = new DatePipe('en-US');//yyyyMMddTHHmmssZ
-    // let fdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.fh.replace(':', '') + '00Z';
-    // let tdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.th.replace(':', '') + '00Z';
-    // let link = type.link
-    //   .replace('!title!', encodeURI(type.subject))
-    //   .replace('!fDate!', fdate)
-    //   .replace('!tDate!', tdate)
-    //   .replace('!location!', encodeURI(this.activity.tid.address))
-    //   .replace('!details!', encodeURI('תודה!'));
-    // let subject = type.subject.replace('!tname!', this.activity.tid.name);
+  // const datepipe: DatePipe = new DatePipe('en-US');//yyyyMMddTHHmmssZ
+  // let fdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.fh.replace(':', '') + '00Z';
+  // let tdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.th.replace(':', '') + '00Z';
+  // let link = type.link
+  //   .replace('!title!', encodeURI(type.subject))
+  //   .replace('!fDate!', fdate)
+  //   .replace('!tDate!', tdate)
+  //   .replace('!location!', encodeURI(this.activity.tid.address))
+  //   .replace('!details!', encodeURI('תודה!'));
+  // let subject = type.subject.replace('!tname!', this.activity.tid.name);
 
-    // return await EmailSvc.SendEmail(email, subject, message, link);
+  // return await EmailSvc.SendEmail(email, subject, message, link);
   // }
 
   async addPhoto() {

@@ -1,13 +1,27 @@
 <div class="full-page">
-    <div class="header"> 
+    <div class="header">
         <button [title]="terms.save" mat-mini-fab color="accent" (click)="update()" style="margin-bottom: 10px;">
-            <mat-icon>save</mat-icon> 
+            <mat-icon>save</mat-icon>
         </button>
     </div>
     <div class="grow-item">
         <mat-card *ngIf="this.details">
             <data-area [settings]="this.details"></data-area>
+            <div style="padding-right: 10px; display: flex; flex-direction: column; justify-content: center;">
+                <!-- <span><u>{{ this.terms.pointsExplain }}</u></span> -->
+                <span>{{ 'כל דיווח מוצלח = ' + this.getPointsForSuccess() + ' נקודות' }}</span>
+                <span>{{ 'כל העלאת תמונה או וידאו = ' + this.getPointsForMedia() + ' נקודות' }}</span>
+                <span>{{ 'על כל צבירה של ' + this.getPointsForSurprise() + ' נקודות מקבלים הפתעה' }}</span>
+            </div>
         </mat-card>
+        <!-- <mat-card>
+            <div style="background-color: wheat; display: flex; flex-direction: column; justify-content: center;">
+                <span><u>{{ this.terms.pointsExplain }}</u></span>
+                <span>{{ 'כל דיווח מוצלח = ' + this.getPointsForSuccess() + ' נקודות' }}</span>
+                <span>{{ 'כל העלאת תמונה או וידאו = ' + this.getPointsForMedia() + ' נקודות' }}</span>
+                <span>{{ 'על כל צבירה של ' + this.getPointsForSurprise() + ' נקודות מקבלים הפתעה' }}</span>
+            </div>
+        </mat-card> -->
     </div>
     <div class="footer">
 

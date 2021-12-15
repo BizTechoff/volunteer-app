@@ -1,6 +1,15 @@
 
 export const terms = {
-    points: 'נקודות',
+    pointsExplain: 'הסבר צבירת נקודות',
+    youGotMorePoint: 'צברת !points! נקודות נוספות, סה"כ צברת עד כה: !sum! נקודות',
+    youMustEnterPurposes: 'לפני סגירת הפעילות יש לציין את המטרות שנמצאו',
+    canNotRemoveActivityOrganizer: 'לא ניתן להסיר את מארגן הפעילות',
+    canNotDeleteBrnachWhileRelationWithUsers: 'לא ניתן למחוק סניף כאשר מחובר למשתמש',
+    canNotDeleteBrnachWhileRelationWithTenants: 'לא ניתן למחוק סניף כאשר מחובר לדייר',
+    canNotDeleteBrnachWhileRelationWithActivities: 'לא ניתן למחוק סניף כאשר מחובר לפעילות',
+    branchDeleteSuccefully: 'סניף !bname! נמחק בהצלחה',
+    pointsYouHaveWithExplain: 'נקודות שצברת (דיווח מוצלח = !success!, העלאת תמונה\\וידאו = !upload!)',
+    pointsYouHave: 'נקודות שצברת',
     emailMiddle1LettersError: 'אמצע האימייל לפחות תו אחד',
     emailSufix3LettersError: 'סיומת האימייל לפחות 3 תווים',
     emailPrefix3LettersError: 'תחילת האימייל לפחות 3 תווים',
@@ -175,8 +184,9 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.12.15.0'
-} 
+    appVersion: '2021.12.16.0'
+}
+
 declare module 'remult' {
     export interface UserInfo {
         bid: string;

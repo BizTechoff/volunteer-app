@@ -1,14 +1,14 @@
 <div class="full-page">
     <div class="header">
         <div style="display: flex; flex-direction: column; justify-content: space-between; ">
-            <div style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
+            <div style="vertical-align: middle; display: flex; flex-direction: column; justify-content: flex-start; ">
                 <h4>{{ 'שיבוץ מתנדבים ל:' }}
                     <strong> {{ this.args.title }} (שפות: {{ this.lgDesc }})</strong>
                 </h4>
             </div>
             <div style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
                 <mat-checkbox [checked]="!!this.filterBtTenantLangs" (change)="checkedChanged($event)">
-                    {{ terms.filterBtTenantLangs }} 
+                    {{ terms.filterBtTenantLangs }}
                 </mat-checkbox>
                 <!-- <mat-checkbox (change)="this.filterBtTenantLangs()" [(ngModel)]='this.filterBtTenantLangs'> {{ terms.filterBtTenantLangs }} </mat-checkbox> -->
                 <!-- <data-control [field]="this.$.filterBtTenantLangs"></data-control>
@@ -21,7 +21,7 @@
                 <button *ngIf="this.isAllowEdit()" mat-raised-button color='primary' (click)='select()'
                     style='margin-bottom: 10px; margin-right: 5px;'>
                     {{ this.terms.ok }}
-                </button> 
+                </button>
                 <!-- <div style="padding-top: 3.5px;">
                     <button style="width: 100%;" mat-raised-button color='primary' (click)="select()">
                         <mat-icon>add</mat-icon>
@@ -29,12 +29,18 @@
                     </button>
                 </div>  -->
             </div>
+            <div *ngIf="this.args.selected.length > 0" style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; "> 
+                {{ 'נבחרו ('+ this.args.selected.length +'): ' }}
+                <span style="color: rgba(250, 15, 117); border-color: black; border-width: 4px; border: black;" *ngFor="let u of this.args.selected"> <mat-icon inline="true" [title]='"הסר את " + u.name' (click)="this.removeVolunteer(u.id)">close</mat-icon>  <span> {{ u.name }} </span></span>
+            </div>
         </div>
-    </div> 
+    </div>
     <div class='grow-item'>
         <data-grid *ngIf="this.volunteers" [settings]="this.volunteers"></data-grid>
     </div>
     <div class="footer">
-        <span style="background-color: rgba(250, 15, 117); color: white;">{{ this.terms.selected }}: {{ this.args.selected.length }} {{ this.terms.volunteers }} ({{ this.getSelectedNames() }})</span>
+        <div style="display: flex; flex-direction: column; justify-content: space-between; ">
+            <!-- <span style="color: rgba(250, 15, 117);">{{ this.terms.selected }}: {{ this.args.selected.length }} {{ this.terms.volunteers }}</span> -->
+        </div>
     </div>
 </div>

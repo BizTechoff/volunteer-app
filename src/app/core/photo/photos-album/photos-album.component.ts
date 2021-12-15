@@ -1,10 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { BackendMethod, getFields, Remult } from 'remult';
+import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { OnlyVolunteerEditActivity } from '../../../common/globals';
+import { OnlyVolunteerEditActivity, pointsEachSuccessPhoto } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
+import { Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
 // import * as AWS from 'aws-sdk';
@@ -32,12 +33,12 @@ export class PhotosAlbumComponent implements OnInit {
   // @Field({ caption: terms.branch })
   // bid: string = '';
   get $() { return getFields(this, this.remult) };
- 
-  constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) { }
-  
 
-  isAllowEdit(){
-    if(this.isDonor() || (OnlyVolunteerEditActivity && this.isManager())){
+  constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) { }
+
+
+  isAllowEdit() {
+    if (this.isDonor() || (OnlyVolunteerEditActivity && this.isManager())) {
       return false;
     }
     return true;
@@ -89,59 +90,59 @@ export class PhotosAlbumComponent implements OnInit {
   // }
 
   async onFileInput(e: any) {
-    
- 
+
+
     // for (let index = 0; index < e.target.files.length; index++) {
     //   const file = e.target.files[index];
     //   let f: File = file;
     //   PhotosAlbumComponent.uploadToAws(f.name);
     // }
-   
 
-// s3.createBucket(params, function(err, data) {
-//     if (err) console.log(err, err.stack);
-//     else console.log('Bucket Created Successfully', data.Location);
-// }); 
+
+    // s3.createBucket(params, function(err, data) {
+    //     if (err) console.log(err, err.stack);
+    //     else console.log('Bucket Created Successfully', data.Location);
+    // }); 
     let changed = this.loadFiles(e.target.files);
     // if (changed) {
     //   await this.refresh();
     // }
   }
-//   private async loadFiles(files: any) {
-//     for (let index = 0; index < files.length; index++) {
-//       const file = files[index];
-//       let f: File = file;
-//       // console.log(f);
-//       // f.lastModified;
-//       // f.name;
-//       // f.size;
-//       // f.type;
-//       // f.webkitRelativePath;
-//       await new Promise((res) => {
-        
-//     // Read content from the file
-//     const fileContent = fs.readFileSync(f.name);
+  //   private async loadFiles(files: any) {
+  //     for (let index = 0; index < files.length; index++) {
+  //       const file = files[index];
+  //       let f: File = file;
+  //       // console.log(f);
+  //       // f.lastModified;
+  //       // f.name;
+  //       // f.size;
+  //       // f.type;
+  //       // f.webkitRelativePath;
+  //       await new Promise((res) => {
 
-//     // Setting up S3 upload parameters
-//     const params = {
-//         Bucket: '',
-//         Key: 'cat.jpg', // File name you want to save as in S3
-//         Body: fileContent
-//     };
+  //     // Read content from the file
+  //     const fileContent = fs.readFileSync(f.name);
 
-//     // Uploading files to the bucket
-//     s3.upload(params, function(err, data) {
-//         if (err) {
-//             throw err;
-//         }
-//         console.log(`File uploaded successfully. ${data.Location}`);
-//     });
-// };
-//         });
-//         // fileReader.readAsDataURL(f);
-//       // });
-//     }
-//   }
+  //     // Setting up S3 upload parameters
+  //     const params = {
+  //         Bucket: '',
+  //         Key: 'cat.jpg', // File name you want to save as in S3
+  //         Body: fileContent
+  //     };
+
+  //     // Uploading files to the bucket
+  //     s3.upload(params, function(err, data) {
+  //         if (err) {
+  //             throw err;
+  //         }
+  //         console.log(`File uploaded successfully. ${data.Location}`);
+  //     });
+  // };
+  //         });
+  //         // fileReader.readAsDataURL(f);
+  //       // });
+  //     }
+  //   }
 
   // private uploadFile(fileName: string){
   //   //https://stackabuse.com/uploading-files-to-aws-s3-with-node-js/
@@ -169,6 +170,7 @@ export class PhotosAlbumComponent implements OnInit {
   // }
 
   private async loadFiles(files: any) {
+    let points = 0;
     for (let index = 0; index < files.length; index++) {
       const file = files[index];
       let f: File = file;
@@ -222,6 +224,7 @@ export class PhotosAlbumComponent implements OnInit {
               let uimg = await this.addPhoto(f.name, dataurl);
               this.photos.push(uimg);
 
+
               // addImageInfo(imgId)
 
 
@@ -234,7 +237,16 @@ export class PhotosAlbumComponent implements OnInit {
           res({});
         };
         fileReader.readAsDataURL(f);
+        points += pointsEachSuccessPhoto;
       });
+    }
+    if (points > 0) {
+      let u = await this.remult.repo(Users).findId(this.remult.user.id);
+      if (u) {
+        u.points += points;
+        await u.save();
+        this.dialog.info(terms.youGotMorePoint.replace('!points!', points.toString()).replace('!sum!', u.points.toString()));
+      }
     }
   }
 

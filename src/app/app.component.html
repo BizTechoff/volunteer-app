@@ -3,15 +3,16 @@
   <mat-toolbar color="primary" style="flex-shrink: 0;">
     <button mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
-    </button>
+    </button> 
     <span class="toolbar-title">{{currentTitle()}}</span>
     <ng-container *ngIf="!remult.authenticated()">
-      <button *ngIf="usersCount === 0" mat-flat-button color="primary" (click)="signUp()">{{terms.signUp}}</button>
+      <!-- <button *ngIf="usersCount === 0" mat-flat-button color="primary" (click)="signUp()">{{terms.signUp}}</button> -->
       <button mat-flat-button color="primary" (click)="signIn()">{{terms.signIn}}</button>
     </ng-container>
     <ng-container *ngIf="remult.authenticated()">
       <button style="word-wrap: break-word;" mat-flat-button color="primary" [matMenuTriggerFor]="menu">
-        {{remult.user.name}} ({{ this.getUserAuthName()}})
+        {{remult.user.name}} 
+        <!-- ({{ this.getUserAuthName()}}) -->
       </button> 
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="updateInfo()">{{terms.updateInfo}}</button>

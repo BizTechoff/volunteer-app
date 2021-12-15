@@ -3,7 +3,8 @@ import { DataControl, InputField, openDialog } from "@remult/angular";
 import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerField, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
-import { FILTER_IGNORE, StringRequiredValidation } from "../common/globals";
+import { DialogService } from "../common/dialog";
+import { FILTER_IGNORE, pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
 import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
@@ -140,7 +141,7 @@ export class Langs {
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
                 }
-                else{
+                else {
                     user.modified = new Date();
                     // user.modifiedBy = await remult.repo(Users).findId(remult.user.id);
                 }
@@ -179,7 +180,7 @@ export class Langs {
 )
 export class Users extends IdEntity {
 
-    constructor(private remult: Remult) {
+    constructor(private remult: Remult, private dialog: DialogService) {
         super();
     }
 
@@ -276,7 +277,11 @@ export class Users extends IdEntity {
     @Field(options => options.valueType = Tenant, { caption: terms.tenant })
     defTid!: Tenant;
 
-    @IntegerField({ caption: terms.points })
+    // @DataControl<Users, number>({
+    //     clickIcon: 'help',
+    //     click: async (r, v) => await r.showPointsExplain()
+    // })
+    @IntegerField({ caption: terms.pointsYouHave })//.replace('!success!', pointsEachSuccessActivity.toString()).replace('!upload!', pointsEachSuccessPhoto.toString()) })
     points: number = 0;
 
     @Field({ includeInApi: false })
@@ -335,7 +340,18 @@ export class Users extends IdEntity {
     @Field({ caption: terms.active })
     active: boolean = true;
 
-
+    async showPointsExplain() {
+        let message = '';
+        message += `כל דיווח מוצלח = ${pointsEachSuccessActivity} נקודות`;
+        message += "\n";
+        message += `כל העלאת תמונה או וידאו = ${pointsEachSuccessPhoto} נקודות`;
+        message += "\n";
+        message += "\n";
+        message += `על כל ${pointsForSurprise} מקבלים הפתעה`;
+        if (this.dialog) {
+            await this.dialog.error(message);
+        }
+    }
 
     calcAge() {
         let result = 0;
