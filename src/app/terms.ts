@@ -1,5 +1,13 @@
 
 export const terms = {
+    validationCodeExpired:'תוקף הקוד פג, יש לשלוח שוב קוד חדש',
+    verificationCodeSendFailed: 'שליחת קוד אימות נכשלה',
+    verificationCodeSuccesfullySent: 'קוד אימות נשלח בהצלחה',
+    notificationVerificationCodeMessage: 'קוד אימות: !code! תקף לחמש דקות',
+    sendVerificationCode: 'שלח שוב',
+    wrongVerificatiobCode: 'קוד אימות שגוי',
+    pleaseEnterVerificationCode: 'ברגעים אלה נשלח מסרון לסלולרי שלך המכיל קוד אימות, יש להזין אותו כאן',
+    verificationCode: 'קוד אימות',
     foodDelivered: 'מסרתי לדייר את האוכל לשבת',
     pointsExplain: 'הסבר צבירת נקודות',
     youGotMorePoint: 'צברת !points! נקודות נוספות, סה"כ צברת עד כה: !sum! נקודות',

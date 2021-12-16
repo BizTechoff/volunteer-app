@@ -6,7 +6,7 @@ import { DialogService } from '../../../common/dialog';
 import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { UserIdName } from '../../../common/types';
-import { EmailSvc } from '../../../common/utils';
+import { NotificationService } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Branch } from '../../branch/branch';
@@ -272,7 +272,7 @@ export class ActivityDetailsComponent implements OnInit {
     this.args.changed = true;
     this.args.aid = this.activity.id;
     // let success = await EmailSvc.toCalendar(this.activity.id);
-    let success = await EmailSvc.toCalendar(this.activity.id);
+    let success = await NotificationService.toCalendar(this.activity.id);
     // let success = await this.sendEmails();
     this.close();
   }

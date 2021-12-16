@@ -5,7 +5,7 @@ import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, points
 import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
-import { EmailSvc } from "../../common/utils";
+import { NotificationService } from "../../common/utils";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
@@ -138,7 +138,7 @@ export class ActivityStatus {
                 a.status = to;
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
-                let success = await EmailSvc.toCalendar(a.id);
+                let success = await NotificationService.toCalendar(a.id);
                 // sendEmail(a, deleteFromCalendar);
             } else return;
         });
@@ -172,7 +172,7 @@ export class ActivityStatus {
                 // console.log('after save', a.vids);
                 await ActivityStatus.showOnlySummary(a);
                 // console.log('from cancel - toCalendar 1')
-                let success = await EmailSvc.toCalendar(a.id);
+                let success = await NotificationService.toCalendar(a.id);
                 // sendEmail(a, updateCalendar);
             } else return;
             // await a.save();

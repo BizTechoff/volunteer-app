@@ -1,3 +1,6 @@
+
+
+
 export interface UserIdName {
     id: string,
     name: string//,
@@ -62,6 +65,11 @@ export interface EmailRequest {
     cc: string,
     subject: string,
     html: string
+}
+
+export interface SmsRequest {
+    mobile: string,
+    message: string
 }
 
 export interface CalendarRequest {

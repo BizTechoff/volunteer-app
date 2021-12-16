@@ -13,12 +13,15 @@ import { initExpress } from 'remult/server';
 //import '../app/app.module';
 // import '../app/users/*';
 import '../app/app-routing.module';
+import '../app/common/types'
 //import '../app/app.component';
 import { getJwtTokenSignKey } from '../app/auth.service';
 import './aws';
 import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
+import './send-sms';
+
 async function startup() {
     config(); //loads the configuration from the .env file
     let dataProvider: DataProvider | undefined;
@@ -62,8 +65,9 @@ async function startup() {
         remult.setDataProvider(dataProvider!);
         importDataNew(remult).then(() => console.timeEnd("noam"));
     }
-
+ 
     let port = process.env.PORT || 3000;
     app.listen(port);
 }
+
 startup();

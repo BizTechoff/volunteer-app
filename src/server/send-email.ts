@@ -1,9 +1,9 @@
 import { createTransport } from 'nodemailer';
 import * as Mail from 'nodemailer/lib/mailer';
 import { CalendarRequest, IcsRequest } from '../app/common/types';
-import { EmailSvc } from '../app/common/utils';
+import { NotificationService } from '../app/common/utils';
 
-EmailSvc.sendMail = async (req: CalendarRequest) => {
+NotificationService.sendMail = async (req: CalendarRequest) => {
     console.debug('send-email', req);
     var transporter = createTransport({
         service: 'gmail',

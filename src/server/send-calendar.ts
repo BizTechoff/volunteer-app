@@ -4,7 +4,7 @@
 
 import { calendar_v3, google } from 'googleapis';
 import { CalendarClient, DateRequest, IcsRequest } from '../app/common/types';
-import { EmailSvc } from '../app/common/utils';
+import { NotificationService } from '../app/common/utils';
 
 function getEnvKeyFor(email: string) {
     if (email.includes('haifa')) {
@@ -22,7 +22,7 @@ function getEnvKeyFor(email: string) {
     return '';
 }
 
-EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
+NotificationService.toCalendarService = async (sender: string, req: IcsRequest) => {
     console.debug('send-calendar', req);
     // if (process.env.CALENDAR_ENABLE_SENDING) {
     //     console.debug('send-calendar', req);

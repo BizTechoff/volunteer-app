@@ -48,7 +48,8 @@ import { NotificationsListComponent } from './core/notification/notifications-li
 import { CalendarComponent } from './core/current-state/calendar/calendar.component';
 import { VolunteerTenantsComponent } from './core/volunteer/volunteer-tenants/volunteer-tenants.component';
 import { SafePipeModule } from 'safe-pipe';
-import { SelectTenantComponent } from './common/select-tenant/select-tenant.component'
+import { SelectTenantComponent } from './common/select-tenant/select-tenant.component';
+import { UserVerificationComponent } from './users/user-verification/user-verification.component'
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -78,7 +79,8 @@ import { SelectTenantComponent } from './common/select-tenant/select-tenant.comp
     NotificationsListComponent,
     CalendarComponent,
     VolunteerTenantsComponent,
-    SelectTenantComponent
+    SelectTenantComponent,
+    UserVerificationComponent
   ],
   imports: [
     BrowserModule,
@@ -106,7 +108,7 @@ import { SelectTenantComponent } from './common/select-tenant/select-tenant.comp
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
     SelectVolunteersComponent, SelectTenantComponent, SelectLangsComponent,
-    UserLoginComponent]//, SelectReferrerComponent]
+    UserLoginComponent, UserVerificationComponent]//, SelectReferrerComponent]
 })
 export class AppModule { }
  

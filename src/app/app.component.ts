@@ -35,6 +35,13 @@ export class AppComponent implements OnInit {
   forgotPassword = false;
   async signIn() {
     await openDialog(UserLoginComponent);
+
+    
+    // // here the login succefull, otherwise it's were throw before.
+    // if (this.remult.user.roles.length === 1 && this.remult.user.roles.includes(Roles.volunteer)) {
+    //   console.log('sending verification sms');
+    // }
+
     // let changes = await openDialog(UserLoginComponent);
     //   _ => _.args = { bid: this.activity.bid, entityId: this.activity.id },
     //   _ => _ ? _.args.changed : false);
@@ -110,6 +117,8 @@ export class AppComponent implements OnInit {
   }
   signUp() {
     let user = this.remult.repo(Users).create();
+    user.bid = undefined;// only admin should be here
+    user.volunteer = true;
     let password = new PasswordControl();
     let confirmPassword = new PasswordControl(terms.confirmPassword);
     openDialog(InputAreaComponent, i => i.args = {
@@ -119,13 +128,12 @@ export class AppComponent implements OnInit {
         user.$.mobile,
         password,
         confirmPassword
-      ], 
+      ],  
       ok: async () => {
         if (password.value != confirmPassword.value) {
           confirmPassword.error = terms.doesNotMatchPassword;
           throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
         }
-        user.bid = undefined;// only admin should be here
         await user.create(password.value);
         this.auth.signIn(user.name, password.value);
 

@@ -3,21 +3,25 @@ import { BackendMethod, Remult } from "remult";
 import { Activity } from "../core/activity/activity";
 import { terms } from "../terms";
 import { Users } from "../users/users";
-import { AttendeeRequest, CalendarRequest, IcsRequest } from "./types";
+import { AttendeeRequest, CalendarRequest, IcsRequest, SmsRequest } from "./types";
 
-export class EmailSvc {
+export class NotificationService {
     static toCalendarService: (sender: string, req: IcsRequest) => Promise<boolean>;
     // static sendCalendar: (req: CalendarRequest) => Promise<boolean>;
     static sendMail: (req: CalendarRequest) => Promise<boolean>;
 
+    static sendSms: (req: SmsRequest) => Promise<boolean>;
+
     @BackendMethod({ allowed: true })
     static async SendEmail(req: CalendarRequest) {
-        return await EmailSvc.sendMail(req);
+        return await NotificationService.sendMail(req);
     }
-    // @BackendMethod({ allowed: true })
-    // static async sendToCalendar(req: CalendarRequest) {
-    //     return await EmailSvc.sendCalendar(req);
-    // } 
+    
+    @BackendMethod({ allowed: true })
+    static async SendSms(req: SmsRequest) {
+        return await NotificationService.sendSms(req);
+    }
+    
     @BackendMethod({ allowed: true })
     static async toCalendar(aid: string, remult?: Remult) {
         // console.log('from cancel - toCalendar 2')
@@ -90,7 +94,7 @@ export class EmailSvc {
         };
 
 
-        return await EmailSvc.toCalendarService(a.bid.email, req);
+        return await NotificationService.toCalendarService(a.bid.email, req);
         // { sender: a.bid.email, req: req}););
     }
 

@@ -5,7 +5,8 @@ import { Remult } from 'remult';
 import { AuthService } from '../../auth.service';
 import { DialogService } from '../../common/dialog';
 import { terms } from '../../terms';
-import { PasswordControl, Users } from '../users';
+import { Roles } from '../roles';
+import { PasswordControl } from '../users';
 
 @Component({
   selector: 'app-user-login',
@@ -13,7 +14,6 @@ import { PasswordControl, Users } from '../users';
   styleUrls: ['./user-login.component.scss']
 })
 export class UserLoginComponent implements OnInit {
-
 
   userName = new InputField<string>({ caption: terms.username });
   password = new PasswordControl();

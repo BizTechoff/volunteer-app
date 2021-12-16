@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { openDialog } from '@remult/angular';
 import * as jwt from 'jsonwebtoken';
 import { BackendMethod, Remult, UserInfo } from 'remult';
+import { useVolunteerLoginWithVerificationCode } from './common/globals';
 import { terms } from './terms';
 import { Roles } from './users/roles';
+import { UserVerificationComponent } from './users/user-verification/user-verification.component';
 import { Users } from './users/users';
 
 const AUTH_TOKEN_KEY = "authToken";
@@ -23,8 +26,37 @@ export class AuthService {
     }
 
     async signIn(username: string, password: string) {
-        this.setAuthToken(await AuthService.signIn(username, password));
+        let ui: UserInfo = await AuthService.signIn(username, password);
+        if (useVolunteerLoginWithVerificationCode) {
+            if (ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)) {
+                let mobile = await AuthService.getUserMobile(ui.id);
+                // apply sms-mobile verification.
+                let verified = await openDialog(UserVerificationComponent,
+                    _ => _.args = { in: { mobile: mobile } },
+                    _ => _ && _.args.out ? _.args.out.verified : false);
+                if (!verified!) {
+                    return;
+                }
+            }
+        }
+        this.setAuthToken(await AuthService.setToken(ui));
     }
+
+    @BackendMethod({ allowed: true })
+    static async setToken(ui: UserInfo) {
+        return jwt.sign(ui, getJwtTokenSignKey());
+    }
+
+    @BackendMethod({ allowed: true })
+    static async getUserMobile(uid: string, remult?: Remult) {
+        let result = '';
+        let u = await remult!.repo(Users).findId(uid);
+        if (u?.mobile) {
+            result = u.mobile;
+        }
+        return result;
+    }
+
     @BackendMethod({ allowed: true })
     static async signIn(user: string, password: string, remult?: Remult) {
         //which user is here? probably kind of a system user
@@ -53,9 +85,8 @@ export class AuthService {
                 else if (u.volunteer) {
                     result.roles.push(Roles.volunteer);
                 }
-                return (jwt.sign(result, getJwtTokenSignKey()));
+                return (result);
             }
-            // throw new Error(terms.wrongPassword);
         }
         throw new Error(terms.invalidSignIn);
     }

@@ -1,0 +1,18 @@
+<div class="full-page">
+    <div class="header"></div>
+    <p>
+        <span style="text-align: center;"> {{ this.terms.pleaseEnterVerificationCode }} </span>
+    </p>
+    <p>
+        <data-control [field]="this.$.code"></data-control>
+        <button mat-flat-button (click)="this.sendVerificationCode()"> {{ this.terms.sendVerificationCode }} </button>
+    </p>
+    <div class="footer">
+        <button mat-raised-button (click)="this.signIn()" color='accent' style="margin-left: 15px;">
+            {{ terms.signIn }}
+        </button>
+        <button mat-raised-button (click)="this.close()">
+            {{ terms.cancel }}
+        </button>
+    </div>
+</div> 
