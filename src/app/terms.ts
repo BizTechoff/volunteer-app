@@ -1,5 +1,6 @@
 
 export const terms = {
+    foodDelivered: 'מסרתי לדייר את האוכל לשבת',
     pointsExplain: 'הסבר צבירת נקודות',
     youGotMorePoint: 'צברת !points! נקודות נוספות, סה"כ צברת עד כה: !sum! נקודות',
     youMustEnterPurposes: 'לפני סגירת הפעילות יש לציין את המטרות שנמצאו',
@@ -184,7 +185,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.12.16.0'
+    appVersion: '2021.12.16.1'
 }
 
 declare module 'remult' {

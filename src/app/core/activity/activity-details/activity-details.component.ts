@@ -126,16 +126,19 @@ export class ActivityDetailsComponent implements OnInit {
         fh: ((hour + 1) % 24).toString().padStart(2, '0') + ':' + '00',
         th: ((hour + 3) % 24).toString().padStart(2, '0') + ':' + '00'
       });
-
+ 
       if (!this.activity.vids) {
         this.activity.vids = [] as UserIdName[];
-      }
+      } 
       this.addCurrentUserToVids();
-
+ 
     }
     this.top = new DataAreaSettings({
       fields: () => {
         let f = [];
+        // if(this.isShowDeliveredFoodToShabat()){
+        //   f.push(this.activity.$.foodDelivered);
+        // }
         if (this.isBoard()) {
           f.push(this.activity.$.bid);
         }

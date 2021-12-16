@@ -6,17 +6,17 @@ import { calendar_v3, google } from 'googleapis';
 import { CalendarClient, DateRequest, IcsRequest } from '../app/common/types';
 import { EmailSvc } from '../app/common/utils';
 
-function getEnvKeyFor(email: string){
-    if(email.includes('haifa')){
+function getEnvKeyFor(email: string) {
+    if (email.includes('haifa')) {
         return 'CALENDAR_HAIFA'
     }
-    if(email.includes('hulon')){
+    if (email.includes('hulon')) {
         return 'CALENDAR_HULON'
     }
-    if(email.includes('ness.tziyona')){
+    if (email.includes('ness.tziyona')) {
         return 'CALENDAR_NESS_TZIYONA'
     }
-    if(email.includes('kiryat.ono')){
+    if (email.includes('kiryat.ono')) {
         return 'CALENDAR_KIRYAT_ONO'
     }
     return '';
@@ -24,8 +24,15 @@ function getEnvKeyFor(email: string){
 
 EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
     console.debug('send-calendar', req);
+    // if (process.env.CALENDAR_ENABLE_SENDING) {
+    //     console.debug('send-calendar', req);
+    // }
+    // else {
+    //     console.debug('CALENDAR_ENABLE_SENDING = DISABLE', req);
+    //     return false;
+    // }
     const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
-    
+
     let envKey = getEnvKeyFor(sender);
     if (!envKey || envKey.length == 0) {
         console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
@@ -38,7 +45,7 @@ EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
     }
     let data = JSON.parse(envBranch);
     let branch: CalendarClient = data as CalendarClient;
-    
+
     const auth = new google.auth.OAuth2(
         {
             clientId: branch.client.id,
@@ -59,7 +66,7 @@ EmailSvc.toCalendarService = async (sender: string, req: IcsRequest) => {
     }
 
     const calendar = google.calendar({ version: "v3", auth: auth });
-    
+
     if (attendees.length > 0) {
         let start = dateTimeForCalander(req.start);
         let calc = req.start;

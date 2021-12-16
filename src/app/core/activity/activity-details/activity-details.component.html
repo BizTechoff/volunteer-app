@@ -22,7 +22,10 @@
 
         <div *ngIf="this.isShowDeliveredFoodToShabat()"
             style="display: flex; flex-direction: row; justify-content: end;">
-            <mat-checkbox>מסרתי לדייר את האוכל לשבת </mat-checkbox>
+            <!-- <data-control [field]="this.activity.$.foodDelivered"></data-control> -->
+            <!-- <mat-label>מסרתי לדייר את האוכל לשבת</mat-label>
+            <input type="checkbox" [(ngModel)]="this.activity.$.foodDelivered"> -->
+            <mat-checkbox [(ngModel)]="this.activity.foodDelivered">מסרתי לדייר את האוכל לשבת</mat-checkbox>
         </div>
         <data-area [settings]='this.top'></data-area>
 
