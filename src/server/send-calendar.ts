@@ -24,96 +24,95 @@ function getEnvKeyFor(email: string) {
 
 NotificationService.toCalendarService = async (sender: string, req: IcsRequest) => {
     console.debug('send-calendar', req);
-    // if (process.env.CALENDAR_ENABLE_SENDING) {
-    //     console.debug('send-calendar', req);
-    // }
-    // else {
-    //     console.debug('CALENDAR_ENABLE_SENDING = DISABLE', req);
-    //     return false;
-    // }
-    const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
+    
+    if (process.env.CALENDAR_CHANNEL_OPENED) {
+        const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
 
-    let envKey = getEnvKeyFor(sender);
-    if (!envKey || envKey.length == 0) {
-        console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
-        return false;
-    }
-    let envBranch = process.env[envKey];
-    if (!envBranch) {
-        console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
-        return false;
-    }
-    let data = JSON.parse(envBranch);
-    let branch: CalendarClient = data as CalendarClient;
-
-    const auth = new google.auth.OAuth2(
-        {
-            clientId: branch.client.id,
-            clientSecret: branch.client.secret
-        });
-
-    auth.setCredentials({
-        scope: SCOPE,
-        refresh_token: branch.client.token
-    })
-
-    let attendees = [] as calendar_v3.Schema$EventAttendee[];
-    for (const a of req.attendees) {
-        attendees.push({
-            email: a.email,
-            displayName: a.name
-        });
-    }
-
-    const calendar = google.calendar({ version: "v3", auth: auth });
-
-    if (attendees.length > 0) {
-        let start = dateTimeForCalander(req.start);
-        let calc = req.start;
-        calc.hours += req.duration.hours;
-        calc.minutes += req.duration.minutes;
-        let end = dateTimeForCalander(calc);
-
-        let organizer = {
-            email: req.organizer.email,
-            displayName: req.organizer.displayName
-        };// calendar_v3.Schema$Event.organizer
-
-        let event: calendar_v3.Schema$Event = {
-            summary: req.title,
-            description: req.description,
-            start: {
-                'dateTime': start,
-                'timeZone': 'Asia/Jerusalem'
-            },
-            end: {
-                'dateTime': end,
-                'timeZone': 'Asia/Jerusalem'
-            },
-            location: req.location,
-            id: iCalId2Id(req.aid),
-            // iCalUID: req.ics.aid,
-            colorId: req.color + '',
-            organizer: organizer,
-            attendees: attendees,
-            visibility: 'public',
-            reminders: {
-                useDefault: false,
-                overrides: [
-                    { method: 'email', minutes: 24 * 60 },//day before
-                    { method: 'popup', minutes: 120 }//2 hours before
-                ]
-            }
-        };
-        if (!await insertEvent(calendar, req.aid, event)) {
-            await updateEvent(calendar, req.aid, event);
+        let envKey = getEnvKeyFor(sender);
+        if (!envKey || envKey.length == 0) {
+            console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
+            return false;
         }
+        let envBranch = process.env[envKey];
+        if (!envBranch) {
+            console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
+            return false;
+        }
+        let data = JSON.parse(envBranch);
+        let branch: CalendarClient = data as CalendarClient;
+
+        const auth = new google.auth.OAuth2(
+            {
+                clientId: branch.client.id,
+                clientSecret: branch.client.secret
+            });
+
+        auth.setCredentials({
+            scope: SCOPE,
+            refresh_token: branch.client.token
+        })
+
+        let attendees = [] as calendar_v3.Schema$EventAttendee[];
+        for (const a of req.attendees) {
+            attendees.push({
+                email: a.email,
+                displayName: a.name
+            });
+        }
+
+        const calendar = google.calendar({ version: "v3", auth: auth });
+
+        if (attendees.length > 0) {
+            let start = dateTimeForCalander(req.start);
+            let calc = req.start;
+            calc.hours += req.duration.hours;
+            calc.minutes += req.duration.minutes;
+            let end = dateTimeForCalander(calc);
+
+            let organizer = {
+                email: req.organizer.email,
+                displayName: req.organizer.displayName
+            };// calendar_v3.Schema$Event.organizer
+
+            let event: calendar_v3.Schema$Event = {
+                summary: req.title,
+                description: req.description,
+                start: {
+                    'dateTime': start,
+                    'timeZone': 'Asia/Jerusalem'
+                },
+                end: {
+                    'dateTime': end,
+                    'timeZone': 'Asia/Jerusalem'
+                },
+                location: req.location,
+                id: iCalId2Id(req.aid),
+                // iCalUID: req.ics.aid,
+                colorId: req.color + '',
+                organizer: organizer,
+                attendees: attendees,
+                visibility: 'public',
+                reminders: {
+                    useDefault: false,
+                    overrides: [
+                        { method: 'email', minutes: 24 * 60 },//day before
+                        { method: 'popup', minutes: 120 }//2 hours before
+                    ]
+                }
+            };
+            if (!await insertEvent(calendar, req.aid, event)) {
+                await updateEvent(calendar, req.aid, event);
+            }
+        }
+        else {
+            await deleteEvent(calendar, req.aid);
+        }
+        return true;
     }
     else {
-        await deleteEvent(calendar, req.aid);
+        console.debug('send-calendar.error: Calendar Cahnnel is Closed!!');
+        return false;
     }
-
-    return true;
 }
 
 
