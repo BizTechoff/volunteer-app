@@ -104,7 +104,7 @@ export class UserVerificationComponent implements OnInit {
 
   @BackendMethod({ allowed: true })
   static async isAdminCode(code: number) {
-    if (code === parseInt(process.env.ADMIN_SMS_VERIFICATION_CODE!)) {
+    if (code === parseInt(process.env.SMS_ADMIN_VERIFICATION_CODE!)) {
       return true;
     }
     return false;
