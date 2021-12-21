@@ -14,14 +14,14 @@ NotificationService.sendSms = async (req: SmsRequest) => {
 
     console.debug(`sendSms: ${JSON.stringify(req)}`);
 
-    if (process.env.SMS_CHANNEL_OPENED === 'true') {        
+    if (process.env.SMS_CHANNEL_OPENED === 'true') {
         let url = process.env.SMS_URL!
             .replace('!user!', process.env.SMS_ACCOUNT!)
             .replace('!password!', process.env.SMS_PASSWORD!)
             .replace('!from!', process.env.SMS_FROM_NAME!)
             .replace('!mobile!', req.mobile)
             .replace('!message!', encodeURI(req.message))
-        // .replace('!userid!', req.uid)
+            .replace('!userid!', req.uid);
         // .replace('!schedule!', '0000-00-00+00:00:00')
 
         // console.log('url',url);
