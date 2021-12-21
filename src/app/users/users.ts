@@ -271,6 +271,10 @@ export class Users extends IdEntity {
     })
     birthday!: Date;
 
+    @DataControl<Tenant, number>({
+        width: '60',
+        readonly: true
+    })
     @Field({ caption: terms.age })
     age: number = 0;
 
