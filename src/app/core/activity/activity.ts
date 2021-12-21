@@ -138,7 +138,7 @@ export class ActivityStatus {
                 a.status = to;
                 await a.save();
                 await ActivityStatus.showOnlySummary(a);
-                let success = await NotificationService.toCalendar(a.id);
+                let success = await NotificationService.SendCalendar(a.id);
                 // sendEmail(a, deleteFromCalendar);
             } else return;
         });
@@ -172,7 +172,7 @@ export class ActivityStatus {
                 // console.log('after save', a.vids);
                 await ActivityStatus.showOnlySummary(a);
                 // console.log('from cancel - toCalendar 1')
-                let success = await NotificationService.toCalendar(a.id);
+                let success = await NotificationService.SendCalendar(a.id);
                 // sendEmail(a, updateCalendar);
             } else return;
             // await a.save();

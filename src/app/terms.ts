@@ -5,6 +5,8 @@ export const terms = {
     verificationCodeSuccesfullySent: 'קוד אימות נשלח בהצלחה',
     notificationVerificationCodeMessage: 'קוד אימות: !code! תקף לחמש דקות',
     sendVerificationCode: 'שלח שוב',
+    verifying:'אימות',
+    verificatiobCodeNotSent:'קוד אימות לא נשלח',
     wrongVerificatiobCode: 'קוד אימות שגוי',
     pleaseEnterVerificationCode: 'ברגעים אלה נשלח מסרון לסלולרי שלך המכיל קוד אימות, יש להזין אותו כאן',
     verificationCode: 'קוד אימות',
@@ -193,7 +195,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.12.16.1'
+    appVersion: '2021.12.21.0'
 }
 
 declare module 'remult' {

@@ -6,12 +6,12 @@ import { Langs, Users } from '../app/users/users';
 
 let folder = `D:\\documents\\אשל ירושלים\\הסבה\\`;
 let branches = [] as string[];
-// branches.push('קריית אונו');
-branches.push('נס ציונה');
-
+branches.push('קריית אונו');
+// branches.push('נס ציונה');
+ 
 let branch = '';
-
-let mobileCounter = 0;
+ 
+let mobileCounter = 56;
 
 export async function importDataNew(remult: Remult) {
 
@@ -25,7 +25,7 @@ export async function importDataNew(remult: Remult) {
 
     for (const brn of branches) {
         branch = brn;
-
+ 
         await importVolunteers(remult);
         await importTenants(remult);
         await importTenantVolunteers(remult);
@@ -86,7 +86,7 @@ async function importVolunteers(remult: Remult) {
             if (split.length > 4) {
                 let bd = split[4].trim();
                 if (bd.length > 0) {
-                    birthday = new Date(split[4].trim());
+                    birthday = new Date(bd);
                     age = new Date().getFullYear() - birthday.getFullYear();
                 }
             }
@@ -120,7 +120,7 @@ async function importVolunteers(remult: Remult) {
             catch (err) {
                 console.log(name, '::', mobile, '::', err);
             }
-            // break;
+            // break; 
         }
     }
 }

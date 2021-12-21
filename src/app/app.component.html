@@ -1,6 +1,6 @@
 <div style="height:100%;display:flex;flex-direction: column;">
-  <!-- <mat-toolbar color="primary" style="flex-shrink: 0; background-image: linear-gradient(90deg, #F69A48, #2CBCC1)"> -->
-  <mat-toolbar color="primary" style="flex-shrink: 0;">
+  <mat-toolbar color="primary" style="flex-shrink: 0; background-image: linear-gradient(90deg, #F69A48, #2CBCC1)">
+  <!-- <mat-toolbar color="primary" style="flex-shrink: 0;"> -->
     <button mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button> 
@@ -10,7 +10,7 @@
       <button mat-flat-button color="primary" (click)="signIn()">{{terms.signIn}}</button>
     </ng-container>
     <ng-container *ngIf="remult.authenticated()">
-      <button style="word-wrap: break-word;" mat-flat-button color="primary" [matMenuTriggerFor]="menu">
+      <button style="word-wrap: break-word; background-color: transparent;" mat-flat-button color="primary" [matMenuTriggerFor]="menu">
         {{remult.user.name}} 
         <!-- ({{ this.getUserAuthName()}}) -->
       </button> 

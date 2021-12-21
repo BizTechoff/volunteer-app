@@ -68,8 +68,10 @@ export interface EmailRequest {
 }
 
 export interface SmsRequest {
+    uid: string,
     mobile: string,
-    message: string
+    message: string,
+    schedule?: string
 }
 
 export interface CalendarRequest {

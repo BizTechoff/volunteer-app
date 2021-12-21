@@ -32,7 +32,7 @@ export class AuthService {
                 let mobile = await AuthService.getUserMobile(ui.id);
                 // apply sms-mobile verification.
                 let verified = await openDialog(UserVerificationComponent,
-                    _ => _.args = { in: { mobile: mobile } },
+                    _ => _.args = { in: { uid: ui.id, mobile: mobile } },
                     _ => _ && _.args.out ? _.args.out.verified : false);
                 if (!verified!) {
                     return;

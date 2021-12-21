@@ -272,9 +272,9 @@ export class ActivityDetailsComponent implements OnInit {
     this.args.changed = true;
     this.args.aid = this.activity.id;
     // let success = await EmailSvc.toCalendar(this.activity.id);
-    let success = await NotificationService.toCalendar(this.activity.id);
+    let success = await NotificationService.SendCalendar(this.activity.id);
     // let success = await this.sendEmails();
-    this.close();
+    this.close(); 
   }
   // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
   close() {

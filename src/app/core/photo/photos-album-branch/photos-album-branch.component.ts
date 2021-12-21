@@ -47,11 +47,11 @@ export class PhotosAlbumBranchComponent implements OnInit {
     if (photos && photos.length > 0) {
       photos.forEach(p => {
         result.push({
-          vname: p.createdBy.name,
+          vname: p.createdBy?.name,
           created: p.created,
           data: p.data,
           link: p.link,
-          bname: p.bid.name
+          bname: p.bid?.name
         });
       });
     }

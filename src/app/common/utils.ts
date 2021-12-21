@@ -6,28 +6,28 @@ import { Users } from "../users/users";
 import { AttendeeRequest, CalendarRequest, IcsRequest, SmsRequest } from "./types";
 
 export class NotificationService {
-    static toCalendarService: (sender: string, req: IcsRequest) => Promise<boolean>;
+    static sendCalendar: (sender: string, req: IcsRequest) => Promise<boolean>;
     // static sendCalendar: (req: CalendarRequest) => Promise<boolean>;
     static sendMail: (req: CalendarRequest) => Promise<boolean>;
 
     static sendSms: (req: SmsRequest) => Promise<boolean>;
 
-    @BackendMethod({ allowed: true })
+    @BackendMethod({ allowed: true /*(r, e) => r.authenticated()*/ })
     static async SendEmail(req: CalendarRequest) {
         return await NotificationService.sendMail(req);
     }
-    
+
     @BackendMethod({ allowed: true })
     static async SendSms(req: SmsRequest) {
         return await NotificationService.sendSms(req);
     }
-    
+
     @BackendMethod({ allowed: true })
-    static async toCalendar(aid: string, remult?: Remult) {
+    static async SendCalendar(aid: string, remult?: Remult) {
         // console.log('from cancel - toCalendar 2')
         let a = await remult!.repo(Activity).findId(aid);
         if (!a) {
-            console.debug(`toCalendar.aid(${aid}) NOT found`);
+            console.debug(`SendCalendar.aid(${aid}) NOT found`);
             return false;
         }
         let vidsNames = '';
@@ -94,8 +94,7 @@ export class NotificationService {
         };
 
 
-        return await NotificationService.toCalendarService(a.bid.email, req);
-        // { sender: a.bid.email, req: req}););
+        return await NotificationService.sendCalendar(a.bid.email, req);
     }
 
     buildEmail() { }
