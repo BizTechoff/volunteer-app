@@ -28,6 +28,14 @@ export class ActiveStatus {
                 bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
             }
         );
+        options.saving = async (act) => {
+            if (isBackend()) {
+                if (act._.isNew()) {
+                    act.created = new Date();
+                    act.createdBy = await remult.repo(Users).findId(remult.user.id);
+                }
+            }
+        };
     })
 export class Photo extends IdEntity {
 
