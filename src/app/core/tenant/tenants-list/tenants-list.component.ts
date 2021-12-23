@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { FILTER_IGNORE } from '../../../common/globals';
+
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
@@ -29,8 +29,10 @@ export class TenantsListComponent implements OnInit {
   tenants: GridSettings<Tenant> = new GridSettings<Tenant>(
     this.remult.repo(Tenant),
     {
-      where: _ => (this.isBoard() ? FILTER_IGNORE : _.bid.contains(this.remult.user.bid))
-        .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
+      where: () => ({
+        bid: this.isBoard() ? undefined : { $contains: this.remult.user.bid },
+        name: this.search ? { $contains: this.search } : undefined
+      }),
       allowCrud: false,
       numOfColumnsInGrid: 10,
       columnSettings: t => {
@@ -140,7 +142,7 @@ export class TenantsListComponent implements OnInit {
           explicit: undefined!,
           title: t.name,
           langs: t.langs,// this.t.langs, 
-          selected: t.defVids.map(s=>s),//clone
+          selected: t.defVids.map(s => s),//clone
           organizer: ''
         },
         output => output && output.args && output.args.changed ? output.args.selected : undefined);
@@ -189,11 +191,11 @@ export class TenantsListComponent implements OnInit {
   async deleteTenant(t: Tenant) {
     let yes = await this.dialog.confirmDelete(terms.tenant);
     if (yes) {
-      let count = await this.remult.repo(Activity).count(row => row.tid.isEqualTo(t));
-      if(count > 0){
+      let count = await this.remult.repo(Activity).count({ tid: t });
+      if (count > 0) {
         this.dialog.error('לא ניתן למחוק דייר עם פעילויות');
       }
-      else{
+      else {
         await t.delete();
         this.dialog.info('הדייר נמחק בהצלחה');
         await this.refresh();

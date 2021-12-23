@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { FILTER_IGNORE } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Branch } from '../../branch/branch';
@@ -27,9 +26,11 @@ export class ActivitiesListComponent implements OnInit {
   activities: GridSettings<Activity> = new GridSettings<Activity>(
     this.remult.repo(Activity),
     {
-      where: _ => _.status.isIn(this.status.statuses)
-        .and(this.bid ? _.bid.isEqualTo(this.bid) : FILTER_IGNORE)
-        .and(this.isBoard() ? FILTER_IGNORE : _.bid.contains(this.remult.user.bid)),
+      where: () => ({
+        status: this.status.statuses,
+        bid: this.bid ? this.bid : this.isBoard() ? undefined : { $contains: this.remult.user.bid }
+      })
+      ,
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
       // allowSelection: true,
       numOfColumnsInGrid: 20,

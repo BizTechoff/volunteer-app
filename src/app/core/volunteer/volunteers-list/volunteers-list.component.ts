@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { FILTER_IGNORE } from '../../../common/globals';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { terms } from '../../../terms';
@@ -28,9 +27,11 @@ export class VolunteersListComponent implements OnInit {
   volunteers: GridSettings<Users> = new GridSettings<Users>(
     this.remult.repo(Users),
     {
-      where: _ => _.volunteer.isEqualTo(true)
-        .and(this.isBoard() ? FILTER_IGNORE : _.bid!.contains(this.remult.user.bid))
-        .and(this.search ? _.name.contains(this.search) : FILTER_IGNORE),
+      where: () => ({
+        volunteer: true,
+        bid: this.isBoard() ? undefined : { $contains: this.remult.user.bid },
+        name: this.search ? { $contains: this.search } : undefined
+      }),
       newRow: _ => _.volunteer = true,
       allowCrud: false,
       // allowSelection: true,
@@ -125,7 +126,7 @@ export class VolunteersListComponent implements OnInit {
   async deleteVolunteer(u: Users) {
     let yes = await this.dialog.confirmDelete(terms.volunteer);
     if (yes) {
-      let count = await this.remult.repo(Activity).count(row => row.vids.contains(u.id));
+      let count = await this.remult.repo(Activity).count({ vids: { $contains: u.id } });
       if (count > 0) {
         this.dialog.error('לא ניתן למחוק מתנדב עם פעילויות');
       }

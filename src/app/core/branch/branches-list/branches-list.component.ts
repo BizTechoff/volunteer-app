@@ -18,7 +18,7 @@ export class BranchesListComponent implements OnInit {
 
   branches = new GridSettings(this.remult.repo(Branch),
     {
-      allowCrud: false, 
+      allowCrud: false,
       // allowDelete: false,
       // allowInsert: this.remult.isAllowed(Roles.admin),
       allowUpdate: this.remult.isAllowed(Roles.admin),
@@ -33,9 +33,9 @@ export class BranchesListComponent implements OnInit {
       gridButtons: [
         {
           textInMenu: () => terms.refresh,
-          icon: 'refresh', 
+          icon: 'refresh',
           click: async () => { await this.refresh(); }
-        } 
+        }
       ]//,
       // rowButtons: [
       //   {
@@ -61,17 +61,17 @@ export class BranchesListComponent implements OnInit {
   }
 
   async deleteBranch(b: Branch) {
-    let count = await this.remult.repo(Users).count(row => row.bid!.isEqualTo(b));
+    let count = await this.remult.repo(Users).count({ bid!: b });
     if (count > 0) {
       this.dialog.error(terms.canNotDeleteBrnachWhileRelationWithUsers);
       return;
     }
-    count = await this.remult.repo(Tenant).count(row => row.bid!.isEqualTo(b));
+    count = await this.remult.repo(Tenant).count({ bid!: b });
     if (count > 0) {
       this.dialog.error(terms.canNotDeleteBrnachWhileRelationWithTenants);
       return;
     }
-    count = await this.remult.repo(Activity).count(row => row.bid!.isEqualTo(b));
+    count = await this.remult.repo(Activity).count({ bid!: b });
     if (count > 0) {
       this.dialog.error(terms.canNotDeleteBrnachWhileRelationWithActivities);
       return;

@@ -1,6 +1,6 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Entity, Field, IdEntity } from "remult";
-import { ColorNumberValidator, EmailValidator, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
+import { ColorNumberValidator, EmailValidator,  StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
@@ -26,16 +26,12 @@ import { Roles } from "../../users/roles";
     // allowApiDelete: Roles.admin,
     // allowApiUpdate: Roles.admin,
     // allowApiRead: Allow.authenticated
-    defaultOrderBy: (row) => [row.name]
+    defaultOrderBy: { name: "asc" }
 },
     (options, remult) => {
-        options.apiPrefilter = async (b) => {
-            let result = FILTER_IGNORE;
-            if (!remult.isAllowed(Roles.board)) {
-                return b.id.isEqualTo(remult.user.bid);
-            }
-            return result;
-        }
+        options.apiPrefilter = async () => ({
+            id: !remult.isAllowed(Roles.board) ? remult.user.bid : undefined
+        })
     }
 )
 export class Branch extends IdEntity {

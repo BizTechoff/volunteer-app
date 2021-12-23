@@ -1,8 +1,7 @@
 import { FieldRef, Filter, IdEntity } from "remult";
 import { terms } from "../terms";
   
-export const FILTER_IGNORE: Filter = new Filter(x => { return true; });
-export const FILTER_RESTRICT: Filter = new Filter(x => { return false; });
+
 export const OnlyVolunteerEditActivity = true;
 export const useVolunteerLoginWithVerificationCode = true;
 export const validVerificationCodeResponseMinutes = 5;

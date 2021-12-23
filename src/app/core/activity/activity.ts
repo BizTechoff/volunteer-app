@@ -1,7 +1,7 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
-import { DateRequiredValidation, EntityRequiredValidation, FILTER_IGNORE, pointsEachSuccessActivity, TimeRequireValidator } from "../../common/globals";
+import { DateRequiredValidation, EntityRequiredValidation, pointsEachSuccessActivity, TimeRequireValidator } from "../../common/globals";
 import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
@@ -281,15 +281,14 @@ export class ActivityGeneralStatus {
         allowApiDelete: Allow.authenticated,
         allowApiUpdate: Allow.authenticated,
         allowApiRead: Allow.authenticated,
-        defaultOrderBy: (_) => [_.date, _.fh, _.status]
+        defaultOrderBy: { date: "asc", fh: "asc", status: "asc" }
     },
     (options, remult) => {
-        options.apiPrefilter = (act) => {
-            let result = FILTER_IGNORE;
-            if (!remult.isAllowed(Roles.board)) {
-                return act.bid.contains(remult.user.bid);
+        options.apiPrefilter = () => {
+            return {
+                bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
             }
-            return result;
+
         };
         options.validation = async (act) => {
             if (isBackend()) {
@@ -301,11 +300,13 @@ export class ActivityGeneralStatus {
                 if (act.$.vids.valueChanged() || act.$.tid.valueChanged() || act.$.date.valueChanged() || act.$.fh.valueChanged() || act.$.th.valueChanged()) {
                     let conflicts = [] as Activity[];
                     let error = '';
-                    for await (const a of remult.repo(Activity).iterate({
-                        where: (_) => _.date.isEqualTo(act.date)
-                            .and(_.fh.isLessOrEqualTo(act.th))
-                            .and(_.th.isGreaterOrEqualTo(act.fh))
-                            .and(_.status.isNotIn([ActivityStatus.cancel]))
+                    for await (const a of remult.repo(Activity).query({
+                        where: {
+                            date: act.date,
+                            fh: { "<=": act.th },
+                            th: { ">=": act.fh },
+                            status: { $ne: ActivityStatus.cancel }
+                        }
                     })) {//if _.tid === act.tid || _.vids equalsAny act.vids
                         if (!a.isNew()) {
                             if (a.id === act.id) {

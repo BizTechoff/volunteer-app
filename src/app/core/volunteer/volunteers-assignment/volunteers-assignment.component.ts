@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaSettings, DataControl, GridSettings } from '@remult/angular';
-import { ContainsFilterFactory, Field, getFields, Remult } from 'remult';
+import { EntityFilter, Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { FILTER_IGNORE, OnlyVolunteerEditActivity } from '../../../common/globals';
+import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -19,12 +19,14 @@ import { Branch } from '../../branch/branch';
 export class VolunteersAssignmentComponent implements OnInit {
 
 
-  contains(l1: ContainsFilterFactory<Langs[]>, l2: Langs[]) {
-    let result = FILTER_IGNORE;
+  contains(l2: Langs[]) {
+    let result: EntityFilter<Users> = { $or: [] };
     for (const l of l2) {
-      result = result.or(l1.contains(l.id.toString()));
+      result.$or!.push({
+        langs: { $contains: l.id.toString() }
+      })
     }
-    return result;
+    return result
   }
 
   args: {
@@ -86,20 +88,22 @@ export class VolunteersAssignmentComponent implements OnInit {
   async initGrid() {
     this.volunteers = new GridSettings<Users>(this.remult.repo(Users),
       {
-        where: u => {
-          let result = FILTER_IGNORE;
-          result = result.and(u.volunteer.isEqualTo(true));
+        where: () => {
+          let result: EntityFilter<Users> = {
+            volunteer: true,
+            $and: []
+          };
           if (this.filterBtTenantLangs) {
-            result = result.and(this.contains(u.langs, this.args.langs));
+            result.$and!.push(this.contains(this.args.langs));
           }
           if (this.search) {
-            result = result.and(u.name.contains(this.search));
+            result.$and!.push({ name: { $contains: this.search } });
           }
           if (this.args.explicit) {
-            result = result.and(u.id.isIn(this.args.explicit.map(x => x.id)));
+            result.$and!.push({ id: this.args.explicit.map(x => x.id) });
           }
           else {
-            result = result.and(u.bid!.isEqualTo(this.args.branch));
+            result.$and!.push({ bid: this.args.branch });
           }
           return result;
         },
@@ -159,7 +163,7 @@ export class VolunteersAssignmentComponent implements OnInit {
       if (this.args.organizer && this.args.organizer.length > 0 && f.id === this.args.organizer) {
         this.dialog.info(terms.canNotRemoveActivityOrganizer)
         return;
-      } 
+      }
       let index = this.args.selected.indexOf(f);
       this.args.selected.splice(index, 1);
     }

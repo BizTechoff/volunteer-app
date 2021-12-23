@@ -16,7 +16,7 @@ export class VolunteerTenantsComponent implements OnInit {
   tenants = new GridSettings<Tenant>(
     this.remult.repo(Tenant),
     {
-      where: row => row.defVids.contains(this.remult.user.id),
+      where: { defVids: { $contains: this.remult.user.id } },
       columnSettings: row => [
         row.name,
         // row.defVids,

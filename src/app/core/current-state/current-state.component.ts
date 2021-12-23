@@ -4,7 +4,6 @@ import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
-import { FILTER_IGNORE } from '../../common/globals';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
@@ -18,7 +17,7 @@ import { Referrer } from '../tenant/tenant';
 })
 export class CurrentStateComponent implements OnInit {
 
-  
+
 
   // colors = {
   //   blue2: '36a2eb'
@@ -53,7 +52,7 @@ export class CurrentStateComponent implements OnInit {
     // },//type PositionType = 'left' | 'right' | 'top' | 'bottom' | 'chartArea';
     title: { text: terms.activitiesByStatuses, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: {left: +28} },
+    layout: { padding: { left: +28 } },
     legend: {
       // align: 'start',
       rtl: true,
@@ -215,8 +214,8 @@ export class CurrentStateComponent implements OnInit {
       var options = { hour12: false };
       // console.log(date.toLocaleString('en-US', options));
       this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
-      for await (const a of this.remult.repo(Activity).iterate({
-        where: row => this.branch ? row.bid.isEqualTo(this.branch) : FILTER_IGNORE
+      for await (const a of this.remult.repo(Activity).query({
+        where: ({ bid: this.branch ? this.branch : undefined })
       })) {
         // By Staus
         let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
@@ -378,10 +377,13 @@ export class CurrentStateComponent implements OnInit {
 
   async openActivities(bid: string, status: ActivityStatus) {
     let list = [];
-    for await (const a of this.remult.repo(Activity).iterate({
-      where: row => row.bid.contains(bid)
-        .and(row.status.isEqualTo(status))
-    })) {
+    for await (const a of this.remult.repo(Activity).query({
+      where: {
+        bid: { $contains: bid },
+        status
+      }
+    }
+    )) {
       list.push(`${a.date.toLocaleDateString()} (${a.fh} - ${a.th})`);
     }
     this.dialog.error(list);

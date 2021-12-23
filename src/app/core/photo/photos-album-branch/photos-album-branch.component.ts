@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { BackendMethod, Remult } from 'remult';
-import { FILTER_IGNORE } from '../../../common/globals';
 import { PhotoDetails } from '../../../common/types';
 import { Roles } from '../../../users/roles';
 import { Photo } from '../photo';
@@ -41,8 +40,8 @@ export class PhotosAlbumBranchComponent implements OnInit {
     let photos = await remult!.repo(Photo).find({
       limit: 15,
       page: page,
-      orderBy: r => r.created.descending(),
-      where: r => remult!.isAllowed(Roles.board) ? FILTER_IGNORE : r.bid.contains(remult!.user.bid)
+      orderBy: { created: "desc" },
+      where: { bid: remult!.isAllowed(Roles.board) ? undefined : { $contains: remult!.user.bid } }
     });
     if (photos && photos.length > 0) {
       photos.forEach(p => {

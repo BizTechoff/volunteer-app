@@ -1,7 +1,6 @@
 import { DataControl } from "@remult/angular";
 import { Allow, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
-import { FILTER_IGNORE } from "../../common/globals";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
@@ -24,21 +23,11 @@ export class ActiveStatus {
         allowApiRead: Allow.authenticated
     },
     (options, remult) => {
-        options.apiPrefilter = (p) => {
-            let result = FILTER_IGNORE;
-            if (!remult.isAllowed(Roles.board)) {
-                result = p.bid.contains(remult.user.bid);
+        options.apiPrefilter = () => (
+            {
+                bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
             }
-            return result;
-        };  
-        options.saving = async (act) => {
-            if (isBackend()) {
-                if (act._.isNew()) {
-                    act.created = new Date();
-                    act.createdBy = await remult.repo(Users).findId(remult.user.id);
-                }
-            }
-        };
+        );
     })
 export class Photo extends IdEntity {
 
@@ -62,7 +51,7 @@ export class Photo extends IdEntity {
 
     @Field({ caption: terms.data })
     data: string = '';
- 
+
     @Field({ caption: terms.createdBy })
     createdBy!: Users;
 

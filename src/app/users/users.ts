@@ -4,7 +4,7 @@ import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerFi
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
-import { FILTER_IGNORE, pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
+import { pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
 import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
@@ -99,24 +99,24 @@ export class Langs {
         allowApiUpdate: Allow.authenticated,
         allowApiDelete: Roles.admin,
         allowApiInsert: Roles.manager,
-        defaultOrderBy: (user) => [
-            user.admin.descending(),
-            user.donor.descending(),
-            user.board.descending(),
-            user.manager.descending(),
-            user.bid ? user.bid.descending() : user.manager.descending(),
-            user.name
-        ]
+        defaultOrderBy: {
+            admin: "desc",
+            donor: "desc",
+            board: "desc",
+            manager: "desc",
+            bid: "desc",
+            name: "asc"
+        }
     },
     (options, remult) => {
-        options.apiPrefilter = (user) => {
-            let active = FILTER_IGNORE;
+        options.apiPrefilter = () => {
+
             if (!remult.authenticated())
-                return user.id.isEqualTo("-1");
+                return { id: [] }
             if (!(remult.isAllowed(Roles.board))) {
-                return user.bid!.contains(remult.user.bid);
+                return { bid: { $contains: remult.user.bid } }
             }
-            return active;
+            return {};
         };
         options.validation = async (user) => {
             let ok = true;

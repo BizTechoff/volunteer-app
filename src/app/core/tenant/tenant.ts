@@ -1,7 +1,7 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
-import { DateRequiredValidation, FILTER_IGNORE, StringRequiredValidation } from "../../common/globals";
+import { DateRequiredValidation, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
 import { SelectTenantComponent } from "../../common/select-tenant/select-tenant.component";
 import { UserIdName } from "../../common/types";
@@ -85,24 +85,21 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
         allowApiDelete: [Roles.admin, Roles.manager],
         allowApiUpdate: Allow.authenticated,
         allowApiRead: Allow.authenticated,
-        defaultOrderBy: (user) => [
-            user.bid ? user.bid.descending() : user.name,
-            user.name
-        ]
+        defaultOrderBy: {
+            bid: "desc",
+            name: "asc"
+        }
     },
     async (options, remult) => {
-        options.apiPrefilter = (tnt) => {
-            if (!(remult.isAllowed(Roles.board))) {
-                return tnt.bid.contains(remult.user.bid);
-            }
-            return FILTER_IGNORE;
-        };
+        options.apiPrefilter = () => (
+            { bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined }
+        )
         options.saving = async (tenant) => {
             if (isBackend()) {
                 if (tenant._.isNew()) {
                     tenant.created = new Date();
                     // tenant.createdBy = await remult.repo(Users).findId(remult.user.id);
-                }  
+                }
                 else {
                     tenant.modified = new Date();
                     // tenant.modifiedBy = await remult.repo(Users).findId(remult.user.id);

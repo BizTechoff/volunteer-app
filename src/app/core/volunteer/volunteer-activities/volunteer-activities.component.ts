@@ -90,10 +90,12 @@ export class VolunteerActivitiesComponent implements OnInit {
       this.userMessage = terms.loadingYourActivities;
       this.refreshing = true;
       let as = [] as Activity[];
-      for await (const a of this.remult.repo(Activity).iterate({
-        where: row => row.status.isNotIn([this.AcitivityStatus.cancel])
-          .and(row.vids.contains(this.remult.user.id)),
-        orderBy: row => [row.status, row.date, row.fh, row.th]
+      for await (const a of this.remult.repo(Activity).query({
+        where: {
+          status: { $ne: [this.AcitivityStatus.cancel] },
+          vids: { $contains: this.remult.user.id }
+        },
+        orderBy: { status: "asc", date: "asc", fh: "asc", th: "asc" }
       })) {
         await a.$.tid.load();
         as.push(a);

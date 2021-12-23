@@ -60,7 +60,7 @@ export class AuthService {
     @BackendMethod({ allowed: true })
     static async signIn(user: string, password: string, remult?: Remult) {
         //which user is here? probably kind of a system user
-        let u = await remult!.repo(Users).findFirst(h => h.name.isEqualTo(user));
+        let u = await remult!.repo(Users).findFirst({ name: user });
         if (u) {
             if (await u.passwordMatches(password)) {
                 let result: UserInfo = {

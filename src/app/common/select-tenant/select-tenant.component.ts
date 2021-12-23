@@ -7,7 +7,6 @@ import { Tenant } from '../../core/tenant/tenant';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
 import { Langs } from '../../users/users';
-import { FILTER_IGNORE } from '../globals';
 import { InputAreaComponent } from '../input-area/input-area.component';
 
 @Component({
@@ -37,15 +36,14 @@ export class SelectTenantComponent implements OnInit {
   }
   async loadTenants() {
     this.tenants = await this.remult.repo(Tenant).find({
-      where: t =>
+      where: {
         // if there is a search value, search by it
         // t.langs.isIn([this.langs])
-        t.active.isEqualTo(true)
-          .and(this.isManager() ? FILTER_IGNORE : t.defVids.contains(this.remult.user.id))//@@@@@@@@@@@2
-          .and(this.isBoard() ? FILTER_IGNORE : t.bid.isEqualTo(this.args.bid))
-          .and(
-            this.searchString ? t.name.contains(this.searchString)
-              : undefined!)
+        active: true,
+        defVids: this.isManager() ? undefined : { $contains: this.remult.user.id },//@@@@@@@@@@@2
+        bid: this.isBoard() ? undefined : this.args.bid,
+        name: this.searchString ? { $contains: this.searchString } : undefined
+      }
     });
   }
   async doSearch() {

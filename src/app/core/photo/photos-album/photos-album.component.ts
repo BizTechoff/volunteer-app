@@ -71,8 +71,8 @@ export class PhotosAlbumComponent implements OnInit {
   async refresh() {
     this.photos.splice(0);
     if (this.isValidEntityId()) {
-      for await (const p of this.remult.repo(Photo).iterate({
-        where: row => row.eid.isEqualTo(this.args.entityId)
+      for await (const p of this.remult.repo(Photo).query({
+        where: { eid: this.args.entityId }
       })) {
         this.photos.push(p);
       }

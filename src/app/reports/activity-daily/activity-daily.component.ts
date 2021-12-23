@@ -15,7 +15,7 @@ export class ActivityDailyComponent implements OnInit {
   activities = [] as Activity[];
   grid = new GridSettings<Activity>(this.remult.repo(Activity),
     {
-      where: row => row.date.isEqualTo(this.selectedDate),
+      where: () => ({ date: this.selectedDate }),
       allowCrud: false,
       columnSettings: (_) => {
         let f = [];
@@ -89,8 +89,8 @@ export class ActivityDailyComponent implements OnInit {
   // @BackendMethod({ allowed: Roles.manager })
   async getDailyActivities(date: Date, remult?: Remult) {
     var result = [] as Activity[];
-    for await (const a of remult!.repo(Activity).iterate({
-      where: row => row.date.isEqualTo(date)
+    for await (const a of remult!.repo(Activity).query({
+      where: { date }
     })) {
       result.push(a);
     }

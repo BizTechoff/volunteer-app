@@ -26,14 +26,13 @@ export class SelectVolunteersComponent implements OnInit {
   }
   async loadUserss() {
     this.volunteers = await this.remult.repo(Users).find({
-      where: t =>
+      where: {
         // if there is a search value, search by it
-        t.volunteer.isEqualTo(true)
-          // .and(t.langs.isIn([this.langs]))
-          .and(t.active.isEqualTo(true))
-          .and(
-            this.searchString ? t.name.contains(this.searchString)
-              : undefined!)
+        volunteer: true,
+        // .and(t.langs.isIn([this.langs]))
+        active: true,
+        name: this.searchString ? { $contains: this.searchString } : undefined
+      }
     });
   }
   async doSearch() {

@@ -31,10 +31,9 @@ export class SelectBranchComponent implements OnInit {
   }
   async loadBranchs() {
     this.branches = await this.remult.repo(Branch).find({
-      where: t =>
-        this.searchString
-          ? t.name.contains(this.searchString)
-          : undefined!
+      where: {
+        name: this.searchString ? { $contains: this.searchString } : undefined!
+      }
     });
   }
   async doSearch() {
@@ -52,7 +51,7 @@ export class SelectBranchComponent implements OnInit {
   isBoard() {
     return this.remult.isAllowed(Roles.board);
   }
-  async clear(){
+  async clear() {
     this.args.onClear();
   }
   async create() {
