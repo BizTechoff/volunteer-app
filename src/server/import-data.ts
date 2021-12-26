@@ -8,16 +8,16 @@ let folder = `D:\\documents\\אשל ירושלים\\הסבה\\`;
 let branches = [] as string[];
 branches.push('קריית אונו');
 // branches.push('נס ציונה');
- 
+
 let branch = '';
- 
+
 let mobileCounter = 56;
 
 export async function importDataNew(remult: Remult) {
 
     console.log(`users: ${await remult.repo(Users).count()} rows`);
     console.log(`tenants: ${await remult.repo(Tenant).count()} rows`);
- 
+
     console.log("starting import");
     console.time("import");
     await seed(remult);
@@ -25,7 +25,7 @@ export async function importDataNew(remult: Remult) {
 
     for (const brn of branches) {
         branch = brn;
- 
+
         await importVolunteers(remult);
         await importTenants(remult);
         await importTenantVolunteers(remult);
@@ -52,7 +52,7 @@ async function seed(remult: Remult) {
 }
 
 async function importVolunteers(remult: Remult) {
-    let b = await remult.repo(Branch).findFirst({ where: row => row.name.contains(branch) });
+    let b = await remult.repo(Branch).findFirst({ name: { $contains: branch } });
     if (!b) {
         debug(`Found NO branch for ${branch} `);
         return;
@@ -126,7 +126,7 @@ async function importVolunteers(remult: Remult) {
 }
 
 async function importTenants(remult: Remult) {
-    let b = await remult.repo(Branch).findFirst({ where: row => row.name.contains(branch) });
+    let b = await remult.repo(Branch).findFirst({ name: { $contains: branch } });
     if (!b) {
         debug(`Found NO branch for ${branch} `);
         return;
@@ -178,7 +178,7 @@ async function importTenants(remult: Remult) {
 }
 
 async function importTenantVolunteers(remult: Remult) {
-    let b = await remult.repo(Branch).findFirst({ where: row => row.name.contains(branch) });
+    let b = await remult.repo(Branch).findFirst({ name: { $contains: branch } });
     if (!b) {
         debug(`Found NO branch for ${branch} `);
         return;
@@ -206,13 +206,13 @@ async function importTenantVolunteers(remult: Remult) {
                 tenant = split[1].trim();
             }
 
-            let t = await remult.repo(Tenant).findFirst({ where: row => row.name.isEqualTo(tenant) });
+            let t = await remult.repo(Tenant).findFirst({ name: tenant });
             if (!t) {
                 console.log(`NOT found tenant: ${tenant}`);
                 continue;
             }
 
-            let u = await remult.repo(Users).findFirst({ where: row => row.name.isEqualTo(volunteer) });
+            let u = await remult.repo(Users).findFirst({ name: volunteer });
             if (!u) {
                 console.log(`NOT found tenant: ${volunteer}`);
                 continue;
@@ -225,7 +225,7 @@ async function importTenantVolunteers(remult: Remult) {
                 catch (err) {
                     console.log(t.name, '::', err);
                 }
-            } 
+            }
             else {
                 console.log(`already exists volunteer: ${u.name, u.id}`);
             }

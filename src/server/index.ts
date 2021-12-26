@@ -9,7 +9,7 @@ import * as helmet from 'helmet';
 import { Pool } from 'pg';
 import { DataProvider, Remult, SqlDatabase } from 'remult';
 import { PostgresDataProvider, verifyStructureOfAllEntities } from 'remult/postgres';
-import { initExpress } from 'remult/server';
+import { remultExpress } from 'remult/remult-express';
 //import '../app/app.module';
 // import '../app/users/*';
 import '../app/app-routing.module';
@@ -47,9 +47,9 @@ async function startup() {
             contentSecurityPolicy: false,
         })
     );
-    initExpress(app, {
+    app.use(remultExpress({
         dataProvider
-    });
+    }));
     app.use(express.static('dist/volunteer-app'));
     app.use('/*', async (req, res) => {
         try {
@@ -65,7 +65,7 @@ async function startup() {
         remult.setDataProvider(dataProvider!);
         importDataNew(remult).then(() => console.timeEnd("noam"));
     }
- 
+
     let port = process.env.PORT || 3000;
     app.listen(port);
 }
