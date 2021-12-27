@@ -44,6 +44,29 @@ export class CurrentStateComponent implements OnInit {
     'gray'
   ];
 
+  public pieChartOptionsByBranches: ChartOptions = {
+    responsive: true,
+    // onClick: (event: MouseEvent, legendItem: any) => {
+    //   // this.openActivitiesByStatuses()
+    //   return false;
+    // },//type PositionType = 'left' | 'right' | 'top' | 'bottom' | 'chartArea';
+    title: { text: terms.activitiesByBranches, display: true },
+    // maintainAspectRatio: false,
+    layout: { padding: { left: +28 } },
+    legend: {
+      // align: 'start',
+      rtl: true,
+      textDirection: 'rtl',
+      position: 'right',
+      // onClick: (event: MouseEvent, legendItem: any) => {
+      //   // this.currentStatFilter = this.pieChartStatObjects[legendItem.index];
+
+      //   return false;
+      // }
+    },
+  };
+
+
   public pieChartOptionsByStatuses: ChartOptions = {
     responsive: true,
     // onClick: (event: MouseEvent, legendItem: any) => {
@@ -149,9 +172,13 @@ export class CurrentStateComponent implements OnInit {
   public pieChartColors: Color[] = [{ backgroundColor: [] }];
   public pieChartLabelsStatuses: Label[] = [];
   public pieChartDataStatuses: SingleDataSet = [];
+
   public pieChartType: ChartType = 'pie';
   public pieChartLegend = true;
   public pieChartPlugins = [];
+
+  public pieChartLabelsBranches: Label[] = [];
+  public pieChartDataBranches: SingleDataSet = [];
 
   public pieChartLabelsPurposes: Label[] = [];
   public pieChartDataPurposes: SingleDataSet = [];
@@ -169,15 +196,25 @@ export class CurrentStateComponent implements OnInit {
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   maxLabelLength = 0;
 
+
+
+  activitiesByBranches: { id: string, name: string, count: number }[] = [];
   activitiesByStatus: { branch: Branch, status: ActivityStatus, count: number }[] = [];
   activitiesByPurpose: { branch: Branch, purpose: ActivityPurpose, count: number }[] = [];
   activitiesByDayPeriods: { branch: Branch, period: ActivityDayPeriod, count: number }[] = [];
   activitiesByWeekDay: { branch: Branch, day: number, count: number }[] = [];
   activitiesByReferrer: { branch: Branch, referrer: Referrer, count: number }[] = [];
 
-  @DataControl<CurrentStateComponent>({ valueChange: async (r, v) => await r.refresh() })
+  @DataControl<CurrentStateComponent, Branch>({
+    valueChange: async (r, v) => {
+      console.log('branchv.alueChanged');
+      console.log('v.value',v.value);
+      console.log('r.branch?.id',r.branch?.id);
+      await r.refresh();
+    }
+  })
   @Field({ caption: terms.branch })
-  branch?: Branch = null!;
+  branch: Branch = undefined!;
 
   constructor(private remult: Remult, private dialog: DialogService) {
 
@@ -205,7 +242,9 @@ export class CurrentStateComponent implements OnInit {
   isRefreshing = false;
   async refresh() {
     if (!this.isRefreshing) {
+      console.log('this.branch?.id',this.branch?.id);
       this.isRefreshing = true;
+      this.activitiesByBranches = [];
       this.activitiesByStatus = [];
       this.activitiesByPurpose = [];
       this.activitiesByWeekDay = [];
@@ -217,6 +256,15 @@ export class CurrentStateComponent implements OnInit {
       for await (const a of this.remult.repo(Activity).query({
         where: ({ bid: this.branch ? this.branch : undefined })
       })) {
+
+        // By Branch
+        let foundBranch = this.activitiesByBranches.find(itm => itm.id === a.bid.id);
+        if (!foundBranch) {
+          foundBranch = { id: a.bid.id, name: a.bid.name, count: 0 };
+          this.activitiesByBranches.push(foundBranch);
+        }
+        ++foundBranch.count;
+
         // By Staus
         let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
         if (!foundStatus) {
@@ -259,10 +307,11 @@ export class CurrentStateComponent implements OnInit {
         //   this.activitiesByReferrer.push(referrer);
         // }
         // ++referrer.count;
-        this.isRefreshing = false;
       }
+      this.isRefreshing = false;
     }
 
+    this.activitiesByBranches.sort((a1, a2) => a1.name.localeCompare(a2.name));
     this.activitiesByStatus.sort((a1, a2) => a1.status.id - a2.status.id);
     this.activitiesByWeekDay.sort((a1, a2) => a1.day - a2.day);
     this.activitiesByDayPeriods.sort((a1, a2) => a1.period.id - a2.period.id);
@@ -302,6 +351,8 @@ export class CurrentStateComponent implements OnInit {
     this.pieChartDataStatuses = [];
     this.pieChartLabelsPurposes = [];
     this.pieChartDataPurposes = [];
+    this.pieChartLabelsBranches = [];
+    this.pieChartDataBranches = [];
     this.pieChartLabelsWeekDay = [];
     this.pieChartDataWeekDay = [];
     this.pieChartLabelsDayPeriods = [];
@@ -317,6 +368,15 @@ export class CurrentStateComponent implements OnInit {
       label += ` (${a.count})`;
       this.pieChartLabelsStatuses.push(label.padEnd(this.maxLabelLength));
       this.pieChartDataStatuses.push(a.count);
+    }
+
+    for (const a of this.activitiesByBranches) {
+      let label = (a.name + ` (${a.count})`);
+      // if (a.purpose === ActivityPurpose.fail) {
+      //   label = terms.activities + ' ' + label;
+      // }
+      this.pieChartLabelsBranches.push(label.padEnd(this.maxLabelLength));
+      this.pieChartDataBranches.push(a.count);
     }
 
     for (const a of this.activitiesByPurpose) {

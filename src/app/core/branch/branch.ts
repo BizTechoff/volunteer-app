@@ -1,9 +1,11 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Entity, Field, IdEntity } from "remult";
-import { ColorNumberValidator, EmailValidator,  StringRequiredValidation } from "../../common/globals";
+import { Entity, Field, IdEntity, Remult } from "remult";
+import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { Users } from "../../users/users";
+import { Tenant } from "../tenant/tenant";
 
 @DataControl<any, Branch>({
     hideDataOnInput: true,
@@ -50,6 +52,31 @@ export class Branch extends IdEntity {
 
     @Field({ caption: terms.frame })
     frame: string = '';
+
+    // @Field({ dbReadOnly: true, allowApiUpdate: false })
+    volunteersCount!:number;
+    // @Field({ dbReadOnly: true, allowApiUpdate: false })
+    tenantsCount!:number;
+
+    constructor(private remult: Remult) {
+        super();
+    }
+
+    // getVolunteersCount() {
+    //     if (this.volunteersCount !== undefined)
+    //         return this.volunteersCount;
+    //     this.volunteersCount = 0;
+    //     this.remult.repo(Users).count({volunteer: true, bid: this}).then(result => { this.volunteersCount = result; })
+    //     return this.volunteersCount;
+    // }
+
+    // getTenantsCount() {
+    //     if (this.tenantsCount !== undefined)
+    //         return this.tenantsCount;
+    //     this.tenantsCount = 0;
+    //     this.remult.repo(Tenant).count({bid: this}).then(result => { this.tenantsCount = result; })
+    //     return this.tenantsCount;
+    // }
 
     isBranch(name: string) {
         let result = this.email.includes(name);

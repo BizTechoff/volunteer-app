@@ -16,7 +16,7 @@ import { Branch } from '../branch';
 })
 export class BranchesListComponent implements OnInit {
 
-  branches = new GridSettings(this.remult.repo(Branch),
+  branches = new GridSettings<Branch>(this.remult.repo(Branch),
     {
       allowCrud: false,
       // allowDelete: false,
@@ -24,8 +24,11 @@ export class BranchesListComponent implements OnInit {
       allowUpdate: this.remult.isAllowed(Roles.admin),
       columnSettings: row => {
         let f = [] as DataControlInfo<Branch>[];
-        f.push(row.name, row.address)
-        // if (this.isAdmin()) {
+        f.push(row.name, row.address);
+        // row.volunteersCount = await this.remult.repo(Users).count({volunteer: true});
+        f.push({ field: row.volunteersCount, getValue: (r, v) => { 0 /*r.getVolunteersCount()*/ } });
+      f.push({ field: row.tenantsCount, getValue: (r, v) => { 0 /*r.getTenantsCount()*/ } });
+        // if (this.isAdmin()) { 
         //   f.push(row.email, row.color, row.frame);
         // }  
         return f;

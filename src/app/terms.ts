@@ -1,5 +1,6 @@
 
 export const terms = {
+    reminder4FoodDelivery: 'תזכורת לסמן אם מסרת את האוכל',
     validationCodeExpired:'תוקף הקוד פג, יש לשלוח שוב קוד חדש',
     verificationCodeSendFailed: 'שליחת קוד אימות נכשלה',
     verificationCodeSuccesfullySent: 'קוד אימות נשלח בהצלחה',
@@ -87,6 +88,7 @@ export const terms = {
     deleteTenant: 'מחיקת דייר',
     activitiesByWeekDay: 'פעילויות לפי ימי השבוע',
     activitiesByPurpose: 'פעילויות לפי מטרות',
+    activitiesByBranches: 'פעילויות לפי סניפים',
     activitiesByStatuses: 'פעילויות לפי סטטוסים',
     activitiesByDayPeriods: 'פעילויות לפי זמני היום',
     activitiesByReferrer: 'פעילויות לפי גורם מפנה',

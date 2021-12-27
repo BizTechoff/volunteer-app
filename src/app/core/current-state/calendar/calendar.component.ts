@@ -15,7 +15,14 @@ export class CalendarComponent implements OnInit {
 
   iframe = document.getElementById('calendar') as HTMLIFrameElement;
   SelectedCalendarFrame = '';
-  @DataControl<CalendarComponent>({ valueChange: async (r, v) => await r.refresh() })
+  @DataControl<CalendarComponent>({
+    valueChange: async (r, v) => {
+      console.log('branchv.alueChanged');
+      console.log('v.value',v.value);
+      console.log('r.branch?.id',r.branch?.id);
+      await r.refresh();
+    }
+  })
   @Field({ caption: terms.branch })
   branch?: Branch = null!;
 

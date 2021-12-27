@@ -1,10 +1,10 @@
-import { Injectable, NgZone, ErrorHandler } from "@angular/core";
+import { ErrorHandler, Injectable, NgZone } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Remult } from "remult";
-
-import { YesNoQuestionComponent } from "./yes-no-question/yes-no-question.component";
 import { openDialog } from "@remult/angular";
+import { Remult } from "remult";
 import { terms } from "../terms";
+import { YesNoQuestionComponent } from "./yes-no-question/yes-no-question.component";
+
 
 
 
@@ -13,8 +13,8 @@ import { terms } from "../terms";
 
 @Injectable()
 export class DialogService {
-    info(info: string): any {
-        this.snackBar.open(info, "close", { duration: 4000 });
+    info(info: string, duration = 4000): any {
+        this.snackBar.open(info, "סגירה", { duration: duration });
     }
     async error(err: any) {
 

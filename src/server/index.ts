@@ -8,10 +8,11 @@ import * as fs from 'fs';
 import * as helmet from 'helmet';
 import { Pool } from 'pg';
 import { DataProvider, Remult, SqlDatabase } from 'remult';
-import { PostgresDataProvider, verifyStructureOfAllEntities } from 'remult/postgres';
+import { PostgresDataProvider, verifyStructureOfAllEntities,createPostgresConnection } from 'remult/postgres';
 import { remultExpress } from 'remult/remult-express';
 //import '../app/app.module';
 // import '../app/users/*';
+// import '../app/core/branch/branch';
 import '../app/app-routing.module';
 import '../app/common/types'
 //import '../app/app.component';
@@ -24,20 +25,7 @@ import './send-sms';
 
 async function startup() {
     config(); //loads the configuration from the .env file
-    let dataProvider: DataProvider | undefined;
-
-    // use json db for dev, and postgres for production
-    if (process.env.USE_PROGRESQL || !process.env.DEV_MODE) {//if you want to use postgres for development - change this if to be if(true)
-        const pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: process.env.DEV_MODE ? false : { rejectUnauthorized: false }// use ssl in production but not in development. the `rejectUnauthorized: false`  is required for deployment to heroku etc...
-        });
-        let database = new SqlDatabase(new PostgresDataProvider(pool));
-        var remult = new Remult();
-        remult.setDataProvider(database);
-        await verifyStructureOfAllEntities(database, remult);
-        dataProvider = database;
-    }
+  
 
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
@@ -46,10 +34,11 @@ async function startup() {
         helmet({
             contentSecurityPolicy: false,
         })
-    );
-    app.use(remultExpress({
-        dataProvider
-    }));
+    ); 
+    const api = remultExpress({
+        dataProvider:async ()=>createPostgresConnection({configuration:"heroku", sslInDev: false})
+    });
+    app.use(api);
     app.use(express.static('dist/volunteer-app'));
     app.use('/*', async (req, res) => {
         try {
@@ -60,9 +49,8 @@ async function startup() {
     });
 
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
-        console.time("noam")
-        var remult = new Remult();
-        remult.setDataProvider(dataProvider!);
+
+        const remult = await api.getRemult(undefined!);
         importDataNew(remult).then(() => console.timeEnd("noam"));
     }
 
