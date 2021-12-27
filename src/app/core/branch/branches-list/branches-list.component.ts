@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControlInfo, GridSettings } from '@remult/angular';
-import { Remult } from 'remult';
+import { Remult, SqlCommand, SqlResult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -26,10 +26,22 @@ export class BranchesListComponent implements OnInit {
         let f = [] as DataControlInfo<Branch>[];
         f.push(row.name, row.address);
         // row.volunteersCount = await this.remult.repo(Users).count({volunteer: true});
-        f.push({ field: row.volunteersCount, getValue: (r, v) => { 0 /*r.getVolunteersCount()*/ } });
-      f.push({ field: row.tenantsCount, getValue: (r, v) => { 0 /*r.getTenantsCount()*/ } });
+        f.push({
+          field: row.volunteersCount, caption: terms.volunteers,
+          getValue: (r, v) => {
+            // for await (const p of this.remult.repo(Tenant).query({
+            //   where: { bid: row }
+            // })) {
+
+            // }
+            // let cmd: SqlCommand;
+            // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);
+            return 0; /*r.getVolunteersCount()*/
+          }
+        });
+        f.push({ field: row.tenantsCount, caption: terms.tenants, getValue: (r, v) => { return 0; /*r.getTenantsCount()*/ } });
         // if (this.isAdmin()) { 
-        //   f.push(row.email, row.color, row.frame);
+        //   f.push(row.email, row.color, row.frame); 
         // }  
         return f;
       },
@@ -84,3 +96,23 @@ export class BranchesListComponent implements OnInit {
   }
 
 }
+
+// export class myDummySQLCommand implements SqlCommand {
+
+//   execute(sql: string): Promise<SqlResult> {
+//       remu
+//   }
+//   addParameterAndReturnSqlToken(val: any): string {
+//     throw new Error("Method not implemented.");
+//       // if (val === null)
+//       //     return "null";
+//       // if (val instanceof Date)
+//       //     val = val.toISOString();
+//       // if (typeof (val) == "string") {
+//       //     return new SqlBuilder(undefined).str(val);
+//       // }
+//       // return val.toString();
+//   }
+
+
+// }

@@ -22,13 +22,13 @@ export async function importDataNew(remult: Remult) {
     console.time("import");
     await seed(remult);
     // await remult.setUser({ id: "API", name: "API", roles: [], bid: '', bname: '' });
-
+ 
     for (const brn of branches) {
         branch = brn;
 
-        await importVolunteers(remult);
-        await importTenants(remult);
-        await importTenantVolunteers(remult);
+        // await importVolunteers(remult);
+        // await importTenants(remult);
+        // await importTenantVolunteers(remult);
 
     }
     console.timeEnd("import");

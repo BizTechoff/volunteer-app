@@ -20,10 +20,10 @@ export class VolunteersListComponent implements OnInit {
   @DataControl<VolunteersListComponent>({ valueChange: async (r) => await r.refresh() })
   @Field({ caption: `${terms.serachForVolunteerHere}` })
   search: string = ''
- 
+
   get $() { return getFields(this, this.remult) };
   terms = terms;
- 
+
   volunteers: GridSettings<Users> = new GridSettings<Users>(
     this.remult.repo(Users),
     {
@@ -47,7 +47,8 @@ export class VolunteersListComponent implements OnInit {
           u.age,
           u.email,
           u.mobile,
-          u.birthday
+          u.birthday,
+          u.points
         );
         return f;
       }, //[
@@ -162,7 +163,8 @@ export class VolunteersListComponent implements OnInit {
             u!.$.birthday,
             { field: u!.$.age, width: '60', visible: (r, v) => this.remult.isAllowed(Roles.manager) },
           ],
-          u!.$.langs//,
+          u!.$.langs,
+          { field: u!.$.points, readonly: true }//,
           // { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
         ],
         ok: async () => {

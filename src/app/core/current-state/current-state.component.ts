@@ -2,14 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { DataControl } from '@remult/angular';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
-import { Field, getFields, Remult } from 'remult';
+import { BackendMethod, Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
 import { Branch } from '../branch/branch';
-import { Referrer } from '../tenant/tenant';
-
+// import { Referrer } from '../tenant/tenant';
+export interface stateResult {
+  activitiesByBranches: { id: string, name: string, count: number }[];
+  activitiesByStatus: { id: string, status: ActivityStatus, count: number }[];
+  activitiesByPurpose: { id: string, purpose: ActivityPurpose, count: number }[];
+  activitiesByDayPeriods: { id: string, period: ActivityDayPeriod, count: number }[];
+  activitiesByWeekDay: { id: string, day: number, count: number }[];
+};
 @Component({
   selector: 'app-current-state',
   templateUrl: './current-state.component.html',
@@ -17,7 +23,7 @@ import { Referrer } from '../tenant/tenant';
 })
 export class CurrentStateComponent implements OnInit {
 
-
+  activitiesResult!: stateResult;
 
   // colors = {
   //   blue2: '36a2eb'
@@ -52,7 +58,7 @@ export class CurrentStateComponent implements OnInit {
     // },//type PositionType = 'left' | 'right' | 'top' | 'bottom' | 'chartArea';
     title: { text: terms.activitiesByBranches, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: { left: +28 } },
+    // layout: { padding: { left: +28 } },
     legend: {
       // align: 'start',
       rtl: true,
@@ -75,7 +81,7 @@ export class CurrentStateComponent implements OnInit {
     // },//type PositionType = 'left' | 'right' | 'top' | 'bottom' | 'chartArea';
     title: { text: terms.activitiesByStatuses, display: true },
     // maintainAspectRatio: false,
-    layout: { padding: { left: +28 } },
+    // layout: { padding: { left: +28 } },
     legend: {
       // align: 'start',
       rtl: true,
@@ -109,25 +115,25 @@ export class CurrentStateComponent implements OnInit {
     },
   };
 
-  public pieChartOptionsByReferrer: ChartOptions = {
-    responsive: true,
-    // onClick: (event: MouseEvent, legendItem: any) => {
-    //   return false;
-    // },
-    title: { text: terms.activitiesByReferrer, display: true },
-    // maintainAspectRatio: false,
-    // layout: { padding: 12 },
-    legend: {
-      rtl: true,
-      textDirection: 'rtl',
-      position: 'right',
-      // onClick: (event: MouseEvent, legendItem: any) => {
-      //   // this.currentStatFilter = this.pieChartStatObjects[legendItem.index];
+  // public pieChartOptionsByReferrer: ChartOptions = {
+  //   responsive: true,
+  //   // onClick: (event: MouseEvent, legendItem: any) => {
+  //   //   return false;
+  //   // },
+  //   title: { text: terms.activitiesByReferrer, display: true },
+  //   // maintainAspectRatio: false,
+  //   // layout: { padding: 12 },
+  //   legend: {
+  //     rtl: true,
+  //     textDirection: 'rtl',
+  //     position: 'right',
+  //     // onClick: (event: MouseEvent, legendItem: any) => {
+  //     //   // this.currentStatFilter = this.pieChartStatObjects[legendItem.index];
 
-      //   return false;
-      // }
-    },
-  };
+  //     //   return false;
+  //     // }
+  //   },
+  // };
 
   public pieChartOptionsByPurpose: ChartOptions = {
     responsive: true,
@@ -189,27 +195,18 @@ export class CurrentStateComponent implements OnInit {
   public pieChartLabelsWeekDay: Label[] = [];
   public pieChartDataWeekDay: SingleDataSet = [];
 
-  public pieChartLabelsReferrer: Label[] = [];
-  public pieChartDataReferrer: SingleDataSet = [];
+  // public pieChartLabelsReferrer: Label[] = [];
+  // public pieChartDataReferrer: SingleDataSet = [];
 
   refreshedTime = '00:00';
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   maxLabelLength = 0;
 
-
-
-  activitiesByBranches: { id: string, name: string, count: number }[] = [];
-  activitiesByStatus: { branch: Branch, status: ActivityStatus, count: number }[] = [];
-  activitiesByPurpose: { branch: Branch, purpose: ActivityPurpose, count: number }[] = [];
-  activitiesByDayPeriods: { branch: Branch, period: ActivityDayPeriod, count: number }[] = [];
-  activitiesByWeekDay: { branch: Branch, day: number, count: number }[] = [];
-  activitiesByReferrer: { branch: Branch, referrer: Referrer, count: number }[] = [];
-
   @DataControl<CurrentStateComponent, Branch>({
     valueChange: async (r, v) => {
       console.log('branchv.alueChanged');
-      console.log('v.value',v.value);
-      console.log('r.branch?.id',r.branch?.id);
+      console.log('v.value', v.value);
+      console.log('r.branch?.id', r.branch?.id);
       await r.refresh();
     }
   })
@@ -229,100 +226,98 @@ export class CurrentStateComponent implements OnInit {
       this.branch = b;
     }
     await this.refresh();
-    // else{
-    //   await this.refresh();
-    // }
-    // await this.refresh();
   }
 
   isBoard() {
     return this.remult.isAllowed(Roles.board);
   }
-
+ 
   isRefreshing = false;
   async refresh() {
     if (!this.isRefreshing) {
-      console.log('this.branch?.id',this.branch?.id);
       this.isRefreshing = true;
-      this.activitiesByBranches = [];
-      this.activitiesByStatus = [];
-      this.activitiesByPurpose = [];
-      this.activitiesByWeekDay = [];
-      this.activitiesByDayPeriods = [];
-      this.activitiesByReferrer = [];
       var options = { hour12: false };
       // console.log(date.toLocaleString('en-US', options));
       this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
-      for await (const a of this.remult.repo(Activity).query({
-        where: ({ bid: this.branch ? this.branch : undefined })
-      })) {
-
-        // By Branch
-        let foundBranch = this.activitiesByBranches.find(itm => itm.id === a.bid.id);
-        if (!foundBranch) {
-          foundBranch = { id: a.bid.id, name: a.bid.name, count: 0 };
-          this.activitiesByBranches.push(foundBranch);
-        }
-        ++foundBranch.count;
-
-        // By Staus
-        let foundStatus = this.activitiesByStatus.find(itm => itm.status === a.status);
-        if (!foundStatus) {
-          foundStatus = { branch: a.bid, status: a.status, count: 0 };
-          this.activitiesByStatus.push(foundStatus);
-        }
-        ++foundStatus.count;
-
-        // By Purpose
-        a.purposes.forEach(p => {
-          let foundPurpose = this.activitiesByPurpose.find(itm => itm.purpose.id === p.id);
-          if (!foundPurpose) {
-            foundPurpose = { branch: a.bid, purpose: p, count: 0 };
-            this.activitiesByPurpose.push(foundPurpose);
-          }
-          ++foundPurpose.count;
-        });
-
-
-        // By Purpose
-        let foundDayPeriod = this.activitiesByDayPeriods.find(itm => itm.period === a.period());
-        if (!foundDayPeriod) {
-          foundDayPeriod = { branch: a.bid, period: a.period(), count: 0 };
-          this.activitiesByDayPeriods.push(foundDayPeriod);
-        }
-        ++foundDayPeriod.count;
-
-        // By Purpose
-        let foundDayWeekDay = this.activitiesByWeekDay.find(itm => itm.day === a.date.getDay());
-        if (!foundDayWeekDay) {
-          foundDayWeekDay = { branch: a.bid, day: a.date.getDay(), count: 0 };
-          this.activitiesByWeekDay.push(foundDayWeekDay);
-        }
-        ++foundDayWeekDay.count;
-
-        // By Purpose
-        // let referrer = this.activitiesByReferrer.find(itm => itm.referrer === a.tid.referrer);
-        // if (!referrer) {
-        //   referrer = { branch: a.bid, referrer: a.tid.referrer, count: 0 };
-        //   this.activitiesByReferrer.push(referrer);
-        // }
-        // ++referrer.count;
-      }
+      this.activitiesResult = await CurrentStateComponent.retrieveGraphes(
+        this.branch?.id);
       this.isRefreshing = false;
+      this.setChart();
+    }
+  }
+
+  @BackendMethod({ allowed: rml => rml.authenticated() })
+  static async retrieveGraphes(branchId?: string, remult?: Remult) {
+    const result: stateResult = {
+      activitiesByBranches: [],
+      activitiesByDayPeriods: [],
+      activitiesByPurpose: [],
+      activitiesByStatus: [],
+      activitiesByWeekDay: []
+    };
+    for await (const a of remult!.repo(Activity).query({
+      where: ({ bid: branchId ? { $contains: branchId } : undefined })
+    })) {
+
+      // By Branch
+      let foundBranch = result.activitiesByBranches.find(itm => itm.id === a.bid.id);
+      if (!foundBranch) {
+        foundBranch = { id: a.bid.id, name: a.bid.name, count: 0 };
+        result.activitiesByBranches.push(foundBranch);
+      }
+      ++foundBranch.count;
+
+      // By Staus
+      let foundStatus = result.activitiesByStatus.find(itm => itm.status === a.status);
+      if (!foundStatus) {
+        foundStatus = { id: a.bid.id, status: a.status, count: 0 };
+        result.activitiesByStatus.push(foundStatus);
+      }
+      ++foundStatus.count;
+
+      // By Purpose
+      a.purposes.forEach(p => {
+        let foundPurpose = result.activitiesByPurpose.find(itm => itm.purpose.id === p.id);
+        if (!foundPurpose) {
+          foundPurpose = { id: a.bid.id, purpose: p, count: 0 };
+          result.activitiesByPurpose.push(foundPurpose);
+        }
+        ++foundPurpose.count;
+      });
+
+
+      // By Purpose
+      let foundDayPeriod = result.activitiesByDayPeriods.find(itm => itm.period === a.period());
+      if (!foundDayPeriod) {
+        foundDayPeriod = { id: a.bid.id, period: a.period(), count: 0 };
+        result.activitiesByDayPeriods.push(foundDayPeriod);
+      }
+      ++foundDayPeriod.count;
+
+      // By Purpose
+      let foundDayWeekDay = result.activitiesByWeekDay.find(itm => itm.day === a.date.getDay());
+      if (!foundDayWeekDay) {
+        foundDayWeekDay = { id: a.bid.id, day: a.date.getDay(), count: 0 };
+        result.activitiesByWeekDay.push(foundDayWeekDay);
+      }
+      ++foundDayWeekDay.count;
+
+      // By Purpose
+      // let referrer = this.activitiesByReferrer.find(itm => itm.referrer === a.tid.referrer);
+      // if (!referrer) {
+      //   referrer = { branch: a.bid, referrer: a.tid.referrer, count: 0 };
+      //   this.activitiesByReferrer.push(referrer);
+      // }
+      // ++referrer.count;
     }
 
-    this.activitiesByBranches.sort((a1, a2) => a1.name.localeCompare(a2.name));
-    this.activitiesByStatus.sort((a1, a2) => a1.status.id - a2.status.id);
-    this.activitiesByWeekDay.sort((a1, a2) => a1.day - a2.day);
-    this.activitiesByDayPeriods.sort((a1, a2) => a1.period.id - a2.period.id);
-    this.activitiesByPurpose.sort((a1, a2) => a1.purpose.id - a2.purpose.id);
-    this.activitiesByReferrer.sort((a1, a2) => a1.referrer.id - a2.referrer.id);
+    result.activitiesByBranches.sort((a1, a2) => a1.name.localeCompare(a2.name));
+    result.activitiesByStatus.sort((a1, a2) => a1.status.id - a2.status.id);
+    result.activitiesByWeekDay.sort((a1, a2) => a1.day - a2.day);
+    result.activitiesByDayPeriods.sort((a1, a2) => a1.period.id - a2.period.id);
+    result.activitiesByPurpose.sort((a1, a2) => a1.purpose.id - a2.purpose.id);
 
-
-    // let c = this.activitiesByWeekDay.reduce((sum, current) => sum + current.count, 0);
-    // this.pieChartOptionsByWeekDay.title =  { text: terms.activitiesByWeekDay + ` (${c})`, display: true };
-
-    this.setChart();
+    return result;
   }
 
   setChart() {
@@ -357,65 +352,65 @@ export class CurrentStateComponent implements OnInit {
     this.pieChartDataWeekDay = [];
     this.pieChartLabelsDayPeriods = [];
     this.pieChartDataDayPeriods = [];
-    this.pieChartLabelsReferrer = [];
-    this.pieChartDataReferrer = [];
+    // this.pieChartLabelsReferrer = [];
+    // this.pieChartDataReferrer = [];
 
-    for (const a of this.activitiesByStatus) {
+    for (const a of this.activitiesResult.activitiesByStatus) {
       let label = a.status.caption;//.replace('ממתין', 'לא');
       // if (a.status === ActivityStatus.problem) {
       //   label = label;
       // }
       label += ` (${a.count})`;
-      this.pieChartLabelsStatuses.push(label.padEnd(this.maxLabelLength));
+      this.pieChartLabelsStatuses.push(label.replace('הסתיים ב', ''));
       this.pieChartDataStatuses.push(a.count);
     }
 
-    for (const a of this.activitiesByBranches) {
+    for (const a of this.activitiesResult.activitiesByBranches) {
       let label = (a.name + ` (${a.count})`);
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsBranches.push(label.padEnd(this.maxLabelLength));
+      this.pieChartLabelsBranches.push(label);
       this.pieChartDataBranches.push(a.count);
     }
 
-    for (const a of this.activitiesByPurpose) {
+    for (const a of this.activitiesResult.activitiesByPurpose) {
       let label = (a.purpose.caption + ` (${a.count})`);
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsPurposes.push(label.padEnd(this.maxLabelLength));
+      this.pieChartLabelsPurposes.push(label);
       this.pieChartDataPurposes.push(a.count);
     }
     // (this.pieChartColors[0].backgroundColor as string[]).push(...this.colors2);
 
-    for (const a of this.activitiesByDayPeriods) {
+    for (const a of this.activitiesResult.activitiesByDayPeriods) {
       let label = a.period.caption + ` (${a.count})`;
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsDayPeriods.push(label.padEnd(this.maxLabelLength));
+      this.pieChartLabelsDayPeriods.push(label);
       this.pieChartDataDayPeriods.push(a.count);
     }
 
-    for (const a of this.activitiesByReferrer) {
-      let label = a.referrer.caption + ` (${a.count})`;
-      // if (a.purpose === ActivityPurpose.fail) {
-      //   label = terms.activities + ' ' + label;
-      // }
-      this.pieChartLabelsReferrer.push(label.padEnd(this.maxLabelLength));
-      this.pieChartDataReferrer.push(a.count);
-    }
+    // for (const a of this.activitiesByReferrer) {
+    //   let label = a.referrer.caption + ` (${a.count})`;
+    //   // if (a.purpose === ActivityPurpose.fail) {
+    //   //   label = terms.activities + ' ' + label;
+    //   // }
+    //   this.pieChartLabelsReferrer.push(label);
+    //   this.pieChartDataReferrer.push(a.count);
+    // }
 
-    for (const a of this.activitiesByWeekDay) {
+    for (const a of this.activitiesResult.activitiesByWeekDay) {
       if (a.day >= 6) {// ללא שבת
         continue;
       }
-      let label = 'יום ' + this.weekDays[a.day] + ` (${a.count})`;
+      let label = this.weekDays[a.day] + ` (${a.count})`;
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsWeekDay.push(label.padEnd(this.maxLabelLength));
+      this.pieChartLabelsWeekDay.push(label);
       this.pieChartDataWeekDay.push(a.count);
     }
     // (this.pieChartColors[0].backgroundColor as string[]).push(...this.colors2);

@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Route, Router } from '@angular/router';
-import { InputField, openDialog, RouteHelperService } from '@remult/angular';
+import { openDialog, RouteHelperService } from '@remult/angular';
 import { Remult } from 'remult';
 import { AuthService } from './auth.service';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
-import { Branch } from './core/branch/branch';
 import { terms } from './terms';
 import { Roles } from './users/roles';
 import { UserLoginComponent } from './users/user-login/user-login.component';
@@ -32,11 +31,15 @@ export class AppComponent implements OnInit {
   }
   terms = terms;
 
+  isVolunteer() {
+    return this.remult.user.roles.length == 1 && this.remult.isAllowed(Roles.volunteer);
+  }
+
   forgotPassword = false;
   async signIn() {
     await openDialog(UserLoginComponent);
 
-    
+
     // // here the login succefull, otherwise it's were throw before.
     // if (this.remult.user.roles.length === 1 && this.remult.user.roles.includes(Roles.volunteer)) {
     //   console.log('sending verification sms');
@@ -61,7 +64,7 @@ export class AppComponent implements OnInit {
     //   }
     // });
   }
- 
+
   usersCount = 0;
   async ngOnInit() {
     // this.usersCount = await this.remult.repo(Users).count();
@@ -87,18 +90,18 @@ export class AppComponent implements OnInit {
       return true;
     }
     return false;
-  } 
- 
+  }
+
   getUserAuthName() {
     let result = 'לא מורשה';
     if (this.remult.user.roles.find(r => r === Roles.admin)) {
       result = 'אדמין';
     }
     else if (this.remult.user.roles.find(r => r === Roles.donor)) {
-      result = 'תורם'; 
+      result = 'תורם';
     }
     else if (this.remult.user.roles.find(r => r === Roles.board)) {
-      result = 'הנהלה'; 
+      result = 'הנהלה';
     }
     else if (this.remult.user.roles.find(r => r === Roles.manager)) {
       let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
@@ -128,7 +131,7 @@ export class AppComponent implements OnInit {
         user.$.mobile,
         password,
         confirmPassword
-      ],  
+      ],
       ok: async () => {
         if (password.value != confirmPassword.value) {
           confirmPassword.error = terms.doesNotMatchPassword;
@@ -194,7 +197,7 @@ export class AppComponent implements OnInit {
       }
     return terms.volunteerApp;
   }
- 
+
   shouldDisplayRoute(route: Route) {
     if (!(route.path && route.path.indexOf(':') < 0 && route.path.indexOf('**') < 0))
       return false;

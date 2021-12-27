@@ -12,7 +12,6 @@ import { PostgresDataProvider, verifyStructureOfAllEntities,createPostgresConnec
 import { remultExpress } from 'remult/remult-express';
 //import '../app/app.module';
 // import '../app/users/*';
-// import '../app/core/branch/branch';
 import '../app/app-routing.module';
 import '../app/common/types'
 //import '../app/app.component';

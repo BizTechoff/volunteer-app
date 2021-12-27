@@ -1,19 +1,20 @@
 <div style="height:100%;display:flex;flex-direction: column;">
   <mat-toolbar color="primary" style="flex-shrink: 0; background-image: linear-gradient(90deg, #F69A48, #2CBCC1)">
-  <!-- <mat-toolbar color="primary" style="flex-shrink: 0;"> -->
+    <!-- <mat-toolbar color="primary" style="flex-shrink: 0;"> -->
     <button mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
-    </button> 
+    </button>
     <span class="toolbar-title">{{currentTitle()}}</span>
     <ng-container *ngIf="!remult.authenticated()">
       <!-- <button *ngIf="usersCount === 0" mat-flat-button color="primary" (click)="signUp()">{{terms.signUp}}</button> -->
       <button mat-flat-button color="primary" (click)="signIn()">{{terms.signIn}}</button>
     </ng-container>
     <ng-container *ngIf="remult.authenticated()">
-      <button style="word-wrap: break-word; background-color: transparent;" mat-flat-button color="primary" [matMenuTriggerFor]="menu">
-        {{remult.user.name}} 
+      <button style="word-wrap: break-word; background-color: transparent;" mat-flat-button color="primary"
+        [matMenuTriggerFor]="menu">
+        {{remult.user.name}}
         <!-- ({{ this.getUserAuthName()}}) -->
-      </button> 
+      </button>
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="updateInfo()">{{terms.updateInfo}}</button>
         <button mat-menu-item (click)="changePassword()">{{terms.changePassword}}</button>
@@ -29,15 +30,26 @@
       [mode]="dialogService.isScreenSmall()?'over':'side'">
       <div style="display:flex; justify-content: center; margin-top: 2%;">
         <!-- <a href="https://www.eshel.org.il/" target="_blank"> -->
-          <img src="assets/logo_eshel.png" width="150px" />
+        <img src="assets/logo_eshel.png" width="150px" />
         <!-- </a> -->
       </div>
       <div style="width:100%;text-align: center">
-
+        <div *ngIf="this.remult.authenticated() && !this.isVolunteer()" style="margin-right: 10px; color: blue;">
+          <a target="_blank" href="https://eshel-app.s3.eu-central-1.amazonaws.com/eshel/eshel.app.manager.guide.mp4">
+            <h3>הסבר תפעול לשליח</h3>
+          </a>
+        </div>
+        <div *ngIf="this.remult.authenticated() && this.isVolunteer()" style="margin-right: 10px; color: blue;">
+          <a target="_blank" href="https://eshel-app.s3.eu-central-1.amazonaws.com/eshel/eshel.app.volunteer.guide.mp4">
+            <h3>הסבר תפעול למתנדב</h3>
+          </a>
+        </div>
       </div>
-      <h4 style="margin-right: 2px;" *ngIf="remult.authenticated()">{{terms.hello}} {{remult.user.name}}</h4>
+      <h4 style="margin-right: 4px;" *ngIf="remult.authenticated()">{{terms.hello}} {{remult.user.name}}</h4>
       <mat-nav-list role="list">
+        
         <ng-container *ngFor="let m of router.config">
+
           <mat-divider *ngIf="shouldDisplayRoute(m) && terms.dailyActivityReport === m.path"></mat-divider>
           <mat-list-item *ngIf="shouldDisplayRoute(m)" routerLinkActive="active-route">
             <a matLine [routerLink]="m.path" (click)="routeClicked()">{{routeName(m)}}</a>
@@ -45,12 +57,12 @@
           <mat-divider *ngIf="shouldDisplayRoute(m) && terms.dailyActivityReport === m.path"></mat-divider>
           <mat-divider *ngIf="shouldDisplayRoute(m) && terms.currentState === m.path"></mat-divider>
           <mat-divider *ngIf="shouldDisplayRoute(m) && terms.myTenants === m.path"></mat-divider>
-        </ng-container>  
+        </ng-container>
         <!-- <mat-list-item  routerLinkActive="active-route">
           <a matLine [routerLink]="'/'+terms.volunteers" (click)="routeClicked()">לחץ עלי</a>
           </mat-list-item> -->
       </mat-nav-list>
- 
+
     </mat-sidenav>
     <div class="app-sidenav-content ">
 
@@ -62,10 +74,10 @@
     </div>
 
   </mat-sidenav-container>
-<div class="footer">
-  <div style="display:flex;flex-direction: row;justify-content: flex-end;">
-    {{ this.terms.appDesc + ' v' + this.terms.appVersion  }}
-    <div>{{ '::BizTechoff ' }}</div>
+  <div class="footer">
+    <div style="display:flex;flex-direction: row;justify-content: flex-end;">
+      {{ this.terms.appDesc + ' v' + this.terms.appVersion }}
+      <div>{{ '::BizTechoff ' }}</div>
+    </div>
   </div>
-</div>
 </div>

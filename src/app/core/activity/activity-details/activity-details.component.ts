@@ -100,17 +100,16 @@ export class ActivityDetailsComponent implements OnInit {
     await this.retrieve();
 
 
-    if (this.didntCheckedFoodDelivery()) {
-
+    if (this.isShowDeliveredFoodToShabat() && this.didntCheckedFoodDelivery()) {
 
       const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-      wait(3500)
-        .then(async () => this.applyNotifications())
-        .catch(err => console.debug(err));
  
       wait(100)
         .then(async () => this.dialog.info(terms.reminder4FoodDelivery, 2300))
+        .catch(err => console.debug(err));
+
+      wait(3500)
+        .then(async () => this.applyNotifications())
         .catch(err => console.debug(err));
     }
   }

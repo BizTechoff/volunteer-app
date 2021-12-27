@@ -53,10 +53,8 @@ export class Branch extends IdEntity {
     @Field({ caption: terms.frame })
     frame: string = '';
 
-    // @Field({ dbReadOnly: true, allowApiUpdate: false })
-    volunteersCount!:number;
-    // @Field({ dbReadOnly: true, allowApiUpdate: false })
-    tenantsCount!:number;
+    volunteersCount = 0;
+    tenantsCount = 0;
 
     constructor(private remult: Remult) {
         super();

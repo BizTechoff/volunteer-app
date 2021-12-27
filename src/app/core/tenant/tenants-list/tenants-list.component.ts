@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
@@ -12,6 +11,7 @@ import { ActivityDetailsComponent } from '../../activity/activity-details/activi
 import { Branch } from '../../branch/branch';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
 import { Tenant } from '../tenant';
+
 
 @Component({
   selector: 'app-tenants-list',
@@ -252,12 +252,15 @@ export class TenantsListComponent implements OnInit {
         //   t!.$.langs,
         //   { field: t!.$.defVids, click: async () => await this.openVolunteers(t!) }]
         ,
-        validate: async () => {
-          return await this.canSaveAndClose(t);
-        },
+        // validate: async () => {
+        //   return await this.canSaveAndClose(t);
+        // },
         ok: async () => {
           if (!this.isDonor()) {
             await t!.save();
+            if (!(t.defVids && t.defVids.length > 0)!) {
+              this.dialog.info(terms.notVolunteersForCurrentTenant);
+            }
           }
         }
       },
@@ -276,7 +279,7 @@ export class TenantsListComponent implements OnInit {
     let result = true;
     let hasVids = (t.defVids && t.defVids.length > 0)!;
     if (!hasVids) {
-      result = await this.dialog.yesNoQuestion(terms.notVolunteersForCurrentTenant);
+      result = await this.dialog.info(terms.notVolunteersForCurrentTenant);
     }
     return result;
   }

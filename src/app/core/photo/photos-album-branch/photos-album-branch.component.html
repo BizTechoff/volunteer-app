@@ -1,5 +1,5 @@
 <div class="full-page">
-    <div class="header">
+    <div class="header" style="margin: 5px;">
         <!-- <div>
             <video width="320" height="240" controls>
                 <source src="https://eshel-app.s3.eu-central-1.amazonaws.com/bbb_sunflower_1080p_60fps_normal.mp4#t=1" type="video/mp4">
@@ -20,21 +20,40 @@
         </div>
     </div>
     <div class="grow-item">
-        <table style="width: 100%;">
-            <tr *ngFor="let p of this.photos">
-                <td>
-                    <mat-card>
-                        <mat-card-title>
-                            <div> {{ p.vname }} ({{ p.bname }}) </div>
+
+        <!-- <span>סהכ: {{ this.photos.length }} </span>
+        <div class="image-container">
+            <ng-container *ngFor="let p of this.photos">
+                <div class="image">
+                    <div> {{ p.vname }} ({{ p.bname }}) </div>
                             <div>
                                 <h3>{{ p.created | date:'dd.MM.YYYY HH:mm' }}</h3>
                             </div>
-                        </mat-card-title>
-                        <img [src]="p.data" height="100px">
-                    </mat-card>
-                </td>
-            </tr>
-        </table>
+                    <img [src]="p.data" style="max-width: 100%;">
+                </div>
+            </ng-container>
+        </div> -->
+
+        <!-- <mat-checkbox style="margin:10px">הסר</mat-checkbox> -->
+
+  
+        <div *ngIf="this.photos" class="image-container">
+            <ng-container *ngFor="let p of this.photos">
+                <mat-card>
+                    <mat-card-title>
+                        <div> {{ p.vname }} ({{ p.bname }}) </div>
+                        <div>
+                            <h3>{{ p.created | date:'dd.MM.YYYY HH:mm' }}</h3>
+                        </div>
+                    </mat-card-title>
+                    <mat-card-content>
+                        <div>
+                            <img  class="image" [src]="p.data">
+                        </div> 
+                    </mat-card-content>
+                </mat-card>
+            </ng-container>
+        </div>
     </div>
     <div class="footer"></div>
 </div>

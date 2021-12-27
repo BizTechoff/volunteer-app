@@ -56,7 +56,7 @@ export const terms = {
     you: 'את/ה',
     transferVolunteer: 'העברת מתנדב לסניף אחר',
     transferTenant: 'העברת דייר לסניף אחר',
-    notVolunteersForCurrentTenant: 'לא שוייכו מתנדבים לדייר זה, האם לסגור את החלון בכל זאת?',
+    notVolunteersForCurrentTenant: 'לא שוייכו עדיין מתנדבים לדייר זה',
     associatedVolunteers: 'מתנדבים משוייכים',
     edit: 'עריכה',
     public: 'שתף באלבום הסניף',
@@ -197,7 +197,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.12.21.0'
+    appVersion: '2021.12.27.0'
 }
 
 declare module 'remult' {
