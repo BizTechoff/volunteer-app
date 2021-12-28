@@ -256,7 +256,7 @@ export class CurrentStateComponent implements OnInit {
       activitiesByWeekDay: []
     };
     for await (const a of remult!.repo(Activity).query({
-      where: ({ bid: branchId ? { $contains: branchId } : undefined })
+      where: ({ bid: branchId ? { $id: branchId } : undefined })
     })) {
 
       // By Branch
@@ -434,7 +434,7 @@ export class CurrentStateComponent implements OnInit {
     let list = [];
     for await (const a of this.remult.repo(Activity).query({
       where: {
-        bid: { $contains: bid },
+        bid: { $id: bid },
         status
       }
     }

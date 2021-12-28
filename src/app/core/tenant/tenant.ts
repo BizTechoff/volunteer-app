@@ -92,7 +92,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
     },
     async (options, remult) => {
         options.apiPrefilter = () => (
-            { bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined }
+            { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         )
         options.saving = async (tenant) => {
             if (isBackend()) {

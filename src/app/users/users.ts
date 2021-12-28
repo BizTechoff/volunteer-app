@@ -114,7 +114,7 @@ export class Langs {
             if (!remult.authenticated())
                 return { id: [] }
             if (!(remult.isAllowed(Roles.board))) {
-                return { bid: { $contains: remult.user.bid } }
+                return { bid: { $id: remult.user.bid } }
             }
             return {};
         };

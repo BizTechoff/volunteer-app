@@ -83,7 +83,7 @@ export class PhotosAlbumBranchComponent implements OnInit {
       limit: 15,
       page: page,
       orderBy: { created: "desc" },
-      where: { bid: remult!.isAllowed(Roles.board) ? undefined : { $contains: remult!.user.bid } }
+      where: { bid: remult!.isAllowed(Roles.board) ? undefined : { $id: remult!.user.bid } }
     });
     if (photos && photos.length > 0) {
       photos.forEach(p => {
