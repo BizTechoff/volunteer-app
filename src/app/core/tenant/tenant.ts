@@ -11,7 +11,7 @@ import { Langs, Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 
 
-@ValueListFieldType(Referrer)
+@ValueListFieldType()
 export class Referrer {
     static welfare = new Referrer(1, 'רווחה');
     static municipality = new Referrer(2, 'עירייה');
@@ -95,9 +95,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
     },
     async (options, remult) => {
         options.apiPrefilter = () => (
-            {
-                bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
-            }
+            { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         )
         options.saving = async (tenant) => {
             if (isBackend()) {

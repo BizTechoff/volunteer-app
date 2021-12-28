@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as helmet from 'helmet';
 import { Pool } from 'pg';
 import { DataProvider, Remult, SqlDatabase } from 'remult';
-import { PostgresDataProvider, verifyStructureOfAllEntities,createPostgresConnection } from 'remult/postgres';
+import { PostgresDataProvider, verifyStructureOfAllEntities, createPostgresConnection } from 'remult/postgres';
 import { remultExpress } from 'remult/remult-express';
 //import '../app/app.module';
 // import '../app/users/*';
@@ -21,11 +21,12 @@ import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
+import { augmentRemult } from 'src/app/terms';
 
 async function startup() {
     config(); //loads the configuration from the .env file
-  
- 
+
+
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());
@@ -33,9 +34,10 @@ async function startup() {
         helmet({
             contentSecurityPolicy: false,
         })
-    ); 
+    );
     const api = remultExpress({
-        dataProvider:async ()=>createPostgresConnection({configuration:"heroku", sslInDev: false})
+        dataProvider: async () => createPostgresConnection({ configuration: "heroku", sslInDev: false }),
+        initRequest: async (remult) => augmentRemult(remult)
     });
     app.use(api);
     app.use(express.static('dist/volunteer-app'));

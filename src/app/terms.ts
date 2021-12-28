@@ -1,13 +1,15 @@
+import { IdFilter, Remult } from 'remult';
+import { Roles } from './users/roles';
 
 export const terms = {
     reminder4FoodDelivery: 'תזכורת לסמן אם מסרת את האוכל',
-    validationCodeExpired:'תוקף הקוד פג, יש לשלוח שוב קוד חדש',
+    validationCodeExpired: 'תוקף הקוד פג, יש לשלוח שוב קוד חדש',
     verificationCodeSendFailed: 'שליחת קוד אימות נכשלה',
     verificationCodeSuccesfullySent: 'קוד אימות נשלח בהצלחה',
     notificationVerificationCodeMessage: 'קוד אימות: !code! תקף לחמש דקות',
     sendVerificationCode: 'שלח שוב',
-    verifying:'אימות',
-    verificatiobCodeNotSent:'קוד אימות לא נשלח',
+    verifying: 'אימות',
+    verificatiobCodeNotSent: 'קוד אימות לא נשלח',
     wrongVerificatiobCode: 'קוד אימות שגוי',
     pleaseEnterVerificationCode: 'ברגעים אלה נשלח מסרון לסלולרי שלך המכיל קוד אימות, יש להזין אותו כאן',
     verificationCode: 'קוד אימות',
@@ -205,5 +207,14 @@ declare module 'remult' {
         bid: string;
         bname: string;
     }
+    export interface Remult {
+        branchAllowedForUser(): IdFilter<import('./core/branch/branch').Branch>
+    }
 }
-
+export function augmentRemult(remult: Remult) {
+    remult.branchAllowedForUser = () => {
+        if (remult.isAllowed(Roles.board))
+            return undefined!;
+        return { $id: [remult.user.bid] };
+    }
+}

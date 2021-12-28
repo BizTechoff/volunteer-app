@@ -55,7 +55,7 @@ export function CommaSeparatedStringArrayFieldPurpose<entityType = any>(
     // , width: '150'
 
 })
-@ValueListFieldType(ActivityPurpose, {
+@ValueListFieldType({
     // displayValue: (e, val) => val.caption,
     // translation: l => l.deliveryStatus
 })
@@ -95,7 +95,7 @@ export class ActivityPurpose {
     // , width: '150'
 
 })
-@ValueListFieldType(ActivityDayPeriod, {
+@ValueListFieldType({
     // displayValue: (e, val) => val.caption,
     // translation: l => l.deliveryStatus
 })
@@ -119,7 +119,7 @@ export class ActivityDayPeriod {
     // , width: '150'
 
 })
-@ValueListFieldType(ActivityStatus, {
+@ValueListFieldType({
     // displayValue: (e, val) => val.caption,
     // translation: l => l.deliveryStatus
 })
@@ -206,8 +206,8 @@ export class ActivityStatus {
         let op = new ValueListValueConverter(ActivityStatus).getOptions();
         return op;
     }
-    
-    isClosed(){
+
+    isClosed() {
         return this === ActivityStatus.success;
     }
 
@@ -269,7 +269,7 @@ export class ActivityStatus {
     }
 }
 
-@ValueListFieldType(ActivityGeneralStatus)
+@ValueListFieldType()
 export class ActivityGeneralStatus {
     static opens = new ActivityGeneralStatus(1, 'פתוחות', ActivityStatus.openStatuses());
     // static inProgress = new ActivityGeneralStatus(2, 'בתהליך', ActivityStatus.inProgressStatuses());
@@ -290,7 +290,7 @@ export class ActivityGeneralStatus {
     (options, remult) => {
         options.apiPrefilter = () => {
             return {
-                bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
+                bid: remult.branchAllowedForUser()
             }
 
         };

@@ -13,7 +13,7 @@ import { terms } from "../terms";
 import { Roles } from './roles';
 
 
-@ValueListFieldType(Langs, { /*displayValue: () => {return '';}*/ /*multi: true*/ })
+@ValueListFieldType({ /*displayValue: () => {return '';}*/ /*multi: true*/ })
 export class Langs {
     static hebrew = new Langs(1, 'עברית');
     static english = new Langs(2, 'אנגלית');
@@ -114,7 +114,7 @@ export class Langs {
             if (!remult.authenticated())
                 return { id: [] }//why not simple empty-string? ''
             if (!(remult.isAllowed(Roles.board))) {
-                return { bid: { $contains: remult.user.bid } }
+                return { bid: { $id: remult.user.bid } }
             }
             return {};
         };
