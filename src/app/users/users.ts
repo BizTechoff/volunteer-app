@@ -112,7 +112,7 @@ export class Langs {
         options.apiPrefilter = () => {
 
             if (!remult.authenticated())
-                return { id: [] }
+                return { id: [] }//why not simple empty-string? ''
             if (!(remult.isAllowed(Roles.board))) {
                 return { bid: { $contains: remult.user.bid } }
             }

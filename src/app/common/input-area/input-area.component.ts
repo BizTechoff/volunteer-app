@@ -16,6 +16,7 @@ import { DialogService } from '../dialog';
 })
 export class InputAreaComponent implements OnInit {
   args!: {
+    disableClose?:boolean,
     title: string,
     helpText?: string,
     fields?: () => DataAreaFieldsSetting<any>[];
@@ -38,6 +39,9 @@ export class InputAreaComponent implements OnInit {
   area!: DataAreaSettings;
 
   ngOnInit() {
+    if(this.args.disableClose){
+      this.dialogRef.disableClose = true;
+    }
     if (this.args.areaSettings)
       this.area = new DataAreaSettings(this.args.areaSettings, undefined, undefined);
     else if (this.args.fields) {

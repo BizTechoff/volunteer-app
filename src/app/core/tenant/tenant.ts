@@ -84,6 +84,9 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
         allowApiInsert: [Roles.admin, Roles.manager],
         allowApiDelete: [Roles.admin, Roles.manager],
         allowApiUpdate: Allow.authenticated,
+        // if (typeof roles === 'function') {
+        //     return (<any>roles)(this(context));//even static-function!
+        // }
         allowApiRead: Allow.authenticated,
         defaultOrderBy: {
             bid: "desc",
@@ -92,7 +95,9 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
     },
     async (options, remult) => {
         options.apiPrefilter = () => (
-            { bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined }
+            {
+                bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
+            }
         )
         options.saving = async (tenant) => {
             if (isBackend()) {

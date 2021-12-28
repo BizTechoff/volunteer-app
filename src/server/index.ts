@@ -25,7 +25,7 @@ import './send-sms';
 async function startup() {
     config(); //loads the configuration from the .env file
   
-
+ 
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());
