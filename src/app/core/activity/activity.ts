@@ -206,6 +206,10 @@ export class ActivityStatus {
         let op = new ValueListValueConverter(ActivityStatus).getOptions();
         return op;
     }
+    
+    isClosed(){
+        return this === ActivityStatus.success;
+    }
 
     static openStatuses() {
         return [

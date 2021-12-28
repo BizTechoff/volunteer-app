@@ -39,3 +39,10 @@ body {
     border-radius: 15px;
     border-width: thin;
 }
+.image-viewer {
+    display: flex;
+    flex-direction: row;
+    // flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: space-between;
+}

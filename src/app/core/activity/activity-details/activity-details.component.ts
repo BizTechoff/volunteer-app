@@ -1,7 +1,7 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DataAreaSettings, openDialog } from '@remult/angular';
+import { DataAreaFieldsSetting, DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { OnlyVolunteerEditActivity } from '../../../common/globals';
@@ -216,38 +216,39 @@ export class ActivityDetailsComponent implements OnInit {
     }
     this.top = new DataAreaSettings({
       fields: () => {
-        let f = [];
+        let f:DataAreaFieldsSetting<Activity>[] = [];
         // if(this.isShowDeliveredFoodToShabat()){
         //   f.push(this.activity.$.foodDelivered);
         // }
         if (this.isBoard()) {
-          f.push(this.activity.$.bid);
+          f.push({field: this.activity.$.bid, readonly: this.activity.status.isClosed()});
         }
         if (this.isManager()) {
-          f.push(this.activity.$.status);
+          f.push({field: this.activity.$.status, readonly: this.activity.status.isClosed()});
         }
         return f;
       }
     })
     this.fields = new DataAreaSettings({
       fields: () => [
-        { field: this.activity.$.tid, clickIcon: 'search', click: async () => await this.openTenants() },//, readonly: true },
+        { field: this.activity.$.tid, readonly: this.activity.status.isClosed(), clickIcon: 'search', click: async () => await this.openTenants() },//, readonly: true },
         {
           field: this.activity.$.vids,
           hideDataOnInput: true,
           getValue: (x, col) => col.displayValue,
-          readonly: () => this.activity.tid && this.activity.tid.id && this.activity.tid.id.length > 0 ? false : true,
+          readonly: () => this.activity.tid && this.activity.tid.id && this.activity.tid.id.length > 0 ? this.activity.status.isClosed() : true,
           clickIcon: 'search',
           click: async () => await this.openAssignment()
         },//, displayValue: () => {return this.activity.$.vids && this.activity.$.vids.value ? this.activity.$.vids.value.map(i => i.name).join(', ').trim() : '';} },
         // { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
-        this.activity.$.date,
-        [this.activity.$.fh, this.activity.$.th],
-        this.activity.$.purposes,
-        this.activity.$.purposeDesc,
-        this.activity.$.remark
+        { field: this.activity.$.date, readonly: this.activity.status.isClosed()},
+        [{ field: this.activity.$.fh, readonly: this.activity.status.isClosed()}, 
+          { field: this.activity.$.th, readonly: this.activity.status.isClosed()}],
+        { field: this.activity.$.purposes, readonly: this.activity.status.isClosed()},
+        { field: this.activity.$.purposeDesc, readonly: this.activity.status.isClosed()},
+        { field: this.activity.$.remark, readonly: this.activity.status.isClosed()}
       ]
-    });
+    }); 
   }
 
   async openTenants() {
