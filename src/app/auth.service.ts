@@ -4,7 +4,7 @@ import { openDialog } from '@remult/angular';
 import * as jwt from 'jsonwebtoken';
 import { BackendMethod, Remult, UserInfo } from 'remult';
 import { useVolunteerLoginWithVerificationCode } from './common/globals';
-import { terms } from './terms';
+import { augmentRemult, terms } from './terms';
 import { Roles } from './users/roles';
 import { UserVerificationComponent } from './users/user-verification/user-verification.component';
 import { Users } from './users/users';
@@ -17,6 +17,7 @@ export class AuthService {
     forgotPassword = false;
     isFirstLogin = true;//welcome message
     constructor(private remult: Remult) {
+        augmentRemult(remult);
         // (<MotiUserInfo>remult.user).snif
         let token = AuthService.fromStorage();
         if (token) {

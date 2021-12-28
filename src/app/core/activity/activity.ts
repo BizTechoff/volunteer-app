@@ -290,7 +290,7 @@ export class ActivityGeneralStatus {
     (options, remult) => {
         options.apiPrefilter = () => {
             return {
-                bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined
+                bid: remult.branchAllowedForUser()
             }
 
         };
