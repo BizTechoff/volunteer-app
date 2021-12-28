@@ -25,7 +25,7 @@ export class ActiveStatus {
     (options, remult) => {
         options.apiPrefilter = () => (
             {
-                bid: !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
+                bid: remult.branchAllowedForUser() // !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
             }
         );
         options.saving = async (act) => {

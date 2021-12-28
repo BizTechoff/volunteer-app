@@ -5,7 +5,7 @@ import { ValueListValueConverter } from 'remult/valueConverters';
 import { terms } from '../../terms';
 
 
-@ValueListFieldType(Referrer, { /*displayValue: () => {return '';}*/ /*multi: true*/ })
+@ValueListFieldType({ /*displayValue: () => {return '';}*/ /*multi: true*/ })
 export class Referrer {
     static welfare = new Referrer(1, 'רווחה');
     static municipality = new Referrer(2, 'עירייה');

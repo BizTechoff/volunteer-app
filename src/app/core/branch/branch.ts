@@ -13,8 +13,22 @@ import { Tenant } from "../tenant/tenant";
     getValue: (_, f) => f.value?.name,
     click: async (_, f) => {
         await openDialog(SelectBranchComponent, x => x.args = {
-            onClear: () => f.value = undefined!,
-            onSelect: u => f.value = u,
+            onClear: () => {
+                if (f.value) {
+                    f.value = undefined!;
+                    if (f.valueChanged) {
+                        f.valueChanged();
+                    }
+                }
+            },
+            onSelect: b => {
+                if (f.value && f.value.id !== b.id) {
+                    f.value = b;
+                    if (f.valueChanged) {
+                        f.valueChanged();
+                    }
+                }
+            },
             title: f.metadata.caption
         })
     }
@@ -31,6 +45,11 @@ import { Tenant } from "../tenant/tenant";
     defaultOrderBy: { name: "asc" }
 },
     (options, remult) => {
+        // options.apiPrefilter = () => {
+        //     return {
+        //         id: remult.branchAllowedForUser()
+        //     }
+        // }
         options.apiPrefilter = async () => ({
             id: !remult.isAllowed(Roles.board) ? remult.user.bid : undefined
         })
@@ -53,7 +72,28 @@ export class Branch extends IdEntity {
     @Field({ caption: terms.frame })
     frame: string = '';
 
+    @Field<Branch>((options, remult) => {
+        if (1 == 1) {
+            options.serverExpression = async branch => {
+                return remult.repo(Users).count({ bid: branch, volunteer: true })
+            };
+        }
+        else {
+            options.sqlExpression = () => "( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )";
+        }
+    })
     volunteersCount = 0;
+
+    @Field<Branch>((options, remult) => {
+        if (1 == 1) {
+            options.serverExpression = async branch => {
+                return remult.repo(Tenant).count({ bid: branch })
+            };
+        }
+        else {
+            options.sqlExpression = () => "( select count(*) from tenants where tenants.bid = branches.id )";
+        }
+    })
     tenantsCount = 0;
 
     constructor(private remult: Remult) {

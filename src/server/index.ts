@@ -21,7 +21,7 @@ import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
-import { augmentRemult } from 'src/app/terms';
+import { augmentRemult } from '../app/terms';
 
 async function startup() {
     config(); //loads the configuration from the .env file

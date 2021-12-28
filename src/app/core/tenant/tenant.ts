@@ -1,5 +1,5 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, EntityBase, Field, FieldOptions, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DateRequiredValidation, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
@@ -9,6 +9,7 @@ import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Langs, Users } from "../../users/users";
 import { Branch } from "../branch/branch";
+import { EntityWithModified } from "./EntityWithModified";
 
 
 @ValueListFieldType()
@@ -65,6 +66,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
 }
 
 
+
 @DataControl<any, Tenant>({
     hideDataOnInput: true,
     clickIcon: 'search',
@@ -98,19 +100,10 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
             { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         )
         options.saving = async (tenant) => {
-            if (isBackend()) {
-                if (tenant._.isNew()) {
-                    tenant.created = new Date();
-                    // tenant.createdBy = await remult.repo(Users).findId(remult.user.id);
-                }
-                else {
-                    tenant.modified = new Date();
-                    // tenant.modifiedBy = await remult.repo(Users).findId(remult.user.id);
-                }
-            }
+          
         };
     })
-export class Tenant extends IdEntity {
+export class Tenant extends EntityWithModified {
 
     constructor(private remult: Remult) {
         super();
@@ -177,25 +170,7 @@ export class Tenant extends IdEntity {
     @CommaSeparatedStringArrayFieldUsersAsString<Tenant>({ caption: terms.associatedVolunteers })
     defVids: UserIdName[] = [] as UserIdName[];
 
-    @Field({
-        allowApiUpdate: false
-    })
-    created: Date = new Date();
-
-    // @Field({
-    //     allowApiUpdate: false
-    // })
-    // createdBy: Users = null!;
-
-    @Field({
-        allowApiUpdate: false
-    })
-    modified: Date = new Date();
-
-    // @Field({
-    //     allowApiUpdate: false
-    // })
-    // modifiedBy: Users = null!;
+ 
 
     calcAge() {
         let result = 0;

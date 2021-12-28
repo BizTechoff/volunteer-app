@@ -204,9 +204,9 @@ export class CurrentStateComponent implements OnInit {
 
   @DataControl<CurrentStateComponent, Branch>({
     valueChange: async (r, v) => {
-      console.log('branchv.alueChanged');
-      console.log('v.value', v.value);
-      console.log('r.branch?.id', r.branch?.id);
+      // console.log('branchv.alueChanged');
+      // console.log('v.value', v.value);
+      // console.log('r.branch?.id', r.branch?.id);
       await r.refresh();
     }
   })
@@ -231,7 +231,7 @@ export class CurrentStateComponent implements OnInit {
   isBoard() {
     return this.remult.isAllowed(Roles.board);
   }
- 
+
   isRefreshing = false;
   async refresh() {
     if (!this.isRefreshing) {

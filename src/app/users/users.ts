@@ -113,10 +113,7 @@ export class Langs {
 
             if (!remult.authenticated())
                 return { id: [] }//why not simple empty-string? ''
-            if (!(remult.isAllowed(Roles.board))) {
-                return { bid: { $id: remult.user.bid } }
-            }
-            return {};
+            return { bid: remult.branchAllowedForUser() };
         };
         options.validation = async (user) => {
             let ok = true;

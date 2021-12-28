@@ -29,7 +29,7 @@ export class VolunteersListComponent implements OnInit {
     {
       where: () => ({
         volunteer: true,
-        bid: this.isBoard() ? undefined : { $id: this.remult.user.bid },
+        bid:this.remult.branchAllowedForUser(),
         name: this.search ? { $contains: this.search } : undefined
       }),
       newRow: _ => _.volunteer = true,
