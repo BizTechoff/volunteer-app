@@ -40,7 +40,7 @@
     "password-hash": "^1.2.2",
     "pg": "^8.3.0",
     "reflect-metadata": "^0.1.12",
-    "remult": "^0.9.27",
+    "remult": "^0.10.1",
     "rxjs": "~6.6.0",
     "safe-pipe": "^1.0.3",
     "tslib": "^2.3.0",
