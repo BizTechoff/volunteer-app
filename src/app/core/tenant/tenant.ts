@@ -100,9 +100,8 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
         options.apiPrefilter = () => (
             { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         )
-        options.saving = async (tenant) => {
-
-        };
+        // options.saving = async (tenant) => {
+        // };
     })
 export class Tenant extends EntityWithModified {
 

@@ -8,8 +8,8 @@ export class EntityWithModified extends IdEntity {
     @Field<EntityWithModified>({
         allowApiUpdate: false,
         saving: self => {
-            if (self.isNew())
-                self.modified = new Date();
+            if (self.isNew() && isBackend())
+                self.created = new Date();
         }
     })
     created: Date = new Date();
@@ -27,9 +27,13 @@ export class EntityWithModified extends IdEntity {
 
     @Field<EntityWithModified>({
         allowApiUpdate: false,
-        saving: self => self.modified = new Date()
+        saving: self => {
+            if (!self.isNew() && isBackend())
+                self.modified = new Date()
+        }
     })
     modified: Date = new Date();
+
     @Field<EntityWithModified>({
         allowApiUpdate: false
     }, (options, remult) => {

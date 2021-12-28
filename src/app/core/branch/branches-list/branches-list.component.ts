@@ -27,19 +27,19 @@ export class BranchesListComponent implements OnInit {
         f.push(row.name, row.address);
         // row.volunteersCount = await this.remult.repo(Users).count({volunteer: true});
         f.push({
-          field: row.volunteersCount, caption: terms.volunteers,
-          getValue: (r, v) => {
-            // for await (const p of this.remult.repo(Tenant).query({
-            //   where: { bid: row }
-            // })) {
+          field: row.volunteersCount, caption: terms.volunteers //,
+          // getValue: (r, v) => {
+          //   // for await (const p of this.remult.repo(Tenant).query({
+          //   //   where: { bid: row }
+          //   // })) {
 
-            // }
-            // let cmd: SqlCommand;
-            // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);
-            return 0; /*r.getVolunteersCount()*/
-          }
+          //   // }
+          //   // let cmd: SqlCommand;
+          //   // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);
+          //   return 0; /*r.getVolunteersCount()*/
+          // }
         });
-        f.push({ field: row.tenantsCount, caption: terms.tenants, getValue: (r, v) => { return 0; /*r.getTenantsCount()*/ } });
+        f.push({ field: row.tenantsCount, caption: terms.tenants });
         // if (this.isAdmin()) { 
         //   f.push(row.email, row.color, row.frame); 
         // }  
