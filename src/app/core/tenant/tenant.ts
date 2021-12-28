@@ -11,7 +11,7 @@ import { Langs, Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 
 
-@ValueListFieldType(Referrer)
+@ValueListFieldType()
 export class Referrer {
     static welfare = new Referrer(1, 'רווחה');
     static municipality = new Referrer(2, 'עירייה');

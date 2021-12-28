@@ -7,7 +7,7 @@ import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 
 
-@ValueListFieldType(ActiveStatus)
+@ValueListFieldType()
 export class ActiveStatus {
     static on = new ActiveStatus();
     static off = new ActiveStatus();
@@ -73,7 +73,7 @@ export class Photo extends IdEntity {
     // , width: '150'
 
 })
-@ValueListFieldType(PhotoStatus, {
+@ValueListFieldType({
     // displayValue: (e, val) => val.caption,
     // translation: l => l.deliveryStatus
 })
