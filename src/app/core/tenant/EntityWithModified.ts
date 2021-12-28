@@ -1,4 +1,5 @@
 import { Field, IdEntity, isBackend } from "remult";
+import { Users } from "../../users/users";
 
 
 
@@ -17,13 +18,13 @@ export class EntityWithModified extends IdEntity {
     @Field<EntityWithModified>({
         allowApiUpdate: false
     }, (options, remult) => {
-
+        options.valueType = Users;
         options.saving = (tenant) => {
             if (tenant.isNew() && isBackend())
-                tenant.createdBy = remult.user.id;
+                tenant.$.createdBy.setId(remult.user.id);
         };
     })
-    createdBy: string = null!;
+    createdBy: IUser = null!;
 
     @Field<EntityWithModified>({
         allowApiUpdate: false,
@@ -37,11 +38,16 @@ export class EntityWithModified extends IdEntity {
     @Field<EntityWithModified>({
         allowApiUpdate: false
     }, (options, remult) => {
-
+        options.valueType = Users;
         options.saving = (tenant) => {
             if (!tenant.isNew() && isBackend())
-                tenant.modifiedBy = remult.user.id;
+                tenant.modifiedBy = remult.user;
         };
     })
-    modifiedBy: string = null!;
+    modifiedBy: IUser = null!;
+}
+
+export interface IUser {
+    id: string;
+    name: string;
 }

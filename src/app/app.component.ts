@@ -6,6 +6,7 @@ import { Remult } from 'remult';
 import { AuthService } from './auth.service';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
+import { Tenant } from './core/tenant/tenant';
 import { terms } from './terms';
 import { Roles } from './users/roles';
 import { UserLoginComponent } from './users/user-login/user-login.component';
@@ -26,7 +27,7 @@ export class AppComponent implements OnInit {
     public dialogService: DialogService,
     public remult: Remult,
     public auth: AuthService) {
-
+    console.log({ a: remult.repo(Tenant).metadata.fields.modifiedBy.valueType });
 
   }
   terms = terms;
