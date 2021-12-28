@@ -4,8 +4,8 @@ import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
-import { Users } from "../../users/users";
-import { Tenant } from "../tenant/tenant";
+
+
 
 @DataControl<any, Branch>({
     hideDataOnInput: true,
@@ -75,7 +75,7 @@ export class Branch extends IdEntity {
     @Field<Branch>((options, remult) => {
         if (1 == 1) {
             options.serverExpression = async branch => {
-                return remult.repo(Users).count({ bid: branch, volunteer: true })
+                return remult.repo((await import("../../users/users")). Users).count({ bid: branch, volunteer: true })
             };
         }
         else {
@@ -87,7 +87,7 @@ export class Branch extends IdEntity {
     @Field<Branch>((options, remult) => {
         if (1 == 1) {
             options.serverExpression = async branch => {
-                return remult.repo(Tenant).count({ bid: branch })
+                return remult.repo((await import ("../tenant/tenant")). Tenant).count({ bid: branch })
             };
         }
         else {

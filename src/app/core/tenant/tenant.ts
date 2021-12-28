@@ -12,6 +12,7 @@ import { Branch } from "../branch/branch";
 import { EntityWithModified } from "./EntityWithModified";
 
 
+
 @ValueListFieldType()
 export class Referrer {
     static welfare = new Referrer(1, 'רווחה');
@@ -100,7 +101,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
             { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         )
         options.saving = async (tenant) => {
-          
+
         };
     })
 export class Tenant extends EntityWithModified {
@@ -170,7 +171,7 @@ export class Tenant extends EntityWithModified {
     @CommaSeparatedStringArrayFieldUsersAsString<Tenant>({ caption: terms.associatedVolunteers })
     defVids: UserIdName[] = [] as UserIdName[];
 
- 
+
 
     calcAge() {
         let result = 0;

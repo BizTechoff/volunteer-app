@@ -5,8 +5,8 @@ import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
 import { pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
-import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
-import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
+//import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
+//import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
 import { CommaSeparatedStringArrayField, Tenant } from "../core/tenant/tenant";
 import { terms } from "../terms";
@@ -85,7 +85,7 @@ export class Langs {
     clickIcon: 'search',
     getValue: (_, f) => f.value?.name,
     click: async (_, f) => {
-        await openDialog(SelectVolunteersComponent, x => x.args = {
+        await openDialog((await import("../common/select-volunteers/select-volunteers.component")).SelectVolunteersComponent, x => x.args = {
             onSelect: u => f.value = u,
             title: f.metadata.caption,
             usersLangs: f.value.langs
@@ -229,7 +229,7 @@ export class Users extends IdEntity {
         getValue: (r, v) => { return v && v.value ? v.value.map(i => i.caption).join(', ').trim() : ''; },
         // getValue : (r,v) => {v.displayValue},
         click: async (_, f) => {
-            await openDialog(SelectLangsComponent, x => x.args = {
+            await openDialog((await import("../common/select-langs/select-langs.component")).SelectLangsComponent, x => x.args = {
                 // onSelect: site => f.value = site,
                 // title: f.metadata.caption,
                 langs: f.value
@@ -403,3 +403,4 @@ export class PasswordControl extends InputField<string>
         super({ caption, inputType: InputTypes.password, defaultValue: () => '' });
     }
 }
+
