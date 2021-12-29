@@ -23,13 +23,13 @@ export async function importDataNew(remult: Remult) {
     console.time("import");
     await seed(remult);
     // await remult.setUser({ id: "API", name: "API", roles: [], bid: '', bname: '' });
-   
+
     for (const brn of branches) {
         branch = brn;
 
-        // await importVolunteers(remult);
-        // await importTenants(remult);
-        // await importTenantVolunteers(remult);
+        await importVolunteers(remult);
+        await importTenants(remult);
+        await importTenantVolunteers(remult);
 
     }
     console.timeEnd("import");
@@ -221,11 +221,14 @@ async function importTenantVolunteers(remult: Remult) {
                 }
 
                 for (const v of volunteers) {
+                    if (!v || v.trim().length == 0) {
+                        continue;
+                    }
                     let u = await remult.repo(Users).findFirst({ name: v });
                     if (!u) {
-                        console.log(`NOT found volunteer: ${v}`);
+                        console.log(`NOT found volunteer: ${v} for tenant: ${t.name}`);
                         continue;
-                    }  
+                    }
                     let f = t.defVids.find(row => row.id === u.id);
                     if (!f) {
                         t.defVids.push({ id: u.id, name: u.name });

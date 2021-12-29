@@ -27,7 +27,7 @@ export class ActiveStatus {
             {
                 bid: remult.branchAllowedForUser() // !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
             }
-        );
+        ); 
         options.saving = async (act) => {
             if (isBackend()) {
                 if (act._.isNew()) {

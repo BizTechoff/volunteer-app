@@ -1,5 +1,5 @@
 import { Field, IdEntity, isBackend } from "remult";
-import { Users } from "../../users/users";
+import { Users } from "../users/users";
 
 
 

@@ -1,6 +1,6 @@
 
 import { DataControl, InputField, openDialog } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerField, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, IntegerField, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
@@ -8,6 +8,7 @@ import { pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, S
 //import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 //import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
+import { EntityWithModified } from "../core/EntityWithModified";
 import { CommaSeparatedStringArrayField, Tenant } from "../core/tenant/tenant";
 import { terms } from "../terms";
 import { Roles } from './roles';
@@ -118,13 +119,15 @@ export class Langs {
         options.validation = async (user) => {
             let ok = true;
             if (user.manager || user.volunteer) {
-                if (!user.bid) {
-                    throw user.$.bid!.metadata.caption + ': ' + terms.requiredField;
+                if (!user.bid || !(user.bid.id && user.bid.id.length > 0)) {
+                    user.$.bid!.error = terms.requiredField;
+                    // throw user.$.bid!.metadata.caption + ': ' + terms.requiredField;
                 }
-                ok &&= (user.bid.id && user.bid.id.length > 0 ? true : false);
-                if (!ok!) {
-                    user.bid._.error = user.$.bid!.metadata.caption + ': ' + terms.requiredField;
-                }
+                // else { 
+                //     ok &&= (user.bid.id && user.bid.id.length > 0 ? true : false);
+                //     if (!ok!) {
+                //         user.bid._.error = user.$.bid!.metadata.caption + ': ' + terms.requiredField;
+                //     }
             }
         };
         options.saving = async (user) => {
@@ -175,7 +178,7 @@ export class Langs {
         // }
     }
 )
-export class Users extends IdEntity {
+export class Users extends EntityWithModified {
 
     constructor(private remult: Remult, private dialog: DialogService) {
         super();
@@ -288,20 +291,20 @@ export class Users extends IdEntity {
     @Field({ includeInApi: false })
     password: string = '';
 
-    @Field({
-        allowApiUpdate: false
-    })
-    created: Date = new Date();
+    // @Field({
+    //     allowApiUpdate: false
+    // })
+    // created: Date = new Date();
 
     // @Field({
     //     allowApiUpdate: false
     // })
     // createdBy: Users = null!;
 
-    @Field({
-        allowApiUpdate: false
-    })
-    modified: Date = new Date();
+    // @Field({
+    //     allowApiUpdate: false
+    // })
+    // modified: Date = new Date();
 
     // @Field({
     //     allowApiUpdate: false

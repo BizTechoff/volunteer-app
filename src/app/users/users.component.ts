@@ -19,8 +19,8 @@ export class UsersComponent implements OnInit {
   isAdmin() {
     return this.remult.isAllowed(Roles.admin);
   }
-  
-  users = new GridSettings(this.remult.repo(Users), {
+
+  users: GridSettings<Users> = new GridSettings<Users>(this.remult.repo(Users), {
     allowDelete: true,
     allowInsert: true,
     allowUpdate: true,
@@ -40,7 +40,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.donor, width: '80', 
+        field: users.donor, width: '80',
         valueChange: user => {//, width: '80'
           if (users.donor) {
             user.admin = false;
@@ -51,7 +51,7 @@ export class UsersComponent implements OnInit {
         }
       },
       {
-        field: users.board, width: '80', 
+        field: users.board, width: '80',
         valueChange: user => {//, width: '80'
           if (users.board) {
             user.admin = false;
@@ -61,7 +61,7 @@ export class UsersComponent implements OnInit {
           }
         }
       },
-      { 
+      {
         field: users.manager, width: '80', valueChange: user => {//, width: '80'
           if (users.manager) {
             user.admin = false;
@@ -92,16 +92,23 @@ export class UsersComponent implements OnInit {
         click: async () => { await this.refresh(); }
       }
     ],
-    rowButtons: [{
-      name: terms.resetPassword,
-      click: async () => {
+    rowButtons: [
+      {
+        name: terms.resetPassword,
+        click: async () => {
 
-        if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
-          await UsersComponent.resetPassword(this.users.currentRow.id);
-          this.dialog.info(terms.passwordReset);
-        };
+          if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
+            await UsersComponent.resetPassword(this.users.currentRow.id);
+            this.dialog.info(terms.passwordReset);
+          };
+        }
+      },
+      {
+        textInMenu: terms.sendWelcomeSms,
+        click: async () => await this.sendWelcomeMeesage(
+          this.users.currentRow.name,
+          this.users.currentRow.mobile)
       }
-    }
     ],
     confirmDelete: async (h) => {
       return await this.dialog.confirmDelete(h.name)
@@ -111,8 +118,37 @@ export class UsersComponent implements OnInit {
   ngOnInit() {
   }
 
-  async refresh(){
+  async refresh() {
     await this.users.reloadData();
+  }
+
+  async sendWelcomeMeesage(name: string, mobile: string) {
+
+    let yes = await this.dialog.yesNoQuestion(
+      `לשלוח ל${name} (${mobile}) מסרון עם פרטי התחברות לאפליקציה`);
+    if (yes) {
+      let message = '';
+      message += 'bit.ly/eshel-app ';
+      message += '\n';
+      message += `שם משתמש: ${name} `;
+      message += '\n';
+      message += 'סיסמא נמסרת טלפונית';
+      message += '\n';
+      message += 'תודה לך';
+
+      // let sent = await NotificationService.sendSms({
+      //   uid: this.remult.user.id,
+      //   mobile: mobile,
+      //   message: message
+      // });
+
+      // if (sent) {
+      //   this.dialog.info(terms.smsSuccefullySent);
+      // }
+      // else {
+      //   this.dialog.info(terms.smsFailSent);
+      // }
+    };
   }
 
   @BackendMethod({ allowed: Roles.admin })

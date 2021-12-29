@@ -2,6 +2,9 @@ import { IdFilter, Remult } from 'remult';
 import { Roles } from './users/roles';
 
 export const terms = {
+    sendWelcomeSms:'שלח מסרון התחברות',
+    smsSuccefullySent:'מסרון נשלח בהצלחה',
+    smsFailSent:'שליחת מסרון נכשלה',
     reminder4FoodDelivery: 'תזכורת לסמן אם מסרת את האוכל',
     validationCodeExpired: 'תוקף הקוד פג, יש לשלוח שוב קוד חדש',
     verificationCodeSendFailed: 'שליחת קוד אימות נכשלה',

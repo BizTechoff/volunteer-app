@@ -4,6 +4,7 @@ import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { EntityWithModified } from "../EntityWithModified";
 
 
 
@@ -55,7 +56,7 @@ import { Roles } from "../../users/roles";
         })
     }
 )
-export class Branch extends IdEntity {
+export class Branch extends EntityWithModified {
 
     @Field({ caption: terms.name, validate: StringRequiredValidation })
     name: string = '';
@@ -77,7 +78,7 @@ export class Branch extends IdEntity {
             options.serverExpression = async branch => {
                 return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
             };
-        }
+        } 
         else {
             options.sqlExpression = () => "( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )";
         }

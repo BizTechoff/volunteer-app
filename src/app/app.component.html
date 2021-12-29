@@ -74,8 +74,8 @@
     </div>
 
   </mat-sidenav-container>
-  <div class="footer">
-    <div style="display:flex;flex-direction: row;justify-content: flex-end;">
+  <div class="footer" style="font-size: smaller;">
+    <div style="display:flex;flex-direction: row;justify-content: flex-end; cursor: pointer;" (click)="showBizTechoff()">
       {{ this.terms.appDesc + ' v' + this.terms.appVersion }}
       <div>{{ '::BizTechoff ' }}</div>
     </div>

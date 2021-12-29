@@ -24,17 +24,18 @@ import './send-sms';
 async function startup() {
     config(); //loads the configuration from the .env file
 
+    let enviroment = 'NO enviroment'.toUpperCase();
     let isDev = true;
     let db = process.env.DATABASE_URL;
     if (db) {
         let i = db.indexOf('@localhost');
         if (i > 0) {
             isDev = true;
-            console.debug('DEV');
+            enviroment = 'DEV';
         }
         else {
             isDev = false;
-            console.debug('PROD PROD PROD PROD PROD PROD PROD');
+            enviroment = 'PROD PROD PROD PROD PROD PROD PROD';
         }
     }
 
@@ -59,6 +60,8 @@ async function startup() {
             res.sendStatus(500);
         }
     });
+ 
+    console.debug(enviroment);
 
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
 

@@ -9,7 +9,7 @@ import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Langs, Users } from "../../users/users";
 import { Branch } from "../branch/branch";
-import { EntityWithModified } from "./EntityWithModified";
+import { EntityWithModified } from "../EntityWithModified";
 
 
 
