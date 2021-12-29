@@ -46,7 +46,7 @@ export class EntityWithModified extends IdEntity {
     })
     modifiedBy: IUser = null!;
 }
-
+ 
 export interface IUser {
     id: string;
     name: string;

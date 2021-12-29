@@ -6,12 +6,13 @@ import { Langs, Users } from '../app/users/users';
 
 let folder = `D:\\documents\\אשל ירושלים\\הסבה\\`;
 let branches = [] as string[];
-branches.push('קריית אונו');
+// branches.push('קריית אונו');
 // branches.push('נס ציונה');
+branches.push('חיפה');
 
 let branch = '';
 
-let mobileCounter = 56;
+let mobileCounter = 59;
 
 export async function importDataNew(remult: Remult) {
 
@@ -22,7 +23,7 @@ export async function importDataNew(remult: Remult) {
     console.time("import");
     await seed(remult);
     // await remult.setUser({ id: "API", name: "API", roles: [], bid: '', bname: '' });
- 
+   
     for (const brn of branches) {
         branch = brn;
 
@@ -45,7 +46,7 @@ async function seed(remult: Remult) {
         let u = remult.repo(Users).create();
         u.admin = true;
         u.name = "admin";
-        u.mobile = "0555555555";
+        u.mobile = "0526526063";
         await u.create(process.env.DEFAULT_PASSWORD);
         console.log("created admin");
     }
@@ -118,7 +119,7 @@ async function importVolunteers(remult: Remult) {
             u.langs = ls;
             try { await u.save(); }
             catch (err) {
-                console.log(name, '::', mobile, '::', err);
+                console.log('importVolunteers.line: ', line, err);
             }
             // break; 
         }
@@ -170,7 +171,7 @@ async function importTenants(remult: Remult) {
             t.age = new Date().getFullYear() - t.birthday.getFullYear();
             try { await t.save(); }
             catch (err) {
-                console.log(name, '::', mobile, '::', address, '::', err);
+                console.log('importTenants.line: ', line, err);
             }
             // break;
         }
@@ -192,44 +193,55 @@ async function importTenantVolunteers(remult: Remult) {
         console.error(`File(${file}) NOT exists: ${err}`)
         return;
     }
-    let lines = require('fs').readFileSync(file, 'utf-8').split(/\r?\n/);
+    let lines: string[] = require('fs').readFileSync(file, 'utf-8').split(/\r?\n/);
     for (const line of lines) {
         if (line && line.length > 0) {
-            let volunteer = '';
+            let volunteers = [] as string[];
             let tenant = '';
 
             let split = line.split(',');
             if (split.length > 0) {
-                volunteer = split[0].trim();
+                volunteers = split[0].split('|').map(v => v.trim());
             }
             if (split.length > 1) {
                 tenant = split[1].trim();
             }
 
-            let t = await remult.repo(Tenant).findFirst({ name: tenant });
-            if (!t) {
-                console.log(`NOT found tenant: ${tenant}`);
-                continue;
-            }
+            if (volunteers.length > 0) {
 
-            let u = await remult.repo(Users).findFirst({ name: volunteer });
-            if (!u) {
-                console.log(`NOT found tenant: ${volunteer}`);
-                continue;
-            }
+                // if (volunteers.length > 1) {
+                //     console.log(volunteers);
+                // break;
+                // }
+                // [ 'אילנה קרימוב', "גל מרקוביץ'" ]
+                let t = await remult.repo(Tenant).findFirst({ name: tenant });
+                if (!t) {
+                    console.log(`NOT found tenant: ${tenant}`);
+                    continue;
+                }
 
-            let f = t.defVids.find(row => row.name === u.name);
-            if (!f) {
-                t.defVids.push({ id: u.id, name: u.name });
-                try { await t.save(); }
-                catch (err) {
-                    console.log(t.name, '::', err);
+                for (const v of volunteers) {
+                    let u = await remult.repo(Users).findFirst({ name: v });
+                    if (!u) {
+                        console.log(`NOT found volunteer: ${v}`);
+                        continue;
+                    }  
+                    let f = t.defVids.find(row => row.id === u.id);
+                    if (!f) {
+                        t.defVids.push({ id: u.id, name: u.name });
+                    }
+                    // else {
+                    //     console.log(`already exists volunteer: ${u.name, u.id}`);
+                    // }
+                }// break;
+
+                if (t.defVids.length > 0) {
+                    try { await t.save(); }
+                    catch (err) {
+                        console.log('importTenantVolunteers.line: ', line, err);
+                    }
                 }
             }
-            else {
-                console.log(`already exists volunteer: ${u.name, u.id}`);
-            }
-            // break;
         }
     }
 }

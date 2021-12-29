@@ -194,12 +194,12 @@ export const terms = {
     userAccounts: 'משתמשים',
     myActivities: 'הפעילויות שלי',
     myTenants: 'הדיירים שלי',
-    filterBtTenantLangs: 'הצג רק מי שדובר בשפת הדייר',
+    filterBtTenantLangs: 'הצג לפי שפות הדייר',
     personalInfo: 'פרטים אישיים',
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2021.12.28.0'
+    appVersion: '2021.12.29.0'
 }
 
 declare module 'remult' {

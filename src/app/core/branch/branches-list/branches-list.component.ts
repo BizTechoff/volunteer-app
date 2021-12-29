@@ -32,7 +32,7 @@ export class BranchesListComponent implements OnInit {
           //   // for await (const p of this.remult.repo(Tenant).query({
           //   //   where: { bid: row }
           //   // })) {
-
+  
           //   // }
           //   // let cmd: SqlCommand;
           //   // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);

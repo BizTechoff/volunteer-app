@@ -3,12 +3,12 @@
         <div style="display: flex; flex-direction: column; justify-content: space-between; ">
             <div style="vertical-align: middle; display: flex; flex-direction: column; justify-content: flex-start; ">
                 <h4>{{ 'שיבוץ מתנדבים ל:' }}
-                    <strong> {{ this.args.title }} (שפות: {{ this.lgDesc }})</strong>
+                    <strong> {{ this.args.title }}</strong>
                 </h4>
-            </div>
+            </div> 
             <div style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
-                <mat-checkbox [checked]="!!this.filterBtTenantLangs" (change)="checkedChanged($event)">
-                    {{ terms.filterBtTenantLangs }}
+                <mat-checkbox [checked]="this.filterBtTenantLangs" (change)="checkedChanged($event)">
+                    {{ terms.filterBtTenantLangs }} ({{ this.lgDesc }})
                 </mat-checkbox>
                 <!-- <mat-checkbox (change)="this.filterBtTenantLangs()" [(ngModel)]='this.filterBtTenantLangs'> {{ terms.filterBtTenantLangs }} </mat-checkbox> -->
                 <!-- <data-control [field]="this.$.filterBtTenantLangs"></data-control>

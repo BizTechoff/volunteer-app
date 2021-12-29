@@ -205,7 +205,7 @@ export class Users extends IdEntity {
 
     @Field({
         caption: terms.branch,
-        allowNull: true
+        allowNull: true//remove-it
     })
     bid?: Branch;
 

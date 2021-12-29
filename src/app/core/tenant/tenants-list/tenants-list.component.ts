@@ -76,7 +76,7 @@ export class TenantsListComponent implements OnInit {
           visible: (_) => !_.isNew(),
           textInMenu: terms.associatedVolunteers,
           icon: 'groups',
-          click: async (_) => await this.assignVolunteers(_)
+          click: async (_) => await this.assignVolunteers(_, true)
         },
         // {
         //   visible: (_) => !_.isNew() && !this.isDonor(),
@@ -121,7 +121,7 @@ export class TenantsListComponent implements OnInit {
     await this.tenants.reloadData();
   }
 
-  async assignVolunteers(t: Tenant) {
+  async assignVolunteers(t: Tenant, autoSave = false) {
     let bidOk = (t && t.bid && t.bid.id && t.bid.id.length > 0)!;
     if (bidOk) {
       // t.defVids.splice(0);
@@ -149,8 +149,10 @@ export class TenantsListComponent implements OnInit {
       if (volids) {
         t.defVids.splice(0);
         t.defVids.push(...volids);
-        // await t.save();
-        // await this.refresh();
+        if (autoSave) {
+          await t.save();
+          await this.refresh();
+        }
       }
     }
     else {

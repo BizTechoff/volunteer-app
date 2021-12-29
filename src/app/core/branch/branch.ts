@@ -22,7 +22,7 @@ import { Roles } from "../../users/roles";
                 }
             },
             onSelect: b => {
-                if (f.value && f.value.id !== b.id) {
+                if (!f.value || f.value.id !== b.id) {
                     f.value = b;
                     if (f.valueChanged) {
                         f.valueChanged();
@@ -75,7 +75,7 @@ export class Branch extends IdEntity {
     @Field<Branch>((options, remult) => {
         if (1 == 1) {
             options.serverExpression = async branch => {
-                return remult.repo((await import("../../users/users")). Users).count({ bid: branch, volunteer: true })
+                return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
             };
         }
         else {
@@ -87,7 +87,7 @@ export class Branch extends IdEntity {
     @Field<Branch>((options, remult) => {
         if (1 == 1) {
             options.serverExpression = async branch => {
-                return remult.repo((await import ("../tenant/tenant")). Tenant).count({ bid: branch })
+                return remult.repo((await import("../tenant/tenant")).Tenant).count({ bid: branch })
             };
         }
         else {
