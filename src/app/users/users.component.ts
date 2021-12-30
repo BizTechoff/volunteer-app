@@ -20,102 +20,110 @@ export class UsersComponent implements OnInit {
     return this.remult.isAllowed(Roles.admin);
   }
 
-  users: GridSettings<Users> = new GridSettings<Users>(this.remult.repo(Users), {
-    allowDelete: true,
-    allowInsert: true,
-    allowUpdate: true,
-    numOfColumnsInGrid: 10,
+  users!: GridSettings<Users>;
 
-    columnSettings: users => [
-      users.name,
-      {
-        field: users.admin, width: '80', //width: '80',
-        valueChange: user => {
-          if (user.admin) {
-            user.donor = false;
-            user.board = false;
-            user.manager = false;
-            user.volunteer = false;
-          }
-        }
-      },
-      {
-        field: users.donor, width: '80',
-        valueChange: user => {//, width: '80'
-          if (users.donor) {
-            user.admin = false;
-            user.board = false;
-            user.manager = false;
-            user.volunteer = false;
-          }
-        }
-      },
-      {
-        field: users.board, width: '80',
-        valueChange: user => {//, width: '80'
-          if (users.board) {
-            user.admin = false;
-            user.donor = false;
-            user.manager = false;
-            user.volunteer = false;
-          }
-        }
-      },
-      {
-        field: users.manager, width: '80', valueChange: user => {//, width: '80'
-          if (users.manager) {
-            user.admin = false;
-            user.donor = false;
-            user.board = false;
-            user.volunteer = false;
-          }
-        }
-      },
-      {
-        field: users.volunteer, width: '80', valueChange: user => {//, width: '80'
-          if (users.volunteer) {
-            user.admin = false;
-            user.donor = false;
-            user.board = false;
-            user.manager = false;
-          }
-        }
-      },
-      { field: users.bid, caption: terms.branch },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
-      { field: users.email },
-      { field: users.mobile }//, width: '100'
-    ],
-    gridButtons: [
-      {
-        textInMenu: () => terms.refresh,
-        icon: 'refresh',
-        click: async () => { await this.refresh(); }
-      }
-    ],
-    rowButtons: [
-      {
-        name: terms.resetPassword,
-        click: async () => {
+  async ngOnInit() {
+    this.users = await this.initGrid();
+    // await this.refresh();
+  }
 
-          if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
-            await UsersComponent.resetPassword(this.users.currentRow.id);
-            this.dialog.info(terms.passwordReset);
-          };
-        }
-      },
-      {
-        textInMenu: terms.sendWelcomeSms,
-        click: async () => await this.sendWelcomeMeesage(
-          this.users.currentRow.name,
-          this.users.currentRow.mobile)
-      }
-    ],
-    confirmDelete: async (h) => {
-      return await this.dialog.confirmDelete(h.name)
-    },
-  });
+  async initGrid() {
+    return new GridSettings<Users>(this.remult.repo(Users), {
+      allowDelete: true,
+      allowInsert: true,
+      allowUpdate: true,
+      numOfColumnsInGrid: 10,
 
-  ngOnInit() {
+      where: { bid: this.remult.branchAllowedForUser() },
+
+      columnSettings: users => [
+        users.name,
+        {
+          field: users.admin, width: '80', //width: '80',
+          valueChange: user => {
+            if (user.admin) {
+              user.donor = false;
+              user.board = false;
+              user.manager = false;
+              user.volunteer = false;
+            }
+          }
+        },
+        {
+          field: users.donor, width: '80',
+          valueChange: user => {//, width: '80'
+            if (users.donor) {
+              user.admin = false;
+              user.board = false;
+              user.manager = false;
+              user.volunteer = false;
+            }
+          }
+        },
+        {
+          field: users.board, width: '80',
+          valueChange: user => {//, width: '80'
+            if (users.board) {
+              user.admin = false;
+              user.donor = false;
+              user.manager = false;
+              user.volunteer = false;
+            }
+          }
+        },
+        {
+          field: users.manager, width: '80', valueChange: user => {//, width: '80'
+            if (users.manager) {
+              user.admin = false;
+              user.donor = false;
+              user.board = false;
+              user.volunteer = false;
+            }
+          }
+        },
+        {
+          field: users.volunteer, width: '80', valueChange: user => {//, width: '80'
+            if (users.volunteer) {
+              user.admin = false;
+              user.donor = false;
+              user.board = false;
+              user.manager = false;
+            }
+          }
+        },
+        { field: users.bid, caption: terms.branch },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
+        { field: users.email },
+        { field: users.mobile }//, width: '100'
+      ],
+      gridButtons: [
+        {
+          textInMenu: () => terms.refresh,
+          icon: 'refresh',
+          click: async () => { await this.refresh(); }
+        }
+      ],
+      rowButtons: [
+        {
+          name: terms.resetPassword,
+          click: async () => {
+
+            if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
+              await UsersComponent.resetPassword(this.users.currentRow.id);
+              this.dialog.info(terms.passwordReset);
+            };
+          }
+        },
+        {
+          textInMenu: terms.sendWelcomeSms,
+          click: async () => await this.sendWelcomeMeesage(
+            this.users.currentRow.name,
+            this.users.currentRow.mobile)
+        }
+      ],
+      confirmDelete: async (h) => {
+        return await this.dialog.confirmDelete(h.name)
+      },
+    });
   }
 
   async refresh() {

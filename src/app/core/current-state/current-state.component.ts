@@ -256,7 +256,7 @@ export class CurrentStateComponent implements OnInit {
       activitiesByWeekDay: []
     };
     for await (const a of remult!.repo(Activity).query({
-      where: ({ bid: branchId ? { $id: branchId } : undefined })
+      where: ({ bid: remult?.branchAllowedForUser() })// branchId ? { $id: branchId } : undefined })
     })) {
 
       // By Branch

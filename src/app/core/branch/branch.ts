@@ -17,17 +17,17 @@ import { EntityWithModified } from "../EntityWithModified";
             onClear: () => {
                 if (f.value) {
                     f.value = undefined!;
-                    if (f.valueChanged) {
-                        f.valueChanged();
-                    }
+                    // if (f.valueChanged) {
+                    //     f.valueChanged();
+                    // }
                 }
             },
             onSelect: b => {
                 if (!f.value || f.value.id !== b.id) {
                     f.value = b;
-                    if (f.valueChanged) {
-                        f.valueChanged();
-                    }
+                    // if (f.valueChanged) {
+                    //     f.valueChanged();
+                    // }
                 }
             },
             title: f.metadata.caption

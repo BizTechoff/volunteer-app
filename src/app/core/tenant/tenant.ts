@@ -1,5 +1,5 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, EntityBase, Field, FieldOptions, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DateRequiredValidation, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
@@ -98,7 +98,8 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
     },
     async (options, remult) => {
         options.apiPrefilter = () => (
-            { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
+            { bid: remult.branchAllowedForUser() }
+            // { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         )
         // options.saving = async (tenant) => {
         // };

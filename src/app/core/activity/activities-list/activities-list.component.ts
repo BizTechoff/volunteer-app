@@ -28,7 +28,8 @@ export class ActivitiesListComponent implements OnInit {
     {
       where: () => ({
         status: this.status.statuses,
-        bid: this.bid ? this.bid : this.isBoard() ? undefined : { $contains: this.remult.user.bid }
+        bid: this.remult.branchAllowedForUser()
+        // bid: this.bid ? this.bid : this.isBoard() ? undefined : { $contains: this.remult.user.bid }
       })
       ,
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,

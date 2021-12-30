@@ -61,6 +61,25 @@ export class AuthService {
     @BackendMethod({ allowed: true })
     static async signIn(user: string, password: string, remult?: Remult) {
         //which user is here? probably kind of a system user
+        
+        // let u: Users = null!;
+        // console.log('signIn', 1);
+        // for await (const a of remult!.repo(Users).query({
+        //     // where: { name: user }
+        // })) {
+        //     console.log('signIn', 2);
+        //     if (a.name === user) {
+        //         u = a;
+        //         break;
+        //     }
+        // }
+        // console.log('signIn', 3);
+        // // console.log('signIn', 1);
+        // // let us = await remult!.repo(Users).query();
+        // // console.log('signIn', 2);
+        // // let u = await remult!.repo(Users).query({ where: { name: user } });
+        // // console.log('signIn', 3);
+
         let u = await remult!.repo(Users).findFirst({ name: user });
         if (u) {
             if (await u.passwordMatches(password)) {

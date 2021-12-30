@@ -12,10 +12,15 @@ import { Roles } from '../../users/roles';
 })
 export class ActivityDailyComponent implements OnInit {
 
-  activities = [] as Activity[];
+  // activities = [] as Activity[];
   grid = new GridSettings<Activity>(this.remult.repo(Activity),
     {
-      where: () => ({ date: this.selectedDate }),
+      where: () => {
+        return ({
+          date: { ">=": this.fromDate, "<=": this.toDate },
+          bid: this.remult.branchAllowedForUser()
+        });
+      },
       allowCrud: false,
       columnSettings: (_) => {
         let f = [];
@@ -51,11 +56,33 @@ export class ActivityDailyComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
 
-  @DataControl<ActivityDailyComponent>({ valueChange: async (r, v) => { await r.refresh(); } })
-  @DateOnlyField({ caption: terms.selectDate })
-  selectedDate: Date = new Date();
+  @DataControl<ActivityDailyComponent, Date>({
+    valueChange: async (r, v) => {
+      if (r.toDate < v.value) {
+        r.toDate = v.value;
+      }
+      await r.refresh();
+    }
+  })
+  @DateOnlyField({ caption: terms.fromDate })
+  fromDate: Date = new Date();
+
+  @DataControl<ActivityDailyComponent>({
+    valueChange: async (r, v) => {
+      if (r.fromDate > v.value) {
+        r.fromDate = v.value;
+      }
+      await r.refresh();
+    }
+  })
+  @DateOnlyField({ caption: terms.toDate })
+  toDate: Date = new Date();
 
   async ngOnInit() {
+    this.fromDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() - 7);
     await this.refresh();
   }
 

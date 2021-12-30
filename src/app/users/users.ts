@@ -1,6 +1,6 @@
 
 import { DataControl, InputField, openDialog } from "@remult/angular";
-import { Allow, BackendMethod, DateOnlyField, Entity, Field, IntegerField, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerField, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
@@ -137,12 +137,14 @@ export class Langs {
                         process.env.DEFAULT_PASSWORD!
                     );
                     user.created = new Date();
+                    user.$.createdBy.value = remult.user.id;
                     // user.createdBy = await remult.repo(Users).findId(remult.user.id);
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
                 }
                 else {
                     user.modified = new Date();
+                    user.$.modifiedBy.value = remult.user.id;
                     // user.modifiedBy = await remult.repo(Users).findId(remult.user.id);
                 }
                 if (user.admin || user.donor || user.board) {
@@ -178,7 +180,7 @@ export class Langs {
         // }
     }
 )
-export class Users extends EntityWithModified {
+export class Users extends IdEntity {
 
     constructor(private remult: Remult, private dialog: DialogService) {
         super();
@@ -291,25 +293,25 @@ export class Users extends EntityWithModified {
     @Field({ includeInApi: false })
     password: string = '';
 
-    // @Field({
-    //     allowApiUpdate: false
-    // })
-    // created: Date = new Date();
+    @Field({
+        allowApiUpdate: false
+    })
+    created: Date = new Date();
 
-    // @Field({
-    //     allowApiUpdate: false
-    // })
-    // createdBy: Users = null!;
+    @Field({
+        allowApiUpdate: false
+    })
+    createdBy: string = '';
 
-    // @Field({
-    //     allowApiUpdate: false
-    // })
-    // modified: Date = new Date();
+    @Field({
+        allowApiUpdate: false
+    })
+    modified: Date = new Date();
 
-    // @Field({
-    //     allowApiUpdate: false
-    // })
-    // modifiedBy: Users = null!;
+    @Field({
+        allowApiUpdate: false
+    })
+    modifiedBy: string  = '';
 
     @Field({
         allowApiUpdate: Roles.admin,

@@ -2,6 +2,8 @@ import { IdFilter, Remult } from 'remult';
 import { Roles } from './users/roles';
 
 export const terms = {
+    fromDate:'מתאריך',
+    toDate:'עד תאריך',
     sendWelcomeSms:'שלח מסרון התחברות',
     smsSuccefullySent:'מסרון נשלח בהצלחה',
     smsFailSent:'שליחת מסרון נכשלה',
