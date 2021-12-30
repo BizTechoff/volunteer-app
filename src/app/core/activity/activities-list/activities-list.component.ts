@@ -124,7 +124,7 @@ export class ActivitiesListComponent implements OnInit {
   }
 
   async refresh() {
-    console.log('refresh');
+    // console.log('refresh');
     await this.activities.reloadData();
   }
 

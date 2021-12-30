@@ -20,9 +20,23 @@ import { Tenant } from '../tenant';
 })
 export class TenantsListComponent implements OnInit {
 
-  @DataControl<TenantsListComponent>({ valueChange: async (r) => await r.refresh() })
+  // @DataControl<TenantsListComponent>({ valueChange: async (r) => await r.refresh() })
+  @DataControl<TenantsListComponent>({
+    valueChange: async (r) =>  await r.refresh()
+    // {
+    //   if (!r.refreshing) {
+    //     if (r.timer) {
+    //       clearTimeout(r.timer);
+    //     }
+    //     r.timer = setTimeout(() => r.subject.next(), 300);
+    //   }
+    // }
+  })
   @Field({ caption: `${terms.serachForTenantNameHere}` })
   search: string = ''
+  // timer: NodeJS.Timeout = undefined!;
+  // subject = new Subject();
+  // refreshing = false;
 
   get $() { return getFields(this, this.remult) };
   terms = terms;
@@ -112,13 +126,19 @@ export class TenantsListComponent implements OnInit {
     }
   );
 
-  constructor(private remult: Remult, private dialog: DialogService) { }
+  constructor(private remult: Remult, private dialog: DialogService) {
+    // this.subject.subscribe(async () => {
+    //   await this.refresh();
+    // });
+  }
 
   ngOnInit(): void {
   }
 
   async refresh() {
+    // this.refreshing = true;
     await this.tenants.reloadData();
+    // this.refreshing = false;
   }
 
   async assignVolunteers(t: Tenant, autoSave = false) {

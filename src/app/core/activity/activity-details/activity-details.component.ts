@@ -191,11 +191,11 @@ export class ActivityDetailsComponent implements OnInit {
       let hour = this.today.getHours();
       let min = this.today.getMinutes();
 
-      console.log(this.today);
-      console.log(hour);
-      console.log(min);
+      // console.log(this.today);
+      // console.log(hour);
+      // console.log(min);
 
-      console.log((hour + 1).toString().padStart(2, '0') + ':' + '00');
+      // console.log((hour + 1).toString().padStart(2, '0') + ':' + '00');
 
 
 
@@ -260,7 +260,7 @@ export class ActivityDetailsComponent implements OnInit {
           this.activity.vids.splice(0);
           this.addCurrentUserToVids();
         }
-        console.log(9);
+        // console.log(9);
       },
       title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
       tenantLangs: []

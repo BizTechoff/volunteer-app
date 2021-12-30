@@ -17,9 +17,9 @@ export class CalendarComponent implements OnInit {
   SelectedCalendarFrame = '';
   @DataControl<CalendarComponent>({
     valueChange: async (r, v) => {
-      console.log('branchv.alueChanged');
-      console.log('v.value',v.value);
-      console.log('r.branch?.id',r.branch?.id);
+      // console.log('branchv.alueChanged');
+      // console.log('v.value',v.value);
+      // console.log('r.branch?.id',r.branch?.id);
       await r.refresh();
     }
   })

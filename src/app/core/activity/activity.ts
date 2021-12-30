@@ -290,7 +290,7 @@ export class ActivityGeneralStatus {
     (options, remult) => {
         options.apiPrefilter = () => {
             // if (isBackend()) {
-                console.log('remult.branchAllowedForUser()', remult.branchAllowedForUser());
+                // console.log('remult.branchAllowedForUser()', remult.branchAllowedForUser());
                 return {
                     bid: remult.branchAllowedForUser()
                 }
