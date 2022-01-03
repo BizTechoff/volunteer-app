@@ -15,7 +15,8 @@ import '../app/app-routing.module';
 import { getJwtTokenSignKey } from '../app/auth.service';
 import '../app/common/types';
 import { augmentRemult } from '../app/terms';
-import './aws';
+import './aws-s3';
+import { generateUploadURL } from './aws-s3';
 import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
@@ -47,12 +48,36 @@ async function startup() {
             contentSecurityPolicy: false,
         })
     );
+
     const api = remultExpress({
         dataProvider: async () => createPostgresConnection({ configuration: "heroku", sslInDev: !isDev }),
         initRequest: async (remult) => augmentRemult(remult)
     });
     app.use(api);
+
+    app.get("/s3Url", async (req, res) => {//?key=[key]&f=[fname]
+        let result: { url: string, error: string } = { url: '', error: '' };
+        // console.log('s3Url CALLED !');
+        let key = req.query.key as string;
+        if (key === process.env.AWS_CLIENT_KEY!) {
+            let fName = req.query.f as string;
+            // console.log('fName', fName);
+            if (fName && fName.length > 0) {
+                result.url = await generateUploadURL(fName)
+            }
+            else {
+                result.error = 's3Url.NO File Name'
+            }
+        }
+        else {
+            result.error = 's3Url.NOT ALLOWED'
+        }
+        console.log(JSON.stringify(result));
+        res.send(JSON.stringify(result));
+    })
+
     app.use(express.static('dist/volunteer-app'));
+
     app.use('/*', async (req, res) => {
         try {
             res.send(fs.readFileSync('dist/volunteer-app/index.html').toString());
@@ -60,7 +85,7 @@ async function startup() {
             res.sendStatus(500);
         }
     });
- 
+
     console.debug(enviroment);
 
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {

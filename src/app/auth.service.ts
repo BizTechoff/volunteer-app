@@ -88,6 +88,7 @@ export class AuthService {
                     roles: [],
                     name: u.name,
                     bid: u.bid?.id ?? '',
+                    // bid2: u.branch2?.id ?? '',
                     bname: u.bid?.name ?? ''
                 };
                 if (u.admin) {

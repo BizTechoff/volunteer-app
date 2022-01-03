@@ -1,13 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import * as fetch from 'node-fetch';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { OnlyVolunteerEditActivity, pointsEachSuccessPhoto } from '../../../common/globals';
+import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
+// import S3 from 'aws-sdk/clients/s3'
+// import * as AWS from 'aws-sdk';
 // import * as AWS from 'aws-sdk';
 // import * as fs from 'fs';
 // import { uploadFile } from '../../../../server/aws';
@@ -90,24 +93,182 @@ export class PhotosAlbumComponent implements OnInit {
   // }
 
   async onFileInput(e: any) {
-
-
-    // for (let index = 0; index < e.target.files.length; index++) {
-    //   const file = e.target.files[index];
-    //   let f: File = file;
-    //   PhotosAlbumComponent.uploadToAws(f.name);
-    // }
-
-
-    // s3.createBucket(params, function(err, data) {
-    //     if (err) console.log(err, err.stack);
-    //     else console.log('Bucket Created Successfully', data.Location);
-    // }); 
     let changed = this.loadFiles(e.target.files);
-    // if (changed) {
-    //   await this.refresh();
-    // }
   }
+
+  private async loadFiles(files: any) {
+    let points = 0;
+    if (files && files.length > 0) {
+      for (let index = 0; index < files.length; index++) {
+        const file = files[index];
+        // let f: File = file;
+        let success = await this.upload(file);
+        if (success) {
+          points += this.getPointByFileType(file.type);
+        }
+      }
+      if (points > 0) {
+        let u = await this.remult.repo(Users).findId(this.remult.user.id);
+        if (u) {
+          u.points += points;
+          await u.save();
+          this.dialog.info(terms.youGotMorePoint.replace('!points!', points.toString()).replace('!sum!', u.points.toString()));
+        }
+      }
+    }
+  }
+
+  getPointByFileType(type: string) {
+    let result = 200;
+    if (['video/mp4', 'video/x-m4v', 'video/*', 'mp4', 'x-m4v'].includes(type)) {
+      result = 500;
+    }
+    return result;
+  }
+
+  async upload(f: any) {
+    // console.log('__dirname', __dirname);
+    let result = false;
+    await new Promise(async (resolve, reject) => {
+      let link = 'https://eshel-app.s3.eu-central-1.amazonaws.com/coupon_image.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA24G2HKRO67SUB52I%2F20220103%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220103T232519Z&X-Amz-Expires=60&X-Amz-Signature=fe06357c11ca74cab03d5231fc4422d1cb946cd3a47fe040cae34932bf832d22&X-Amz-SignedHeaders=host';
+      const linkRes = await fetch.default(link, {
+        method: "PUT",
+        body: f
+      })
+
+      if (linkRes.ok) {
+        console.log(linkRes.url)
+        await this.addPhoto(f.name, f.type, linkRes.url)
+        result = true;
+      }
+      else {
+        let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
+        console.debug(message);
+      }
+    });
+    return result;
+  }
+
+  async upload2(f: any) {
+    // console.log('__dirname', __dirname);
+    let result = false;
+    await new Promise(async (resolve, reject) => {
+
+      // get secure url from our server//'http://localhost:3000' + 
+      const s3SignUrl = 'http://localhost:3000' + `/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(f.name)}`;
+      console.log('s3SignUrl', s3SignUrl)
+      const signRes = await fetch.default(s3SignUrl);
+
+      if (signRes.ok) {
+        let link = await signRes.json();// JSON.parse(await url.text());// as AwsS3SignUrlResponse;
+        console.log('link', link)
+        console.log('result.url', link.url)
+        console.log('result.error', link.error)
+
+        // const imageUrl = link.split('?')[0]
+        // console.log(imageUrl)
+
+        // post the image direclty to the s3 bucket
+        const linkRes = await fetch.default(link, {
+          method: "PUT",
+          body: f
+        })
+
+        if (signRes.ok) {
+          let link = await signRes.json();
+          await this.addPhoto(f.name, f.type, link)
+          result = true;
+        }
+        else {
+          let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
+          console.debug(message);
+        }
+      }
+      else {
+        let message = `upload(${f.name}): { status: ${signRes.status}, statusText: ${signRes.statusText} }`;
+        console.debug(message);
+      }
+    });
+    return result;
+  }
+
+  // await this.test(
+  //   'https://eshel-app.s3.eu-central-1.amazonaws.com/coupon_image.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA24G2HKRO67SUB52I%2F20220103%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220103T204101Z&X-Amz-Expires=60&X-Amz-Signature=a5c92c84acd317b835ccb8b3b0063b725fd9768d29a28af8727e91c92103dd7a&X-Amz-SignedHeaders=host', 
+  //   f);
+
+  async test(link: string, f: any) {
+    // post the image direclty to the s3 bucket
+    await fetch.default(link, {
+      method: "PUT",
+      // headers: {
+      //   "Content-Type": "multipart/form-data"
+      // },
+      body: f
+    })
+
+    const imageUrl = link.split('?')[0]
+    console.log(imageUrl)
+  }
+
+
+
+  // this.addPhoto(this.args.bid, imageUrl)
+
+  //   let aws = require('aws-sdk');
+  //   const bucket = new aws.S3(
+  //     {
+  //       accessKeyId: s3Params.accessKeyId,
+  //       secretAccessKey: s3Params.secretAccessKey,
+  //       region: s3Params.region,
+  //       ACL: 'bucket-owner-full-control'
+  //     }
+  //   );
+  //   const params = {
+  //     Bucket: s3Params.bucket,
+  //     Key: f.name,
+  //     Body: f
+  //   };
+
+
+  //   console.log('upload', 0);
+  //   bucket.getBucketPolicy({ Bucket: s3Params.bucket }, function (err: any, data: any) {
+  //     if (err) {
+  //       console.log('upload', 10);
+  //       console.log("Error", err);
+  //     } else if (data) {
+  //       console.log('upload', 11);
+  //       console.log("Success", data.Policy);
+  //     }
+  //   });
+
+  //   console.log('upload', 1);
+  //   console.log(params);
+  //   bucket.upload(params, async (err: any, data: any) => {
+  //     if (data) {
+  //       console.log('upload', 2);
+  //       console.log("Video uploaded")
+  //     }
+  //     if (err) {
+  //       console.log('upload', 3);
+  //       console.log("Video uploaded failed")
+  //     }
+  //   });
+  //   console.log('upload', 4);
+
+  // for (let index = 0; index < e.target.files.length; index++) {
+  //   const file = e.target.files[index];
+  //   let f: File = file;
+  //   PhotosAlbumComponent.uploadToAws(f.name);
+  // }
+
+
+  // s3.createBucket(params, function(err, data) {
+  //     if (err) console.log(err, err.stack);
+  //     else console.log('Bucket Created Successfully', data.Location);
+  // }); 
+  // if (changed) {
+  //   await this.refresh();
+  // }
   //   private async loadFiles(files: any) {
   //     for (let index = 0; index < files.length; index++) {
   //       const file = files[index];
@@ -169,86 +330,86 @@ export class PhotosAlbumComponent implements OnInit {
   // });
   // }
 
-  private async loadFiles(files: any) {
-    let points = 0;
-    for (let index = 0; index < files.length; index++) {
-      const file = files[index];
-      let f: File = file;
-      // console.log(f);
-      // f.lastModified;
-      // f.name;
-      // f.size;
-      // f.type;
-      // f.webkitRelativePath;
-      await new Promise((res) => {
-        var fileReader = new FileReader();
+  // private async loadFiles(files: any) {
+  //   let points = 0;
+  //   for (let index = 0; index < files.length; index++) {
+  //     const file = files[index];
+  //     let f: File = file;
+  //     // console.log(f);
+  //     // f.lastModified;
+  //     // f.name;
+  //     // f.size;
+  //     // f.type;
+  //     // f.webkitRelativePath;
+  //     await new Promise((res) => {
+  //       var fileReader = new FileReader();
 
-        fileReader.onload = async (e: any) => {
-          var img = new Image();
+  //       fileReader.onload = async (e: any) => {
+  //         var img = new Image();
 
-          var canvas = document.createElement("canvas");
-          if (true) {
-            img.onload = async () => {
-              var ctx = canvas.getContext("2d");
-              ctx!.drawImage(img, 0, 0);
+  //         var canvas = document.createElement("canvas");
+  //         if (true) {
+  //           img.onload = async () => {
+  //             var ctx = canvas.getContext("2d");
+  //             ctx!.drawImage(img, 0, 0);
 
-              var MAX_WIDTH = 800;
-              var MAX_HEIGHT = 600;
-              var width = img.width;
-              var height = img.height;
+  //             var MAX_WIDTH = 800;
+  //             var MAX_HEIGHT = 600;
+  //             var width = img.width;
+  //             var height = img.height;
 
-              if (width > height) {
-                if (width > MAX_WIDTH) {
-                  height *= MAX_WIDTH / width;
-                  width = MAX_WIDTH;
-                }
-              } else {
-                if (height > MAX_HEIGHT) {
-                  width *= MAX_HEIGHT / height;
-                  height = MAX_HEIGHT;
-                }
-              }
-              canvas.width = width;
-              canvas.height = height;
+  //             if (width > height) {
+  //               if (width > MAX_WIDTH) {
+  //                 height *= MAX_WIDTH / width;
+  //                 width = MAX_WIDTH;
+  //               }
+  //             } else {
+  //               if (height > MAX_HEIGHT) {
+  //                 width *= MAX_HEIGHT / height;
+  //                 height = MAX_HEIGHT;
+  //               }
+  //             }
+  //             canvas.width = width;
+  //             canvas.height = height;
 
-              let margin = 50;
-              // canvas.pad?
+  //             let margin = 50;
+  //             // canvas.pad?
 
-              var ctx = canvas.getContext("2d");
-              ctx!.drawImage(img, 0, 0, width, height);
+  //             var ctx = canvas.getContext("2d");
+  //             ctx!.drawImage(img, 0, 0, width, height);
 
-              var dataurl = canvas.toDataURL("image/png");
-              //console.log(dataurl);
-              //create row in db
+  //             var dataurl = canvas.toDataURL("image/png");
+  //             //console.log(dataurl);
+  //             //create row in db
 
-              let uimg = await this.addPhoto(f.name, dataurl);
-              this.photos.push(uimg);
-
-
-              // addImageInfo(imgId)
+  //             let uimg = await this.addPhoto(f.name, dataurl);
+  //             this.photos.push(uimg);
 
 
-            }
-            img.src = e.target.result.toString();
-            // console.log(img.src)
-          }
-          //   this.image.image.value = e.target.result.toString();
-          //   this.image.fileName.value = f.name;
-          res({});
-        };
-        fileReader.readAsDataURL(f);
-        points += pointsEachSuccessPhoto;
-      });
-    }
-    if (points > 0) {
-      let u = await this.remult.repo(Users).findId(this.remult.user.id);
-      if (u) {
-        u.points += points;
-        await u.save();
-        this.dialog.info(terms.youGotMorePoint.replace('!points!', points.toString()).replace('!sum!', u.points.toString()));
-      }
-    }
-  }
+  //             // addImageInfo(imgId)
+
+
+  //           }
+  //           img.src = e.target.result.toString();
+  //           // console.log(img.src)
+  //         }
+  //         //   this.image.image.value = e.target.result.toString();
+  //         //   this.image.fileName.value = f.name;
+  //         res({});
+  //       };
+  //       fileReader.readAsDataURL(f);
+  //       points += pointsEachSuccessPhoto;
+  //     });
+  //   }
+  //   if (points > 0) {
+  //     let u = await this.remult.repo(Users).findId(this.remult.user.id);
+  //     if (u) {
+  //       u.points += points;
+  //       await u.save();
+  //       this.dialog.info(terms.youGotMorePoint.replace('!points!', points.toString()).replace('!sum!', u.points.toString()));
+  //     }
+  //   }
+  // }
 
   async removePhoto(img: Photo) {
     let yes = await this.dialog.confirmDelete(terms.photo)!;
@@ -263,7 +424,18 @@ export class PhotosAlbumComponent implements OnInit {
     }
   }
 
-  async addPhoto(title: string, data: string): Promise<Photo> {
+  async addPhoto(name: string, type: string, link: string): Promise<Photo> {
+    let result = this.remult.repo(Photo).create();
+    result.bid = this.args.bid;
+    result.eid = this.args.entityId;
+    result.title = name;
+    result.link = link;
+    await result.save();
+    this.args.changed = true;
+    return result;
+  }
+
+  async addPhoto2(title: string, data: string): Promise<Photo> {
     let result = this.remult.repo(Photo).create();
     result.bid = this.args.bid;
     result.eid = this.args.entityId;

@@ -178,13 +178,13 @@ export class VolunteersListComponent implements OnInit {
     }
   }
 
-  async openTenants(u: Users) {
-    await openDialog(SelectTenantComponent, x => x.args = {
-      bid: u.bid!,
-      onSelect: t => u.defTid = t,
-      title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
-      tenantLangs: []
-    });
-  }
+  // async openTenants(u: Users) {
+  //   await openDialog(SelectTenantComponent, x => x.args = {
+  //     bid: u.bid!,
+  //     onSelect: t => u.defTid = t,
+  //     title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+  //     tenantLangs: []
+  //   });
+  // }
 
 }

@@ -207,12 +207,17 @@ export class Users extends IdEntity {
         });
         return result;
     }
-
+ 
     @Field({
         caption: terms.branch,
         allowNull: true//remove-it
     })
     bid?: Branch;
+
+    // @Field({
+    //     caption: terms.branch
+    // })
+    // branch2?: Branch;
 
     @Field({
         caption: terms.username,

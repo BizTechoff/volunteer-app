@@ -8,12 +8,19 @@ let folder = `D:\\documents\\אשל ירושלים\\הסבה\\`;
 let branches = [] as string[];
 // branches.push('קריית אונו');
 // branches.push('נס ציונה');
-branches.push('חיפה');
-
+// branches.push('חיפה');
+// branches.push('חולון');
+// branches.push('זכרון יעקב');
+// branches.push('חדרה');
+// branches.push('יבנה');
+// branches.push('נתניה');
+// branches.push('עומר');
+branches.push('ראשון לציון');
+ 
 let branch = '';
 
-let mobileCounter = 59;
-
+let mobileCounter = 117;
+ 
 export async function importDataNew(remult: Remult) {
 
     console.log(`users: ${await remult.repo(Users).count()} rows`);
@@ -26,11 +33,11 @@ export async function importDataNew(remult: Remult) {
 
     for (const brn of branches) {
         branch = brn;
-
-        await importVolunteers(remult);
-        await importTenants(remult);
-        await importTenantVolunteers(remult);
-
+  
+        // await importVolunteers(remult);
+        // await importTenants(remult);
+        // await importTenantVolunteers(remult);
+  
     }
     console.timeEnd("import");
     console.log("finished import");
@@ -92,7 +99,7 @@ async function importVolunteers(remult: Remult) {
                 }
             }
             // console.log('name', name, 'mobile', mobile, 'langs', langs, 'email', email, 'birthday', birthday);
-
+ 
             let ls = [Langs.hebrew] as Langs[];
             for (const l of langs) {
                 // ls.push(Langs.hebrew);

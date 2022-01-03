@@ -148,8 +148,9 @@ export const terms = {
     name: 'שם',
     type: 'סוג',
     title: 'כותרת ראשית',
-    tenant: 'דייר',
+    tenant: 'דייר', 
     branch: 'סניף',
+    branch2: 'סניף נוסף',
     subTitle: 'כותרת משנית',
     volunteerApp: 'פעילות התנדבותית',
     currentStatus: 'סטטוס נוכחי',
@@ -209,7 +210,8 @@ export const terms = {
 
 declare module 'remult' {
     export interface UserInfo {
-        bid: string;
+        bid: string; 
+        // bid2: string;
         bname: string;
     }
     export interface Remult {
@@ -220,6 +222,6 @@ export function augmentRemult(remult: Remult) {
     remult.branchAllowedForUser = () => {
         if (remult.isAllowed(Roles.board))
             return undefined!;
-        return { $id: [remult.user.bid] };
+        return { $id: [remult.user.bid] };//, remult.user.bid2] };
     }
 }
