@@ -130,6 +130,48 @@ export class PhotosAlbumComponent implements OnInit {
     // console.log('__dirname', __dirname);
     let result = false;
     await new Promise(async (resolve, reject) => {
+
+      // get secure url from our server//'http://localhost:3000' + 
+      const s3SignUrl = `/api/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(f.name)}`;
+      // console.log('s3SignUrl', s3SignUrl)
+      const signRes = await fetch.default(s3SignUrl);
+
+      if (signRes.ok) {
+        // coso
+        let link = await signRes.json();// JSON.parse(await url.text());// as AwsS3SignUrlResponse;
+        // console.log('link', link)
+
+        // post the image direclty to the s3 bucket
+        const linkRes = await fetch.default(link.url, {
+          method: "PUT",
+          body: f
+        })
+
+        if (linkRes.ok) {
+          // console.log('linkRes.linkRes', linkRes)
+          const imageUrl = link.url.split('?')[0]
+          // console.log(imageUrl)
+          await this.addPhoto(f.name, f.type, imageUrl)
+          result = true;
+        }
+        else {
+          // console.log('NOT OK')
+          let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
+          console.debug(message);
+        }
+      }
+      else {
+        let message = `upload(${f.name}): { status: ${signRes.status}, statusText: ${signRes.statusText} }`;
+        console.debug(message);
+      }
+    });
+    return result;
+  }
+
+  async upload3(f: any) {
+    // console.log('__dirname', __dirname);
+    let result = false;
+    await new Promise(async (resolve, reject) => {
       let link = 'https://eshel-app.s3.eu-central-1.amazonaws.com/coupon_image.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA24G2HKRO67SUB52I%2F20220103%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220103T232519Z&X-Amz-Expires=60&X-Amz-Signature=fe06357c11ca74cab03d5231fc4422d1cb946cd3a47fe040cae34932bf832d22&X-Amz-SignedHeaders=host';
       const linkRes = await fetch.default(link, {
         method: "PUT",

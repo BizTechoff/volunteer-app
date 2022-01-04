@@ -119,7 +119,7 @@ export class VolunteerActivitiesComponent implements OnInit {
 
   getVolunteers(a: Activity) {
     let voids = a.vids && a.vids.length > 0 ? a.vids : [] as UserIdName[];
-    return voids.map(v => v.id === this.remult.user.id ? terms.you : v.name).join(', ');
+    return voids.map(v => v.id === this.remult.user.id ? terms.me : v.name).join(', ');
   }
 
   getLang(a: Activity) {

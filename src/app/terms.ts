@@ -61,6 +61,7 @@ export const terms = {
     youGot200Points: 'צברת !points! נקודות',
     pleaseTellUsWhatGoingOn: 'הערות וסיכום פעילות',
     you: 'את/ה',
+    me: 'אני',
     transferVolunteer: 'העברת מתנדב לסניף אחר',
     transferTenant: 'העברת דייר לסניף אחר',
     notVolunteersForCurrentTenant: 'לא שוייכו עדיין מתנדבים לדייר זה',

@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: flex-start;">
-                        משתתפים: {{ this.getVolunteers(a) }}
+                        <span> {{ 'משתתפים:' }} <b>{{ this.getVolunteers(a) }}</b> </span>
                     </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
                         <button [disabled]="this.isFuture(a)" (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'

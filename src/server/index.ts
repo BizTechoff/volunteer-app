@@ -55,7 +55,7 @@ async function startup() {
     });
     app.use(api);
 
-    app.get("/s3Url", async (req, res) => {//?key=[key]&f=[fname]
+    app.get("/api/s3Url", async (req, res) => {//?key=[key]&f=[fname]
         let result: { url: string, error: string } = { url: '', error: '' };
         // console.log('s3Url CALLED !');
         let key = req.query.key as string;
