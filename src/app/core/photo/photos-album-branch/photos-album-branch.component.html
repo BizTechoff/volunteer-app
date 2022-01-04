@@ -30,7 +30,7 @@
             </div>
             <div class="image-viewer">
                 <ng-container>
-                    <button (click)="this.setSelectedImage(-1)">
+                    <button mat-flat-button (click)="this.setSelectedImage(-1)" style="background-color: transparent;">
                         <mat-icon>navigate_next</mat-icon>
                     </button>
                     <mat-card>
@@ -41,12 +41,28 @@
                             </div>
                         </mat-card-title>
                         <mat-card-content>
-                            <div>
-                                <img class="image" [src]="this.selectedImage.data">
+                            <div class="image" style="width: 80%;">
+                                <div *ngIf="this.selectedImage.type.includes('video')">
+                                    <video controls>
+                                        <source [src]="this.selectedImage.link + '#t=1'">
+                                        Your browser does not support the video tag.
+                                      </video>
+                                </div>
+                                
+                                <div *ngIf="this.selectedImage.type.includes('audio')">
+                                    <audio controls>
+                                        <source [src]="this.selectedImage.link" [type]="this.selectedImage.type">
+                                        Your browser does not support the audio tag.
+                                      </audio>
+                                </div>
+                                
+                                <div *ngIf="!(this.selectedImage.type.includes('video') || this.selectedImage.type.includes('audio'))">
+                                    <img [src]='this.selectedImage.link'>
+                                </div>
                             </div>
                         </mat-card-content>
                     </mat-card>
-                    <button (click)="this.setSelectedImage(+1)">
+                    <button mat-flat-button (click)="this.setSelectedImage(+1)" style="background-color: transparent;">
                         <mat-icon>navigate_before</mat-icon>
                     </button>
                 </ng-container>
@@ -65,7 +81,23 @@
                     </mat-card-title>
                     <mat-card-content>
                         <div>
-                            <img class="image" [src]="p.data" (click)="this.selectedImage = p; this.showViewer = true">
+                            <div *ngIf="p.type.includes('video')" (click)="this.selectedImage = p; this.showViewer = false">
+                                <video class="image" controls>
+                                    <source [src]="p.link + '#t=1'">
+                                    Your browser does not support the video tag.
+                                  </video>
+                            </div>
+                            
+                            <div *ngIf="p.type.includes('audio')" (click)="this.selectedImage = p; this.showViewer = false">
+                                <audio class="image" controls>
+                                    <source [src]="p.link" [type]="p.type">
+                                    Your browser does not support the audio tag.
+                                  </audio>
+                            </div>
+                            
+                            <div *ngIf="!(p.type.includes('video') || p.type.includes('audio'))" (click)="this.selectedImage = p; this.showViewer = false">
+                                <img class="image" [src]='p.link'>
+                            </div>
                         </div>
                     </mat-card-content>
                 </mat-card>

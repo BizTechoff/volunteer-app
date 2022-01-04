@@ -40,21 +40,5 @@
         <data-area [settings]='this.fields'></data-area>
     </div>
     <div class="footer">
-        <!-- <app-photos-album *ngIf='this.activity' [entityId]='this.activity.id'></app-photos-album> -->
-        <!-- <div>
-            <button title=' {{ this.terms.unpoladYoursPhotosTogether }} ' mat-button *ngIf="this.images.length < 10">
-                <label for="uploadImage" style="display: flex;      align-items: center;">
-                    <mat-icon>photo_camera</mat-icon>
-                </label>
-            </button>
-            <input #fileInput type="file" (input)="onFileInput($event)" accept="image/*" id="uploadImage"
-                style="display:none" />
-        </div>
-        <ng-container *ngFor='let img of this.images'>
-            <mat-card>
-                <h5> {{ img.title }} <button mat-flat-button (click)="this.removeImage(img)"><mat-icon>close</mat-icon></button> </h5>
-                <img [src]='img.data' style="height: 30px; width: 30px;">
-            </mat-card>
-        </ng-container> -->
     </div>
 </div>

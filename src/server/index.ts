@@ -17,6 +17,7 @@ import '../app/common/types';
 import { augmentRemult } from '../app/terms';
 import './aws-s3';
 import { generateUploadURL } from './aws-s3';
+import { downloadPhotos } from './download-photos';
 import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
@@ -61,9 +62,10 @@ async function startup() {
         let key = req.query.key as string;
         if (key === process.env.AWS_CLIENT_KEY!) {
             let fName = req.query.f as string;
+            let branch = req.query.branch as string;
             // console.log('fName', fName);
             if (fName && fName.length > 0) {
-                result.url = await generateUploadURL(fName)
+                result.url = await generateUploadURL(fName, branch)
             }
             else {
                 result.error = 's3Url.NO File Name'
@@ -72,7 +74,7 @@ async function startup() {
         else {
             result.error = 's3Url.NOT ALLOWED'
         }
-        console.log(JSON.stringify(result));
+        // console.log(JSON.stringify(result));
         res.send(JSON.stringify(result));
     })
 
@@ -87,6 +89,9 @@ async function startup() {
     });
 
     console.debug(enviroment);
+
+    // const remult = await api.getRemult(undefined!);
+    // downloadPhotos(remult).then(() => { });
 
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
 

@@ -11,8 +11,8 @@ export interface UserIdName {
 export interface PhotoDetails {
     vname: string,
     created: Date,
-    data: string,
     bname: string,
+    type: string,
     link: string
 }
 

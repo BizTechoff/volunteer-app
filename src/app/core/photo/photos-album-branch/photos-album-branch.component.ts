@@ -8,7 +8,7 @@ import { Photo } from '../photo';
   selector: 'app-photos-album-branch',
   templateUrl: './photos-album-branch.component.html',
   styleUrls: ['./photos-album-branch.component.scss']
-})
+}) 
 export class PhotosAlbumBranchComponent implements OnInit {
 
   photos: PhotoDetails[] = [] as PhotoDetails[];
@@ -36,7 +36,7 @@ export class PhotosAlbumBranchComponent implements OnInit {
     if (this.photos.length > 0) {
       if (this.selectedImage) {
         if (this.photos.length > 1) {
-          let f = this.photos.find(itm => itm.data === this.selectedImage.data);
+          let f = this.photos.find(itm => itm.link === this.selectedImage.link);
           if (f) {
             let i = this.photos.indexOf(f);
             if (i === 0) {// 0,1,2,3 => i=0
@@ -57,6 +57,9 @@ export class PhotosAlbumBranchComponent implements OnInit {
               else if (add === -1) {
                 this.selectedImage = this.photos[i + add];//+-=-
               }
+            }
+            else{
+                this.selectedImage = this.photos[i + add];//+-=-
             }
           }
         }
@@ -90,12 +93,12 @@ export class PhotosAlbumBranchComponent implements OnInit {
         result.push({
           vname: p.createdBy?.name,
           created: p.created,
-          data: p.data,
+          type: p.type, 
           link: p.link,
           bname: p.bid?.name
         });
       });
     }
-    return result;
+    return result; 
   }
 }

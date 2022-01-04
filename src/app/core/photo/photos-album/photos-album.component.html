@@ -8,7 +8,7 @@
                     <mat-icon>photo_camera</mat-icon>
                 </label>
             </button>
-            <input #fileInput type="file" (input)="onFileInput($event)" accept="image/*" id="uploadImage"
+            <input #fileInput type="file" (input)="onFileInput($event)" accept="audio/mp3,video/mp4,image/*" id="uploadImage"
                 style="display:none" />
         </div>
         <div class="image-container">
@@ -17,7 +17,23 @@
                     <button [title]='this.terms.removeImage' mat-flat-button (click)="this.removePhoto(img)">
                         <mat-icon>close</mat-icon>
                     </button>
-                    <img [src]='img.data' style="height: 200px; width: 200px;"><!-- max-width: 100%; -->
+                    <div *ngIf="img.type.includes('video')">
+                        <video width="100%" controls>
+                            <source [src]="img.link + '#t=1'">
+                            Your browser does not support the video tag.
+                          </video>
+                    </div>
+                    
+                    <div *ngIf="img.type.includes('audio')">
+                        <audio width="100%" controls>
+                            <source [src]="img.link">
+                            Your browser does not support the audio tag.
+                          </audio>
+                    </div>
+                    
+                    <div *ngIf="!(img.type.includes('video') || img.type.includes('audio'))">
+                        <img [src]='img.link' width="100%">
+                    </div>
                 </div>
             </ng-container>
         </div>

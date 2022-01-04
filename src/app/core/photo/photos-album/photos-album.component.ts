@@ -75,7 +75,8 @@ export class PhotosAlbumComponent implements OnInit {
     this.photos.splice(0);
     if (this.isValidEntityId()) {
       for await (const p of this.remult.repo(Photo).query({
-        where: { eid: this.args.entityId }
+        where: { eid: this.args.entityId },
+        orderBy: {created: 'desc'}
       })) {
         this.photos.push(p);
       }
@@ -91,19 +92,35 @@ export class PhotosAlbumComponent implements OnInit {
   // static uploadToAws(fileName:string){
   //   uploadFile(fileName);
   // }
+  
+//eshel.app.hulon@gmail.com
+getBranchFromEmail(email:string){
+  let result = '';
+  if(email && email.length > 0)
+  { 
+     result  = email.split('@')[0];
+}
+  return result;
+}
 
-  async onFileInput(e: any) {
-    let changed = this.loadFiles(e.target.files);
+  async onFileInput(e: any) {//eshel.app.hulon@gmail.com
+    let branch = this.getBranchFromEmail(this.args.bid.email);
+    let changed = await this.loadFiles(e.target.files,branch);
+    if(changed){
+      await this.refresh();
+    }
   }
 
-  private async loadFiles(files: any) {
+  private async loadFiles(files: any,branch:string) {
     let points = 0;
     if (files && files.length > 0) {
       for (let index = 0; index < files.length; index++) {
         const file = files[index];
         // let f: File = file;
-        let success = await this.upload(file);
-        if (success) {
+        let success = await this.upload(file,branch);
+        console.log('success',success)
+        if (success!) {
+          console.log(file.type);
           points += this.getPointByFileType(file.type);
         }
       }
@@ -113,9 +130,11 @@ export class PhotosAlbumComponent implements OnInit {
           u.points += points;
           await u.save();
           this.dialog.info(terms.youGotMorePoint.replace('!points!', points.toString()).replace('!sum!', u.points.toString()));
+        return true;
         }
       }
     }
+    return false;
   }
 
   getPointByFileType(type: string) {
@@ -126,16 +145,16 @@ export class PhotosAlbumComponent implements OnInit {
     return result;
   }
 
-  async upload(f: any) {
+  async upload(f: any,branch:string) {
     // console.log('__dirname', __dirname);
     let result = false;
     await new Promise(async (resolve, reject) => {
 
       // get secure url from our server//'http://localhost:3000' + 
-      const s3SignUrl = `/api/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(f.name)}`;
+      const s3SignUrl = `/api/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(f.name)}&branch=${encodeURI(branch)}`;
       // console.log('s3SignUrl', s3SignUrl)
       const signRes = await fetch.default(s3SignUrl);
-
+  
       if (signRes.ok) {
         // coso
         let link = await signRes.json();// JSON.parse(await url.text());// as AwsS3SignUrlResponse;
@@ -168,89 +187,124 @@ export class PhotosAlbumComponent implements OnInit {
     return result;
   }
 
-  async upload3(f: any) {
-    // console.log('__dirname', __dirname);
-    let result = false;
-    await new Promise(async (resolve, reject) => {
-      let link = 'https://eshel-app.s3.eu-central-1.amazonaws.com/coupon_image.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA24G2HKRO67SUB52I%2F20220103%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220103T232519Z&X-Amz-Expires=60&X-Amz-Signature=fe06357c11ca74cab03d5231fc4422d1cb946cd3a47fe040cae34932bf832d22&X-Amz-SignedHeaders=host';
-      const linkRes = await fetch.default(link, {
-        method: "PUT",
-        body: f
-      })
-
-      if (linkRes.ok) {
-        console.log(linkRes.url)
-        await this.addPhoto(f.name, f.type, linkRes.url)
-        result = true;
+  async removePhoto(img: Photo) {
+    let yes = await this.dialog.confirmDelete(terms.photo)!;
+    if (yes) {
+      await img.delete();
+      this.args.changed = true;
+      var index = this.photos.indexOf(img);
+      if (index >= 0) {
+        this.photos.splice(index, 1);
+        this.dialog.info('התמונה הוסרה בהצלחה');
       }
-      else {
-        let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
-        console.debug(message);
-      }
-    });
-    return result;
+    }
   }
 
-  async upload2(f: any) {
-    // console.log('__dirname', __dirname);
-    let result = false;
-    await new Promise(async (resolve, reject) => {
-
-      // get secure url from our server//'http://localhost:3000' + 
-      const s3SignUrl = 'http://localhost:3000' + `/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(f.name)}`;
-      console.log('s3SignUrl', s3SignUrl)
-      const signRes = await fetch.default(s3SignUrl);
-
-      if (signRes.ok) {
-        let link = await signRes.json();// JSON.parse(await url.text());// as AwsS3SignUrlResponse;
-        console.log('link', link)
-        console.log('result.url', link.url)
-        console.log('result.error', link.error)
-
-        // const imageUrl = link.split('?')[0]
-        // console.log(imageUrl)
-
-        // post the image direclty to the s3 bucket
-        const linkRes = await fetch.default(link, {
-          method: "PUT",
-          body: f
-        })
-
-        if (signRes.ok) {
-          let link = await signRes.json();
-          await this.addPhoto(f.name, f.type, link)
-          result = true;
-        }
-        else {
-          let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
-          console.debug(message);
-        }
-      }
-      else {
-        let message = `upload(${f.name}): { status: ${signRes.status}, statusText: ${signRes.statusText} }`;
-        console.debug(message);
-      }
-    });
+  async addPhoto(name: string, type: string, link: string): Promise<Photo> {
+    let result = this.remult.repo(Photo).create();
+    result.bid = this.args.bid;
+    result.eid = this.args.entityId;
+    result.title = name;
+    result.type = type;
+    result.link = link;
+    await result.save();
+    this.args.changed = true;
     return result;
   }
+}
 
+
+
+// async upload3(f: any) {
+//   // console.log('__dirname', __dirname);
+//   let result = false;
+//   await new Promise(async (resolve, reject) => {
+//     let link = 'https://eshel-app.s3.eu-central-1.amazonaws.com/coupon_image.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA24G2HKRO67SUB52I%2F20220103%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220103T232519Z&X-Amz-Expires=60&X-Amz-Signature=fe06357c11ca74cab03d5231fc4422d1cb946cd3a47fe040cae34932bf832d22&X-Amz-SignedHeaders=host';
+//     const linkRes = await fetch.default(link, {
+//       method: "PUT",
+//       body: f
+//     })
+
+//     if (linkRes.ok) {
+//       console.log(linkRes.url)
+//       await this.addPhoto(f.name, f.type, linkRes.url)
+//       result = true;
+//     }
+//     else {
+//       let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
+//       console.debug(message);
+//     }
+//   });
+//   return result;
+// }
+
+// async upload2(f: any) {
+//   // console.log('__dirname', __dirname);
+//   let result = false;
+//   await new Promise(async (resolve, reject) => {
+
+//     // get secure url from our server//'http://localhost:3000' + 
+//     const s3SignUrl = 'http://localhost:3000' + `/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(f.name)}`;
+//     console.log('s3SignUrl', s3SignUrl)
+//     const signRes = await fetch.default(s3SignUrl);
+
+//     if (signRes.ok) {
+//       let link = await signRes.json();// JSON.parse(await url.text());// as AwsS3SignUrlResponse;
+//       console.log('link', link)
+//       console.log('result.url', link.url)
+//       console.log('result.error', link.error)
+
+//       // post the image direclty to the s3 bucket
+//       const linkRes = await fetch.default(link, {
+//         method: "PUT",
+//         body: f
+//       })
+
+//       if (signRes.ok) {
+//         let link = await signRes.json();
+//         await this.addPhoto(f.name, f.type, link)
+//         result = true;
+//       }
+//       else {
+//         let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
+//         console.debug(message);
+//       }
+//     }
+//     else {
+//       let message = `upload(${f.name}): { status: ${signRes.status}, statusText: ${signRes.statusText} }`;
+//       console.debug(message);
+//     }
+//   });
+//   return result;
+// }
+
+  // async addPhoto2(title: string, data: string): Promise<Photo> {
+  //   let result = this.remult.repo(Photo).create();
+  //   result.bid = this.args.bid;
+  //   result.eid = this.args.entityId;
+  //   result.title = title;
+  //   result.data = data;
+  //   await result.save();
+  //   this.args.changed = true;
+  //   return result;
+  // }
   // await this.test(
   //   'https://eshel-app.s3.eu-central-1.amazonaws.com/coupon_image.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA24G2HKRO67SUB52I%2F20220103%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220103T204101Z&X-Amz-Expires=60&X-Amz-Signature=a5c92c84acd317b835ccb8b3b0063b725fd9768d29a28af8727e91c92103dd7a&X-Amz-SignedHeaders=host', 
   //   f);
 
-  async test(link: string, f: any) {
-    // post the image direclty to the s3 bucket
-    await fetch.default(link, {
-      method: "PUT",
-      // headers: {
-      //   "Content-Type": "multipart/form-data"
-      // },
-      body: f
-    })
+  // async test(link: string, f: any) {
+  //   // post the image direclty to the s3 bucket
+  //   await fetch.default(link, {
+  //     method: "PUT",
+  //     // headers: {
+  //     //   "Content-Type": "multipart/form-data"
+  //     // },
+  //     body: f
+  //   })
 
-    const imageUrl = link.split('?')[0]
-    console.log(imageUrl)
-  }
+  //   const imageUrl = link.split('?')[0]
+  //   console.log(imageUrl)
+  // }
 
 
 
@@ -452,39 +506,3 @@ export class PhotosAlbumComponent implements OnInit {
   //     }
   //   }
   // }
-
-  async removePhoto(img: Photo) {
-    let yes = await this.dialog.confirmDelete(terms.photo)!;
-    if (yes) {
-      await img.delete();
-      this.args.changed = true;
-      var index = this.photos.indexOf(img);
-      if (index >= 0) {
-        this.photos.splice(index, 1);
-        this.dialog.info('התמונה הוסרה בהצלחה');
-      }
-    }
-  }
-
-  async addPhoto(name: string, type: string, link: string): Promise<Photo> {
-    let result = this.remult.repo(Photo).create();
-    result.bid = this.args.bid;
-    result.eid = this.args.entityId;
-    result.title = name;
-    result.link = link;
-    await result.save();
-    this.args.changed = true;
-    return result;
-  }
-
-  async addPhoto2(title: string, data: string): Promise<Photo> {
-    let result = this.remult.repo(Photo).create();
-    result.bid = this.args.bid;
-    result.eid = this.args.entityId;
-    result.title = title;
-    result.data = data;
-    await result.save();
-    this.args.changed = true;
-    return result;
-  }
-}
