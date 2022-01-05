@@ -14,6 +14,7 @@ import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activit
 import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/volunteer-details.component';
 import { VolunteerTenantsComponent } from './core/volunteer/volunteer-tenants/volunteer-tenants.component';
 import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
+import { OfflineReadComponent } from './demo/offline-read/offline-read.component';
 import { HomeComponent } from './home/home.component';
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
 import { terms } from './terms';
@@ -24,6 +25,7 @@ import { UsersComponent } from './users/users.component';
 
 const defaultRoute = terms.home;
 const routes: Routes = [ 
+  { path: 'demo', component: OfflineReadComponent, canActivate: [NotAuthenticatedGuard] },
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
   { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerGuard] },
   { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerGuard] },

@@ -49,7 +49,8 @@ import { CalendarComponent } from './core/current-state/calendar/calendar.compon
 import { VolunteerTenantsComponent } from './core/volunteer/volunteer-tenants/volunteer-tenants.component';
 import { SafePipeModule } from 'safe-pipe';
 import { SelectTenantComponent } from './common/select-tenant/select-tenant.component';
-import { UserVerificationComponent } from './users/user-verification/user-verification.component'
+import { UserVerificationComponent } from './users/user-verification/user-verification.component';
+import { OfflineReadComponent } from './demo/offline-read/offline-read.component'
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -80,7 +81,8 @@ import { UserVerificationComponent } from './users/user-verification/user-verifi
     CalendarComponent,
     VolunteerTenantsComponent,
     SelectTenantComponent,
-    UserVerificationComponent
+    UserVerificationComponent,
+    OfflineReadComponent
   ],
   imports: [
     BrowserModule,

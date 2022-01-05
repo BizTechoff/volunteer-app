@@ -77,10 +77,10 @@
                         <div> {{ p.vname }} ({{ p.bname }}) </div>
                         <div>
                             <h3>{{ p.created | date:'dd.MM.YYYY HH:mm' }}</h3>
-                        </div>
+                        </div> 
                     </mat-card-title>
                     <mat-card-content>
-                        <div>
+                        <div style="width: 100%;">
                             <div *ngIf="p.type.includes('video')" (click)="this.selectedImage = p; this.showViewer = false">
                                 <video class="image" controls>
                                     <source [src]="p.link + '#t=1'">

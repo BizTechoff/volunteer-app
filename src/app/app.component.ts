@@ -35,9 +35,13 @@ export class AppComponent implements OnInit {
   isVolunteer() {
     return this.remult.user.roles.length == 1 && this.remult.isAllowed(Roles.volunteer);
   }
-
+ 
   showBizTechoff() {
     window.open('https://biztechoff.co.il', '_blank');
+  }
+
+  routeHome(){
+    window.location.href = encodeURI( "/ברוכים הבאים")
   }
 
   forgotPassword = false;
