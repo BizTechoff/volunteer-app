@@ -2,7 +2,6 @@ import { DataControl } from "@remult/angular";
 import { Allow, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { terms } from "../../terms";
-import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 
@@ -17,17 +16,22 @@ export class ActiveStatus {
 
 @Entity<Photo>('photos',
     {
-        allowApiInsert: Roles.volunteer,
-        allowApiDelete: Roles.manager,
-        allowApiUpdate: false,
-        allowApiRead: Allow.authenticated
+        // allowApiInsert: Roles.volunteer,
+        // allowApiDelete: Roles.manager,
+        // allowApiUpdate: false,
+        allowApiRead: true// Allow.authenticated
     },
     (options, remult) => {
-        options.apiPrefilter = () => (
-            {
-                bid: remult.branchAllowedForUser() // !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
-            }
-        ); 
+        options.apiPrefilter = () => {
+            if (!remult.authenticated())
+                return { id: [] }//why not simple empty-string? ''
+            return { bid: remult.branchAllowedForUser() };
+        };
+        // (
+        //     {
+        //         bid: remult.branchAllowedForUser() // !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
+        //     }
+        // );
         options.saving = async (act) => {
             if (isBackend()) {
                 if (act._.isNew()) {
@@ -39,7 +43,7 @@ export class ActiveStatus {
     })
 export class Photo extends IdEntity {
 
-    @Field({ caption: terms.branch })
+    @Field({ caption: terms.branch, includeInApi: Allow.authenticated, lazy: true })
     bid!: Branch;
 
     @Field({ caption: terms.entityId })
