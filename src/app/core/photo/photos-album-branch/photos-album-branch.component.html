@@ -46,17 +46,18 @@
                                     <video controls>
                                         <source [src]="this.selectedImage.link + '#t=1'">
                                         Your browser does not support the video tag.
-                                      </video>
+                                    </video>
                                 </div>
-                                
+
                                 <div *ngIf="this.selectedImage.type.includes('audio')">
                                     <audio controls>
                                         <source [src]="this.selectedImage.link" [type]="this.selectedImage.type">
                                         Your browser does not support the audio tag.
-                                      </audio>
+                                    </audio>
                                 </div>
-                                
-                                <div *ngIf="!(this.selectedImage.type.includes('video') || this.selectedImage.type.includes('audio'))">
+
+                                <div
+                                    *ngIf="!(this.selectedImage.type.includes('video') || this.selectedImage.type.includes('audio'))">
                                     <img [src]='this.selectedImage.link'>
                                 </div>
                             </div>
@@ -77,26 +78,31 @@
                         <div> {{ p.vname }} ({{ p.bname }}) </div>
                         <div>
                             <h3>{{ p.created | date:'dd.MM.YYYY HH:mm' }}</h3>
-                        </div> 
+                        </div>
                     </mat-card-title>
                     <mat-card-content>
                         <div style="width: 100%;">
-                            <div *ngIf="p.type.includes('video')" (click)="this.selectedImage = p; this.showViewer = false">
-                                <video class="image" controls>
+                            <div *ngIf="p.type.includes('video')"
+                                (click)="this.selectedImage = p; this.showViewer = false">
+                                <video class="image" controls controlsList="nodownload">
                                     <source [src]="p.link + '#t=1'">
                                     Your browser does not support the video tag.
-                                  </video>
+                                </video>
                             </div>
-                            
-                            <div *ngIf="p.type.includes('audio')" (click)="this.selectedImage = p; this.showViewer = false">
-                                <audio class="image" controls>
+
+                            <div *ngIf="p.type.includes('audio')"
+                                (click)="this.selectedImage = p; this.showViewer = false">
+                                <audio class="image" controls controlsList="nodownload">
                                     <source [src]="p.link" [type]="p.type">
                                     Your browser does not support the audio tag.
-                                  </audio>
+                                </audio>
                             </div>
-                            
-                            <div *ngIf="!(p.type.includes('video') || p.type.includes('audio'))" (click)="this.selectedImage = p; this.showViewer = false">
-                                <img class="image" [src]='p.link'>
+
+                            <div *ngIf="!(p.type.includes('video') || p.type.includes('audio'))"
+                                (click)="this.selectedImage = p; this.showViewer = false">
+                                <picture controls controlsList="nodownload">
+                                    <img class="image" [src]='p.link'>
+                                </picture>
                             </div>
                         </div>
                     </mat-card-content>

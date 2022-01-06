@@ -159,12 +159,12 @@ getBranchFromEmail(email:string){
         // coso
         let link = await signRes.json();// JSON.parse(await url.text());// as AwsS3SignUrlResponse;
         // console.log('link', link)
-
+        if(link && link.url && link.url.length > 0)
         // post the image direclty to the s3 bucket
-        const linkRes = await fetch.default(link.url, {
+        {
+          const linkRes = await fetch.default(link.url, {
           method: "PUT",
-          body: f
-        })
+          body: f        })
 
         if (linkRes.ok) {
           // console.log('linkRes.linkRes', linkRes)
@@ -178,6 +178,10 @@ getBranchFromEmail(email:string){
           let message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
           console.debug(message);
         }
+      }else{
+          // console.log('NOT OK')
+          let message = `upload(${f.name}): upSigning Url Failed`;
+          console.debug(message);}
       }
       else {
         let message = `upload(${f.name}): { status: ${signRes.status}, statusText: ${signRes.statusText} }`;

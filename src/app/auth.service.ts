@@ -16,6 +16,7 @@ const AUTH_TOKEN_KEY = "authToken";
 export class AuthService {
     forgotPassword = false;
     isFirstLogin = true;//welcome message
+    isConnected = false;
     constructor(private remult: Remult) {
         augmentRemult(remult);
         // (<MotiUserInfo>remult.user).snif
@@ -27,6 +28,7 @@ export class AuthService {
     }
 
     async signIn(username: string, password: string) {
+        this.isConnected = false;
         let ui: UserInfo = await AuthService.signIn(username, password);
         if (useVolunteerLoginWithVerificationCode) {
             if (ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)) {
@@ -36,11 +38,12 @@ export class AuthService {
                     _ => _.args = { in: { uid: ui.id, mobile: mobile } },
                     _ => _ && _.args.out ? _.args.out.verified : false);
                 if (!verified!) {
-                    return;
+                    return false;
                 }
             }
         }
         this.setAuthToken(await AuthService.setToken(ui));
+        return true;
     }
 
     @BackendMethod({ allowed: true })
@@ -85,11 +88,12 @@ export class AuthService {
             if (await u.passwordMatches(password)) {
                 let result: UserInfo = {
                     id: u.id,
-                    roles: [],
+                    roles: [], 
                     name: u.name,
                     bid: u.bid?.id ?? '',
-                    // bid2: u.branch2?.id ?? '',
-                    bname: u.bid?.name ?? ''
+                    bname: u.bid?.name ?? '',
+                    bid2: u.branch2?.id ?? '',
+                    b2name: u.branch2?.name ?? ''
                 };
                 if (u.admin) {
                     result.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);
@@ -114,6 +118,7 @@ export class AuthService {
     setAuthToken(token: string) {
         this.remult.setUser(new JwtHelperService().decodeToken(token));
         sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+        this.isConnected = true;
     }
     static fromStorage(): string {
         return sessionStorage.getItem(AUTH_TOKEN_KEY)!;

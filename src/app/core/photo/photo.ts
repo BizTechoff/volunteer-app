@@ -2,6 +2,7 @@ import { DataControl } from "@remult/angular";
 import { Allow, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { terms } from "../../terms";
+import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 
@@ -16,9 +17,9 @@ export class ActiveStatus {
 
 @Entity<Photo>('photos',
     {
-        // allowApiInsert: Roles.volunteer,
-        // allowApiDelete: Roles.manager,
-        // allowApiUpdate: false,
+        allowApiInsert: Roles.volunteer,
+        allowApiDelete: Roles.manager,
+        allowApiUpdate: false,
         allowApiRead: true// Allow.authenticated
     },
     (options, remult) => {

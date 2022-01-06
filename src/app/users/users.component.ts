@@ -92,7 +92,7 @@ export class UsersComponent implements OnInit {
           }
         },
         { field: users.bid, caption: terms.branch },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
-        // { field: users.branch2, caption: terms.branch2 },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
+        { field: users.branch2, caption: terms.branch2 },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
         { field: users.email },
         { field: users.mobile }//, width: '100'
       ],

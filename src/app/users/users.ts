@@ -214,10 +214,10 @@ export class Users extends IdEntity {
     })
     bid?: Branch;
 
-    // @Field({
-    //     caption: terms.branch
-    // })
-    // branch2?: Branch;
+    @Field({
+        caption: terms.branch
+    })
+    branch2?: Branch;
 
     @Field({
         caption: terms.username,

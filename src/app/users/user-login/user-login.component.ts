@@ -5,7 +5,6 @@ import { Remult } from 'remult';
 import { AuthService } from '../../auth.service';
 import { DialogService } from '../../common/dialog';
 import { terms } from '../../terms';
-import { Roles } from '../roles';
 import { PasswordControl } from '../users';
 
 @Component({
@@ -15,6 +14,7 @@ import { PasswordControl } from '../users';
 })
 export class UserLoginComponent implements OnInit {
 
+  args: { out: { connected?: boolean, error?: string } } = { out: { connected: false, error: '' } }
   userName = new InputField<string>({ caption: terms.username });
   password = new PasswordControl();
   area = new DataAreaSettings({
@@ -31,7 +31,8 @@ export class UserLoginComponent implements OnInit {
   }
 
   async signIn() {
-    await this.auth.signIn(this.userName.value.trim(), this.password.value);
+    let success = await this.auth.signIn(this.userName.value.trim(), this.password.value);
+    this.args.out.connected = success;
     this.close();
   }
 

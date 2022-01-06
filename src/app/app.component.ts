@@ -23,12 +23,13 @@ export class AppComponent implements OnInit {
   isMultiBrnachEnabled = true;
 
   @DataControl<AppComponent, Branch>({
+    cssClass: 'branch',
     valueChange: async (r, v) => {
       console.log('CurrentStateComponent.valueChange')
       await r.switchBranch();
     }
   })
-  @Field({ caption: terms.branch })
+  @Field({ caption: 'סניף לתצוגה' })
   branch: Branch = undefined!;
 
   constructor(
@@ -44,12 +45,28 @@ export class AppComponent implements OnInit {
   terms = terms;
   get $() { return getFields(this, this.remult) };
 
+  usersCount = 0;
+  async ngOnInit() {
+    // this.usersCount = await this.remult.repo(Users).count();
+    if (this.auth.isConnected) {
+      this.setMultiBranches();
+    }
+  }
+
   isVolunteer() {
     return this.remult.user.roles.length == 1 && this.remult.isAllowed(Roles.volunteer);
   }
 
+  isBoard() {
+    return this.remult.isAllowed(Roles.board);
+  }
+
   async switchBranch() {
-    this.dialogService.info('מחליף סניף');
+    if (this.branch && this.branch.id.length > 0) {
+      this.remult.user.bid = this.branch.id;
+      window?.location?.reload();
+      this.dialogService.info('סניף הוחלף בהצלחה');
+    }
   }
 
   showBizTechoff() {
@@ -62,37 +79,29 @@ export class AppComponent implements OnInit {
 
   forgotPassword = false;
   async signIn() {
-    await openDialog(UserLoginComponent);
-
-
-    // // here the login succefull, otherwise it's were throw before.
-    // if (this.remult.user.roles.length === 1 && this.remult.user.roles.includes(Roles.volunteer)) {
-    //   console.log('sending verification sms');
-    // }
-
-    // let changes = await openDialog(UserLoginComponent);
-    //   _ => _.args = { bid: this.activity.bid, entityId: this.activity.id },
-    //   _ => _ ? _.args.changed : false);
-    // if (changes) {
-    //   // await this.refresh();
-    // } 
-    // let user = new InputField<string>({ caption: terms.username });
-    // let password = new PasswordControl();
-    // openDialog(InputAreaComponent, i => i.args = {
-    //   title: terms.signIn,
-    //   fields: () => [
-    //     user,
-    //     password
-    //   ],
-    //   ok: async () => {
-    //     this.auth.signIn(user.value, password.value);
-    //   }
-    // });
+    this.isMultiBrnachEnabled = false;
+    let connected = await openDialog(UserLoginComponent,
+      _ => { },
+      _ => _ ? _.args.out.connected : false
+    );
+    if (connected) {
+      this.setMultiBranches();
+    }
   }
 
-  usersCount = 0;
-  async ngOnInit() {
-    // this.usersCount = await this.remult.repo(Users).count();
+  setMultiBranches() {
+    console.log(JSON.stringify(this.remult.user))
+    console.log('bid2', this.remult.user.bid2)
+    this.isMultiBrnachEnabled = false;
+    if (this.isVolunteer()) {
+      let multi = this.remult.user.bid2 && this.remult.user.bid2.length > 0;
+      if (multi) {
+        this.isMultiBrnachEnabled = true;
+      }
+    }
+    else if (this.isBoard()) {
+      this.isMultiBrnachEnabled = true;
+    }
   }
 
   getUserBrnachDesc() {

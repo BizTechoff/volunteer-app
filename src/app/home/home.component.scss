@@ -135,10 +135,12 @@ header:after {
 
 
 #media-viewer {
-    border-image: url(../../assets/image-viewer-border.webp) no-repeat center 100%;
+    // border-image: url(../../assets/image-viewer-border.webp) no-repeat center 100%;
+    background-color: $componentBackgroun;
 }
 
 #media-viewer img {
+    background-color: $componentBackgroun;
     // background-color: red;
     position: absolute;
     margin: 2%;
@@ -150,12 +152,12 @@ header:after {
     border-radius: 10%;
 }
 
-.top-right {
+.middle-left {
     position: absolute;
     padding-top: 5%;
     padding-left: 5%;
-    // color: green;
-    text-shadow: green;
+    color: white;
+    // text-shadow: green;
     text-align: left;
     top: 65%;
     left: 0;
@@ -166,6 +168,44 @@ header:after {
     background-color: transparent;
     z-index: 1;
   }
+
+  .top-left {
+      position: absolute;
+      padding-top: 5%;
+      padding-left: 5%;
+      color: white;
+      // text-shadow: green;
+      text-align: right;
+      top: 0;
+      left: 0;
+      width: 90%;
+      // height: 33%;
+      // border-style: double;
+      // border-radius: 20%;
+      background-color: transparent;
+      z-index: 1;
+    }
+
+    .top-middle {
+        position: absolute;
+        padding-top: 5%;
+        padding-left: 5%;
+        color: white;
+        // text-shadow: green;
+        text-align: center;
+        text-decoration: double;
+        font-size: medium;
+        font-weight: bolder;
+        font-style: oblique;
+        top: 0;
+        left: 50%;
+        width: auto;
+        // height: 33%;
+        // border-style: double;
+        // border-radius: 20%;
+        background-color: transparent;
+        z-index: 1;
+      }
 
 #selling-points {
     margin-top: 60px;

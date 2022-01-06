@@ -1,9 +1,8 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Entity, Field, IdEntity, Remult } from "remult";
+import { Entity, Field, Remult } from "remult";
 import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
-import { Roles } from "../../users/roles";
 import { EntityWithModified } from "../EntityWithModified";
 
 
@@ -38,22 +37,27 @@ import { EntityWithModified } from "../EntityWithModified";
     allowApiDelete: false,
     allowApiInsert: false,
     allowApiUpdate: true,
-    allowApiRead: c => c.authenticated(),
+    allowApiRead: c => true,
     // allowApiInsert: Roles.admin,
     // allowApiDelete: Roles.admin,
     // allowApiUpdate: Roles.admin,
     // allowApiRead: Allow.authenticated
     defaultOrderBy: { name: "asc" }
-},
+}, 
     (options, remult) => {
+        // options.apiPrefilter = () => (
+        //     { id: remult.branchAllowedForUser() }
+        // )
+        // { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         // options.apiPrefilter = () => {
         //     return {
         //         id: remult.branchAllowedForUser()
         //     }
         // }
-        options.apiPrefilter = async () => ({
-            id: !remult.isAllowed(Roles.board) ? remult.user.bid : undefined
-        })
+        // options.apiPrefilter = async () => ({
+        //     id: remult.branchAllowedForUser()
+        //     // id: !remult.isAllowed(Roles.board) ? remult.user.bid : undefined
+        // })
     }
 )
 export class Branch extends EntityWithModified {
@@ -78,7 +82,7 @@ export class Branch extends EntityWithModified {
             options.serverExpression = async branch => {
                 return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
             };
-        } 
+        }
         else {
             options.sqlExpression = () => "( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )";
         }

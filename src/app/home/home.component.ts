@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BusyService, openDialog } from '@remult/angular';
 import { Remult } from 'remult';
-import { interval } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { DialogService } from '../common/dialog';
 import { Photo } from '../core/photo/photo';
 import { terms } from '../terms';
@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit {
   constructor(public remult: Remult, private dialog: DialogService, private busy: BusyService) { }
   terms = terms;
 
+  timer: Subscription = undefined!;
   currentPhoto = { id: '', link: '', name: '', created: new Date() };
   photos = [] as { id: string, link: string, name: string, created: Date }[];
   // timer = undefined!;
@@ -28,9 +29,14 @@ export class HomeComponent implements OnInit {
     await openDialog(UserLoginComponent);
   }
 
+  setTitle(){
+    terms.home = 'שלום ' +  this.remult.user.name;
+  }
+
+  tries = 5;
   async nextPhoto() {
     let next: Photo = undefined!
-    if (this.photos.length < 30) {
+    if (this.photos.length < 30 && this.tries > 0) {
       next = await this.busy.donotWait(async () => await this.remult.repo(Photo)
         .findFirst({
           id: { $ne: this.photos.map(itm => itm.id) },
@@ -38,14 +44,22 @@ export class HomeComponent implements OnInit {
         }));
     }
     if (next) {
-      this.currentPhoto = { id: next.id, link: next.link, name: next.createdBy.name, created: next.created };
-      this.photos.push(this.currentPhoto);
+      let f = this.photos.find(p => p.id === next.id);
+      if (f) {
+        --this.tries;
+        this.currentPhoto = f;
+      }
+      else {
+        this.tries = 5;
+        this.currentPhoto = { id: next.id, link: next.link, name: next.createdBy.name, created: next.created };
+        this.photos.push(this.currentPhoto);
+      }
     }
     else if (this.photos.length > 0) {
       let i = this.getRandoxIndex();
       this.currentPhoto = this.photos[i];
     }
-    console.log(JSON.stringify(this.currentPhoto));
+    // console.log(JSON.stringify(this.currentPhoto));
   }
 
   getRandoxIndex() {
@@ -57,7 +71,7 @@ export class HomeComponent implements OnInit {
 
   async ngOnInit() {
     await this.nextPhoto();
-    interval(3000)
+    this.timer = interval(3000)
       .subscribe(async (val) => { await this.nextPhoto(); });
     // // this.u = 
     // const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -66,5 +80,13 @@ export class HomeComponent implements OnInit {
     //   .then(async () => this.dialog.info(terms.reminder4FoodDelivery, 2300))
     //   .catch(err => console.debug(err));
   }
+
+  ngOnDestroy() {
+    if (this.timer) {
+      this.timer.unsubscribe();
+      this.timer = undefined!;
+    }
+  }
+  
 }
 

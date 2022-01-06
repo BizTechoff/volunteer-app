@@ -1,25 +1,17 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Marble</title>
-    <!-- <link href="style.css" rel="stylesheet" type="text/css"> -->
-    <meta name="viewport" content="width=device-width">
-    <script>
-        // Picture element HTML5 shiv
-        document.createElement("picture");
-    </script>
-    <script src="https://cdn.rawgit.com/scottjehl/picturefill/master/dist/picturefill.min.js" async></script>
-</head>
-
-<body>
-
-    <header>
-        <div class="wrapper">
-            <div class="logo">
-                <img class="rotating-image" [src]="this.logo">
-            </div>
-            <!-- <nav>
+<div class="header">
+    
+    <div *ngIf="this.remult.authenticated()" class="top-middle">
+        <h3>{{ 'שלום ' + this.remult.user.name }}</h3>
+        <span>{{ this.setTitle() }}</span>
+        <!-- {{ terms }}
+        <h3>{{ 'שלום ' + this.remult.user.name }}</h3> -->
+        <!-- <h1> {{ this.currentPhoto.name.split(' ')[0] }} <span> ({{ this.currentPhoto.created | date:'dd.MM.YYYY HH:mm' }}) </span> </h1> -->
+    </div>
+    <div class="wrapper">
+        <div class="logo">
+            <img class="rotating-image" [src]="this.logo">
+        </div>`
+        <!-- <nav>
                     <h2>Main Navigation</h2>
                     <div id="burger-nav"></div>
                     <ul>
@@ -31,39 +23,41 @@
                         <li><a href="">Contact</a></li>
                     </ul>
                 </nav> -->
-        </div>
-    </header>
+    </div>
+</div>
 
-    <div id="main-banner">
-        <picture>
-            <!-- <source [srcset]="this.currentPhoto.link" alt="banner">
+<!-- ציור ברקע העליון -->
+<div id="main-banner">
+    <picture>
+        <!-- <source [srcset]="this.currentPhoto.link" alt="banner">
                 <source srcset="../../assets/banner-s.jpg" media="(max-width: 480px)">
                 <source srcset="../../assets/banner-m.jpg" media="(max-width: 768px)"> -->
-            <img srcset="../../assets/volunteer.app.background.png" alt="banner">
-        </picture>
-    </div>
+        <img srcset="../../assets/volunteer.app.background.png" alt="banner">
+    </picture>
+</div>
 
+<!-- תמונות בחלק התחתון -->
+<div style="background-color: rgb(207, 240, 157);">
     <div *ngIf="this.currentPhoto.link.length == 0" id="quote">
         <h1>הפעילויות איתך נותנות להם חיות</h1>
         <!-- <blockquote><h1>הפעילויות איתך נותנות להם חיות</h1></blockquote> -->
     </div>
 
     <div *ngIf="this.currentPhoto.link.length > 0" id="media-viewer">
-        <div class="top-right">
+        <div class="middle-left">
             <h3>{{ this.currentPhoto.created | date:'dd.MM.YYYY HH:mm' }}</h3>
-           <!-- <h1> {{ this.currentPhoto.name.split(' ')[0] }} <span> ({{ this.currentPhoto.created | date:'dd.MM.YYYY HH:mm' }}) </span> </h1> -->
+            <!-- <h1> {{ this.currentPhoto.name.split(' ')[0] }} <span> ({{ this.currentPhoto.created | date:'dd.MM.YYYY HH:mm' }}) </span> </h1> -->
         </div>
         <picture>
             <img [srcset]="this.currentPhoto.link" alt="viewer">
         </picture>
     </div>
-    <!-- </div> -->
-</body>
+</div>
+<!-- </div> -->
 
-<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-<script src="menu.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<script src="menu.js"></script> -->
 
-</html>
 <!--         
         <main class="wrapper">
         

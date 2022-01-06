@@ -2,11 +2,11 @@ import { IdFilter, Remult } from 'remult';
 import { Roles } from './users/roles';
 
 export const terms = {
-    fromDate:'מתאריך',
-    toDate:'עד תאריך',
-    sendWelcomeSms:'שלח מסרון התחברות',
-    smsSuccefullySent:'מסרון נשלח בהצלחה',
-    smsFailSent:'שליחת מסרון נכשלה',
+    fromDate: 'מתאריך',
+    toDate: 'עד תאריך',
+    sendWelcomeSms: 'שלח מסרון התחברות',
+    smsSuccefullySent: 'מסרון נשלח בהצלחה',
+    smsFailSent: 'שליחת מסרון נכשלה',
     reminder4FoodDelivery: 'תזכורת לסמן אם מסרת את האוכל',
     validationCodeExpired: 'תוקף הקוד פג, יש לשלוח שוב קוד חדש',
     verificationCodeSendFailed: 'שליחת קוד אימות נכשלה',
@@ -149,7 +149,7 @@ export const terms = {
     name: 'שם',
     type: 'סוג',
     title: 'כותרת ראשית',
-    tenant: 'דייר', 
+    tenant: 'דייר',
     branch: 'סניף',
     branch2: 'סניף נוסף',
     subTitle: 'כותרת משנית',
@@ -211,9 +211,10 @@ export const terms = {
 
 declare module 'remult' {
     export interface UserInfo {
-        bid: string; 
-        // bid2: string;
+        bid: string;
         bname: string;
+        bid2: string;
+        b2name: string;
     }
     export interface Remult {
         branchAllowedForUser(): IdFilter<import('./core/branch/branch').Branch>
@@ -223,6 +224,6 @@ export function augmentRemult(remult: Remult) {
     remult.branchAllowedForUser = () => {
         if (remult.isAllowed(Roles.board))
             return undefined!;
-        return { $id: [remult.user.bid] };//, remult.user.bid2] };
+        return { $id: [remult.user.bid, remult.user.bid2] };
     }
 }
