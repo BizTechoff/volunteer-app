@@ -15,8 +15,9 @@ export class CalendarComponent implements OnInit {
 
   iframe = document.getElementById('calendar') as HTMLIFrameElement;
   SelectedCalendarFrame = '';
-  @DataControl<CalendarComponent>({
+  @DataControl<CalendarComponent, Branch>({
     valueChange: async (r, v) => {
+      console.debug('CalendarComponent.valueChange')
       // console.log('branchv.alueChanged');
       // console.log('v.value',v.value);
       // console.log('r.branch?.id',r.branch?.id);
@@ -50,8 +51,9 @@ export class CalendarComponent implements OnInit {
 
     return true;
   }
-
+ 
   async refresh() {
+    console.log('CalendarComponent.refresh')
     // console.log('from refresh');
     window?.location?.reload();
     // let t = this.branch;

@@ -1,10 +1,10 @@
 <div style="height:100%;display:flex;flex-direction: column;">
   <mat-toolbar color="primary" style="flex-shrink: 0; background-image: linear-gradient(90deg, #F69A48, #2CBCC1)">
     <!-- <mat-toolbar color="primary" style="flex-shrink: 0;"> -->
-    <button mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
+    <button *ngIf="this.remult.authenticated()" mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
-    </button> 
-    <span class="toolbar-title">{{currentTitle()}}</span>
+    </button>
+    <span class="toolbar-title"> {{currentTitle()}}</span>
     <ng-container *ngIf="!remult.authenticated()">
       <!-- <button *ngIf="usersCount === 0" mat-flat-button color="primary" (click)="signUp()">{{terms.signUp}}</button> -->
       <button mat-flat-button color="primary" (click)="signIn()">{{terms.signIn}}</button>
@@ -25,8 +25,12 @@
       <span class="toolbar-title">{{ 'ב"ה, כ"ה חשון ה` אלפים תשפ"ב' }}</span>
     </ng-container> -->
   </mat-toolbar>
+  <div style="background-color: rgb(207, 240, 157);">
+    <data-control *ngIf="this.remult.authenticated()&&this.isMultiBrnachEnabled" style="width: 100%;" [field]="this.$.branch!"></data-control> 
+  </div> 
   <mat-sidenav-container class="app-sidenav-container">
-    <mat-sidenav #sidenav class="app-sidenav mat-elevation-z10 no-print" [opened]="!dialogService.isScreenSmall()"
+    <!-- !dialogService.isScreenSmall() -->
+    <mat-sidenav #sidenav class="app-sidenav mat-elevation-z10 no-print" [opened]="false"
       [mode]="dialogService.isScreenSmall()?'over':'side'">
       <div style="display:flex; justify-content: center; margin-top: 2%;">
         <!-- <a href="https://www.eshel.org.il/" target="_blank"> -->
@@ -47,7 +51,7 @@
       </div>
       <h4 style="margin-right: 4px;" *ngIf="remult.authenticated()">{{terms.hello}} {{remult.user.name}}</h4>
       <mat-nav-list role="list">
-        
+
         <ng-container *ngFor="let m of router.config">
 
           <mat-divider *ngIf="shouldDisplayRoute(m) && terms.dailyActivityReport === m.path"></mat-divider>
@@ -75,7 +79,8 @@
 
   </mat-sidenav-container>
   <div class="footer" style="font-size: smaller;">
-    <div style="display:flex;flex-direction: row;justify-content: flex-end; cursor: pointer;" (click)="showBizTechoff()">
+    <div style="display:flex;flex-direction: row;justify-content: flex-end; cursor: pointer;"
+      (click)="showBizTechoff()">
       {{ this.terms.appDesc + ' v' + this.terms.appVersion }}
       <div>{{ '::BizTechoff ' }}</div>
     </div>

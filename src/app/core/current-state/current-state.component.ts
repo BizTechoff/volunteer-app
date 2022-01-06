@@ -204,6 +204,8 @@ export class CurrentStateComponent implements OnInit {
 
   @DataControl<CurrentStateComponent, Branch>({
     valueChange: async (r, v) => {
+      
+    console.log('CurrentStateComponent.valueChange')
       // console.log('branchv.alueChanged');
       // console.log('v.value', v.value);
       // console.log('r.branch?.id', r.branch?.id);

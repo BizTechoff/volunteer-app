@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute, Route, Router } from '@angular/router';
-import { openDialog, RouteHelperService } from '@remult/angular';
-import { Remult } from 'remult';
+import { DataControl, openDialog, RouteHelperService } from '@remult/angular';
+import { Field, getFields, Remult } from 'remult';
 import { AuthService } from './auth.service';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
+import { Branch } from './core/branch/branch';
 import { Tenant } from './core/tenant/tenant';
 import { terms } from './terms';
 import { Roles } from './users/roles';
@@ -19,6 +20,16 @@ import { PasswordControl, Users } from './users/users';
 })
 export class AppComponent implements OnInit {
 
+  isMultiBrnachEnabled = true;
+
+  @DataControl<AppComponent, Branch>({
+    valueChange: async (r, v) => {
+      console.log('CurrentStateComponent.valueChange')
+      await r.switchBranch();
+    }
+  })
+  @Field({ caption: terms.branch })
+  branch: Branch = undefined!;
 
   constructor(
     public router: Router,
@@ -31,17 +42,22 @@ export class AppComponent implements OnInit {
 
   }
   terms = terms;
+  get $() { return getFields(this, this.remult) };
 
   isVolunteer() {
     return this.remult.user.roles.length == 1 && this.remult.isAllowed(Roles.volunteer);
   }
- 
+
+  async switchBranch() {
+    this.dialogService.info('מחליף סניף');
+  }
+
   showBizTechoff() {
     window.open('https://biztechoff.co.il', '_blank');
   }
 
-  routeHome(){
-    window.location.href = encodeURI( "/ברוכים הבאים")
+  routeHome() {
+    window.location.href = encodeURI("/ברוכים הבאים")
   }
 
   forgotPassword = false;

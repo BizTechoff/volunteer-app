@@ -8,7 +8,6 @@ import { pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, S
 //import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 //import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
-import { EntityWithModified } from "../core/EntityWithModified";
 import { CommaSeparatedStringArrayField, Tenant } from "../core/tenant/tenant";
 import { terms } from "../terms";
 import { Roles } from './roles';
@@ -207,10 +206,11 @@ export class Users extends IdEntity {
         });
         return result;
     }
- 
+
     @Field({
+        includeInApi: Allow.authenticated,
         caption: terms.branch,
-        allowNull: true//remove-it
+        allowNull: true//remove-it,
     })
     bid?: Branch;
 
@@ -285,7 +285,7 @@ export class Users extends IdEntity {
     @Field({ caption: terms.age })
     age: number = 0;
 
-    @Field(options => options.valueType = Tenant, { caption: terms.tenant })
+    @Field(options => options.valueType = Tenant, { caption: terms.tenant, includeInApi: Allow.authenticated })
     defTid!: Tenant;
 
     // @DataControl<Users, number>({
@@ -316,7 +316,7 @@ export class Users extends IdEntity {
     @Field({
         allowApiUpdate: false
     })
-    modifiedBy: string  = '';
+    modifiedBy: string = '';
 
     @Field({
         allowApiUpdate: Roles.admin,

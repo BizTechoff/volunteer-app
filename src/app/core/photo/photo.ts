@@ -43,7 +43,7 @@ export class ActiveStatus {
     })
 export class Photo extends IdEntity {
 
-    @Field({ caption: terms.branch, includeInApi: Allow.authenticated, lazy: true })
+    @Field({ caption: terms.branch, includeInApi: Allow.authenticated })
     bid!: Branch;
 
     @Field({ caption: terms.entityId })
@@ -51,7 +51,7 @@ export class Photo extends IdEntity {
 
     @Field({ caption: terms.public })
     public: boolean = true;
-
+ 
     @Field({ caption: terms.status })
     status: ActiveStatus = ActiveStatus.on;
 
