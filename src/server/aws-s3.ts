@@ -1,4 +1,5 @@
 import * as aws from 'aws-sdk';
+import { isDevMode } from '.';
 // const randomBytes = promisify(crypto.randomBytes)
 //https://www.youtube.com/watch?v=yGYeYJpRWPM&ab_channel=SamMeech-Ward
 export async function generateUploadURL(fName: string, branch: string) {
@@ -21,7 +22,7 @@ export async function generateUploadURL(fName: string, branch: string) {
 
         const params = ({
             Bucket: bucketName,
-            Key: branch + "/" + fName,
+            Key: (isDevMode() ? 'dev/' : '') + branch + "/" + fName,
             Expires: 60 //sec
         })
 

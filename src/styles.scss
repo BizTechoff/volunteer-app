@@ -22,6 +22,12 @@ body {
 }
 
 .image-container {
+    overflow:auto;
+    // height: 250px;
+    // flex-grow: 1;
+    // scroll
+    // flex-shrink: 0;
+    // overflow-y: auto;
     display: flex;
     flex-direction: column;
     // flex-wrap: wrap;
@@ -31,6 +37,20 @@ body {
 .image {
     padding: 5%;
     width: 90%;
+    // max-width: 20%;
+    max-height: 80%;
+    // min-height: 20%;
+    // min-width: 20%;
+    // max-width: 400px;
+    border: solid;
+    // align-content: center;
+    // margin-bottom: 11px;
+    border-radius: 15px;
+    border-width: thin;
+}
+.image-act {
+    padding: 5%;
+    width: 80%;
     // max-width: 20%;
     max-height: 80%;
     // min-height: 20%;

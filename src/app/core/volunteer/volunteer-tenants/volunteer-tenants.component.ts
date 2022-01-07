@@ -4,6 +4,7 @@ import { Remult } from 'remult';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
+import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
 
 @Component({
@@ -59,6 +60,15 @@ export class VolunteerTenantsComponent implements OnInit {
       this.userMessage = terms.volunteerNoTenants;
     }
   }
+
+  async openPhotosAlbum(t: Tenant) {
+    let changes = await openDialog(PhotosAlbumComponent,
+      _ => _.args = { bid: t.bid, aid: '', tid: t.id },
+      _ => _ ? _.args.changed : false);
+    if (changes) {
+      // await this.refresh();
+    }
+  } 
 
   getLang(a: Tenant) {
     let result = 'לא צויינו';

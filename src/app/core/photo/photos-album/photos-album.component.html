@@ -1,19 +1,19 @@
 <div class="full-page">
     <div class="header"></div>
-    <div class="ng-container">
+    <div class="grow-item">
+        <button *ngIf="this.isAllowEdit()" title='{{ this.terms.uploadPhoto }}' mat-button>
+            <label for="uploadImage" style="display: flex; align-items: center;">
+                <mat-icon>add</mat-icon>
+                <mat-icon>photo_camera</mat-icon>
+            </label>
+        </button>
+        <input multiple excludeAcceptAllOption=true #fileInput type="file" (input)="onFileInput($event)"
+            accept="audio/mp3,video/mp4,video/avi,image/png,image/jpg,image/jpeg" id="uploadImage"
+            style="display:none" />
+
         <div>
-            <button *ngIf="this.isAllowEdit()" title='{{ this.terms.uploadPhoto }}' mat-button>
-                <label for="uploadImage" style="display: flex; align-items: center;">
-                    <mat-icon>add</mat-icon>
-                    <mat-icon>photo_camera</mat-icon>
-                </label>
-            </button> 
-            <input #fileInput type="file" (input)="onFileInput($event)" accept="audio/mp3,video/mp4,image/*" id="uploadImage"
-                style="display:none" />
-        </div>
-        <div class="image-container">
-            <ng-container *ngFor='let img of this.photos'>
-                <div class="image">
+            <div *ngFor='let img of this.photos'>
+                <div class="image-act">
                     <button [title]='this.terms.removeImage' mat-flat-button (click)="this.removePhoto(img)">
                         <mat-icon>close</mat-icon>
                     </button>
@@ -21,21 +21,21 @@
                         <video width="100%" controls>
                             <source [src]="img.link + '#t=1'">
                             Your browser does not support the video tag.
-                          </video>
+                        </video>
                     </div>
-                    
+
                     <div *ngIf="img.type.includes('audio')">
                         <audio width="100%" controls>
                             <source [src]="img.link">
                             Your browser does not support the audio tag.
-                          </audio>
+                        </audio>
                     </div>
-                    
+
                     <div *ngIf="!(img.type.includes('video') || img.type.includes('audio'))">
                         <img [src]='img.link' width="100%">
                     </div>
                 </div>
-            </ng-container>
+            </div>
         </div>
         <div *ngIf="this.photos.length == 0">
             <h2> {{ terms.noPhotosOfYoursTogether }} </h2>

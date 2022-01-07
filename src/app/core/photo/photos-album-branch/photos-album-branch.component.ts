@@ -8,7 +8,7 @@ import { Photo } from '../photo';
   selector: 'app-photos-album-branch',
   templateUrl: './photos-album-branch.component.html',
   styleUrls: ['./photos-album-branch.component.scss']
-}) 
+})
 export class PhotosAlbumBranchComponent implements OnInit {
 
   photos: PhotoDetails[] = [] as PhotoDetails[];
@@ -27,9 +27,18 @@ export class PhotosAlbumBranchComponent implements OnInit {
     this.photos = await PhotosAlbumBranchComponent.retrievePhotos();
   }
 
+  async prevPage() {
+    if (this.page > 1) {
+      --this.page;
+      this.photos = await PhotosAlbumBranchComponent.retrievePhotos(this.page);
+    }
+  }
+
   async nextPage() {
-    ++this.page;
-    this.photos = await PhotosAlbumBranchComponent.retrievePhotos(this.page);
+    if (this.photos.length > 0) {
+      ++this.page;
+      this.photos = await PhotosAlbumBranchComponent.retrievePhotos(this.page);
+    }
   }
 
   setSelectedImage(add: number) {
@@ -58,8 +67,8 @@ export class PhotosAlbumBranchComponent implements OnInit {
                 this.selectedImage = this.photos[i + add];//+-=-
               }
             }
-            else{
-                this.selectedImage = this.photos[i + add];//+-=-
+            else {
+              this.selectedImage = this.photos[i + add];//+-=-
             }
           }
         }
@@ -93,12 +102,12 @@ export class PhotosAlbumBranchComponent implements OnInit {
         result.push({
           vname: p.createdBy?.name,
           created: p.created,
-          type: p.type, 
+          type: p.type,
           link: p.link,
           bname: p.bid?.name
         });
       });
     }
-    return result; 
+    return result;
   }
 }

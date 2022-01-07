@@ -1,13 +1,12 @@
 <div class="full-page">
     <div *ngIf="!this.showViewer" class="header" style="margin: 5px;">
-        <!-- <div>
-            <video width="320" height="240" controls>
-                <source src="https://eshel-app.s3.eu-central-1.amazonaws.com/bbb_sunflower_1080p_60fps_normal.mp4#t=1" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-        </div> -->
-        <div style="display: flex; flex-direction: row">
+        <div style="display: flex; flex-direction: row;">
             <div style="display: flex; flex-direction: row; justify-content: flex-start;">
+                <button mat-mini-fab (click)="this.prevPage()">
+                    <mat-icon>navigate_next</mat-icon>
+                </button>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: center;">
                 <button mat-mini-fab (click)="this.refresh()">
                     <mat-icon>refresh</mat-icon>
                 </button>

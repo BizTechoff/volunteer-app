@@ -314,7 +314,7 @@ export class ActivityDetailsComponent implements OnInit {
 
   async openPhotosAlbum() {
     let changes = await openDialog(PhotosAlbumComponent,
-      _ => _.args = { bid: this.activity.bid, entityId: this.activity.id },
+      _ => _.args = { bid: this.activity.bid, aid: this.activity.id, tid: '' },
       _ => _ ? _.args.changed : false);
     if (changes) {
       // await this.refresh();

@@ -1,5 +1,7 @@
 <div class="full-page">
-    <div class="header"></div>
+    <div class="header">
+        <h3 *ngIf="this.tenants && this.tenants.items.length > 0" style="text-align: center;">לחיצה על הפלוס (+) מוסיפה לך פעילות חדשה עם הדייר</h3>
+    </div>
     <div class="grow-item">
         <div style="display: flex; flex-direction: column; justify-content: center;">
             <h1 *ngIf="this.tenants && this.tenants.items.length == 0"> {{ this.userMessage }} </h1>
@@ -8,14 +10,18 @@
                     <mat-card-title>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
                             <div style="display: flex; flex-direction: row; justify-content: start;">
- 
+                                <!-- <div style="display: flex; flex-direction: row; justify-content: flex-start;">
+                                    <button mat-mini-fab (click)="this.refresh()">
+                                        <mat-icon>refresh</mat-icon>
+                                    </button>
+                                </div> -->
                                 <button mat-mini-fab color="accent"
                                     [title]="terms.addActivity" (click)="openActivity(a)">
                                     <mat-icon>add</mat-icon>
                                 </button>
                                <p style="margin-top: 10px; margin-right: 5px;"> {{ a.name }} </p>
                             </div>
-                            <!-- <div style="display: flex; flex-direction: row; justify-content: end;">
+                            <div style="display: flex; flex-direction: row; justify-content: end;">
                                 <button mat-mini-fab color="primary" [title]="a.mobile!"
                                     (click)="this.call(a.mobile!)">
                                     <mat-icon>call</mat-icon>
@@ -24,11 +30,11 @@
                                     [title]='a.address' (click)="this.openWaze(a.address!)">
                                     <img src="./assets/waze.svg">
                                 </button>
-                                <button style="margin-right: 10px;" mat-mini-fab color="primary"
+                                <!-- <button style="margin-right: 10px;" mat-mini-fab color="primary"
                                     [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
                                     <mat-icon>photo</mat-icon>
-                                </button>
-                            </div> -->
+                                </button> -->
+                            </div>
                         </div>
                     </mat-card-title>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
@@ -38,18 +44,6 @@
                             </div>
                             <div>
                                 שפות: {{ this.getLang(a) }}
-                            </div>
-                        </div>
-
-                        <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;">
-                            <div>
-                                <!-- <mat-icon inline="true">call</mat-icon> -->
-                                <span style="color: blue;" (click)="this.call(a.mobile!)"><u> {{ a.mobile }} </u></span>
-                                <!-- <button style="color: blue;" mat-flat-button (click)="this.call(a.mobile!)"><u> {{ a.mobile }} </u></button> -->
-                            </div>
-                            <div>
-                                <!-- <img src="./assets/waze.svg" inline="true"> -->
-                                <span style="color: blue;" (click)="this.openWaze(a.address!)"><u> {{ a.address }} </u></span>
                             </div>
                         </div>
                     </div>

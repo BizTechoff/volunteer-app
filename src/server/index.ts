@@ -17,28 +17,31 @@ import '../app/common/types';
 import { augmentRemult } from '../app/terms';
 import './aws-s3';
 import { generateUploadURL } from './aws-s3';
-import { downloadPhotos } from './download-photos';
 import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
+ 
+export function isDevMode() {
+    let result = false;
+    let db = process.env.DATABASE_URL;
+    if (db) {
+        let i = db.indexOf('@localhost');
+        if (i > 0) {
+            result = true;
+        }
+    }
+    return result;
+}
 
 async function startup() {
     config(); //loads the configuration from the .env file
 
     let enviroment = 'NO enviroment'.toUpperCase();
-    let isDev = true;
-    let db = process.env.DATABASE_URL;
-    if (db) {
-        let i = db.indexOf('@localhost');
-        if (i > 0) {
-            isDev = true;
-            enviroment = 'DEV';
-        }
-        else {
-            isDev = false;
-            enviroment = 'PROD PROD PROD PROD PROD PROD PROD';
-        }
+    let isDev = isDevMode();
+    enviroment = 'PROD PROD PROD PROD PROD PROD PROD';
+    if (isDev) {
+        enviroment = 'DEV';
     }
 
     let app = express();
