@@ -31,7 +31,7 @@
     </ng-container> -->
   </mat-toolbar>
   <div color="primary" style="background-image: linear-gradient(90deg, #2CBCC1, #F69A48)">
-    <data-control *ngIf="this.remult.authenticated()&&this.isMultiBrnachEnabled" style="width: 100%; color: white;" [field]="this.$.branch!"></data-control> 
+    <data-control [field]="this.$.branch!" *ngIf="this.remult.authenticated()&&this.isMultiBrnachEnabled" style="width: 100%; color: white;"></data-control> 
   </div> 
   <mat-sidenav-container class="app-sidenav-container">
     <!-- !dialogService.isScreenSmall() -->
@@ -44,12 +44,12 @@
       </div>
       <div style="width:100%;text-align: center">
         <div *ngIf="this.remult.authenticated() && !this.isVolunteer()" style="margin-right: 10px; color: blue;">
-          <a target="_blank" href="https://eshel-app.s3.eu-central-1.amazonaws.com/eshel/eshel.app.manager.guide.mp4">
+          <a target="_blank" href="https://eshel-app.s3.eu-central-1.amazonaws.com/guide/eshel.app.manager.guide.mp4">
             <h3>הסבר תפעול לשליח</h3>
           </a>
         </div>
         <div *ngIf="this.remult.authenticated() && this.isVolunteer()" style="margin-right: 10px; color: blue;">
-          <a target="_blank" href="https://eshel-app.s3.eu-central-1.amazonaws.com/eshel/eshel.app.volunteer.guide.mp4">
+          <a target="_blank" href="https://eshel-app.s3.eu-central-1.amazonaws.com/guide/eshel.app.volunteer.guide.mp4">
             <h3>הסבר תפעול למתנדב</h3>
           </a>
         </div>

@@ -89,6 +89,12 @@ export class VolunteerTenantsComponent implements OnInit {
   }
 
   async openActivity(tnt: Tenant) {
+
+    // where: {
+      //   status:  [ActivityStatus.openStatuses()],
+      //   date: { '<': today }
+      // },
+
     let changes = await openDialog(ActivityDetailsComponent,
       _ => _.args = { bid: tnt.bid, tid: tnt },
       _ => _ ? _.args.changed : false);

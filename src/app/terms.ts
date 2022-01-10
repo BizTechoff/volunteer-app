@@ -19,6 +19,7 @@ export const terms = {
     pleaseEnterVerificationCode: 'ברגעים אלה נשלח מסרון לסלולרי שלך המכיל קוד אימות, יש להזין אותו כאן',
     verificationCode: 'קוד אימות',
     foodDelivered: 'מסרתי לדייר את האוכל לשבת',
+    foodCount: 'מנות',
     pointsExplain: 'הסבר צבירת נקודות',
     youGotMorePoint: 'צברת !points! נקודות נוספות, סה"כ צברת עד כה: !sum! נקודות',
     youMustEnterPurposes: 'לפני סגירת הפעילות יש לציין את המטרות שנמצאו',

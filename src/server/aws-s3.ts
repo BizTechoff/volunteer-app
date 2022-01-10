@@ -22,7 +22,7 @@ export async function generateUploadURL(fName: string, branch: string) {
 
         const params = ({
             Bucket: bucketName,
-            Key: (isDevMode() ? 'dev/' : '') + branch + "/" + fName,
+            Key: (isDevMode() ? 'dev/' : 'prod/') + branch + "/" + fName,
             Expires: 60 //sec
         })
 

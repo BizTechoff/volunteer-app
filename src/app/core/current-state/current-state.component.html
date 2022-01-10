@@ -4,6 +4,7 @@
             <button mat-mini-fab color='primary' (click)='this.refresh()'>
                 <mat-icon>refresh</mat-icon>
             </button>
+            <!-- valueChnaged NOT fired! -->
             <data-control *ngIf="this.isBoard()" style="width: 100%;" [field]="this.$.branch!"></data-control>
         </div>
     </div>

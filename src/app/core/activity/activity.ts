@@ -279,6 +279,14 @@ export class ActivityGeneralStatus {
     constructor(public id: number, public caption: string, public statuses: ActivityStatus[]) { }
 }
 
+@ValueListFieldType()
+export class FoodDeliveredCount {
+    static one = new FoodDeliveredCount(1, 'מנה 1');
+    // static inProgress = new ActivityGeneralStatus(2, 'בתהליך', ActivityStatus.inProgressStatuses());
+    static two = new FoodDeliveredCount(2, '2 מנות');
+    constructor(public id: number, public caption: string) { }
+}
+
 @Entity<Activity>('activities',
     {
         allowApiInsert: Allow.authenticated,
@@ -290,10 +298,10 @@ export class ActivityGeneralStatus {
     (options, remult) => {
         options.apiPrefilter = () => {
             // if (isBackend()) {
-                // console.log('remult.branchAllowedForUser()', remult.branchAllowedForUser());
-                return {
-                    bid: remult.branchAllowedForUser()
-                }
+            // console.log('remult.branchAllowedForUser()', remult.branchAllowedForUser());
+            return {
+                bid: remult.branchAllowedForUser()
+            }
             // }
             // else return undefined!;
         };
@@ -360,6 +368,10 @@ export class Activity extends IdEntity {
 
     @Field({ caption: terms.foodDelivered })
     foodDelivered = false;
+
+    // @DataControl<Activity>({readonly: this.foodDelivered })
+    @Field({ caption: terms.foodCount })
+    foodCount:FoodDeliveredCount = FoodDeliveredCount.one;
 
     isBoard() {
         return this.remult.isAllowed(Roles.board) ? true : false;

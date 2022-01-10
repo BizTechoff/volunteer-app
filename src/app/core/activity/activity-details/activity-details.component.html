@@ -10,7 +10,7 @@
                 </div>
                 <div style="display: flex; flex-direction: row; justify-content: end;">
                     <button *ngIf="this.activity && !this.activity.isNew()" mat-flat-button color="primary"
-                        style="height: 35px; margin-left: 5px;" (click)='openPhotosAlbum()'>
+                        style="height: 35px; margin-right: 5px;" (click)='openPhotosAlbum()'>
                         <!-- {{ terms.saveAndClose }} -->
                         <mat-icon>photo_camera</mat-icon>
                     </button>
@@ -24,13 +24,11 @@
             </div>
         </div>
 
-        <div *ngIf="this.isShowDeliveredFoodToShabat()"
+        <div [@shakeit] [@.disabled]="!this.didntCheckedFoodDelivery()" *ngIf="this.isShowDeliveredFoodToShabat()"
             style="display: flex; flex-direction: row; justify-content: end;">
-            <!-- <data-control [field]="this.activity.$.foodDelivered"></data-control> -->
-            <!-- <mat-label>מסרתי לדייר את האוכל לשבת</mat-label>
-            <input type="checkbox" [(ngModel)]="this.activity.$.foodDelivered"> -->
-            <mat-checkbox [@shakeit] [@.disabled]="!this.didntCheckedFoodDelivery()"
-                [(ngModel)]="this.activity.foodDelivered">מסרתי לדייר את האוכל לשבת</mat-checkbox>
+            <mat-checkbox style="padding-top: 12px;" [(ngModel)]="this.activity.foodDelivered">מסרתי לדייר</mat-checkbox>
+            <data-control [field]="this.activity.$.foodCount"></data-control>
+            <span style="padding-top: 14px;">אוכל לשבת</span>
         </div>
         <data-area [settings]='this.top'></data-area>
 

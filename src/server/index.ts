@@ -21,7 +21,7 @@ import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
- 
+  
 export function isDevMode() {
     let result = false;
     let db = process.env.DATABASE_URL;
