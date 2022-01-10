@@ -25,7 +25,7 @@ import { UsersComponent } from './users/users.component';
 
 const defaultRoute = terms.home;
 const routes: Routes = [ 
-  { path: 'demo', component: OfflineReadComponent, canActivate: [NotAuthenticatedGuard] },
+  { path: 'demo', component: OfflineReadComponent, canActivate: [AdminGuard] },
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
   { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerGuard] },
   { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerGuard] },
