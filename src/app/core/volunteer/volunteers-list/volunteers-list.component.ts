@@ -156,7 +156,8 @@ export class VolunteersListComponent implements OnInit {
         disableClose: u.isNew(),
         title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? '(לקריאה בלבד)' : ''),
         fields: () => [
-          { field: u!.$.bid, visible: (r, v) => this.remult.isAllowed(Roles.board) },
+          { field: u!.$.bid, visible: (r, v) => this.isBoard() }, 
+          { field: u!.$.branch2, visible: (r, v) => this.isBoard() && u!.hasBranch2() },
           { field: u!.$.name, caption: terms.name },
           u!.$.mobile,
           u!.$.email,

@@ -27,6 +27,9 @@ export const StringRequiredValidation = (_: any, col: FieldRef<any, string>) => 
     let ok = col.value && col.value.trim().length > 0 ? true : false;
     if (!ok!)
         col.error = terms.requiredField;
+
+        // col.dbTo = 0501234567;
+        // col.dbFrom = 050-1234-567
 }
 
 export const TimeRequireValidator = (_: any, col: FieldRef<any, string>) => {

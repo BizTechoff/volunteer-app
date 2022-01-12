@@ -130,9 +130,24 @@ export class Tenant extends EntityWithModified {
     })
     mobile: string = '';
 
+    @Field({
+        caption: terms.phone
+        // validate: [StringRequiredValidation, Validators.unique]
+    })
+    phone: string = '';
+
     @Field({ caption: terms.address, validate: StringRequiredValidation })
     address: string = '';
 
+    @Field({ caption: terms.addressRemark })
+    addressRemark: string = '';
+
+    @Field({ caption: terms.apartment })
+    apartment: string = '';
+
+    @Field({ caption: terms.floor })
+    floor: string = '';
+    
     @DataControl<Tenant, Langs[]>({
         hideDataOnInput: true,
         clickIcon: 'search',
@@ -152,7 +167,7 @@ export class Tenant extends EntityWithModified {
     @DataControl<Tenant, Date>({
         valueChange: (r, _) => { r.calcAge(); }
     })
-    @DateOnlyField({ caption: terms.birthday, validate: DateRequiredValidation })
+    @DateOnlyField({ caption: terms.birthday })//
     birthday!: Date;
 
     @DataControl<Tenant, number>({

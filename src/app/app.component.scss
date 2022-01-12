@@ -1,5 +1,6 @@
 
 $componentBackgroun: rgb(207, 240, 157);
+$appTheme: linear-gradient(180deg, #2CBCC1, #F69A48);
 
 .active-route{
     background-color: #f2f2f2;
@@ -47,7 +48,8 @@ $componentBackgroun: rgb(207, 240, 157);
     flex-direction: column;
 }
 .app-sidenav{
-    background-color: $componentBackgroun;
+    // background-image: $appTheme;
+    // background-color: $componentBackgroun;
     width:240px;
 }
 .wrapper{

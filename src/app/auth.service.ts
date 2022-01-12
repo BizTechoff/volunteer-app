@@ -117,16 +117,19 @@ export class AuthService {
     }
     setAuthToken(token: string) {
         this.remult.setUser(new JwtHelperService().decodeToken(token));
-        sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+        // sessionStorage.setItem(AUTH_TOKEN_KEY, token);
         this.isConnected = true;
     }
     static fromStorage(): string {
-        return sessionStorage.getItem(AUTH_TOKEN_KEY)!;
+        return localStorage.getItem(AUTH_TOKEN_KEY)!;
+        // return sessionStorage.getItem(AUTH_TOKEN_KEY)!;
     }
 
     signOut() {
         this.remult.setUser(undefined!);
-        sessionStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        // sessionStorage.removeItem(AUTH_TOKEN_KEY);
     }
 }
 

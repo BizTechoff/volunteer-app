@@ -10,6 +10,7 @@ export class Referrer {
     static welfare = new Referrer(1, 'רווחה');
     static municipality = new Referrer(2, 'עירייה');
     static tenant = new Referrer(3, 'דייר אחר');
+    static neighbor = new Referrer(4, 'שכנה');
     constructor(public id: number, public caption: string) { }
 
     static getOptions() {

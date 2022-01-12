@@ -19,6 +19,7 @@ export class Langs {
     static english = new Langs(2, 'אנגלית');
     static russian = new Langs(3, 'רוסית');
     static french = new Langs(4, 'צרפתית');
+    static ukrainian = new Langs(5, 'אוקראינית');
     constructor(public id: number, public caption: string) { }
 
     static getOptions() {
@@ -33,6 +34,20 @@ export class Langs {
         let options = Langs.getOptions();
         split.forEach(l => {
             let found = options.find(_ => _.id === parseInt(l));
+            if (found) {
+                result.push(found);
+            }
+        });
+        return result;
+    }
+    static fromStringByCaption(str: string) {
+        // console.log(str);
+        let split = str.toString().split(',');
+        // console.log(split);
+        let result = [] as Langs[];
+        let options = Langs.getOptions();
+        split.forEach(l => {
+            let found = options.find(_ => _.caption === l.trim());
             if (found) {
                 result.push(found);
             }
@@ -212,24 +227,25 @@ export class Users extends IdEntity {
         caption: terms.branch,
         allowNull: true//remove-it,
     })
-    bid?: Branch;
+    bid?: Branch = undefined;
 
     @Field({
-        caption: terms.branch
+        caption: terms.branch2
     })
-    branch2?: Branch;
+    branch2?: Branch = undefined;
 
     @Field({
         caption: terms.username,
         validate: [
-            StringRequiredValidation,
-            (e, c) => {
-                if (isBackend())
-                    Validators.unique(e, c)
-            }]
+            StringRequiredValidation//,
+            // (e, c) => {
+            //     if (isBackend())
+            //         Validators.unique(e, c)
+            // }
+         ]
     })
     name: string = '';
-
+ 
     // @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
     // numOfActivities: number = 0;
 
@@ -250,8 +266,8 @@ export class Users extends IdEntity {
     langs: Langs[] = [Langs.hebrew];
 
     @Field({
-        validate: [StringRequiredValidation, Validators.unique],
-        caption: terms.mobile
+        validate: [StringRequiredValidation, Validators.uniqueOnBackend],
+        caption: terms.mobile,
     })
     mobile: string = '';
 
@@ -375,9 +391,19 @@ export class Users extends IdEntity {
 
     hasValidBranch() {
         let result = true;
-        if (!this.board && this.volunteer) {
-            result &&= this.bid && this.bid.id && this.bid.id.length > 0 ? true : false;
+        if (!this.board && this.volunteer) {//=manager&volunteer
+            result &&= this.hasBranch();
         }
+        return result;
+    }
+
+    hasBranch() {
+        let result = this.bid && this.bid.id && this.bid.id.length > 0 ? true : false;
+        return result;
+    }
+
+    hasBranch2() {
+        let result = this.branch2 && this.branch2.id && this.branch2.id.length > 0 ? true : false;
         return result;
     }
     async hashAndSetPassword(password: string) {
