@@ -90,8 +90,8 @@ export class AppComponent implements OnInit {
   }
 
   setMultiBranches() {
-    console.log(JSON.stringify(this.remult.user))
-    console.log('bid2', this.remult.user.bid2)
+    // console.log(JSON.stringify(this.remult.user))
+    // console.log('bid2', this.remult.user.bid2)
     this.isMultiBrnachEnabled = false;
     if (this.isVolunteer()) {
       let multi = this.remult.user.bid2 && this.remult.user.bid2.length > 0;

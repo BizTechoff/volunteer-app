@@ -103,7 +103,7 @@ export class ActivityDetailsComponent implements OnInit {
     if (this.isShowDeliveredFoodToShabat() && this.didntCheckedFoodDelivery()) {
 
       const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
- 
+
       wait(100)
         .then(async () => this.dialog.info(terms.reminder4FoodDelivery, 2300))
         .catch(err => console.debug(err));
@@ -216,15 +216,15 @@ export class ActivityDetailsComponent implements OnInit {
     }
     this.top = new DataAreaSettings({
       fields: () => {
-        let f:DataAreaFieldsSetting<Activity>[] = [];
+        let f: DataAreaFieldsSetting<Activity>[] = [];
         // if(this.isShowDeliveredFoodToShabat()){
         //   f.push(this.activity.$.foodDelivered);
         // }
         if (this.isBoard()) {
-          f.push({field: this.activity.$.bid, readonly: this.activity.status.isClosed()});
+          f.push({ field: this.activity.$.bid, readonly: this.activity.status.isClosed(), valueChange: (r, c) => { console.log('bid changed') } });
         }
         if (this.isManager()) {
-          f.push({field: this.activity.$.status, readonly: this.activity.status.isClosed()});
+          f.push({ field: this.activity.$.status, readonly: this.activity.status.isClosed() });
         }
         return f;
       }
@@ -241,30 +241,36 @@ export class ActivityDetailsComponent implements OnInit {
           click: async () => await this.openAssignment()
         },//, displayValue: () => {return this.activity.$.vids && this.activity.$.vids.value ? this.activity.$.vids.value.map(i => i.name).join(', ').trim() : '';} },
         // { field: this.activity.$.volids, clickIcon: 'search', click: async () => await this.openAssignment() },
-        { field: this.activity.$.date, readonly: this.activity.status.isClosed()},
-        [{ field: this.activity.$.fh, readonly: this.activity.status.isClosed()}, 
-          { field: this.activity.$.th, readonly: this.activity.status.isClosed()}],
-        { field: this.activity.$.purposes, readonly: this.activity.status.isClosed()},
-        { field: this.activity.$.purposeDesc, readonly: this.activity.status.isClosed()},
-        { field: this.activity.$.remark, readonly: this.activity.status.isClosed()}
+        { field: this.activity.$.date, readonly: this.activity.status.isClosed() },
+        [{ field: this.activity.$.fh, readonly: this.activity.status.isClosed() },
+        { field: this.activity.$.th, readonly: this.activity.status.isClosed() }],
+        { field: this.activity.$.purposes, readonly: this.activity.status.isClosed() },
+        { field: this.activity.$.purposeDesc, readonly: this.activity.status.isClosed() },
+        { field: this.activity.$.remark, readonly: this.activity.status.isClosed() }
       ]
-    }); 
+    });
   }
 
   async openTenants() {
-    await openDialog(SelectTenantComponent, x => x.args = {
-      bid: this.activity.bid,
-      onSelect: t => {
-        if (!this.activity.tid || this.activity.tid.id !== t.id) {
-          this.activity.tid = t;
-          this.activity.vids.splice(0);
-          this.addCurrentUserToVids();
-        }
-        // console.log(9);
-      },
-      title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
-      tenantLangs: []
-    });
+    let bidOk = (this.activity.bid && this.activity.bid.id && this.activity.bid.id.length > 0)!;
+    if (bidOk) {
+      await openDialog(SelectTenantComponent, x => x.args = {
+        bid: this.activity.bid,
+        onSelect: t => {
+          if (!this.activity.tid || this.activity.tid.id !== t.id) {
+            this.activity.tid = t;
+            this.activity.vids.splice(0);
+            this.addCurrentUserToVids();
+          }
+          // console.log(9);
+        },
+        title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+        tenantLangs: []
+      });
+    }
+    else {
+      await this.dialog.error(terms.mustSetBidForSetTenant);
+    }
   }
 
   async openAssignment() {
@@ -308,7 +314,7 @@ export class ActivityDetailsComponent implements OnInit {
       }
     }
     else {
-      await this.dialog.error(terms.mustSetBidForThisAction);
+      await this.dialog.error(terms.mustSetBidForSetVolunteers);
     }
   }
 

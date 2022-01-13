@@ -41,7 +41,7 @@ export class SelectTenantComponent implements OnInit {
         // t.langs.isIn([this.langs])
         active: true,
         defVids: this.isManager() ? undefined : { $contains: this.remult.user.id },//@@@@@@@@@@@2
-        bid: this.isBoard() ? undefined : this.args.bid,
+        bid: this.args.bid,// this.isBoard() ? undefined : this.args.bid,
         name: this.searchString ? { $contains: this.searchString } : undefined
       }
     });

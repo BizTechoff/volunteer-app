@@ -86,3 +86,42 @@ export const EmailValidator = (_: any, col: FieldRef<any, string>) => {
     if (!ok!)
         col.error = message;
 }
+
+export const mobileFromDb = (mobile: string) => {
+    let result = '';// [0]00-0000-000
+    if (mobile && mobile.length > 0) {
+        let last = mobile.length - 3;
+        if (last > 0) {
+            result = mobile.substring(0, last) + '-' + mobile.substring(last);
+
+            let first = result.length - 7 - 1;//'-'
+            if (first > 0) {
+                result = result.substring(0, first) + '-' + result.substring(first);
+            }
+        }
+    }
+    return result;
+}
+
+export const mobileToDb = (mobile: string) => {
+    let result = '';// [0]000000000
+    if (mobile && mobile.length > 0) {
+        let digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        for (const c of mobile) {
+            if (digits.includes(c)) {
+                result += c;
+            }
+        }
+    }
+    if (result.length > 0) {
+        result = result.padStart(10, '0');
+        if (!result.startsWith('05')) {
+            if (!result.startsWith('000')) {
+                if (result.startsWith('00')) {
+                    result = result.substring(1);//02,03,..
+                }
+            }
+        }
+    }
+    return result;
+}

@@ -22,7 +22,7 @@ export class TenantsListComponent implements OnInit {
 
   // @DataControl<TenantsListComponent>({ valueChange: async (r) => await r.refresh() })
   @DataControl<TenantsListComponent>({
-    valueChange: async (r) =>  await r.refresh()
+    valueChange: async (r) => await r.refresh()
     // {
     //   if (!r.refreshing) {
     //     if (r.timer) {
@@ -63,6 +63,7 @@ export class TenantsListComponent implements OnInit {
           t.address,
           t.mobile,
           t.referrer,
+          // t.referrerRemark,
           t.birthday
           // t.email
         );
@@ -176,7 +177,7 @@ export class TenantsListComponent implements OnInit {
       }
     }
     else {
-      await this.dialog.error(terms.mustSetBidForThisAction);
+      await this.dialog.error(terms.mustSetBidForSetVolunteers);
     }
   }
 
@@ -251,10 +252,11 @@ export class TenantsListComponent implements OnInit {
             f.push(t.$.bid);
           }
           f.push(
-            t.$.referrer,
+            [{ field: t.$.referrer, width: '88' }, t.$.referrerRemark],
             t.$.name,
-            t.$.mobile,
+            [t.$.mobile, t.$.phone],
             t.$.address,
+            [t.$.addressRemark, { field: t.$.apartment, width: '50' }, { field: t.$.floor, width: '50' }],
             [t.$.birthday,
             t.$.age],
             t.$.langs,

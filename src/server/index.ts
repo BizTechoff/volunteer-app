@@ -58,7 +58,7 @@ async function startup() {
         initRequest: async (remult) => augmentRemult(remult)
     });
     app.use(api);
-
+ 
     app.get("/api/s3Url", async (req, res) => {//?key=[key]&f=[fname]
         let result: { url: string, error: string } = { url: '', error: '' };
         // console.log('s3Url CALLED !');

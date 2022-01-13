@@ -1,7 +1,7 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
-import { DateRequiredValidation, StringRequiredValidation } from "../../common/globals";
+import { mobileFromDb, mobileToDb, StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
 import { SelectTenantComponent } from "../../common/select-tenant/select-tenant.component";
 import { UserIdName } from "../../common/types";
@@ -18,6 +18,7 @@ export class Referrer {
     static welfare = new Referrer(1, 'רווחה');
     static municipality = new Referrer(2, 'עירייה');
     static tenant = new Referrer(3, 'דייר אחר');
+    static neighbor = new Referrer(4, 'שכנה');
     constructor(public id: number, public caption: string) { }
 
     static getOptions() {
@@ -118,15 +119,22 @@ export class Tenant extends EntityWithModified {
     @Field({ caption: terms.referrer, validate: Validators.required.withMessage(terms.requiredField) })
     referrer: Referrer = Referrer.welfare;
 
+    @Field({ caption: terms.referrerRemark })
+    referrerRemark: string = '';
+
     @Field({
         caption: terms.name,
         validate: StringRequiredValidation
     })
     name: string = '';
-
+  
     @Field({
         caption: terms.mobile,
-        validate: [StringRequiredValidation, Validators.unique]
+        validate: [StringRequiredValidation, Validators.unique]//,052-3333333 BUG
+        // valueConverter: {
+        //     fromDb: col => mobileFromDb(mobileToDb(col)),
+        //     toDb: col => mobileToDb(col)
+        // }
     })
     mobile: string = '';
 
@@ -147,7 +155,7 @@ export class Tenant extends EntityWithModified {
 
     @Field({ caption: terms.floor })
     floor: string = '';
-    
+
     @DataControl<Tenant, Langs[]>({
         hideDataOnInput: true,
         clickIcon: 'search',
@@ -185,8 +193,6 @@ export class Tenant extends EntityWithModified {
     })
     @CommaSeparatedStringArrayFieldUsersAsString<Tenant>({ caption: terms.associatedVolunteers })
     defVids: UserIdName[] = [] as UserIdName[];
-
-
 
     calcAge() {
         let result = 0;
