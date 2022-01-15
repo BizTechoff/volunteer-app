@@ -82,7 +82,11 @@ export class ActivityDailyComponent implements OnInit {
     this.fromDate = new Date(
       this.fromDate.getFullYear(),
       this.fromDate.getMonth(),
-      this.fromDate.getDate() - 7);
+      this.fromDate.getDate() - this.fromDate.getDay());
+    this.toDate = new Date(
+      this.toDate.getFullYear(),
+      this.toDate.getMonth(),
+      this.fromDate.getDate() + 7 - 1);
     await this.refresh();
   }
 
@@ -122,6 +126,34 @@ export class ActivityDailyComponent implements OnInit {
       result.push(a);
     }
     return result;
+  }
+
+  async prevWeek() {
+    this.fromDate = new Date(// יום 1 = 0
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() - this.fromDate.getDay() - 7);
+    this.toDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() + 6);
+    await this.refresh();
+  }
+  async nextWeek() {
+    this.fromDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() - this.fromDate.getDay() + 7);
+    this.toDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() + 6);
+    await this.refresh();
+  }
+
+  getDayOfWeek(d:Date){
+    let days = ['א','ב','ג','ד','ה','ו','ז']
+    return days[d.getDay()]
   }
 
 }

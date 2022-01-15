@@ -34,25 +34,43 @@ export interface tenantVolunteersInfo {
     tenant: string,
     volunteers: string
 }
- 
+
 let folder = `D:\\documents\\אשל ירושלים\\הסבה\\`;
 let branches = [] as string[];
-// branches.push('זכרון יעקב');//****
-// branches.push('אשקלון');//****
-// branches.push('חולון');//**** 
-// branches.push('חדרה');
-// branches.push('קריית אונו');
-// branches.push('קריית גת');//****
-// branches.push('נס ציונה');
-// branches.push('חיפה');
-// branches.push('יבנה');//**** חסר סלולרי
-// branches.push('אשקלון');//****
-// branches.push('עומר');//****
+// branches.push('אשקלון');
+// branches.push('זכרון יעקב');
+// branches.push('חולון');
+// branches.push('חיפה'); 
 // branches.push('ירושלים');
-// branches.push('נתניה');//****
+// branches.push('נס ציונה');
+// branches.push('קריית אונו');
 // branches.push('ראשון לציון');
-// branches.push('');
- 
+// branches.push('דימונה');
+// branches.push('חדרה');
+// branches.push('יבנה');
+// branches.push('נתניה');
+// branches.push('עומר');
+// branches.push('קריית גת');
+// -------------------------------
+// -------------------------------
+
+// נסים בוארון | 0584877770
+// branches.push('דימונה');//***
+// אלי לוין | 0
+// branches.push('חדרה');
+// אין | 0
+// branches.push('יבנה');
+// שניאור לנדא | 0527703130
+// branches.push('נתניה');//****
+// יודי פלמן | 0542006801
+// branches.push('עומר');//**** 
+// יוראי ברימט | 0528443544 
+// branches.push('קריית גת');//****
+// -------------------------------
+// branches.push('לוד');// אין קובץ
+// מנדי טורקוב | 0584577012 
+// branches.push('טבריה');// סלולרים נראים כמו ת.ז
+   
 let saveToDb = false;
 
 let vMobileCounter = 117;

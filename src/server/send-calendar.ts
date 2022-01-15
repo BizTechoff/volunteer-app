@@ -7,6 +7,15 @@ import { CalendarClient, DateRequest, IcsRequest } from '../app/common/types';
 import { NotificationService } from '../app/common/utils';
 
 function getEnvKeyFor(email: string) {
+    let branches = [] as { key: string, val: string }[]
+    branches.push({ key: 'haifa', val: 'CALENDAR_HAIFA' })
+    branches.push({ key: 'hulon', val: 'CALENDAR_HULON' })
+    branches.push({ key: 'ness.tziyona', val: 'CALENDAR_NESS_TZIYONA' })
+    branches.push({ key: 'kiryat.ono', val: 'CALENDAR_KIRYAT_ONO' })
+    branches.push({ key: '', val: '' })
+    let key = email
+    let val = 'CALENDAR_' + email.replace('.', '_').toUpperCase()
+
     if (email.includes('haifa')) {
         return 'CALENDAR_HAIFA'
     }
@@ -21,18 +30,18 @@ function getEnvKeyFor(email: string) {
     }
     return '';
 }
-
+       // if (!envKey || envKey.length == 0) {
+        //     console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
+        //     return false;
+        // }
+ 
 NotificationService.sendCalendar = async (sender: string, req: IcsRequest) => {
-    console.debug(`sendCalendar: ${JSON.stringify(req)}`);
-    
+    console.debug(`sendCalendar: { sender: ${sender}, req: ${JSON.stringify(req)} }`);
+
     if (process.env.CALENDAR_CHANNEL_OPENED === 'true') {
         const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
 
-        let envKey = getEnvKeyFor(sender);
-        if (!envKey || envKey.length == 0) {
-            console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
-            return false;
-        }
+        let envKey = 'CALENDAR_' + sender.replace('.', '_').toUpperCase() // getEnvKeyFor(sender);
         let envBranch = process.env[envKey];
         if (!envBranch) {
             console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
@@ -110,7 +119,7 @@ NotificationService.sendCalendar = async (sender: string, req: IcsRequest) => {
         return true;
     }
     else {
-        console.debug('send-calendar.error: Calendar Cahnnel is Closed!!');
+        console.debug('send-calendar.error: Calendar Channel is Closed!!');
         return false;
     }
 }

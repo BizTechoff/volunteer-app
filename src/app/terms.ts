@@ -168,7 +168,7 @@ export const terms = {
     reports: 'דוחות',
     branches: 'סניפים',
     photoAlbum: 'אלבום תמונות',
-    dailyActivityReport: 'דוח פעילות יומי',
+    dailyActivityReport: 'דוח פעילות שבועי',
     volunteers: 'מתנדבים',
     email: 'דוא"ל',
     color: 'צבע',

@@ -94,7 +94,7 @@ export class Langs {
 //     //         usersLangs: f.value.langs
 //     //     })
 //     // }
-// }) 
+// })
 @DataControl<any, Users>({
     hideDataOnInput: true,
     clickIcon: 'search',
