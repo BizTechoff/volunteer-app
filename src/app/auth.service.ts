@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { openDialog } from '@remult/angular';
 import * as jwt from 'jsonwebtoken';
-import { BackendMethod, Remult, UserInfo } from 'remult';
-import { useVolunteerLoginWithVerificationCode } from './common/globals';
+import { Allow, BackendMethod, Remult, UserInfo } from 'remult';
+import { mobileToDb, useVolunteerLoginWithVerificationCode } from './common/globals';
 import { augmentRemult, terms } from './terms';
 import { Roles } from './users/roles';
 import { UserVerificationComponent } from './users/user-verification/user-verification.component';
@@ -27,12 +27,13 @@ export class AuthService {
         }
     }
 
-    async signIn(username: string, password: string) {
+    async signIn(mobile: string ){ //, password: string) {
         this.isConnected = false;
-        let ui: UserInfo = await AuthService.signIn(username, password);
-        if (useVolunteerLoginWithVerificationCode) {
-            if (ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)) {
-                let mobile = await AuthService.getUserMobile(ui.id);
+        mobile = mobileToDb(mobile)
+        let ui: UserInfo = await AuthService.signIn(mobile);//, password);
+        // if (useVolunteerLoginWithVerificationCode) {
+            // if (ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)) {
+                // let mobile = await AuthService.getUserMobile(ui.id);
                 // apply sms-mobile verification.
                 let verified = await openDialog(UserVerificationComponent,
                     _ => _.args = { in: { uid: ui.id, mobile: mobile } },
@@ -40,8 +41,8 @@ export class AuthService {
                 if (!verified!) {
                     return false;
                 }
-            }
-        }
+            // }
+        // }
         this.setAuthToken(await AuthService.setToken(ui));
         return true;
     }
@@ -60,9 +61,14 @@ export class AuthService {
         }
         return result;
     }
+    @BackendMethod({allowed:Allow.authenticated})
+    static async switchBranch(newBranchId:string,remult?:Remult){
+        remult!.user.bid = newBranchId;//maybe check if it's a valid branch for the user
+        return jwt.sign(remult!.user, getJwtTokenSignKey())
+    }
 
     @BackendMethod({ allowed: true })
-    static async signIn(user: string, password: string, remult?: Remult) {
+    static async signIn(mobile: string, remult?: Remult) {//, password: string
         //which user is here? probably kind of a system user
         
         // let u: Users = null!;
@@ -83,9 +89,9 @@ export class AuthService {
         // // let u = await remult!.repo(Users).query({ where: { name: user } });
         // // console.log('signIn', 3);
 
-        let u = await remult!.repo(Users).findFirst({ name: user });
+        let u = await remult!.repo(Users).findFirst({ mobile: mobile });
         if (u) {
-            if (await u.passwordMatches(password)) {
+          //  if (await u.passwordMatches(password)) {
                 let result: UserInfo = {
                     id: u.id,
                     roles: [], 
@@ -111,7 +117,7 @@ export class AuthService {
                     result.roles.push(Roles.volunteer);
                 }
                 return (result);
-            }
+           // }
         }
         throw new Error(terms.invalidSignIn);
     }
