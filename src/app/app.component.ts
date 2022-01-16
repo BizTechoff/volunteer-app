@@ -172,7 +172,7 @@ export class AppComponent implements OnInit {
           throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
         }
         await user.create(password.value);
-        this.auth.signIn(user.name, password.value);
+        this.auth.signIn(user.mobile);//, password.value);
 
       }
     });

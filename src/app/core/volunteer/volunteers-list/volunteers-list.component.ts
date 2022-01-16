@@ -68,6 +68,11 @@ export class VolunteersListComponent implements OnInit {
         }
       ],
       rowButtons: [
+        // {
+        //   textInMenu: terms.volunteerTenants,
+        //   icon: 'tanant',
+        //   click: async (u) => await this.volunteerTenants(u.id)
+        // },
         {
           textInMenu: terms.volunteerDetails,
           icon: 'edit',

@@ -1,5 +1,5 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Entity, Field, Remult } from "remult";
+import { Entity, Field, FieldRef, Remult } from "remult";
 import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
@@ -7,31 +7,11 @@ import { EntityWithModified } from "../EntityWithModified";
 
 
 
-@DataControl<any, Branch>({
+@DataControl<any, Branch | undefined>({
     hideDataOnInput: true,
     clickIcon: 'search',
     getValue: (_, f) => f.value?.name,
-    click: async (_, f) => {
-        await openDialog(SelectBranchComponent, x => x.args = {
-            onClear: () => {
-                if (f.value) {
-                    f.value = undefined!;
-                    // if (f.valueChanged) {
-                    //     f.valueChanged();
-                    // }
-                }
-            },
-            onSelect: b => {
-                if (!f.value || f.value.id !== b.id) {
-                    f.value = b;
-                    // if (f.valueChanged) {
-                    //     f.valueChanged();
-                    // }
-                }
-            },
-            title: f.metadata.caption
-        })
-    }
+    click: Branch.selectBranch()
 })
 @Entity<Branch>('branches', {
     allowApiDelete: false,
@@ -43,7 +23,7 @@ import { EntityWithModified } from "../EntityWithModified";
     // allowApiUpdate: Roles.admin,
     // allowApiRead: Allow.authenticated
     defaultOrderBy: { name: "asc" }
-}, 
+},
     (options, remult) => {
         // options.apiPrefilter = () => (
         //     { id: remult.branchAllowedForUser() }
@@ -126,6 +106,24 @@ export class Branch extends EntityWithModified {
         // console.log('isBranch', name, result);
 
         return result;
+    }
+    static selectBranch<containerType = any>(change?: (e: containerType) => void) {
+        return (container: containerType, f: FieldRef<any, Branch | undefined>) => {
+            console.log('click');
+            openDialog(SelectBranchComponent, x => x.args = {
+                onSelect: b => {
+                    console.log('select');
+                    if (f.value != b) {
+                        f.value = b;
+                        if (change) {
+                            console.log('change');
+                            change(container);
+                        }
+                    }
+                },
+                title: f.metadata.caption
+            })
+        }
     }
 
 }

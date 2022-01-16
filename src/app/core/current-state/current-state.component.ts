@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl } from '@remult/angular';
+import { async } from '@angular/core/testing';
+import { DataControl, openDialog } from '@remult/angular';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { BackendMethod, Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
+import { SelectBranchComponent } from '../../common/select-branch/select-branch.component';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
@@ -202,15 +204,10 @@ export class CurrentStateComponent implements OnInit {
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   maxLabelLength = 0;
 
-  @DataControl<CurrentStateComponent, Branch>({
-    valueChange: async (r, v) => {
-      
-    console.log('CurrentStateComponent.valueChange')
-      // console.log('branchv.alueChanged');
-      // console.log('v.value', v.value);
-      // console.log('r.branch?.id', r.branch?.id);
-      await r.refresh();
-    }
+  @DataControl<CurrentStateComponent, Branch | undefined>({
+    click:  Branch.selectBranch<CurrentStateComponent>(r => r.refresh())
+    
+
   })
   @Field({ caption: terms.branch })
   branch: Branch = undefined!;
@@ -236,7 +233,8 @@ export class CurrentStateComponent implements OnInit {
 
   isRefreshing = false;
   async refresh() {
-    if (!this.isRefreshing) {
+    console.log('refresh')
+    // if (!this.isRefreshing) {
       this.isRefreshing = true;
       var options = { hour12: false };
       // console.log(date.toLocaleString('en-US', options));
@@ -245,7 +243,7 @@ export class CurrentStateComponent implements OnInit {
         this.branch?.id);
       this.isRefreshing = false;
       this.setChart();
-    }
+    // }
   }
 
   @BackendMethod({ allowed: rml => rml.authenticated() })

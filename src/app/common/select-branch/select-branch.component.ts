@@ -20,8 +20,7 @@ export class SelectBranchComponent implements OnInit {
   ]
   args!: {
     title?: string,
-    onClear: () => void,
-    onSelect: (b: Branch) => void
+    onSelect: (b?: Branch) => void
   }
   constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
   branches: Branch[] = [];
@@ -52,7 +51,7 @@ export class SelectBranchComponent implements OnInit {
     return this.remult.isAllowed(Roles.board);
   }
   async clear() {
-    this.args.onClear();
+    this.args.onSelect(undefined!);
   }
   async create() {
     let t = this.remult.repo(Branch).create();

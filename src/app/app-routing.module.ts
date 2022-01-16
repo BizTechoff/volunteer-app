@@ -39,7 +39,7 @@ const routes: Routes = [
   { path: terms.photoAlbum, component: PhotosAlbumBranchComponent, canActivate: [VolunteerGuard] },
   { path: terms.branches, component: BranchesListComponent, canActivate: [AdminGuard] },
   { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
-  { path: '**', redirectTo: '/' + defaultRoute, pathMatch: 'full' }
+  { path: '**', redirectTo: '/' + defaultRoute }
 
 ]; 
 

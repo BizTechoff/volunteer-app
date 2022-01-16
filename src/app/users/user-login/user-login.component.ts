@@ -15,14 +15,14 @@ import { PasswordControl } from '../users';
 export class UserLoginComponent implements OnInit {
 
   args: { out: { connected?: boolean, error?: string } } = { out: { connected: false, error: '' } }
-  userName = new InputField<string>({ caption: terms.username });
-  password = new PasswordControl();
-  area = new DataAreaSettings({
-    fields: () => [
-      this.userName,
-      this.password
-    ]
-  });
+  mobile = new InputField<string>({ caption: terms.mobile });
+  // password = new PasswordControl();
+  // area = new DataAreaSettings({
+  //   fields: () => [
+  //     this.mobile//,
+  //     // this.password
+  //   ]
+  // });
 
   constructor(private remult: Remult, private auth: AuthService, private dialog: DialogService, private win: MatDialogRef<any>) { }
   terms = terms;
@@ -31,7 +31,7 @@ export class UserLoginComponent implements OnInit {
   }
 
   async signIn() {
-    let success = await this.auth.signIn(this.userName.value.trim(), this.password.value);
+    let success = await this.auth.signIn(this.mobile.value.trim());//, this.password.value);
     this.args.out.connected = success;
     this.close();
   }
