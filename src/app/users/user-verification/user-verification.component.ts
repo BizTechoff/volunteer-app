@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BusyService } from '@remult/angular';
-import { BackendMethod, Field, getFields, Remult } from 'remult';
+import { Field, getFields, Remult } from 'remult';
+import { AuthService } from '../../auth.service';
 import { DialogService } from '../../common/dialog';
-import { validVerificationCodeResponseMinutes } from '../../common/globals';
-import { NotificationService } from '../../common/utils';
 import { terms } from '../../terms';
 
 @Component({
@@ -15,16 +14,19 @@ import { terms } from '../../terms';
 export class UserVerificationComponent implements OnInit {
 
   args: {
-    in: { uid: string, mobile: string },
+    in: { mobile: string },
     out?: { verified: boolean }
-  } = { in: { uid: '', mobile: '' }, out: { verified: false } };
+  } = { in: { mobile: '' }, out: { verified: false } };
 
   @Field({ caption: terms.verificationCode })
   code!: number;
-  sent!: Date;
-  randomCode!: number;
 
-  constructor(private remult: Remult, private busy: BusyService, private dialog: DialogService, private win: MatDialogRef<any>) {
+  constructor(
+    private remult: Remult,
+    private auth: AuthService,
+    private busy: BusyService,
+    private dialog: DialogService,
+    private win: MatDialogRef<any>) {
     win.disableClose = true;
   }
   terms = terms;
@@ -32,7 +34,7 @@ export class UserVerificationComponent implements OnInit {
 
   async ngOnInit() {
     if (!this.args) {
-      this.args = { in: { uid: '', mobile: '' }, out: { verified: false } };
+      this.args = { in: { mobile: '' }, out: { verified: false } };
     }
     if (!this.args.out) {
       this.args.out = { verified: false };
@@ -48,66 +50,27 @@ export class UserVerificationComponent implements OnInit {
         .catch(err => console.debug(err)));
   }
 
-  generateVerificationCode() {
-    let min = 700000;
-    let max = 999999
-    let rnd = Math.floor(Math.random() * (max - min) + min);
-    return rnd;
-  }
-
   async sendVerificationCode() {
-    this.randomCode = this.generateVerificationCode();
-    let sent = await NotificationService.SendSms(
-      {
-        uid: this.args.in.uid,
-        mobile: this.args.in.mobile,
-        message: terms.notificationVerificationCodeMessage
-          .replace('!code!', this.randomCode.toString())
-      });
-    if (sent) {
-      this.sent = new Date();
+    let response = await this.auth.sendVerifyCode(this.args.in.mobile)
+    if (response.success) {
       this.dialog.info(terms.verificationCodeSuccesfullySent);
     }
     else {
-      this.dialog.info(terms.verificationCodeSendFailed);
+      this.dialog.info(`${terms.verificationCodeSendFailed}: ${response.error}`);
     }
   }
 
   async signIn() {
-    if (await UserVerificationComponent.isAdminCode(this.code)) {
+    let success = await this.auth.signIn(
+      this.args.in.mobile,
+      this.code.toString());
+    if (success) {
       this.args.out!.verified = true;
       this.close();
     }
-    else if (this.sent) {
-      let now = new Date();
-      let minValidTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        now.getHours(),
-        now.getMinutes() - validVerificationCodeResponseMinutes);
-      if (this.sent < minValidTime) {
-        this.dialog.info(terms.validationCodeExpired);
-      }
-      else if (this.code === this.randomCode) {
-        this.args.out!.verified = true;
-        this.close();
-      }
-      else {
-        this.dialog.info(terms.wrongVerificatiobCode);
-      }
-    }
     else {
-      this.dialog.info(terms.verificatiobCodeNotSent);
+      this.dialog.info('כניסה נכשלה');
     }
-  }
-
-  @BackendMethod({ allowed: true })
-  static async isAdminCode(code: number) {
-    if (code === parseInt(process.env.SMS_ADMIN_VERIFICATION_CODE!)) {
-      return true;
-    }
-    return false;
   }
 
   close() {

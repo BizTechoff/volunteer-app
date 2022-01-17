@@ -92,6 +92,7 @@ export class VolunteerActivitiesComponent implements OnInit {
       let as = [] as Activity[];
       for await (const a of this.remult.repo(Activity).query({
         where: {
+          bid: this.remult.branchAllowedForUser(),
           status: { $ne: [this.AcitivityStatus.cancel] },
           vids: { $contains: this.remult.user.id }
         },

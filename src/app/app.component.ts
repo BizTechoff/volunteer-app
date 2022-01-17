@@ -21,13 +21,19 @@ import { PasswordControl, Users } from './users/users';
 export class AppComponent implements OnInit {
 
   isMultiBrnachEnabled = true;
+  explicit = [] as string[]
 
   @DataControl<AppComponent, Branch>({
-    cssClass: 'branch',
-    valueChange: async (r, v) => {
-      console.log('CurrentStateComponent.valueChange')
-      await r.switchBranch();
-    }
+    // click: async (r, v) => {
+    //   Branch.selectBranch<AppComponent>(async (r, b) => {
+    //     await r.auth.swithToBranch(b)
+    //     r.refresh();
+    //   })
+    // }
+    click: Branch.selectBranch(async (r, b) => {
+      await r.auth.swithToBranch(b)
+      r.refresh();
+    })
   })
   @Field({ caption: 'סניף לתצוגה' })
   branch: Branch = undefined!;
@@ -40,7 +46,6 @@ export class AppComponent implements OnInit {
     public remult: Remult,
     public auth: AuthService) {
     console.log({ a: remult.repo(Tenant).metadata.fields.modifiedBy.valueType });
-
   }
   terms = terms;
   get $() { return getFields(this, this.remult) };
@@ -49,8 +54,15 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
     // this.usersCount = await this.remult.repo(Users).count();
     if (this.auth.isConnected) {
+      if (this.remult.user.bid && this.remult.user.bid.length > 0) {
+        this.branch = await this.remult.repo(Branch).findId(this.remult.user.bid)
+      }
       this.setMultiBranches();
     }
+  }
+
+  async refresh() {
+    window?.location?.reload()
   }
 
   isVolunteer() {
@@ -63,7 +75,7 @@ export class AppComponent implements OnInit {
 
   async switchBranch() {
     if (this.branch && this.branch.id.length > 0) {
-      this.remult.user.bid = this.branch.id;
+      await this.auth.swithToBranch(this.branch.id)
       window?.location?.reload();
       this.dialogService.info('סניף הוחלף בהצלחה');
     }
@@ -94,9 +106,12 @@ export class AppComponent implements OnInit {
     // console.log('bid2', this.remult.user.bid2)
     this.isMultiBrnachEnabled = false;
     if (this.isVolunteer()) {
-      let multi = this.remult.user.bid2 && this.remult.user.bid2.length > 0;
-      if (multi) {
-        this.isMultiBrnachEnabled = true;
+      if (this.remult.user.bid2) {
+        if (this.remult.user.bid2.length > 0) {
+          this.isMultiBrnachEnabled = true
+          this.explicit.push(this.remult.user.bid)
+          this.explicit.push(this.remult.user.bid2)
+        }
       }
     }
     else if (this.isBoard()) {
@@ -153,29 +168,29 @@ export class AppComponent implements OnInit {
     this.router.navigate(['/']);
   }
   signUp() {
-    let user = this.remult.repo(Users).create();
-    user.bid = undefined;// only admin should be here
-    user.volunteer = true;
-    let password = new PasswordControl();
-    let confirmPassword = new PasswordControl(terms.confirmPassword);
-    openDialog(InputAreaComponent, i => i.args = {
-      title: terms.signUp,
-      fields: () => [
-        user.$.name,
-        user.$.mobile,
-        password,
-        confirmPassword
-      ],
-      ok: async () => {
-        if (password.value != confirmPassword.value) {
-          confirmPassword.error = terms.doesNotMatchPassword;
-          throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
-        }
-        await user.create(password.value);
-        this.auth.signIn(user.mobile);//, password.value);
+    // let user = this.remult.repo(Users).create();
+    // user.bid = undefined;// only admin should be here
+    // user.volunteer = true;
+    // let password = new PasswordControl();
+    // let confirmPassword = new PasswordControl(terms.confirmPassword);
+    // openDialog(InputAreaComponent, i => i.args = {
+    //   title: terms.signUp,
+    //   fields: () => [
+    //     user.$.name,
+    //     user.$.mobile,
+    //     password,
+    //     confirmPassword
+    //   ],
+    //   ok: async () => {
+    //     if (password.value != confirmPassword.value) {
+    //       confirmPassword.error = terms.doesNotMatchPassword;
+    //       throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
+    //     }
+    //     await user.create(password.value);
+    //     this.auth.signIn(user.mobile);//, password.value);
 
-      }
-    });
+    //   }
+    // });
   }
 
   async updateInfo() {

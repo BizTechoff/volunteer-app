@@ -50,13 +50,14 @@ import { VolunteerTenantsComponent } from './core/volunteer/volunteer-tenants/vo
 import { SafePipeModule } from 'safe-pipe';
 import { SelectTenantComponent } from './common/select-tenant/select-tenant.component';
 import { UserVerificationComponent } from './users/user-verification/user-verification.component';
-import { OfflineReadComponent } from './demo/offline-read/offline-read.component'
+import { GridDialogComponent } from './common/grid-dialog/grid-dialog.component';
 @NgModule({ 
   declarations: [
     AppComponent,
     UsersComponent,
     HomeComponent,
     YesNoQuestionComponent,
+    GridDialogComponent,
     InputAreaComponent,
     CurrentStateComponent,
     ActivitiesListComponent,
@@ -81,9 +82,8 @@ import { OfflineReadComponent } from './demo/offline-read/offline-read.component
     CalendarComponent,
     VolunteerTenantsComponent,
     SelectTenantComponent,
-    UserVerificationComponent,
-    OfflineReadComponent
-  ],
+    UserVerificationComponent
+  ], 
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -108,7 +108,7 @@ import { OfflineReadComponent } from './demo/offline-read/offline-read.component
   ],
   providers: [DialogService, AdminGuard, DonorGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
   bootstrap: [AppComponent],
-  entryComponents: [YesNoQuestionComponent, InputAreaComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
+  entryComponents: [YesNoQuestionComponent, InputAreaComponent, GridDialogComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
     SelectVolunteersComponent, SelectTenantComponent, SelectLangsComponent,
     UserLoginComponent, UserVerificationComponent]//, SelectReferrerComponent]
 })

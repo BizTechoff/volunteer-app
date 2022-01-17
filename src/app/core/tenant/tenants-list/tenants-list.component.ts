@@ -44,7 +44,8 @@ export class TenantsListComponent implements OnInit {
     this.remult.repo(Tenant),
     {
       where: () => ({
-        bid: this.isBoard() ? undefined : { $contains: this.remult.user.bid },
+        bid: this.remult.branchAllowedForUser(),
+        // bid: this.isBoard() ? undefined : { $contains: this.remult.user.bid },
         name: this.search ? { $contains: this.search } : undefined
       }),
       allowCrud: false,

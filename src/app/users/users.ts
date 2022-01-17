@@ -4,7 +4,7 @@ import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerFi
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
-import { mobileFromDb, mobileToDb, pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
+import { pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
 //import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 //import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
@@ -242,10 +242,10 @@ export class Users extends IdEntity {
             //     if (isBackend())
             //         Validators.unique(e, c)
             // }
-         ]
+        ]
     })
     name: string = '';
- 
+
     // @Field<Users>((options, remult) => options.serverExpression = async user => await remult.repo(Users).count())
     // numOfActivities: number = 0;
 
@@ -274,6 +274,12 @@ export class Users extends IdEntity {
         // }
     })
     mobile: string = '';
+
+    @Field({ includeInApi: false })
+    verifyCode: string = ''
+
+    @Field({ includeInApi: false })
+    verifyTime: Date = new Date()
 
     @Field<Users, string>({
         caption: terms.email,

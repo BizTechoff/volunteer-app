@@ -20,18 +20,23 @@ export class SelectBranchComponent implements OnInit {
   ]
   args!: {
     title?: string,
+    explicit?: string[],
     onSelect: (b?: Branch) => void
   }
   constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
   branches: Branch[] = [];
   terms = terms;
   ngOnInit() {
+    if (!this.args.explicit) {
+      this.args.explicit = [] as string[]
+    }
     this.loadBranchs();
   }
   async loadBranchs() {
     this.branches = await this.remult.repo(Branch).find({
       where: {
-        name: this.searchString ? { $contains: this.searchString } : undefined!
+        name: this.searchString ? { $contains: this.searchString } : undefined!,
+        id: this.args.explicit && this.args.explicit.length > 0 ? this.args.explicit : undefined
       }
     });
   }

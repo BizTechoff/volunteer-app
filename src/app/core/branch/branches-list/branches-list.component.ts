@@ -22,6 +22,10 @@ export class BranchesListComponent implements OnInit {
       // allowDelete: false,
       // allowInsert: this.remult.isAllowed(Roles.admin),
       allowUpdate: this.remult.isAllowed(Roles.admin),
+      where: () => ({
+        // id: this.remult.branchAllowedForUser()
+        // bid: this.isBoard() ? undefined : { $co
+      }),
       columnSettings: row => {
         let f = [] as DataControlInfo<Branch>[];
         f.push(row.name, row.address);

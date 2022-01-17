@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
+import { GridDialogComponent } from '../../../common/grid-dialog/grid-dialog.component';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
-import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
 import { Activity } from '../../activity/activity';
 import { Branch } from '../../branch/branch';
+import { Tenant } from '../../tenant/tenant';
 
 @Component({
   selector: 'app-volunteers-list',
@@ -29,7 +30,7 @@ export class VolunteersListComponent implements OnInit {
     {
       where: () => ({
         volunteer: true,
-        bid:this.remult.branchAllowedForUser(),
+        bid: this.remult.branchAllowedForUser(),
         name: this.search ? { $contains: this.search } : undefined
       }),
       newRow: _ => _.volunteer = true,
@@ -68,11 +69,11 @@ export class VolunteersListComponent implements OnInit {
         }
       ],
       rowButtons: [
-        // {
-        //   textInMenu: terms.volunteerTenants,
-        //   icon: 'tanant',
-        //   click: async (u) => await this.volunteerTenants(u.id)
-        // },
+        {
+          textInMenu: terms.showAssignTenants,
+          icon: 'groups',
+          click: async (u) => await this.showVolunteerTenants(u)
+        },
         {
           textInMenu: terms.volunteerDetails,
           icon: 'edit',
@@ -125,6 +126,27 @@ export class VolunteersListComponent implements OnInit {
 
   }
 
+  async showVolunteerTenants(user: Users) {
+    await openDialog(GridDialogComponent, gd => gd.args = {
+      title: `דיירים משוייכים ל${user.name}`,
+      settings: new GridSettings(this.remult.repo(Tenant), {
+        allowCrud: false,
+        where: { defVids: { $contains: user.id } },
+        columnSettings: cur => [
+          {field: cur.name,width:'90',caption: terms.tenant},
+           cur.defVids],
+        gridButtons: [
+          {
+            textInMenu: () => terms.refresh,
+            icon: 'refresh',
+            click: async () => { await this.refresh(); }
+          }
+        ]
+      }),
+      ok: () => { }
+    })
+  }
+
   async showActivities(user: Users) {
     return true;
   }
@@ -161,7 +183,7 @@ export class VolunteersListComponent implements OnInit {
         disableClose: u.isNew(),
         title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? '(לקריאה בלבד)' : ''),
         fields: () => [
-          { field: u!.$.bid, visible: (r, v) => this.isBoard() }, 
+          { field: u!.$.bid, visible: (r, v) => this.isBoard() },
           { field: u!.$.branch2, visible: (r, v) => this.isBoard() && u!.hasBranch2() },
           { field: u!.$.name, caption: terms.name },
           u!.$.mobile,

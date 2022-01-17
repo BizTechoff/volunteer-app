@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DataAreaSettings, InputField } from '@remult/angular';
+import { InputField, openDialog } from '@remult/angular';
 import { Remult } from 'remult';
 import { AuthService } from '../../auth.service';
 import { DialogService } from '../../common/dialog';
+import { mobileToDb } from '../../common/globals';
 import { terms } from '../../terms';
-import { PasswordControl } from '../users';
+import { UserVerificationComponent } from '../user-verification/user-verification.component';
 
 @Component({
   selector: 'app-user-login',
@@ -14,6 +15,7 @@ import { PasswordControl } from '../users';
 })
 export class UserLoginComponent implements OnInit {
 
+  codeSent = false
   args: { out: { connected?: boolean, error?: string } } = { out: { connected: false, error: '' } }
   mobile = new InputField<string>({ caption: terms.mobile });
   // password = new PasswordControl();
@@ -31,25 +33,23 @@ export class UserLoginComponent implements OnInit {
   }
 
   async signIn() {
-    let success = await this.auth.signIn(this.mobile.value.trim());//, this.password.value);
-    this.args.out.connected = success;
-    this.close();
+    this.args.out.connected = false;
+    if (this.mobile.value && this.mobile.value.length > 0) {
+      let mobile = mobileToDb(this.mobile.value)
+      if (mobile.length > 0) {
+        let verified = await openDialog(UserVerificationComponent,
+        _ => _.args = { in: { mobile: mobile } },
+        _ => _ && _.args.out ? _.args.out.verified : false);
+      if (verified!) {
+        this.args.out.connected = true;
+        this.close();
+      }
+      }
+    }
   }
 
   close() {
     this.win.close();
-  }
-
-  async frogotPassword() {
-    // let user = await this.remult.repo(Users).findFirst({
-    //   where: u => u.name.isEqualTo(this.userName.value)
-    // });
-    // if (user) {
-    //   // if (user.email) {
-    //   //   await EmailSvc.SendEmail(user.email, 'איפוס סיסמה');
-    //   //   this.dialog.info(this.terms.passwordSentToYourEmail.replace('!email!', user.email));
-    //   // }
-    // }
   }
 
 }

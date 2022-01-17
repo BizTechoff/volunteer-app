@@ -17,7 +17,10 @@ export class VolunteerTenantsComponent implements OnInit {
   tenants = new GridSettings<Tenant>(
     this.remult.repo(Tenant),
     {
-      where: { defVids: { $contains: this.remult.user.id } },
+      where: {
+        bid: this.remult.branchAllowedForUser(),
+        defVids: { $contains: this.remult.user.id }
+      },
       columnSettings: row => [
         row.name,
         // row.defVids,
@@ -68,7 +71,7 @@ export class VolunteerTenantsComponent implements OnInit {
     if (changes) {
       // await this.refresh();
     }
-  } 
+  }
 
   getLang(a: Tenant) {
     let result = 'לא צויינו';
@@ -91,9 +94,9 @@ export class VolunteerTenantsComponent implements OnInit {
   async openActivity(tnt: Tenant) {
 
     // where: {
-      //   status:  [ActivityStatus.openStatuses()],
-      //   date: { '<': today }
-      // },
+    //   status:  [ActivityStatus.openStatuses()],
+    //   date: { '<': today }
+    // },
 
     let changes = await openDialog(ActivityDetailsComponent,
       _ => _.args = { bid: tnt.bid, tid: tnt },

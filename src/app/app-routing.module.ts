@@ -14,18 +14,16 @@ import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activit
 import { VolunteerDetailsComponent } from './core/volunteer/volunteer-details/volunteer-details.component';
 import { VolunteerTenantsComponent } from './core/volunteer/volunteer-tenants/volunteer-tenants.component';
 import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
-import { OfflineReadComponent } from './demo/offline-read/offline-read.component';
 import { HomeComponent } from './home/home.component';
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
 import { terms } from './terms';
 import { AdminGuard, BoardGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
 import { UsersComponent } from './users/users.component';
 
-   
+
 
 const defaultRoute = terms.home;
-const routes: Routes = [ 
-  { path: 'demo', component: OfflineReadComponent, canActivate: [AdminGuard] },
+const routes: Routes = [
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
   { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerGuard] },
   { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerGuard] },
@@ -40,8 +38,7 @@ const routes: Routes = [
   { path: terms.branches, component: BranchesListComponent, canActivate: [AdminGuard] },
   { path: terms.userAccounts, component: UsersComponent, canActivate: [AdminGuard] },
   { path: '**', redirectTo: '/' + defaultRoute }
-
-]; 
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes),

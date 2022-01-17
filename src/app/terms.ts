@@ -1,7 +1,8 @@
 import { IdFilter, Remult } from 'remult';
-import { Roles } from './users/roles';
 
 export const terms = {
+    succefullyConnected: 'התחברת בהצלחה',
+    wrongMobile: 'סלולרי שגוי',
     fromDate: 'מתאריך',
     toDate: 'עד תאריך',
     sendWelcomeSms: 'שלח מסרון התחברות',
@@ -176,10 +177,10 @@ export const terms = {
     photo: 'תמונה',
     active: 'פעיל',
     address: 'כתובת',
-    addressRemark:'הערות לכתובת',
-    apartment:'דירה',
-    floor:'קומה',
-    phone:'טלפון',
+    addressRemark: 'הערות לכתובת',
+    apartment: 'דירה',
+    floor: 'קומה',
+    phone: 'טלפון',
     photos: 'תמונות',
     data: 'מידע',
     birthday: 'תאריך לידה',
@@ -227,10 +228,14 @@ declare module 'remult' {
         branchAllowedForUser(): IdFilter<import('./core/branch/branch').Branch>
     }
 }
+
 export function augmentRemult(remult: Remult) {
     remult.branchAllowedForUser = () => {
-        if (remult.isAllowed(Roles.board))
+        if (!remult.user.bid || remult.user.bid.trim().length === 0) {// if (remult.isAllowed(Roles.board))
+            console.log('remult.user.ADMIN', remult.user.bid)
             return undefined!;
-        return { $id: [remult.user.bid, remult.user.bid2] };
+        }
+        console.log('remult.user.bid', remult.user.bid)
+        return { $id: [remult.user.bid] };//, remult.user.bid2
     }
 }
