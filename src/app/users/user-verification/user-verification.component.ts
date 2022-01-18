@@ -47,7 +47,7 @@ export class UserVerificationComponent implements OnInit {
     this.busy.donotWait(() =>
       wait(1000)
         .then(async () => await this.sendVerificationCode())
-        .catch(err => console.debug(err)));
+        .catch(err => console.debug(`donotWait.sendVerificationCode.Error: ${err}`)));
   }
 
   async sendVerificationCode() {

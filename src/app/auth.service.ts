@@ -44,17 +44,17 @@ export class AuthService {
                     u.verifyTime = new Date()
                     await u.save()
 
-                    result.success = await NotificationService.SendSms({
+                    let response = await NotificationService.SendSms({
                         mobile: mobile,
                         uid: u.id,
                         message: terms.notificationVerificationCodeMessage
                             .replace('!code!', code.toString())
                     })
-                    if (result.success) {
+                    if (response.success) {
                         result.error = terms.verificationCodeSuccesfullySent
                     }
                     else {
-                        result.error = terms.verificationCodeSendFailed
+                        result.error = response.message
                     }
                 }
             }
@@ -161,9 +161,9 @@ export class AuthService {
     }
 
     setAuthToken(token: string) {
-        console.log('setAuthToken 1', this.remult.user)
+        // console.log('setAuthToken 1', this.remult.user)
         this.remult.setUser(new JwtHelperService().decodeToken(token));
-        console.log('setAuthToken 2', this.remult.user)
+        // console.log('setAuthToken 2', this.remult.user)
         localStorage.setItem(AUTH_TOKEN_KEY, token);
         // sessionStorage.setItem(AUTH_TOKEN_KEY, token); 
         this.isConnected = true;

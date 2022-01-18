@@ -51,23 +51,27 @@ export class CalendarComponent implements OnInit {
 
     return true;
   }
- 
+
   async refresh() {
-    console.log('CalendarComponent.refresh')
-    // console.log('from refresh');
     window?.location?.reload();
-    // let t = this.branch;
-    // this.branch  = null!;
-    // this.branch = 
-    // if (this.branch) {
-    //   // this.selectedCalendarFrame = this.branch.frame;
-    //   this.SelectedCalendarFrame = this.branch.email;
-    //   window.location.reload();
-    //   // if (this.iframe.contentWindow) {
-    //   //   this.iframe.innerHTML
-    //   //   this.iframe.contentWindow.location.reload();
-    //   // }
-    // }
   }
+ 
+  // async refresh() {
+  //   // console.log('CalendarComponent.refresh')
+  //   // console.log('from refresh');
+  //   window?.location?.reload();
+  //   // let t = this.branch;
+  //   // this.branch  = null!;
+  //   // this.branch = 
+  //   // if (this.branch) {
+  //   //   // this.selectedCalendarFrame = this.branch.frame;
+  //   //   this.SelectedCalendarFrame = this.branch.email;
+  //   //   window.location.reload();
+  //   //   // if (this.iframe.contentWindow) {
+  //   //   //   this.iframe.innerHTML
+  //   //   //   this.iframe.contentWindow.location.reload();
+  //   //   // }
+  //   // }
+  // }
 
 }

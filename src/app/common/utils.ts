@@ -10,7 +10,7 @@ export class NotificationService {
     // static sendCalendar: (req: CalendarRequest) => Promise<boolean>;
     static sendMail: (req: CalendarRequest) => Promise<boolean>;
 
-    static sendSms: (req: SmsRequest) => Promise<boolean>;
+    static sendSms: (req: SmsRequest) => Promise<{ success: boolean, message: string, count: number }>;
 
     @BackendMethod({ allowed: true /*(r, e) => r.authenticated()*/ })
     static async SendEmail(req: CalendarRequest) {

@@ -214,7 +214,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2022.01.10.0'
+    appVersion: '2022.01.18.0'
 }
 
 declare module 'remult' {
@@ -232,10 +232,10 @@ declare module 'remult' {
 export function augmentRemult(remult: Remult) {
     remult.branchAllowedForUser = () => {
         if (!remult.user.bid || remult.user.bid.trim().length === 0) {// if (remult.isAllowed(Roles.board))
-            console.log('remult.user.ADMIN', remult.user.bid)
+            // console.log('remult.user.ADMIN', remult.user.bid)
             return undefined!;
         }
-        console.log('remult.user.bid', remult.user.bid)
+        // console.log('remult.user.bid', remult.user.bid)
         return { $id: [remult.user.bid] };//, remult.user.bid2
     }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BusyService } from '@remult/angular';
 import * as fetch from 'node-fetch';
-import { getFields, Remult } from 'remult';
+import { getFields, Remult, UuidField } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { mediaAllowedUploadFileTypes, OnlyVolunteerEditActivity } from '../../../common/globals';
 import { terms } from '../../../terms';
@@ -11,6 +11,8 @@ import { Users } from '../../../users/users';
 import { Activity } from '../../activity/activity';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
+
+// import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-photos-album',
@@ -88,7 +90,7 @@ export class PhotosAlbumComponent implements OnInit {
           where: { tid: { $id: [this.args.tid] } }
         })) {
           aids.push(a.id)
-          console.log(JSON.stringify(a))
+          // console.log(JSON.stringify(a))
         }
       }
       else if (this.args.aid && this.args.aid.length > 0) {
@@ -138,11 +140,11 @@ export class PhotosAlbumComponent implements OnInit {
           continue; 
         }
         // let f: File = file; 
-        console.log('success-0', false)
+        // console.log('success-0', false)
         let success = await this.upload(file, branch);
-        console.log('success-1', success)
+        // console.log('success-1', success)
         if (success!) {
-          console.log(file.type);
+          // console.log(file.type);
           points += this.getPointByFileType(file.type);
         }
       }
@@ -171,8 +173,11 @@ export class PhotosAlbumComponent implements OnInit {
     let p = new Promise<boolean>(async (resolve, reject) => {
       let message = '';
       let result = false;
+      const { v4: uuidv4 } = require('uuid');
+      let id = uuidv4()
+      // console.log('upload.uuid',id)
       // get secure url from our server//'http://localhost:3000' + 
-      const s3SignUrl = `/api/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(f.name)}&branch=${encodeURI(branch)}`;
+      const s3SignUrl = `/api/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(id)}&branch=${encodeURI(branch)}`;
       // console.log('s3SignUrl', s3SignUrl)
       const signRes = await fetch.default(s3SignUrl);
 
@@ -192,23 +197,23 @@ export class PhotosAlbumComponent implements OnInit {
             // console.log('linkRes.linkRes', linkRes)
             const imageUrl = link.url.split('?')[0]
             // console.log(imageUrl)
-            await this.addPhoto(f.name, f.type, imageUrl)
+            await this.addPhoto(id, f.name, f.type, imageUrl)
             result = true;
           }
           else {
             // console.log('NOT OK')
             message = `upload.link(${link}): { status: ${linkRes.status}, statusText: ${linkRes.statusText} }`;
-            console.debug(message);
+            // console.debug(message);
           }
         } else {
           // console.log('NOT OK')
           message = `upload(${f.name}): upSigning Url Failed`;
-          console.debug(message);
+          // console.debug(message);
         }
       }
       else {
         message = `upload(${f.name}): { status: ${signRes.status}, statusText: ${signRes.statusText} }`;
-        console.debug(message);
+        // console.debug(message);
       }
       if (message.length > 0) {
         console.debug(message);
@@ -240,14 +245,17 @@ export class PhotosAlbumComponent implements OnInit {
     }
   }
 
-  async addPhoto(name: string, type: string, link: string): Promise<Photo> {
+  async addPhoto(id:string ,name: string, type: string, link: string): Promise<Photo> {
     let result = this.remult.repo(Photo).create();
+    result.id = id;
     result.bid = this.args.bid;
     result.eid = this.args.aid;
     result.title = name;
     result.type = type;
     result.link = link;
+    console.log('result.id.1',result.id)
     await result.save();
+    console.log('result.id.2',result.id)
     this.args.changed = true;
     return result;
   }

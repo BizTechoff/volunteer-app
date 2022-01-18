@@ -107,20 +107,21 @@ export class Branch extends EntityWithModified {
 
         return result;
     }
-    static selectBranch<containerType = any>(change?: (e: containerType, b?: string) => void) {
+    static selectBranch<containerType = any>(explicit?:string[], change?: (e: containerType, b?: string) => void) {
         return (container: containerType, f: FieldRef<any, Branch | undefined>) => {
-            console.log('click');
-            // if(!explicit){
-            //     explicit = [] as string[]
-            // }  
+            // console.log('click');
+            if(!explicit){
+                explicit = [] as string[]
+            }  
             openDialog(SelectBranchComponent, x => x.args = {
                 // explicit: explicit,
+                canSelectAll: true,
                 onSelect: b => {
-                    console.log('select');
+                    // console.log('select');
                     if (f.value != b) {
                         f.value = b;
                         if (change) {
-                            console.log('change');
+                            // console.log('change');
                             change(container, b?.id);
                         }
                     }

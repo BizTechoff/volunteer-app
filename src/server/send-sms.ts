@@ -9,7 +9,7 @@ export interface SendSmsResponse {
     count: number
 };
 
-NotificationService.sendSms = async (req: SmsRequest) => {
+NotificationService.sendSms = async (req: SmsRequest) :Promise<{ success: boolean, message: string, count: number }> => {
     let result: SendSmsResponse = { success: false, message: 'Sms channel is close!', count: 0 };
 
     console.debug(`sendSms: ${JSON.stringify(req)}`);
@@ -28,7 +28,7 @@ NotificationService.sendSms = async (req: SmsRequest) => {
 
         let r = await fetch.default(url, {//require('node-fetch').
             method: 'GET'
-        });
+        }); 
         if (r.ok) {
             let res = JSON.parse(await r.text());// as SendSmsResponse;
             result.success = res.success;
@@ -45,5 +45,5 @@ NotificationService.sendSms = async (req: SmsRequest) => {
         console.debug(`sendSms.return: Sms channel is close!`);
     }
 
-    return result.success;
+    return result;
 }

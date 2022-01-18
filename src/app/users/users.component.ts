@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GridSettings } from '@remult/angular';
 import { BackendMethod, Remult } from 'remult';
 import { DialogService } from '../common/dialog';
+import { NotificationService } from '../common/utils';
 import { terms } from '../terms';
 import { Roles } from './roles';
 import { Users } from './users';
@@ -139,26 +140,28 @@ export class UsersComponent implements OnInit {
       `לשלוח ל${name} (${mobile}) מסרון עם פרטי התחברות לאפליקציה`);
     if (yes) {
       let message = '';
+      message += `שלום ${name}, פרטי כניסה לאפליקציה`;
+      message += '\n';
       message += 'bit.ly/eshel-app ';
       message += '\n';
-      message += `שם משתמש: ${name} `;
-      message += '\n';
-      message += 'סיסמא נמסרת טלפונית';
+      message += `כניסה עם סלולרי שלך `;
+      message += '\n'; 
+      message += 'סיסמא נמסרת טלפונית ';
       message += '\n';
       message += 'תודה לך';
 
-      // let sent = await NotificationService.sendSms({
-      //   uid: this.remult.user.id,
-      //   mobile: mobile,
-      //   message: message
-      // });
+      let sent = await NotificationService.SendSms({
+        uid: this.remult.user.id,
+        mobile: mobile,
+        message: message
+      });
 
-      // if (sent) {
-      //   this.dialog.info(terms.smsSuccefullySent);
-      // }
-      // else {
-      //   this.dialog.info(terms.smsFailSent);
-      // }
+      if (sent) {
+        this.dialog.info(terms.smsSuccefullySent);
+      }
+      else {
+        this.dialog.info(terms.smsFailSent);
+      }
     };
   }
 

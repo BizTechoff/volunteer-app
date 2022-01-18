@@ -230,7 +230,7 @@ export class CurrentStateComponent implements OnInit {
 
   isRefreshing = false;
   async refresh() {
-    console.log('refresh')
+    // console.log('refresh')
     // if (!this.isRefreshing) {
       this.isRefreshing = true;
       var options = { hour12: false };

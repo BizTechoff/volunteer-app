@@ -18,15 +18,18 @@ export class SelectBranchComponent implements OnInit {
   options = [
     Langs.hebrew, Langs.english, Langs.russian, Langs.french
   ]
-  args!: {
+  args: {
+    canSelectAll?:boolean,
     title?: string,
     explicit?: string[],
     onSelect: (b?: Branch) => void
-  }
+  } = {canSelectAll: true, title: '', explicit: [], onSelect: undefined!}
   constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
   branches: Branch[] = [];
   terms = terms;
   ngOnInit() {
+    // console.log(this.args.canSelectAll)
+    // this.args.canSelectAll = true
     if (!this.args.explicit) {
       this.args.explicit = [] as string[]
     }
@@ -39,7 +42,7 @@ export class SelectBranchComponent implements OnInit {
         id: this.args.explicit && this.args.explicit.length > 0 ? this.args.explicit : undefined
       }
     });
-  }
+  } 
   async doSearch() {
     await this.busy.donotWait(async () => this.loadBranchs());
   }
@@ -47,7 +50,7 @@ export class SelectBranchComponent implements OnInit {
   select(p: Branch) {
     this.args.onSelect(p);
     this.dialogRef.close();
-  }
+  } 
   selectFirst() {
     if (this.branches.length > 0)
       this.select(this.branches[0]);

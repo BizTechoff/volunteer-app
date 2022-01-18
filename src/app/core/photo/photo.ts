@@ -1,5 +1,5 @@
 import { DataControl } from "@remult/angular";
-import { Allow, Entity, Field, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
+import { Allow, Entity, EntityBase, Field, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
@@ -33,16 +33,23 @@ export class ActiveStatus {
         //         bid: remult.branchAllowedForUser() // !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
         //     }
         // );
-        options.saving = async (act) => {
+        options.saving = async (row) => {
             if (isBackend()) {
-                if (act._.isNew()) {
-                    act.created = new Date();
-                    act.createdBy = await remult.repo(Users).findId(remult.user.id);
+                if (row._.isNew()) {
+                    if (row.id.length === 0) {
+                        const { v4: uuidv4 } = require('uuid');
+                        row.id = uuidv4()
+                    }
+                    row.created = new Date();
+                    row.createdBy = await remult.repo(Users).findId(remult.user.id);
                 }
             }
         };
     })
-export class Photo extends IdEntity {
+export class Photo extends EntityBase {
+
+    @Field() //({dbReadOnly, includeInApi, allowApiUpdate})
+    id: string = ''
 
     @Field({ caption: terms.branch, includeInApi: Allow.authenticated })
     bid!: Branch;
@@ -52,7 +59,7 @@ export class Photo extends IdEntity {
 
     @Field({ caption: terms.public })
     public: boolean = true;
- 
+
     @Field({ caption: terms.status })
     status: ActiveStatus = ActiveStatus.on;
 

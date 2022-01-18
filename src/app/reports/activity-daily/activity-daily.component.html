@@ -1,7 +1,7 @@
 <div class="full-page">
     <div class="header">
         <div style="display: flex; flex-direction: row; justify-content: center; ">
- 
+  
             <button mat-flat-button (click)="this.prevWeek()">&#60; שבוע קודם</button>
             <data-control [field]='this.$.fromDate'></data-control>
             <span style="margin: 7px;margin-top: 10px;">{{this.getDayOfWeek(this.fromDate)}}' - {{this.getDayOfWeek(this.toDate)}}'</span>

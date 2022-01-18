@@ -15,8 +15,8 @@
             <mat-divider></mat-divider>
         </ng-container>
     </mat-nav-list>
-</div>
-<div mat-dialog-actions>
+</div> 
+<div *ngIf="this.args.canSelectAll" mat-dialog-actions>
   
     <!-- <button mat-icon-button (click)="create()">
         <mat-icon>add</mat-icon>

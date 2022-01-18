@@ -30,7 +30,8 @@ export class AppComponent implements OnInit {
     //     r.refresh();
     //   })
     // }
-    click: Branch.selectBranch(async (r, b) => {
+    getValue: (_, f) =>f.value ? `מציג רק את סניף ${f.value?.name}` : 'מציג את כל הסניפים',
+    click: Branch.selectBranch([], async (r, b) => {
       await r.auth.swithToBranch(b)
       r.refresh();
     })
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit {
     public dialogService: DialogService,
     public remult: Remult,
     public auth: AuthService) {
-    console.log({ a: remult.repo(Tenant).metadata.fields.modifiedBy.valueType });
+    // console.log({ a: remult.repo(Tenant).metadata.fields.modifiedBy.valueType });
   }
   terms = terms;
   get $() { return getFields(this, this.remult) };

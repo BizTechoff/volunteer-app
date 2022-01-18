@@ -221,7 +221,7 @@ export class ActivityDetailsComponent implements OnInit {
         //   f.push(this.activity.$.foodDelivered);
         // }
         if (this.isBoard()) {
-          f.push({ field: this.activity.$.bid, readonly: this.activity.status.isClosed(), valueChange: (r, c) => { console.log('bid changed') } });
+          f.push({ field: this.activity.$.bid, readonly: this.activity.status.isClosed() });
         }
         if (this.isManager()) {
           f.push({ field: this.activity.$.status, readonly: this.activity.status.isClosed() });
