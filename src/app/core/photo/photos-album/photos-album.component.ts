@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BusyService } from '@remult/angular';
 import * as fetch from 'node-fetch';
-import { getFields, Remult, UuidField } from 'remult';
+import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { mediaAllowedUploadFileTypes, OnlyVolunteerEditActivity } from '../../../common/globals';
+import { mediaAllowedUploadFileTypes, OnlyVolunteerEditActivity, uploadS3WithFileExtention } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
@@ -12,8 +12,8 @@ import { Activity } from '../../activity/activity';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
 
-// import { v4 as uuidv4 } from 'uuid';
-
+// import { v4 as uuidv4 } from 'uuid'; 
+ 
 @Component({
   selector: 'app-photos-album',
   templateUrl: './photos-album.component.html',
@@ -137,7 +137,7 @@ export class PhotosAlbumComponent implements OnInit {
         const file = files[index];
         if (!mediaAllowedUploadFileTypes.includes(file.type)) {
           console.debug(`loadFiles(${file.name}): file type ${file.type} not allowed to upload`)
-          continue; 
+          continue;
         }
         // let f: File = file; 
         // console.log('success-0', false)
@@ -175,9 +175,18 @@ export class PhotosAlbumComponent implements OnInit {
       let result = false;
       const { v4: uuidv4 } = require('uuid');
       let id = uuidv4()
+
+      let fileName = `${id}`
+      if (uploadS3WithFileExtention) {
+        let split = f.type.split('/')
+        if (split.length > 1) {
+          fileName += `.${split[1]}`
+        }
+      }
+
       // console.log('upload.uuid',id)
       // get secure url from our server//'http://localhost:3000' + 
-      const s3SignUrl = `/api/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(id)}&branch=${encodeURI(branch)}`;
+      const s3SignUrl = `/api/s3Url?key=${'eshel-app-s3-key'}&f=${encodeURI(fileName)}&branch=${encodeURI(branch)}`;
       // console.log('s3SignUrl', s3SignUrl)
       const signRes = await fetch.default(s3SignUrl);
 
@@ -245,7 +254,7 @@ export class PhotosAlbumComponent implements OnInit {
     }
   }
 
-  async addPhoto(id:string ,name: string, type: string, link: string): Promise<Photo> {
+  async addPhoto(id: string, name: string, type: string, link: string): Promise<Photo> {
     let result = this.remult.repo(Photo).create();
     result.id = id;
     result.bid = this.args.bid;
@@ -253,9 +262,9 @@ export class PhotosAlbumComponent implements OnInit {
     result.title = name;
     result.type = type;
     result.link = link;
-    console.log('result.id.1',result.id)
+    console.log('result.id.1', result.id)
     await result.save();
-    console.log('result.id.2',result.id)
+    console.log('result.id.2', result.id)
     this.args.changed = true;
     return result;
   }

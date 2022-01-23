@@ -133,15 +133,17 @@ export class VolunteersListComponent implements OnInit {
         allowCrud: false,
         where: { defVids: { $contains: user.id } },
         columnSettings: cur => [
-          {field: cur.name,width:'90',caption: terms.tenant},
-           cur.defVids],
-        gridButtons: [
-          {
-            textInMenu: () => terms.refresh,
-            icon: 'refresh',
-            click: async () => { await this.refresh(); }
-          }
-        ]
+          { field: cur.name, width: '90', caption: terms.tenant },
+          cur.defVids
+        ],
+        gridButtons:
+          [
+            {
+              textInMenu: () => terms.refresh,
+              icon: 'refresh',
+              click: async () => { await this.refresh(); }
+            }
+          ]
       }),
       ok: () => { }
     })
@@ -176,26 +178,37 @@ export class VolunteersListComponent implements OnInit {
     if (!u) {
       u = this.remult.repo(Users).create();
       u.volunteer = true;
-      u.bid = this.isBoard() ? undefined : await this.remult.repo(Branch).findId(this.remult.user.bid);
+      u.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
     }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         disableClose: u.isNew(),
         title: (u!.isNew() ? terms.addVolunteer : terms.volunteerDetails) + (this.isDonor() ? '(לקריאה בלבד)' : ''),
-        fields: () => [
-          { field: u!.$.bid, visible: (r, v) => this.isBoard() },
-          { field: u!.$.branch2, visible: (r, v) => this.isBoard() && u!.hasBranch2() },
-          { field: u!.$.name, caption: terms.name },
-          u!.$.mobile,
-          u!.$.email,
-          [
-            u!.$.birthday,
-            { field: u!.$.age, width: '60', visible: (r, v) => this.remult.isAllowed(Roles.manager) },
-          ],
-          u!.$.langs,
-          { field: u!.$.points, readonly: true }//,
-          // { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
-        ],
+        fields: () => {
+          let f = [];
+          if (this.isBoard()) {
+            f.push({ field: u!.$.bid, readonly: u.bid ? true : false })
+            if (u!.hasBranch2()) {
+              f.push({ field: u!.$.branch2, readonly: u.branch2 ? true : false })
+            }
+          }
+          f.push(
+            // { field: u!.$.bid, visible: (r, v) => this.isBoard() },
+            // { field: u!.$.branch2, visible: (r, v) => this.isBoard() && u!.hasBranch2() },
+            { field: u!.$.name, caption: terms.name },
+            u!.$.mobile,
+            u!.$.email,
+            u!.$.birthday)
+          if (this.remult.isAllowed(Roles.manager)) {
+            f.push({ field: u!.$.age, width: '60' })
+          }
+          f.push(
+            u!.$.langs,
+            { field: u!.$.points, readonly: true }//,
+            // { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
+          )
+          return f
+        },
         ok: async () => {
           if (!this.isDonor()) { await (u!.isNew() ? u!.create() : u!.save()); }
         }

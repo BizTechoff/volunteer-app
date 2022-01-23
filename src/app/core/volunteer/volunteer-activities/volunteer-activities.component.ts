@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
-import { Remult } from 'remult';
+import { Remult, ValueListFieldType } from 'remult';
+import { ValueListValueConverter } from 'remult/valueConverters';
 import { DialogService } from '../../../common/dialog';
 import { pointsEachSuccessActivity } from '../../../common/globals';
+import { SelectCallComponent } from '../../../common/select-call/select-call.component';
+import { SelectNavigatorComponent } from '../../../common/select-navigator/select-navigator.component';
 import { UserIdName } from '../../../common/types';
 import { DateUtils } from '../../../common/utils';
 import { terms } from '../../../terms';
@@ -10,6 +13,29 @@ import { Users } from '../../../users/users';
 import { Activity, ActivityStatus } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
+
+@ValueListFieldType({})
+export class Navigators {
+  static waze = new Navigators({
+    getUrl: (address) => `waze://?q=${encodeURI(address)}&navigate=yes`,
+    click: (address) => window.open(`waze://?q=${encodeURI(address)}&navigate=yes`, '_blank')
+  });
+  static gmaps = new Navigators({
+    getUrl: (address) => `https://maps.google.com/maps?q=${encodeURI(address)}`,
+    click: (address) => window.open(`https://maps.google.com/maps?q=${encodeURI(address)}`, '_blank')
+  });
+  constructor(public args?: {
+    getUrl: (address: string) => string,
+    click: (address: string) => void
+  }) { }
+  id!: string
+  caption!: string
+
+  static getOptions() {
+    let op = new ValueListValueConverter(Navigators).getOptions();
+    return op;
+  }
+}
 
 @Component({
   selector: 'app-volunteer-activities',
@@ -83,6 +109,7 @@ export class VolunteerActivitiesComponent implements OnInit {
   }
 
   ActivityStatus = ActivityStatus;
+  Navigators = Navigators
 
   refreshing = false;
   async refresh() {
@@ -118,6 +145,22 @@ export class VolunteerActivitiesComponent implements OnInit {
     return result;
   }
 
+  getTanantRemark(a: Activity) {
+    let result = ''
+    if (a.tid.apartment && a.tid.apartment.length > 0) {
+      result += ` דירה ${a.tid.apartment} `
+    }
+
+    if (a.tid.floor && a.tid.floor.length > 0) {
+      result += ` קומה ${a.tid.floor} `
+    }
+
+    if (a.tid.addressRemark && a.tid.addressRemark.length > 0) {
+      result += ` ${a.tid.addressRemark} `
+    }
+    return result.trim()
+  }
+
   getVolunteers(a: Activity) {
     let voids = a.vids && a.vids.length > 0 ? a.vids : [] as UserIdName[];
     return voids.map(v => v.id === this.remult.user.id ? terms.me : v.name).join(', ');
@@ -151,22 +194,56 @@ export class VolunteerActivitiesComponent implements OnInit {
     await this.refresh();
   }
 
-  async openWaze(a: Activity) {
-    let address = a?.tid?.address;
-    if (address) {
+  async navigate(a: Activity) {
+    let nav = undefined
+    if (a.tid?.address) {
+      nav = await openDialog(SelectNavigatorComponent,
+        dlg => dlg.args = {},
+        dlg => dlg ? dlg.args.selected : undefined)
+    }
+    if (nav) {
       a.wazed = new Date();
       await a.save();
-      let url = `waze://?q=${encodeURI(address)}&navigate=yes`;
-      window.open(url, '_blank');
+      nav.args?.click(a?.tid?.address)
     }
   }
 
+  // let selected = openDialog()
+  // a.wazed = new Date();
+  // await a.save();
+  // nav.args?.click(a?.tid?.address)
+  // let address = a?.tid?.address
+  // if (address) {
+  //   a.wazed = new Date();
+  //   await a.save();
+  //   let url = nav.args!.getUrl(address) // `waze://?q=${encodeURI(address)}&navigate=yes`;
+  //   window.open(url, '_blank');
+  // }
+
+  openWaze() {
+    // window.open('waze://?ll=' + this.e.longLat + "&q=" + encodeURI(this.e.theAddress) + '&navigate=yes');
+  }
+  openGoogleMap() {
+    // window.open('https://maps.google.com/maps?q=' + this.e.longLat + '&hl=' + getLang(this.remult).languageCode, '_blank');
+  }
+
   async call(a: Activity) {
-    let mobile = a?.tid?.mobile;
-    if (mobile) {
+    let number = ''
+    if (a.tid?.mobile && a.tid?.phone) {
+      number = await openDialog(SelectCallComponent,
+        dlg => dlg.args = { options: [a.tid?.mobile, a.tid?.phone] },
+        dlg => dlg ? dlg.args.selected! : '')
+    }
+    else if (a.tid?.mobile){
+      number = a.tid?.mobile
+    }
+    else if (a.tid?.phone){
+      number = a.tid?.phone
+    }
+    if (number && number.length > 0) {
       a.called = new Date();
       await a.save();
-      let url = `tel:${mobile}`;
+      let url = `tel:${number}`;
       window.open(url, '_blank');
     }
   }

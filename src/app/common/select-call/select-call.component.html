@@ -1,0 +1,8 @@
+<div class="full-page">
+    <div class="header"></div>
+    <div *ngIf="this.args.options" class="ng-container">
+        <div *ngFor="let n of this.args.options">
+            <button (click)="this.close(n)"> {{ n }} </button>
+        </div>
+    </div>
+</div> 

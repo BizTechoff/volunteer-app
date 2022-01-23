@@ -84,7 +84,12 @@ export class AuthService {
 
     @BackendMethod({ allowed: Allow.authenticated })
     static async switchBranch(newBranchId?: string, remult?: Remult) {
+        let b1 = remult!.user.bid
+        let b2 = remult!.user.bid2
         remult!.user.bid = newBranchId ?? undefined!;//maybe check if it's a valid branch for the user
+        if (b2 === newBranchId) {
+            remult!.user.bid2 = b1
+        }
         return jwt.sign(remult!.user, getJwtTokenSignKey())
     }
 
@@ -99,7 +104,7 @@ export class AuthService {
                 if (special) {
                     result.success = true;
                     result.error = 'easter egg'
-                    result.token = AuthService.doSignIn(u)
+                    result.token = AuthService.buildToken(u)
                 }
                 else if (u.verifyTime && u.verifyTime.getFullYear() > 1900) {//has sent
                     let now = new Date();
@@ -115,7 +120,7 @@ export class AuthService {
                     else if (u.verifyCode === code) {
                         result.success = true
                         result.error = terms.succefullyConnected
-                        result.token = AuthService.doSignIn(u)
+                        result.token = AuthService.buildToken(u)
                     }
                     else {
                         result.error = terms.wrongVerificatiobCode
@@ -132,40 +137,69 @@ export class AuthService {
         return result
     }
 
-    private static doSignIn(u: Users) {
-        let ui: UserInfo = {
-            id: u.id,
-            roles: [],
-            name: u.name,
-            bid: u.bid?.id ?? '',
-            bname: u.bid?.name ?? '',
-            bid2: u.branch2?.id ?? '',
-            b2name: u.branch2?.name ?? ''
-        };
-        if (u.admin) {
-            ui.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);
+    private static buildToken(u: Users | UserInfo) {
+        let ui: UserInfo;
+        if (u instanceof Users) {
+            ui = {
+                id: u.id,
+                roles: [],
+                name: u.name,
+                bid: u.bid?.id ?? '',
+                bname: u.bid?.name ?? '',
+                bid2: u.branch2?.id ?? '',
+                b2name: u.branch2?.name ?? ''
+            };
+            if (u.admin) {
+                ui.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);
+            }
+            else if (u.donor) {
+                ui.roles.push(Roles.donor, Roles.board, Roles.manager, Roles.volunteer);
+            }
+            else if (u.board) {
+                ui.roles.push(Roles.board, Roles.manager, Roles.volunteer);
+            }
+            else if (u.manager) {
+                ui.roles.push(Roles.manager, Roles.volunteer);
+            }
+            else if (u.volunteer) {
+                ui.roles.push(Roles.volunteer);
+            }
         }
-        else if (u.donor) {
-            ui.roles.push(Roles.donor, Roles.board, Roles.manager, Roles.volunteer);
-        }
-        else if (u.board) {
-            ui.roles.push(Roles.board, Roles.manager, Roles.volunteer);
-        }
-        else if (u.manager) {
-            ui.roles.push(Roles.manager, Roles.volunteer);
-        }
-        else if (u.volunteer) {
-            ui.roles.push(Roles.volunteer);
+        else {
+            ui = u as UserInfo
         }
         return jwt.sign(ui, getJwtTokenSignKey())
     }
 
-    setAuthToken(token: string) {
-        // console.log('setAuthToken 1', this.remult.user)
+    isVolunteerOnly() {
+        return this.remult.isAllowed(Roles.volunteer) && this.remult.user.roles.length === 1
+    }
+
+    getUserBranches() {
+        let result = [] as string[];
+        if (this.remult.user.bid) {
+            result.push(this.remult.user.bid)
+        }
+        if (this.remult.user.bid2) {
+            result.push(this.remult.user.bid2)
+        }
+        return result;
+    }
+
+    async setAuthToken(token: string) {
         this.remult.setUser(new JwtHelperService().decodeToken(token));
-        // console.log('setAuthToken 2', this.remult.user)
+
+        if (this.isVolunteerOnly()) {
+            let vBrnaches = this.getUserBranches()
+            if (!vBrnaches.includes(this.remult.user.bid)) {
+                await AuthService.switchBranch(vBrnaches[0])
+                // if (this.remult.user.bid) {
+                //     await AuthService.switchBranch(vBrnaches[0])
+                // }
+            }
+        }
+
         localStorage.setItem(AUTH_TOKEN_KEY, token);
-        // sessionStorage.setItem(AUTH_TOKEN_KEY, token); 
         this.isConnected = true;
     }
     static fromStorage(): string {

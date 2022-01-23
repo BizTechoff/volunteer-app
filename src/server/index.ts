@@ -17,7 +17,7 @@ import '../app/common/types';
 import { augmentRemult } from '../app/terms';
 import './aws-s3';
 import { generateUploadURL } from './aws-s3';
-import { importDataNew } from './import-data';
+import { buildPhotoLinks, importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
@@ -95,11 +95,13 @@ async function startup() {
 
     // const remult = await api.getRemult(undefined!);
     // downloadPhotos(remult).then(() => { });
-
+ 
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
 
         const remult = await api.getRemult(undefined!);
         importDataNew(remult).then(() => { });
+        // updateTenants('יבנה',remult).then(() => { });
+        // buildPhotoLinks(remult).then(() => { });
     }
 
     let port = process.env.PORT || 3000;

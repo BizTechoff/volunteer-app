@@ -1,7 +1,8 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from "remult/valueConverters";
-import { mobileFromDb, mobileToDb, StringRequiredValidation } from "../../common/globals";
+import { FoodDeliveredCount, Gender } from "../../common/enums";
+import { StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
 import { SelectTenantComponent } from "../../common/select-tenant/select-tenant.component";
 import { UserIdName } from "../../common/types";
@@ -19,11 +20,22 @@ export class Referrer {
     static municipality = new Referrer(2, 'עירייה');
     static tenant = new Referrer(3, 'דייר אחר');
     static neighbor = new Referrer(4, 'שכנה');
+    static cake = new Referrer(5, 'פרויקט עוגה לקשיש');
     constructor(public id: number, public caption: string) { }
 
     static getOptions() {
         let op = new ValueListValueConverter(Referrer).getOptions();
         return op;
+    }
+
+    static fromStringByCaption(str: string) {
+        let result: Referrer = Referrer.welfare;
+        let options = Referrer.getOptions();
+        let found = options.find(_ => _.caption === str);
+        if (found) {
+            result = found
+        }
+        return result;
     }
 
 }
@@ -121,13 +133,19 @@ export class Tenant extends EntityWithModified {
 
     @Field({ caption: terms.referrerRemark })
     referrerRemark: string = '';
+    
+    @Field({ caption: terms.foodCount })
+    foodCount: FoodDeliveredCount = FoodDeliveredCount.one;
+
+    @Field({ caption: terms.gender })
+    gender: Gender = Gender.unKnown;
 
     @Field({
         caption: terms.name,
         validate: StringRequiredValidation
     })
     name: string = '';
-  
+
     @Field({
         caption: terms.mobile,
         validate: [StringRequiredValidation, Validators.unique]//,052-3333333 BUG

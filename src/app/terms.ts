@@ -21,6 +21,7 @@ export const terms = {
     verificationCode: 'קוד אימות',
     foodDelivered: 'מסרתי לדייר את האוכל לשבת',
     foodCount: 'מנות',
+    gender:'מגדר',
     pointsExplain: 'הסבר צבירת נקודות',
     youGotMorePoint: 'צברת !points! נקודות נוספות, סה"כ צברת עד כה: !sum! נקודות',
     youMustEnterPurposes: 'לפני סגירת הפעילות יש לציין את המטרות שנמצאו',

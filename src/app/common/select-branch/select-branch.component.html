@@ -21,7 +21,7 @@
     <!-- <button mat-icon-button (click)="create()">
         <mat-icon>add</mat-icon>
     </button> -->
-    <button mat-icon-button mat-dialog-close (click)="clear()" title="נקה בחירה">
+    <button *ngif="!this.args.explicit || this.args.explicit.length > 0" mat-icon-button mat-dialog-close (click)="clear()" title="נקה בחירה">
         <mat-icon>clear</mat-icon>
     </button>
 

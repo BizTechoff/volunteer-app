@@ -36,6 +36,7 @@ export class SelectBranchComponent implements OnInit {
     this.loadBranchs();
   }
   async loadBranchs() {
+    // console.log('this.args.explicit',this.args.explicit)
     this.branches = await this.remult.repo(Branch).find({
       where: {
         name: this.searchString ? { $contains: this.searchString } : undefined!,

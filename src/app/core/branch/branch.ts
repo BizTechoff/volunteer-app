@@ -58,13 +58,14 @@ export class Branch extends EntityWithModified {
     frame: string = '';
 
     @Field<Branch>((options, remult) => {
-        if (1 == 1) {
+        if (true) {
             options.serverExpression = async branch => {
                 return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
             };
         }
         else {
-            options.sqlExpression = () => "( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )";
+            options.sqlExpression = (branch) => `( select count(*) from users where users.bid = '${branch.key}' && users.volunteer = 'true' )`;
+            // options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )`;
         }
     })
     volunteersCount = 0;
@@ -109,12 +110,12 @@ export class Branch extends EntityWithModified {
     }
     static selectBranch<containerType = any>(explicit?:string[], change?: (e: containerType, b?: string) => void) {
         return (container: containerType, f: FieldRef<any, Branch | undefined>) => {
-            // console.log('click');
+            
             if(!explicit){
                 explicit = [] as string[]
             }  
             openDialog(SelectBranchComponent, x => x.args = {
-                // explicit: explicit,
+                explicit: explicit,
                 canSelectAll: true,
                 onSelect: b => {
                     // console.log('select');

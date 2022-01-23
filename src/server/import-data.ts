@@ -1,7 +1,9 @@
 import { debug } from 'console';
 import { Remult } from 'remult';
+import { FoodDeliveredCount, Gender } from '../app/common/enums';
 import { Branch } from '../app/core/branch/branch';
-import { Tenant } from '../app/core/tenant/tenant';
+import { Photo } from '../app/core/photo/photo';
+import { Referrer, Tenant } from '../app/core/tenant/tenant';
 import { Langs, Users } from '../app/users/users';
 
 
@@ -27,7 +29,10 @@ export interface tenantInfo {
     address: string,
     addressRemark: string,
     floor: string,
-    apartment: string
+    apartment: string,
+    refferrer: string,
+    foodCount: number,
+    gender:string
 }
 
 export interface tenantVolunteersInfo {
@@ -47,11 +52,17 @@ let branches = [] as string[];
 // branches.push('ראשון לציון');
 // branches.push('דימונה');
 // branches.push('חדרה');
-// branches.push('יבנה');
+// branches.push('יבנה'); 
 // branches.push('נתניה');
 // branches.push('עומר');
 // branches.push('קריית גת');
 // -------------------------------
+// branches.push('אילת נוער');
+// branches.push('אילת קמפוס');
+// branches.push('נהריה');
+// branches.push('ראשון לציון ב');
+// -------------------------------
+// branches.push('ירושלים ג');
 // -------------------------------
 
 // נסים בוארון | 0584877770
@@ -70,11 +81,58 @@ let branches = [] as string[];
 // branches.push('לוד');// אין קובץ
 // מנדי טורקוב | 0584577012 
 // branches.push('טבריה');// סלולרים נראים כמו ת.ז
-   
-let saveToDb = false;
 
+let saveToDb = true;
+  
 let vMobileCounter = 117;
 let tMobileCounter = 117;
+ 
+export async function updateTenants(branch: string, remult: Remult) {
+
+    let count = 0;
+    let b = await remult.repo(Branch).findFirst({ name: branch })
+    if (b) {
+        let data: tenantInfo[] = [] as tenantInfo[]
+  
+        let file = folder + '\\' + b.name + '\\tenants.txt';
+        let lines = require('fs').readFileSync(file, 'utf-8').split(/\r?\n/);
+        let today = new Date();
+        for (const line of lines) {
+            if (line && line.length > 0) {
+                let info = JSON.parse(line) as tenantInfo;
+                data.push(info)
+            }
+        }
+
+        for await (const t of remult.repo(Tenant).query({
+            where: { bid: { $contains: b.id } }
+        })) {
+            let f = data.find(
+                l => l.mobile === t.mobile)
+            if (f) {
+                t.address = f.address
+                t.apartment = f.apartment
+                t.floor = f.floor
+                t.save();
+                ++count;
+            }
+        }
+    }
+    console.log(`updated ${count} rows`)
+}
+
+export async function buildPhotoLinks(remult: Remult) {
+    let count = 0;
+    let s3 = 'https://eshel-app.s3.eu-central-1.amazonaws.com/dev/eshel.app.ness.tziyona/'
+    for await (const p of remult.repo(Photo).query()) {
+        if (p.created.getDate() !== 18) {
+            p.link = s3 + p.id
+            await p.save()
+            ++count;
+        }
+    }
+    console.log(`updated ${count} row's link`)
+}
 
 export async function importDataNew(remult: Remult) {
 
@@ -122,7 +180,7 @@ export async function importDataNew(remult: Remult) {
     }
     console.timeEnd("import");
     console.log("finished import");
-
+ 
     console.log(`users: ${await remult.repo(Users).count()} rows`);
     console.log(`tenants: ${await remult.repo(Tenant).count()} rows`);
 }
@@ -220,27 +278,31 @@ async function importTenants(branch: Branch, remult: Remult) {
             if (info.birthday && info.birthday.toString().length > 0) {
                 t.birthday = new Date(info.birthday);
                 t.age = today.getFullYear() - t.birthday.getFullYear();
-            }
+            } 
             t.address = info.address;
             t.addressRemark = info.addressRemark;
             t.floor = info.floor;
             t.apartment = info.apartment;
-
+            t.referrer = Referrer.fromStringByCaption(info.refferrer)
+            t.foodCount = FoodDeliveredCount.fromStringById(info.foodCount)
+            t.gender = Gender.fromStringByCaption(info.gender)
+  
             if (saveToDb) {
                 try { await t.save(); }
                 catch (err) {
                     console.log('importTenants.line: ', line, err);
                 }
             }
-        } 
+        }
     }
 }
-
+ 
 async function importTenantVolunteers(branch: Branch, remult: Remult) {
     let file = folder + '\\' + branch.name + '\\tenant-volunteers.txt';
     let lines: string[] = require('fs').readFileSync(file, 'utf-8').split(/\r?\n/);
     for (const line of lines) {
         if (line && line.length > 0) {
+            // console.log(line)
             let info = JSON.parse(line) as tenantVolunteersInfo;
             if (info.volunteers.length > 0) {
                 let t = await remult.repo(Tenant).findFirst({ name: info.tenant });
@@ -248,7 +310,7 @@ async function importTenantVolunteers(branch: Branch, remult: Remult) {
                     console.log(`NOT found tenant: ${info.tenant}`);
                     continue;
                 }
-
+ 
                 for (const v of info.volunteers.split(',')) {
                     if (!v || v.trim().length == 0) {
                         continue;

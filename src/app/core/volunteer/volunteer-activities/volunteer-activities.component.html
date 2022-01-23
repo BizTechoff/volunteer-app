@@ -37,15 +37,15 @@
                             </span>
 
                             <div style="display: flex; flex-direction: row; justify-content: end;">
-                                <button mat-mini-fab color="primary" [title]="a?.tid?.mobile!"
+                                <button *ngIf="a?.tid?.mobile || a?.tid?.phone" mat-mini-fab color="primary"
                                     (click)="this.call(a)">
                                     <mat-icon>call</mat-icon>
-                                </button> 
-                                <button style="margin-right: 10px;" mat-mini-fab color="primary"
-                                    [title]='a?.tid?.address' (click)="this.openWaze(a)">
+                                </button>
+                                <button *ngIf="a?.tid?.address" style="margin-right: 10px;" mat-mini-fab color="primary"
+                                    [title]='a?.tid?.address' (click)="this.navigate(a)">
                                     <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
                                     <img src="./assets/waze.svg">
-                                </button> 
+                                </button>
                                 <button style="margin-right: 10px;" mat-mini-fab color="primary"
                                     [title]='terms.openPhotosAlbum' (click)="this.openPhotosAlbum(a)">
                                     <mat-icon>photo</mat-icon>
@@ -53,6 +53,9 @@
                             </div>
                         </div>
                     </mat-card-title>
+                    <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: flex-start;">
+                        <span style="border-radius: 5px;background-color: burlywood;"> {{ this.getTanantRemark(a) }} </span>
+                    </div>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-start;">
                             <div>

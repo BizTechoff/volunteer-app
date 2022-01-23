@@ -7,7 +7,6 @@ import { AuthService } from './auth.service';
 import { DialogService } from './common/dialog';
 import { InputAreaComponent } from './common/input-area/input-area.component';
 import { Branch } from './core/branch/branch';
-import { Tenant } from './core/tenant/tenant';
 import { terms } from './terms';
 import { Roles } from './users/roles';
 import { UserLoginComponent } from './users/user-login/user-login.component';
@@ -24,17 +23,17 @@ export class AppComponent implements OnInit {
   explicit = [] as string[]
 
   @DataControl<AppComponent, Branch>({
-    // click: async (r, v) => {
-    //   Branch.selectBranch<AppComponent>(async (r, b) => {
-    //     await r.auth.swithToBranch(b)
-    //     r.refresh();
-    //   })
-    // }
-    getValue: (_, f) =>f.value ? `מציג רק את סניף ${f.value?.name}` : 'מציג את כל הסניפים',
-    click: Branch.selectBranch([], async (r, b) => {
-      await r.auth.swithToBranch(b)
-      r.refresh();
-    })
+    click: (_, f) => {
+      Branch.selectBranch(_.explicit, async (r, b) => {
+        await r.auth.swithToBranch(b)
+        r.refresh();
+      })(_, f)
+    },
+    getValue: (_, f) => f.value ? `מציג רק את סניף ${f.value?.name}` : 'מציג את כל הסניפים',
+    // click: Branch.selectBranch([], async (r, b) => {
+    //   await r.auth.swithToBranch(b)
+    //   r.refresh();
+    // })
   })
   @Field({ caption: 'סניף לתצוגה' })
   branch: Branch = undefined!;
@@ -53,13 +52,17 @@ export class AppComponent implements OnInit {
 
   usersCount = 0;
   async ngOnInit() {
+    console.log('ngOnInit.this.router.url-0', this.router.url)
     // this.usersCount = await this.remult.repo(Users).count();
     if (this.auth.isConnected) {
       if (this.remult.user.bid && this.remult.user.bid.length > 0) {
         this.branch = await this.remult.repo(Branch).findId(this.remult.user.bid)
+        console.log('ngOnInit', this.remult.user.bid)
       }
       this.setMultiBranches();
     }
+    // this.refresh()
+    // console.log(this.explicit)
   }
 
   async refresh() {
@@ -90,6 +93,12 @@ export class AppComponent implements OnInit {
     window.location.href = encodeURI("/ברוכים הבאים")
   }
 
+  async routeToeDefault() {
+    if (this.router.url.length < 3 || this.router.url.includes(terms.home)) {
+      this.routeHelper.navigateToComponent((await import('./core/volunteer/volunteer-activities/volunteer-activities.component')).VolunteerActivitiesComponent)
+    }
+  }
+
   forgotPassword = false;
   async signIn() {
     this.isMultiBrnachEnabled = false;
@@ -99,12 +108,16 @@ export class AppComponent implements OnInit {
     );
     if (connected) {
       this.setMultiBranches();
+
+
     }
   }
 
   setMultiBranches() {
+    // this.explicit.splice(0)
     // console.log(JSON.stringify(this.remult.user))
     // console.log('bid2', this.remult.user.bid2)
+    this.explicit.splice(0)
     this.isMultiBrnachEnabled = false;
     if (this.isVolunteer()) {
       if (this.remult.user.bid2) {
@@ -118,6 +131,16 @@ export class AppComponent implements OnInit {
     else if (this.isBoard()) {
       this.isMultiBrnachEnabled = true;
     }
+    // if (this.isVolunteer()) {
+    //   console.log('this.router.url-2',this.router.url)
+    //   if(this.router.url.length < 3 || this.router.url.includes(terms.home)){
+    //     this.routeHelper.navigateToComponent((await import('./core/volunteer/volunteer-activities/volunteer-activities.component')).VolunteerActivitiesComponent)
+    //   }
+    //   //
+    //   // if (!this.router.getCurrentNavigation()?.finalUrl) {
+    //   //   this.routeHelper.navigateToComponent((await import('./core/volunteer/volunteer-activities/volunteer-activities.component')).VolunteerActivitiesComponent)
+    //   // }
+    // }
   }
 
   getUserBrnachDesc() {

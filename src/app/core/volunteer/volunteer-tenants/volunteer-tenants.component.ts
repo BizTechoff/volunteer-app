@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { GridSettings, openDialog } from '@remult/angular';
 import { Remult } from 'remult';
+import { SelectCallComponent } from '../../../common/select-call/select-call.component';
+import { SelectNavigatorComponent } from '../../../common/select-navigator/select-navigator.component';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
@@ -81,14 +83,39 @@ export class VolunteerTenantsComponent implements OnInit {
     return result;
   }
 
-  openWaze(address: string) {
-    let url = `waze://?q=${encodeURI(address)}&navigate=yes`;
-    window.open(url, '_blank');
+  
+  async navigate(a: Tenant) {
+    let nav = undefined
+    if (a.address) {
+      nav = await openDialog(SelectNavigatorComponent,
+        dlg => dlg.args = {},
+        dlg => dlg ? dlg.args.selected : undefined)
+    }
+    if (nav) {
+      // a.wazed = new Date();
+      // await a.save();
+      nav.args?.click(a?.address)
+    }
   }
-
-  call(mobile: string) {
-    let url = `tel:${mobile}`;
-    window.open(url, '_blank');
+  async call(a: Tenant) {
+    let number = ''
+    if (a.mobile && a.phone) {
+      number = await openDialog(SelectCallComponent,
+        dlg => dlg.args = { options: [a.mobile, a.phone] },
+        dlg => dlg ? dlg.args.selected! : '')
+    }
+    else if (a.mobile){
+      number = a.mobile
+    }
+    else if (a.phone){
+      number = a.phone
+    }
+    if (number && number.length > 0) {
+      // a.called = new Date();
+      // await a.save();
+      let url = `tel:${number}`;
+      window.open(url, '_blank');
+    }
   }
 
   async openActivity(tnt: Tenant) {

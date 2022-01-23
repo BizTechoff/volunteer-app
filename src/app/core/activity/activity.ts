@@ -1,6 +1,7 @@
 import { DataControl, openDialog } from "@remult/angular";
 import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
+import { FoodDeliveredCount } from "../../common/enums";
 import { DateRequiredValidation, EntityRequiredValidation, pointsEachSuccessActivity, TimeRequireValidator } from "../../common/globals";
 import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
@@ -279,14 +280,6 @@ export class ActivityGeneralStatus {
     constructor(public id: number, public caption: string, public statuses: ActivityStatus[]) { }
 }
 
-@ValueListFieldType()
-export class FoodDeliveredCount {
-    static one = new FoodDeliveredCount(1, 'מנה 1');
-    // static inProgress = new ActivityGeneralStatus(2, 'בתהליך', ActivityStatus.inProgressStatuses());
-    static two = new FoodDeliveredCount(2, '2 מנות');
-    constructor(public id: number, public caption: string) { }
-}
-
 @Entity<Activity>('activities',
     {
         allowApiInsert: Allow.authenticated,
@@ -366,12 +359,19 @@ export class Activity extends IdEntity {
 
     constructor(private remult: Remult) { super(); }
 
+    // @DataControl<Activity,boolean>({
+    //     valueChange: (r,c) => c.metadata.options.
+    // })
     @Field({ caption: terms.foodDelivered })
     foodDelivered = false;
 
-    // @DataControl<Activity>({readonly: this.foodDelivered })
+
+    @DataControl<Activity, FoodDeliveredCount>({
+        valueChange: (r, c) => r.foodDelivered = true
+        // readonly: row => !row.foodDelivered 
+    })
     @Field({ caption: terms.foodCount })
-    foodCount:FoodDeliveredCount = FoodDeliveredCount.one;
+    foodCount: FoodDeliveredCount = FoodDeliveredCount.one;
 
     isBoard() {
         return this.remult.isAllowed(Roles.board) ? true : false;
@@ -392,6 +392,12 @@ export class Activity extends IdEntity {
         return false;
     }
 
+    @DataControl<Activity, Branch | undefined>({
+        hideDataOnInput: true,
+        clickIcon: 'search',
+        getValue: (_, f) => f.value?.name,
+        click: Branch.selectBranch([], (e, b) => { e.tid = undefined!, e.vids.splice(0) })
+    })
     @Field({
         caption: terms.branch, validate: EntityRequiredValidation
     })

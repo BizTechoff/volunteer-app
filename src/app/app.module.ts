@@ -51,6 +51,8 @@ import { SafePipeModule } from 'safe-pipe';
 import { SelectTenantComponent } from './common/select-tenant/select-tenant.component';
 import { UserVerificationComponent } from './users/user-verification/user-verification.component';
 import { GridDialogComponent } from './common/grid-dialog/grid-dialog.component';
+import { SelectNavigatorComponent } from './common/select-navigator/select-navigator.component';
+import { SelectCallComponent } from './common/select-call/select-call.component';
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -82,7 +84,9 @@ import { GridDialogComponent } from './common/grid-dialog/grid-dialog.component'
     CalendarComponent,
     VolunteerTenantsComponent,
     SelectTenantComponent,
-    UserVerificationComponent
+    UserVerificationComponent,
+    SelectNavigatorComponent,
+    SelectCallComponent
   ], 
   imports: [
     BrowserModule,
@@ -110,7 +114,8 @@ import { GridDialogComponent } from './common/grid-dialog/grid-dialog.component'
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, GridDialogComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
     SelectVolunteersComponent, SelectTenantComponent, SelectLangsComponent,
-    UserLoginComponent, UserVerificationComponent]//, SelectReferrerComponent]
+    UserLoginComponent, UserVerificationComponent, SelectNavigatorComponent,
+    SelectCallComponent]//, SelectReferrerComponent]
 })
 export class AppModule { }
  

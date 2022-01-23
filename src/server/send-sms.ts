@@ -9,11 +9,11 @@ export interface SendSmsResponse {
     count: number
 };
 
-NotificationService.sendSms = async (req: SmsRequest) :Promise<{ success: boolean, message: string, count: number }> => {
+NotificationService.sendSms = async (req: SmsRequest): Promise<{ success: boolean, message: string, count: number }> => {
     let result: SendSmsResponse = { success: false, message: 'Sms channel is close!', count: 0 };
 
     console.debug(`sendSms: ${JSON.stringify(req)}`);
-
+    console.log(process.env.SMS_CHANNEL_OPENED, process.env.SMS_CHANNEL_OPENED === 'true')
     if (process.env.SMS_CHANNEL_OPENED === 'true') {
         let url = process.env.SMS_URL!
             .replace('!user!', process.env.SMS_ACCOUNT!)
@@ -28,13 +28,14 @@ NotificationService.sendSms = async (req: SmsRequest) :Promise<{ success: boolea
 
         let r = await fetch.default(url, {//require('node-fetch').
             method: 'GET'
-        }); 
+        });
         if (r.ok) {
             let res = JSON.parse(await r.text());// as SendSmsResponse;
             result.success = res.success;
-            result.message = res.message?.trim();
-            result.count = res.smsCount;
-            console.debug(`sendSms.return: ${JSON.stringify(res)}`);
+            result.message = res.message ? res.message : res.error?JSON.stringify(res.error): 'unKnown';
+            result.count = res.smsCount; 
+            console.debug(`sendSms.res: ${JSON.stringify(res)}`);
+            // console.debug(`sendSms.result: ${JSON.stringify(result)}`);
         }
         else {
             result.message = `status: ${r.status}, statusText: ${r.statusText} }`;

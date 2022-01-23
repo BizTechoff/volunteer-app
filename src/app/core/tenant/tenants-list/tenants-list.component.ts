@@ -238,9 +238,9 @@ export class TenantsListComponent implements OnInit {
       title = terms.addTenant;
       t = this.remult.repo(Tenant).create();
       isNew = true;
-      if (!this.isBoard()) {
-        t.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
-      }
+      // if (!this.isBoard()) {
+      t.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
+      // }
     }
     // console.log(t);
     let changed = await openDialog(InputAreaComponent,
@@ -250,14 +250,14 @@ export class TenantsListComponent implements OnInit {
         fields: () => {
           let f = [];
           if (this.isBoard()) {
-            f.push(t.$.bid);
+            f.push({ field: t.$.bid, readonly: t.bid ? true : false });
           }
           f.push(
             [{ field: t.$.referrer, width: '88' }, t.$.referrerRemark],
             t.$.name,
             [t.$.mobile, t.$.phone],
-            t.$.address,
-            [t.$.addressRemark, { field: t.$.apartment, width: '50' }, { field: t.$.floor, width: '50' }],
+            [t.$.address, { field: t.$.apartment, width: '50' }, { field: t.$.floor, width: '50' }],
+            t.$.addressRemark,
             [t.$.birthday,
             t.$.age],
             t.$.langs,

@@ -22,12 +22,13 @@
                                <p style="margin-top: 10px; margin-right: 5px;"> {{ a.name }} </p>
                             </div> 
                             <div style="display: flex; flex-direction: row; justify-content: end;">
-                                <button mat-mini-fab color="primary" [title]="a.mobile!"
-                                    (click)="this.call(a.mobile!)">
+                                <button *ngIf="this.a?.mobile || this.a?.phone" mat-mini-fab color="primary"
+                                    (click)="this.call(this.a)">
                                     <mat-icon>call</mat-icon>
                                 </button>
-                                <button style="margin-right: 10px;" mat-mini-fab color="primary"
-                                    [title]='a.address' (click)="this.openWaze(a.address!)">
+                                <button *ngIf="this.a?.address" style="margin-right: 10px;" mat-mini-fab color="primary"
+                                    [title]='this.a?.address' (click)="this.navigate(this.a)">
+                                    <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
                                     <img src="./assets/waze.svg">
                                 </button>
                                 <!-- <button style="margin-right: 10px;" mat-mini-fab color="primary"
