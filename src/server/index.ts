@@ -80,7 +80,7 @@ async function startup() {
         // console.log(JSON.stringify(result));
         res.send(JSON.stringify(result));
     })
-
+  
     app.use(express.static('dist/volunteer-app'));
 
     app.use('/*', async (req, res) => {
@@ -93,9 +93,13 @@ async function startup() {
 
     console.debug(enviroment);
 
+    // let f = new Date()
+    // f= undefined!
+    // console.log('YEP!',f)
+
     // const remult = await api.getRemult(undefined!);
     // downloadPhotos(remult).then(() => { });
- 
+    
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
 
         const remult = await api.getRemult(undefined!);

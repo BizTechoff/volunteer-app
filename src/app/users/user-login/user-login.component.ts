@@ -35,7 +35,7 @@ export class UserLoginComponent implements OnInit {
   async signIn() {
     this.args.out.connected = false;
     if (this.mobile.value && this.mobile.value.length > 0) {
-      let mobile = mobileToDb(this.mobile.value)
+      let mobile = mobileToDb(this.mobile.value) as string
       if (mobile.length > 0) {
         let verified = await openDialog(UserVerificationComponent,
         _ => _.args = { in: { mobile: mobile } },

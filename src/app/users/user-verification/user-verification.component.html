@@ -3,16 +3,27 @@
     <p>
         <span style="text-align: center;"> {{ this.terms.pleaseEnterVerificationCode }} </span>
     </p>
+    <div *ngIf="this.showLoginAsVolunteer" style="padding-bottom: 7px;">
+        <mat-radio-group [(ngModel)]="this.isLoginAsVolunteer">
+            <mat-radio-button [value]="false">
+                <span>כניסה כמנהל</span>
+            </mat-radio-button>
+            <mat-radio-button [value]="true" style="padding-right: 7px;">
+                <span>כניסה כמתנדב</span>
+            </mat-radio-button>
+        </mat-radio-group>
+    </div>
     <p>
         <data-control [field]="this.$.code"></data-control>
-        <button mat-flat-button (click)="this.sendVerificationCode()"> {{ this.terms.sendVerificationCode }} </button>
+        <button *ngIf="!this.sending" mat-flat-button (click)="this.sendVerificationCode()"> {{ this.terms.sendVerificationCode }} </button>
     </p>
+
     <div class="footer">
-        <button mat-raised-button (click)="this.signIn()" color='accent' style="margin-left: 15px;">
+        <button *ngIf="!this.sending" mat-raised-button (click)="this.signIn()" color='accent' style="margin-left: 15px;">
             {{ terms.verifying }}
         </button>
         <button mat-raised-button (click)="this.close()">
             {{ terms.cancel }}
         </button>
     </div>
-</div> 
+</div>

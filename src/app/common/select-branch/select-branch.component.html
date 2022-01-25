@@ -15,15 +15,18 @@
             <mat-divider></mat-divider>
         </ng-container>
     </mat-nav-list>
-</div> 
+</div>  
 <div *ngIf="this.args.canSelectAll" mat-dialog-actions>
   
     <!-- <button mat-icon-button (click)="create()">
         <mat-icon>add</mat-icon>
     </button> -->
-    <button *ngif="!this.args.explicit || this.args.explicit.length > 0" mat-icon-button mat-dialog-close (click)="clear()" title="נקה בחירה">
+    <button mat-icon-button mat-dialog-close (click)="clear()" title="נקה בחירה">
         <mat-icon>clear</mat-icon>
     </button>
+    <!-- <button *ngif="!this.args.explicit || this.args.explicit.length > 0" mat-icon-button mat-dialog-close (click)="clear()" title="נקה בחירה">
+        <mat-icon>clear</mat-icon>
+    </button> -->
 
 
 </div>

@@ -59,4 +59,15 @@ export class OnlyVolunteerGuard extends AuthenticatedInGuard {
         return this.remult.isAllowed(Roles.volunteer) &&
             !this.remult.isAllowed(Roles.manager);
     }
+}
+
+@Injectable()
+export class ManagerOrAboveGuard extends AuthenticatedInGuard {
+
+    isAllowed() {
+        return this.remult.isAllowed(Roles.manager) ||
+            this.remult.isAllowed(Roles.board)||
+            this.remult.isAllowed(Roles.donor)||
+            this.remult.isAllowed(Roles.admin);
+    }
 } 

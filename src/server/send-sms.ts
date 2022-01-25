@@ -28,12 +28,12 @@ NotificationService.sendSms = async (req: SmsRequest): Promise<{ success: boolea
 
         let r = await fetch.default(url, {//require('node-fetch').
             method: 'GET'
-        });
+        }); 
         if (r.ok) {
             let res = JSON.parse(await r.text());// as SendSmsResponse;
             result.success = res.success;
-            result.message = res.message ? res.message : res.error?JSON.stringify(res.error): 'unKnown';
-            result.count = res.smsCount; 
+            result.message = res.message ? res.message : res.error ? JSON.stringify(res.error) : 'unKnown';
+            result.count = res.smsCount;
             console.debug(`sendSms.res: ${JSON.stringify(res)}`);
             // console.debug(`sendSms.result: ${JSON.stringify(result)}`);
         }

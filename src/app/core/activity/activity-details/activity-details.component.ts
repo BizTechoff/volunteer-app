@@ -152,7 +152,7 @@ export class ActivityDetailsComponent implements OnInit {
   isDonor() {
     return this.remult.isAllowed(Roles.donor);
   }
-
+ 
   isManager() {
     return this.remult.isAllowed(Roles.manager);
   }
@@ -264,8 +264,8 @@ export class ActivityDetailsComponent implements OnInit {
           }
           // console.log(9);
         },
-        title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
-        tenantLangs: []
+        title: 'דייר'// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+        // tenantLangs: []
       });
     }
     else {

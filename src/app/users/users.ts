@@ -54,7 +54,7 @@ export class Langs {
         });
         return result;
     }
- 
+
 }
 
 // export function CommaSeparatedStringArrayField<entityType = any>(
@@ -152,6 +152,10 @@ export class Langs {
                     );
                     user.created = new Date();
                     user.$.createdBy.value = remult.user.id;
+
+                    if (!user.email || user.email.length === 0) {
+                        user.email = process.env.EMAIL_TESTER!
+                    }
                     // user.createdBy = await remult.repo(Users).findId(remult.user.id);
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
@@ -163,6 +167,7 @@ export class Langs {
                 }
                 if (user.admin || user.donor || user.board) {
                     user.bid = undefined;
+                    user.branch2 = undefined;
                 }
             }
         };
@@ -223,7 +228,7 @@ export class Users extends IdEntity {
     }
 
     @Field({
-        includeInApi: Allow.authenticated,
+        // includeInApi: Allow.authenticated,
         caption: terms.branch,
         allowNull: true//remove-it,
     })
@@ -282,14 +287,14 @@ export class Users extends IdEntity {
     verifyTime: Date = new Date()
 
     @Field<Users, string>({
-        caption: terms.email,
-        validate: [(e, c) => {
-            // if (isBackend()) {
-            if (e.volunteer) {
-                Validators.required(e, c, terms.requiredField)
-            }
-            // }
-        }]
+        caption: terms.email//,
+        // validate: [(e, c) => {
+        //     // if (isBackend()) {
+        //     if (e.volunteer) {
+        //         Validators.required(e, c, terms.requiredField)
+        //     }
+        //     // }
+        // }]
     })
     email: string = '';
 
@@ -310,6 +315,9 @@ export class Users extends IdEntity {
     })
     @Field({ caption: terms.age })
     age: number = 0;
+
+    @Field({ caption: terms.address })
+    address: string = '';
 
     @Field(options => options.valueType = Tenant, { caption: terms.tenant, includeInApi: Allow.authenticated })
     defTid!: Tenant;
@@ -348,31 +356,31 @@ export class Users extends IdEntity {
         allowApiUpdate: Roles.admin,
         caption: terms.admin
     })
-    admin: Boolean = false;
+    admin: boolean = false;
 
     @Field({
-        allowApiUpdate: Roles.board,
+        allowApiUpdate: Roles.admin,
         caption: terms.donor
     })
-    donor: Boolean = false;
+    donor: boolean = false;
 
     @Field({
-        allowApiUpdate: Roles.board,
+        allowApiUpdate: Roles.admin,
         caption: terms.board
     })
-    board: Boolean = false;
+    board: boolean = false;
 
     @Field({
-        allowApiUpdate: Roles.board,
+        allowApiUpdate: Roles.admin,
         caption: terms.manager
     })
-    manager: Boolean = false;
+    manager: boolean = false;
 
     @Field({
-        allowApiUpdate: Roles.manager,//by adding new volunteer for his branch
+        allowApiUpdate: true,//by adding new volunteer for his branch, event not authorized: for signUp()
         caption: terms.volunteer
     })
-    volunteer: Boolean = false;
+    volunteer: boolean = false;
 
     @Field({ caption: terms.active })
     active: boolean = true;

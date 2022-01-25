@@ -1,6 +1,6 @@
-import { FieldRef, Filter, IdEntity } from "remult";
+import { FieldRef, IdEntity } from "remult";
 import { terms } from "../terms";
-  
+
 
 export const OnlyVolunteerEditActivity = true;
 export const useVolunteerLoginWithVerificationCode = true;
@@ -29,8 +29,8 @@ export const StringRequiredValidation = (_: any, col: FieldRef<any, string>) => 
     if (!ok!)
         col.error = terms.requiredField;
 
-        // col.dbTo = 0501234567;
-        // col.dbFrom = 050-1234-567
+    // col.dbTo = 0501234567;
+    // col.dbFrom = 050-1234-567
 }
 
 export const TimeRequireValidator = (_: any, col: FieldRef<any, string>) => {
@@ -65,7 +65,7 @@ export const EmailValidator = (_: any, col: FieldRef<any, string>) => {
             message = terms.missingAt;
         }
         else {
-            if(split[0].length < 3){
+            if (split[0].length < 3) {
                 ok = false;
                 message = terms.emailPrefix3LettersError;
             }
@@ -74,11 +74,11 @@ export const EmailValidator = (_: any, col: FieldRef<any, string>) => {
                 ok = false;
                 message = terms.missingPoint;
             }
-            else if(split[0].length < 1){
+            else if (split[0].length < 1) {
                 ok = false;
                 message = terms.emailMiddle1LettersError;
             }
-            else if(split[1].length < 3){
+            else if (split[1].length < 3) {
                 ok = false;
                 message = terms.emailSufix3LettersError;
             }
@@ -103,26 +103,49 @@ export const mobileFromDb = (mobile: string) => {
     }
     return result;
 }
+ 
+export const mobileToDb = (mobile: string, mobile2?: string): boolean | string => {
+    let digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
-export const mobileToDb = (mobile: string) => {
-    let result = '';// [0]000000000
+    let fixedMobile = '';// [0]000000000
     if (mobile && mobile.length > 0) {
-        let digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         for (const c of mobile) {
             if (digits.includes(c)) {
-                result += c;
+                fixedMobile += c;
             }
         }
     }
-    if (result.length > 0) {
-        result = result.padStart(10, '0');
-        if (!result.startsWith('05')) {
-            if (!result.startsWith('000')) {
-                if (result.startsWith('00')) {
-                    result = result.substring(1);//02,03,..
+    if (fixedMobile.length > 0) {
+        fixedMobile = fixedMobile.padStart(10, '0');
+        if (!fixedMobile.startsWith('05')) {
+            if (!fixedMobile.startsWith('000')) {
+                if (fixedMobile.startsWith('00')) {
+                    fixedMobile = fixedMobile.substring(1);//02,03,..
                 }
             }
         }
     }
-    return result;
+
+    if (mobile2 && mobile2.length > 0) {
+        let fixedMobile2 = '';// [0]000000000
+        for (const c of mobile2) {
+            if (digits.includes(c)) {
+                fixedMobile2 += c;
+            }
+        }
+        if (fixedMobile2.length > 0) {
+            fixedMobile2 = fixedMobile2.padStart(10, '0');
+            if (!fixedMobile2.startsWith('05')) {
+                if (!fixedMobile2.startsWith('000')) {
+                    if (fixedMobile2.startsWith('00')) {
+                        fixedMobile2 = fixedMobile2.substring(1);//02,03,..
+                    }
+                }
+            }
+        }
+
+        return fixedMobile === fixedMobile2
+    }
+
+    return fixedMobile;
 }

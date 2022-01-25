@@ -21,7 +21,7 @@ export const terms = {
     verificationCode: 'קוד אימות',
     foodDelivered: 'מסרתי לדייר את האוכל לשבת',
     foodCount: 'מנות',
-    gender:'מגדר',
+    gender: 'מגדר',
     pointsExplain: 'הסבר צבירת נקודות',
     youGotMorePoint: 'צברת !points! נקודות נוספות, סה"כ צברת עד כה: !sum! נקודות',
     youMustEnterPurposes: 'לפני סגירת הפעילות יש לציין את המטרות שנמצאו',
@@ -81,6 +81,7 @@ export const terms = {
     voulnteerUpdateAssign: 'עודכנה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     voulnteerCancelAssign: 'בוטלה לך פעילות עם הדייר !name! בתאריך !date! משעה !from! עד שעה !to! בכתובת !address!',
     referrer: 'גורם מפנה',
+    foodDeliveryArea: 'איזור חלוקה',
     referrerRemark: 'שם גורם מפנה',
     volunteerNoActivities: 'תודה לך! כרגע אין לך פעילויות פתוחות',
     volunteerNoTenants: 'תודה לך! לא שוייכו לך עדיין דיירים',
@@ -217,18 +218,28 @@ export const terms = {
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
     appVersion: '2022.01.18.0'
 }
-
+ 
 declare module 'remult' {
     export interface UserInfo {
         bid: string;
-        bname: string;
-        bid2: string;
-        b2name: string;
+        isReadOnly: boolean;
+        isVolunteerMultiBrnach: boolean;
+        isVolunteerOnly: boolean;
+        isBoardOrDonorOrAdmin: boolean;
+        // bname: string;
+        // bid2: string;
+        // b2name: string;
     }
     export interface Remult {
         branchAllowedForUser(): IdFilter<import('./core/branch/branch').Branch>
     }
 }
+
+// declare class 'system' {
+//     export interface string {
+//         isNotEmpty = (s: string) => { s && s.trim().length > 0 }
+//     }
+// }
 
 export function augmentRemult(remult: Remult) {
     remult.branchAllowedForUser = () => {

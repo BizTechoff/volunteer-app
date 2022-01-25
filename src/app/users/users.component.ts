@@ -78,7 +78,6 @@ export class UsersComponent implements OnInit {
               user.admin = false;
               user.donor = false;
               user.board = false;
-              user.volunteer = false;
               // user.volunteer = false;
             }
           }
@@ -89,7 +88,6 @@ export class UsersComponent implements OnInit {
               user.admin = false;
               user.donor = false;
               user.board = false;
-              user.manager = false;
               // user.manager = false;
             }
           }

@@ -1,6 +1,8 @@
 import { debug } from 'console';
+import { exit } from 'process';
 import { Remult } from 'remult';
 import { FoodDeliveredCount, Gender } from '../app/common/enums';
+import { mobileToDb } from '../app/common/globals';
 import { Branch } from '../app/core/branch/branch';
 import { Photo } from '../app/core/photo/photo';
 import { Referrer, Tenant } from '../app/core/tenant/tenant';
@@ -15,7 +17,8 @@ export interface volunteerInfo {
     langs: string,
     birthday: Date,
     age: Date,
-    email: string
+    email: string,
+    address: string
 }
 
 export interface tenantInfo {
@@ -32,7 +35,8 @@ export interface tenantInfo {
     apartment: string,
     refferrer: string,
     foodCount: number,
-    gender:string
+    gender: string,
+    foodDeliveryArea: string
 }
 
 export interface tenantVolunteersInfo {
@@ -55,16 +59,20 @@ let branches = [] as string[];
 // branches.push('יבנה'); 
 // branches.push('נתניה');
 // branches.push('עומר');
-// branches.push('קריית גת');
+// branches.push('קריית גת'); 
 // -------------------------------
-// branches.push('אילת נוער');
+// branches.push('אילת נוער'); 
 // branches.push('אילת קמפוס');
 // branches.push('נהריה');
 // branches.push('ראשון לציון ב');
-// -------------------------------
+// branches.push('שדרות');   
+// branches.push('ירושלים ב');
+// branches.push('חולון ב');
+// branches.push('טבריה');
+// ------------------------------- 
 // branches.push('ירושלים ג');
 // -------------------------------
-
+ 
 // נסים בוארון | 0584877770
 // branches.push('דימונה');//***
 // אלי לוין | 0
@@ -83,17 +91,17 @@ let branches = [] as string[];
 // branches.push('טבריה');// סלולרים נראים כמו ת.ז
 
 let saveToDb = true;
-  
+
 let vMobileCounter = 117;
 let tMobileCounter = 117;
- 
+
 export async function updateTenants(branch: string, remult: Remult) {
 
     let count = 0;
     let b = await remult.repo(Branch).findFirst({ name: branch })
     if (b) {
         let data: tenantInfo[] = [] as tenantInfo[]
-  
+
         let file = folder + '\\' + b.name + '\\tenants.txt';
         let lines = require('fs').readFileSync(file, 'utf-8').split(/\r?\n/);
         let today = new Date();
@@ -108,7 +116,7 @@ export async function updateTenants(branch: string, remult: Remult) {
             where: { bid: { $contains: b.id } }
         })) {
             let f = data.find(
-                l => l.mobile === t.mobile)
+                l => mobileToDb(l.mobile, t.mobile)!)
             if (f) {
                 t.address = f.address
                 t.apartment = f.apartment
@@ -133,6 +141,11 @@ export async function buildPhotoLinks(remult: Remult) {
     }
     console.log(`updated ${count} row's link`)
 }
+
+export async function fixUsersMobiles(remult: Remult) {
+
+}
+
 
 export async function importDataNew(remult: Remult) {
 
@@ -180,7 +193,7 @@ export async function importDataNew(remult: Remult) {
     }
     console.timeEnd("import");
     console.log("finished import");
- 
+
     console.log(`users: ${await remult.repo(Users).count()} rows`);
     console.log(`tenants: ${await remult.repo(Tenant).count()} rows`);
 }
@@ -211,13 +224,15 @@ async function importVolunteers(branch: Branch, remult: Remult) {
             }
             info.mobile = info.mobile.padStart(10, '0');
             if (!info.email || info.email.length === 0) {
-                info.email = 'biztechoff.app@gmail.com'
+                info.email = process.env.EMAIL_TESTER!
             }
             if (!info.langs || info.langs.length === 0) {
                 info.langs = Langs.hebrew.caption;
             }
 
-            let u = await remult.repo(Users).findFirst({ mobile: info.mobile }, { createIfNotFound: true });
+            let u = await remult.repo(Users).findFirst(
+                { mobile: { $contains: mobileToDb(info.mobile) as string } },
+                { createIfNotFound: true });
             if (u.hasBranch()) {
                 console.log(`Found volunteer ${u.name} and update his fields`)
                 if (u.bid?.id !== branch.id) {
@@ -230,7 +245,9 @@ async function importVolunteers(branch: Branch, remult: Remult) {
                 u.mobile = info.mobile;
             }
             u.volunteer = true;
-            u.email = info.email;
+            u.email = info.email; 
+            u.address = info.address
+            // exit(99)
             if (info.birthday && info.birthday.toString().length > 0) {
                 u.birthday = new Date(info.birthday);
                 u.age = today.getFullYear() - u.birthday.getFullYear();
@@ -250,9 +267,9 @@ async function importTenants(branch: Branch, remult: Remult) {
     let file = folder + '\\' + branch.name + '\\tenants.txt';
     let lines = require('fs').readFileSync(file, 'utf-8').split(/\r?\n/);
     let today = new Date();
-    for (const line of lines) {
+    for (const line of lines) { 
         if (line && line.length > 0) {
-            // console.log(line)
+            // console.log(line) 
             let info = JSON.parse(line) as tenantInfo;
             if (!info.mobile || info.mobile.length == 0) {
                 ++tMobileCounter;
@@ -265,10 +282,16 @@ async function importTenants(branch: Branch, remult: Remult) {
             if (!info.mobile.startsWith('05')) {
                 if (!info.mobile.startsWith('000')) {
                     if (info.mobile.startsWith('00')) {
-                        info.mobile = info.mobile.substring(1);
+                        info.mobile = info.mobile.substring(1);//fix double zero(s) to only one
                     }
                 }
             }
+            // remult.repo(Tenant).findFirst(
+            //     {
+            //         mobile: mobileToDb(info.mobile) as string
+            //     }
+            // );
+
             let t = remult.repo(Tenant).create();
             t.bid = branch;
             t.name = info.name;
@@ -276,9 +299,9 @@ async function importTenants(branch: Branch, remult: Remult) {
             t.phone = info.phone;
             t.langs = Langs.fromStringByCaption(info.langs);
             if (info.birthday && info.birthday.toString().length > 0) {
-                t.birthday = new Date(info.birthday);
+                t.birthday = new Date(info.birthday);//date.fromString(info.birthday) : Date | undefined!// 
                 t.age = today.getFullYear() - t.birthday.getFullYear();
-            } 
+            }
             t.address = info.address;
             t.addressRemark = info.addressRemark;
             t.floor = info.floor;
@@ -286,7 +309,8 @@ async function importTenants(branch: Branch, remult: Remult) {
             t.referrer = Referrer.fromStringByCaption(info.refferrer)
             t.foodCount = FoodDeliveredCount.fromStringById(info.foodCount)
             t.gender = Gender.fromStringByCaption(info.gender)
-  
+            t.foodDeliveryArea = info.foodDeliveryArea
+
             if (saveToDb) {
                 try { await t.save(); }
                 catch (err) {
@@ -296,7 +320,7 @@ async function importTenants(branch: Branch, remult: Remult) {
         }
     }
 }
- 
+
 async function importTenantVolunteers(branch: Branch, remult: Remult) {
     let file = folder + '\\' + branch.name + '\\tenant-volunteers.txt';
     let lines: string[] = require('fs').readFileSync(file, 'utf-8').split(/\r?\n/);
@@ -310,9 +334,11 @@ async function importTenantVolunteers(branch: Branch, remult: Remult) {
                     console.log(`NOT found tenant: ${info.tenant}`);
                     continue;
                 }
- 
+
+                // add volunteer to tenant (.defVids) if not exists, otherwise optional update his fields
                 for (const v of info.volunteers.split(',')) {
                     if (!v || v.trim().length == 0) {
+                        console.log(`Skipping Empty volunteer for tenant: ${t.name}`);
                         continue;
                     }
                     let u = await remult.repo(Users).findFirst({ name: v.trim() });
@@ -324,10 +350,22 @@ async function importTenantVolunteers(branch: Branch, remult: Remult) {
                     if (!f) {
                         t.defVids.push({ id: u.id, name: u.name });
                     }
+                    else {
+                        console.log(`Volunteer: ${v} already Exists for tenant: ${t.name}`);
+                        // can update fields
+                        if (process.env.IMPORT_DATA_UPDATE_IF_EXISTS === 'true') {
+                            u.name = f.name
+                            await u.save()
+                            console.log(`Volunteer: ${v} Updated for tenant: ${t.name}`);
+                        }
+                    }
                 }
 
                 if (saveToDb) {
                     if (t.defVids.length > 0) {
+                        // if (t.name.includes('דן נס')) {
+                        //     console.log(t.name, t)
+                        // } 
                         try { await t.save(); }
                         catch (err) {
                             console.log('importTenantVolunteers.line: ', line, err);

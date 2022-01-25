@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { GridSettings, openDialog } from '@remult/angular';
 import { Remult } from 'remult';
+import { DialogService } from '../../../common/dialog';
 import { SelectCallComponent } from '../../../common/select-call/select-call.component';
 import { SelectNavigatorComponent } from '../../../common/select-navigator/select-navigator.component';
+import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
+import { Branch } from '../../branch/branch';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
 
@@ -48,7 +51,7 @@ export class VolunteerTenantsComponent implements OnInit {
       ]
     });
   userMessage = terms.loadingYourTenants;
-  constructor(private remult: Remult) { }
+  constructor(private remult: Remult, private dialog: DialogService) { }
   terms = terms;
   async ngOnInit() {
     await this.refresh();
@@ -64,6 +67,48 @@ export class VolunteerTenantsComponent implements OnInit {
     if (this.tenants.items.length == 0) {
       this.userMessage = terms.volunteerNoTenants;
     }
+  }
+
+  async removeTenant(t: Tenant) {
+    if (t && t.defVids && t.defVids.length > 0) {
+      let f = t.defVids.find(row => row.id === this.remult.user.id);
+      if (f) {
+        let yes = await this.dialog.yesNoQuestion('האם להסר את שיוכך מהדייר ' + t.name)
+        if (yes) {
+          let i = t.defVids.indexOf(f);
+          t.defVids.splice(i, 1);
+          await t.save()
+          await this.refresh()
+        }
+      }
+    }
+  }
+
+  async addTenant() {
+    let newT: Tenant = undefined!;
+    await openDialog(SelectTenantComponent,
+      async x => x.args = {
+        ignoreDefVids: true,
+        title: 'דייר חדש לדיירים שלי',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+        bid: await this.remult.repo(Branch).findId(this.remult.user.bid),
+        onSelect: t => newT = t
+      })
+    if (newT) {
+      console.log(2)
+      let yes = await this.dialog.yesNoQuestion('האם לשייך לך את ' + newT.name)
+      if (yes) {
+        let f = newT.defVids.find(row => row.id === this.remult.user.id);
+        if (!f) {
+          newT.defVids.push({ id: this.remult.user.id, name: this.remult.user.name });
+          await newT.save()
+          await this.refresh()
+        }
+        else {
+          this.dialog.info('דייר זה כבר משוייך לך')
+        }
+      }
+    }
+    console.log(3)
   }
 
   async openPhotosAlbum(t: Tenant) {
@@ -83,7 +128,7 @@ export class VolunteerTenantsComponent implements OnInit {
     return result;
   }
 
-  
+
   async navigate(a: Tenant) {
     let nav = undefined
     if (a.address) {
@@ -104,10 +149,10 @@ export class VolunteerTenantsComponent implements OnInit {
         dlg => dlg.args = { options: [a.mobile, a.phone] },
         dlg => dlg ? dlg.args.selected! : '')
     }
-    else if (a.mobile){
+    else if (a.mobile) {
       number = a.mobile
     }
-    else if (a.phone){
+    else if (a.phone) {
       number = a.phone
     }
     if (number && number.length > 0) {

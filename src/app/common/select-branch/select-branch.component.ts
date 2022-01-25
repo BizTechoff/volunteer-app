@@ -5,7 +5,7 @@ import { Remult } from 'remult';
 import { Branch } from '../../core/branch/branch';
 import { terms } from '../../terms';
 import { Roles } from '../../users/roles';
-import { Langs } from '../../users/users';
+import { Users } from '../../users/users';
 import { InputAreaComponent } from '../input-area/input-area.component';
 
 @Component({
@@ -15,15 +15,12 @@ import { InputAreaComponent } from '../input-area/input-area.component';
 })
 export class SelectBranchComponent implements OnInit {
   searchString = '';
-  options = [
-    Langs.hebrew, Langs.english, Langs.russian, Langs.french
-  ]
   args: {
-    canSelectAll?:boolean,
+    canSelectAll?: boolean,
     title?: string,
     explicit?: string[],
     onSelect: (b?: Branch) => void
-  } = {canSelectAll: true, title: '', explicit: [], onSelect: undefined!}
+  } = { canSelectAll: true, title: '', explicit: [], onSelect: undefined! }
   constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
   branches: Branch[] = [];
   terms = terms;
@@ -36,14 +33,26 @@ export class SelectBranchComponent implements OnInit {
     this.loadBranchs();
   }
   async loadBranchs() {
+    let bids = [] as string[]
+    let uid = this.remult.user.id
+    let u = await this.remult.repo(Users).findId(uid)
+    if (u) {
+      if (u.bid) {
+        bids.push(u.bid.id)
+      }
+      if (u.branch2) {
+        bids.push(u.branch2.id)
+      }
+    }
     // console.log('this.args.explicit',this.args.explicit)
     this.branches = await this.remult.repo(Branch).find({
       where: {
         name: this.searchString ? { $contains: this.searchString } : undefined!,
-        id: this.args.explicit && this.args.explicit.length > 0 ? this.args.explicit : undefined
+        id: bids.length > 0 ? bids : undefined!
+        // id: this.args.explicit && this.args.explicit.length > 0 ? this.args.explicit : undefined
       }
     });
-  } 
+  }
   async doSearch() {
     await this.busy.donotWait(async () => this.loadBranchs());
   }
@@ -51,7 +60,7 @@ export class SelectBranchComponent implements OnInit {
   select(p: Branch) {
     this.args.onSelect(p);
     this.dialogRef.close();
-  } 
+  }
   selectFirst() {
     if (this.branches.length > 0)
       this.select(this.branches[0]);

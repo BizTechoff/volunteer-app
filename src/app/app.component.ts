@@ -19,7 +19,7 @@ import { PasswordControl, Users } from './users/users';
 })
 export class AppComponent implements OnInit {
 
-  isMultiBrnachEnabled = true;
+  // isMultiBrnachEnabled = true;
   explicit = [] as string[]
 
   @DataControl<AppComponent, Branch>({
@@ -45,6 +45,7 @@ export class AppComponent implements OnInit {
     public dialogService: DialogService,
     public remult: Remult,
     public auth: AuthService) {
+      console.log('constructor', remult.user)
     // console.log({ a: remult.repo(Tenant).metadata.fields.modifiedBy.valueType });
   }
   terms = terms;
@@ -55,14 +56,18 @@ export class AppComponent implements OnInit {
     console.log('ngOnInit.this.router.url-0', this.router.url)
     // this.usersCount = await this.remult.repo(Users).count();
     if (this.auth.isConnected) {
-      if (this.remult.user.bid && this.remult.user.bid.length > 0) {
-        this.branch = await this.remult.repo(Branch).findId(this.remult.user.bid)
-        console.log('ngOnInit', this.remult.user.bid)
-      }
-      this.setMultiBranches();
+      await this.setSelectedBranch()
+      // this.setMultiBranches();
     }
     // this.refresh()
     // console.log(this.explicit)
+  }
+
+  async setSelectedBranch(){
+    if (this.remult.user.bid && this.remult.user.bid.length > 0) {
+      this.branch = await this.remult.repo(Branch).findId(this.remult.user.bid)
+      console.log('ngOnInit', this.remult.user.bid)
+    }
   }
 
   async refresh() {
@@ -84,7 +89,7 @@ export class AppComponent implements OnInit {
       this.dialogService.info('סניף הוחלף בהצלחה');
     }
   }
-
+ 
   showBizTechoff() {
     window.open('https://biztechoff.co.il', '_blank');
   }
@@ -101,47 +106,48 @@ export class AppComponent implements OnInit {
 
   forgotPassword = false;
   async signIn() {
-    this.isMultiBrnachEnabled = false;
+    // this.isMultiBrnachEnabled = false;
     let connected = await openDialog(UserLoginComponent,
       _ => { },
       _ => _ ? _.args.out.connected : false
     );
     if (connected) {
-      this.setMultiBranches();
+      await this.setSelectedBranch()
+    //   this.setMultiBranches();
 
 
     }
   }
 
-  setMultiBranches() {
-    // this.explicit.splice(0)
-    // console.log(JSON.stringify(this.remult.user))
-    // console.log('bid2', this.remult.user.bid2)
-    this.explicit.splice(0)
-    this.isMultiBrnachEnabled = false;
-    if (this.isVolunteer()) {
-      if (this.remult.user.bid2) {
-        if (this.remult.user.bid2.length > 0) {
-          this.isMultiBrnachEnabled = true
-          this.explicit.push(this.remult.user.bid)
-          this.explicit.push(this.remult.user.bid2)
-        }
-      }
-    }
-    else if (this.isBoard()) {
-      this.isMultiBrnachEnabled = true;
-    }
-    // if (this.isVolunteer()) {
-    //   console.log('this.router.url-2',this.router.url)
-    //   if(this.router.url.length < 3 || this.router.url.includes(terms.home)){
-    //     this.routeHelper.navigateToComponent((await import('./core/volunteer/volunteer-activities/volunteer-activities.component')).VolunteerActivitiesComponent)
-    //   }
-    //   //
-    //   // if (!this.router.getCurrentNavigation()?.finalUrl) {
-    //   //   this.routeHelper.navigateToComponent((await import('./core/volunteer/volunteer-activities/volunteer-activities.component')).VolunteerActivitiesComponent)
-    //   // }
-    // }
-  }
+  // setMultiBranches() {
+  //   // this.explicit.splice(0)
+  //   // console.log(JSON.stringify(this.remult.user))
+  //   // console.log('bid2', this.remult.user.bid2)
+  //   this.explicit.splice(0)
+  //   this.isMultiBrnachEnabled = false;
+  //   if (this.isVolunteer()) {
+  //     if (this.remult.user.bid2) {
+  //       if (this.remult.user.bid2.length > 0) {
+  //         this.isMultiBrnachEnabled = true
+  //         this.explicit.push(this.remult.user.bid)
+  //         this.explicit.push(this.remult.user.bid2)
+  //       }
+  //     }
+  //   }
+  //   else if (this.isBoard()) {
+  //     this.isMultiBrnachEnabled = true;
+  //   }
+  //   // if (this.isVolunteer()) {
+  //   //   console.log('this.router.url-2',this.router.url)
+  //   //   if(this.router.url.length < 3 || this.router.url.includes(terms.home)){
+  //   //     this.routeHelper.navigateToComponent((await import('./core/volunteer/volunteer-activities/volunteer-activities.component')).VolunteerActivitiesComponent)
+  //   //   }
+  //   //   //
+  //   //   // if (!this.router.getCurrentNavigation()?.finalUrl) {
+  //   //   //   this.routeHelper.navigateToComponent((await import('./core/volunteer/volunteer-activities/volunteer-activities.component')).VolunteerActivitiesComponent)
+  //   //   // }
+  //   // }
+  // }
 
   getUserBrnachDesc() {
     if (this.isValidBidId()) {
@@ -165,56 +171,60 @@ export class AppComponent implements OnInit {
     return false;
   }
 
-  getUserAuthName() {
-    let result = 'לא מורשה';
-    if (this.remult.user.roles.find(r => r === Roles.admin)) {
-      result = 'אדמין';
-    }
-    else if (this.remult.user.roles.find(r => r === Roles.donor)) {
-      result = 'תורם';
-    }
-    else if (this.remult.user.roles.find(r => r === Roles.board)) {
-      result = 'הנהלה';
-    }
-    else if (this.remult.user.roles.find(r => r === Roles.manager)) {
-      let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
-      result = 'מנהל ב' + this.remult.user.bname;
-    }
-    else if (this.remult.user.roles.find(r => r === Roles.volunteer)) {
-      let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
-      result = 'מתנדב ב' + this.remult.user.bname;
-    }
-    return result;
-  }
+  // getUserAuthName() {
+  //   let result = 'לא מורשה';
+  //   if (this.remult.user.roles.find(r => r === Roles.admin)) {
+  //     result = 'אדמין';
+  //   }
+  //   else if (this.remult.user.roles.find(r => r === Roles.donor)) {
+  //     result = 'תורם';
+  //   }
+  //   else if (this.remult.user.roles.find(r => r === Roles.board)) {
+  //     result = 'הנהלה';
+  //   }
+  //   else if (this.remult.user.roles.find(r => r === Roles.manager)) {
+  //     let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
+  //     result = 'מנהל ב' + this.remult.user.bname;
+  //   }
+  //   else if (this.remult.user.roles.find(r => r === Roles.volunteer)) {
+  //     let name = this.remult.user.bid;// await this.remult.repo(Branch).findId(this.remult.user.bid);
+  //     result = 'מתנדב ב' + this.remult.user.bname;
+  //   }
+  //   return result;
+  // }
 
   signOut() {
     this.auth.signOut();
     this.router.navigate(['/']);
   }
+  
   signUp() {
-    // let user = this.remult.repo(Users).create();
+    let user = this.remult.repo(Users).create();
     // user.bid = undefined;// only admin should be here
-    // user.volunteer = true;
-    // let password = new PasswordControl();
-    // let confirmPassword = new PasswordControl(terms.confirmPassword);
-    // openDialog(InputAreaComponent, i => i.args = {
-    //   title: terms.signUp,
-    //   fields: () => [
-    //     user.$.name,
-    //     user.$.mobile,
-    //     password,
-    //     confirmPassword
-    //   ],
-    //   ok: async () => {
-    //     if (password.value != confirmPassword.value) {
-    //       confirmPassword.error = terms.doesNotMatchPassword;
-    //       throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
-    //     }
-    //     await user.create(password.value);
-    //     this.auth.signIn(user.mobile);//, password.value);
+    user.volunteer = true;
+    let password = new PasswordControl();
+    let confirmPassword = new PasswordControl(terms.confirmPassword);
+    openDialog(InputAreaComponent, i => i.args = {
+      title: terms.signUp,
+      fields: () => [
+        user.$.bid!,
+        user.$.name,
+        user.$.mobile,
+        user.$.email
+        // password,
+        // confirmPassword
+      ],
+      ok: async () => {
+        if (password.value != confirmPassword.value) {
+          confirmPassword.error = terms.doesNotMatchPassword;
+          throw new Error(confirmPassword.metadata.caption + " " + confirmPassword.error);
+        }
+        await user.create(password.value);
+        this.signIn()
+        // await this.auth.signIn(user.mobile);//, password.value);
 
-    //   }
-    // });
+      }
+    });
   }
 
   async updateInfo() {

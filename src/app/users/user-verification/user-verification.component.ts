@@ -21,8 +21,12 @@ export class UserVerificationComponent implements OnInit {
   @Field({ caption: terms.verificationCode })
   code!: number;
 
+  sending = true
+  showLoginAsVolunteer = false
+  isLoginAsVolunteer = false;
+
   constructor(
-    private remult: Remult,
+    public remult: Remult,
     private auth: AuthService,
     private busy: BusyService,
     private dialog: DialogService,
@@ -51,25 +55,36 @@ export class UserVerificationComponent implements OnInit {
   }
 
   async sendVerificationCode() {
+    this.sending = true
+    console.log('sendVerificationCode')
     let response = await this.auth.sendVerifyCode(this.args.in.mobile)
+    console.log('response', response)
+    this.showLoginAsVolunteer = response.managerAsVolunteer
     if (response.success) {
       this.dialog.info(terms.verificationCodeSuccesfullySent);
     }
     else {
       this.dialog.info(`${terms.verificationCodeSendFailed}: ${response.error}`);
     }
+    this.sending = false
   }
 
   async signIn() {
-    let success = await this.auth.signIn(
-      this.args.in.mobile,
-      this.code.toString());
-    if (success) {
-      this.args.out!.verified = true;
-      this.close();
+    if (this.code && this.code > 0) {
+      let success = await this.auth.signIn(
+        this.args.in.mobile,
+        this.code.toString(),
+        this.isLoginAsVolunteer);
+      if (success) {
+        this.args.out!.verified = true;
+        this.close();
+      }
+      else {
+        this.dialog.info('כניסה נכשלה');
+      }
     }
     else {
-      this.dialog.info('כניסה נכשלה');
+      this.dialog.info('לא הוזן קוד');
     }
   }
 

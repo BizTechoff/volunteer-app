@@ -90,8 +90,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
             x => x.args = {
                 title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
                 bid: f.value.bid,
-                onSelect: t => f.value = t,
-                tenantLangs: f.value.langs
+                onSelect: t => f.value = t
             })
     }
 })
@@ -136,6 +135,9 @@ export class Tenant extends EntityWithModified {
     
     @Field({ caption: terms.foodCount })
     foodCount: FoodDeliveredCount = FoodDeliveredCount.one;
+
+    @Field({ caption: terms.foodDeliveryArea })
+    foodDeliveryArea: string = '';
 
     @Field({ caption: terms.gender })
     gender: Gender = Gender.unKnown;

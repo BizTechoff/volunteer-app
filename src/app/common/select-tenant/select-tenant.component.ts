@@ -21,17 +21,16 @@ export class SelectTenantComponent implements OnInit {
     Langs.hebrew, Langs.english, Langs.russian, Langs.french
   ]
   args!: {
+    ignoreDefVids?:boolean,
     title?: string,
     // uid: Users,
-    bid: Branch,
-    tenantLangs: Langs[],
+    bid: Branch
     onSelect: (p: Tenant) => void;
   }
   constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
   tenants: Tenant[] = [];
   terms = terms;
   ngOnInit() {
-    this.langs = this.args.tenantLangs;
     this.loadTenants();
   }
   async loadTenants() {
@@ -40,7 +39,7 @@ export class SelectTenantComponent implements OnInit {
         // if there is a search value, search by it
         // t.langs.isIn([this.langs])
         active: true,
-        defVids: this.isManager() ? undefined : { $contains: this.remult.user.id },//@@@@@@@@@@@2
+        defVids: this.isManager() ? undefined :  this.args.ignoreDefVids!? undefined! : { $contains: this.remult.user.id },//@@@@@@@@@@@2
         bid: this.args.bid,// this.isBoard() ? undefined : this.args.bid,
         name: this.searchString ? { $contains: this.searchString } : undefined
       }

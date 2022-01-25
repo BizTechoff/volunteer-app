@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatRadioModule} from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -34,7 +35,7 @@ import { VolunteersAssignmentComponent } from './core/volunteer/volunteers-assig
 import { VolunteersListComponent } from './core/volunteer/volunteers-list/volunteers-list.component';
 import { HomeComponent } from './home/home.component';
 import { ActivityDailyComponent } from './reports/activity-daily/activity-daily.component';
-import { AdminGuard, BoardGuard, DonorGuard, ManagerGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
+import { AdminGuard, BoardGuard, DonorGuard, ManagerGuard, ManagerOrAboveGuard, OnlyVolunteerGuard, VolunteerGuard } from './users/roles';
 import { UsersComponent } from './users/users.component';
 import { SelectVolunteersComponent } from './common/select-volunteers/select-volunteers.component';
 import { SelectLangsComponent } from './common/select-langs/select-langs.component';
@@ -102,6 +103,7 @@ import { SelectCallComponent } from './common/select-call/select-call.component'
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatRadioModule,
     MatIconModule,
     MatMenuModule,
     RemultModule,
@@ -110,7 +112,8 @@ import { SelectCallComponent } from './common/select-call/select-call.component'
     MatSelectModule,
     SafePipeModule
   ],
-  providers: [DialogService, AdminGuard, DonorGuard, BoardGuard, ManagerGuard, VolunteerGuard, OnlyVolunteerGuard],
+  providers: [DialogService, AdminGuard, DonorGuard, BoardGuard, ManagerGuard, VolunteerGuard,
+     OnlyVolunteerGuard, ManagerOrAboveGuard],
   bootstrap: [AppComponent],
   entryComponents: [YesNoQuestionComponent, InputAreaComponent, GridDialogComponent, ActivityDetailsComponent, VolunteersAssignmentComponent,
     SelectVolunteersComponent, SelectTenantComponent, SelectLangsComponent,
