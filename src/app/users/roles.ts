@@ -56,8 +56,7 @@ export class DonorGuard extends AuthenticatedInGuard {
 export class OnlyVolunteerGuard extends AuthenticatedInGuard {
 
     isAllowed() {//this.remult.user.roles.length === 1
-        return this.remult.isAllowed(Roles.volunteer) &&
-            !this.remult.isAllowed(Roles.manager);
+        return this.remult.user.isVolunteerOnly
     }
 }
 
@@ -65,9 +64,10 @@ export class OnlyVolunteerGuard extends AuthenticatedInGuard {
 export class ManagerOrAboveGuard extends AuthenticatedInGuard {
 
     isAllowed() {
-        return this.remult.isAllowed(Roles.manager) ||
-            this.remult.isAllowed(Roles.board)||
-            this.remult.isAllowed(Roles.donor)||
-            this.remult.isAllowed(Roles.admin);
+        return this.remult.user.isManagerOrAbove
+        // .isAllowed(Roles.manager) ||
+        //     this.remult.isAllowed(Roles.board)||
+        //     this.remult.isAllowed(Roles.donor)||
+        //     this.remult.isAllowed(Roles.admin);
     }
 } 

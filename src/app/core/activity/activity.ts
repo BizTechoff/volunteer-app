@@ -242,7 +242,7 @@ export class ActivityStatus {
             _ => _.args = {
                 title: terms.thankYou,
                 fields: () => [a.$.started],
-                ok: async () => { }
+                ok: async () => { await a.save() }
             });
     }
 
@@ -251,7 +251,7 @@ export class ActivityStatus {
             _ => _.args = {
                 title: terms.thankYou,
                 fields: () => [a.$.ended, a.$.remark],
-                ok: async () => { }
+                ok: async () => { await a.save() }
             });
     }
 
@@ -261,7 +261,7 @@ export class ActivityStatus {
             _ => _.args = {
                 title: terms.thankYou + (points > 0 ? ' ' + terms.youGot200Points.replace('!points!', points.toString()) : ''),
                 fields: () => [a.$.remark],
-                ok: async () => { }
+                ok: async () => { await a.save() }
             });
     }
 
@@ -374,7 +374,7 @@ export class Activity extends IdEntity {
     foodCount: FoodDeliveredCount = FoodDeliveredCount.one;
 
     isBoard() {
-        return this.remult.isAllowed(Roles.board) ? true : false;
+        return this.remult.user.isBoardOrAbove;
     }
 
     static hasIntersuct(us1: UserIdName[], us2: UserIdName[]) {

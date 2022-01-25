@@ -25,7 +25,7 @@ export class AuthService {
         if (token) {
             this.isFirstLogin = false;
             this.setAuthToken(token);
-            console.log('AuthService.constructor', remult.user)
+            // console.log('AuthService.constructor', remult.user)
         }
     }
 
@@ -41,11 +41,12 @@ export class AuthService {
             if (mobile.length > 0) {
                 let u = await remult?.repo(Users).findFirst({ mobile: mobile });
                 if (u) {
+                    result.managerAsVolunteer = u.manager! && u.volunteer!
+                    
                     let code = AuthService.generateCode();
                     u.verifyCode = code.toString()
                     u.verifyTime = new Date()
                     await u.save()
-                    result.managerAsVolunteer = u.manager! && u.volunteer!
 
                     let response = await NotificationService.SendSms({
                         mobile: mobile,
@@ -72,12 +73,21 @@ export class AuthService {
         return Math.floor(Math.random() * (max - min) + min)
     }
 
+    getIPAddress()
+  {
+    // https://www.itsolutionstuff.com/post/how-to-get-client-ip-address-in-angularexample.html
+    // import { HttpClientModule } from '@angular/common/http';
+    // this.http.get("http://api.ipify.org/?format=json").subscribe((res:any)=>{
+    //   this.ipAddress = res.ip;
+    // });
+  }
+
     async signIn(mobile: string, code: string, managerAsVolunteer = false) {
         this.isConnected = false;
         let response = await AuthService.signIn(mobile, code, managerAsVolunteer)
         if (response.success) {
             this.setAuthToken(response.token);
-            console.log('AuthService.signIn', this.remult.user)
+            // console.log('AuthService.signIn', this.remult.user)
         }
         return this.isConnected;
     }
@@ -147,7 +157,8 @@ export class AuthService {
                 isReadOnly: false,
                 isVolunteerMultiBrnach: false,
                 isVolunteerOnly: false,
-                isBoardOrDonorOrAdmin: false
+                isBoardOrAbove: false,
+                isManagerOrAbove: false
                 // bname: u.bid?.name ?? '',
                 // bid2: u.branch2?.id ?? '',
                 // b2name: u.branch2?.name ?? ''
@@ -196,8 +207,8 @@ export class AuthService {
             ui.isReadOnly = ui.roles.length === 1 && ui.roles.includes(Roles.donor)
             ui.isVolunteerMultiBrnach = u.bid && u.branch2 && u.bid?.id.length > 0 && u.branch2?.id.length > 0 ? true : false
             ui.isVolunteerOnly = ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)
-            ui.isBoardOrDonorOrAdmin = ui.roles.length === 1 && (ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
-
+            ui.isBoardOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
+            ui.isManagerOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.manager) || ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
         }
         else {
             ui = u as UserInfo

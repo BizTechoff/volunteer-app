@@ -58,6 +58,7 @@ export class Branch extends EntityWithModified {
     frame: string = '';
 
     @Field<Branch>((options, remult) => {
+        options.caption = terms.volunteers
         if (true) {
             options.serverExpression = async branch => {
                 return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
@@ -70,7 +71,25 @@ export class Branch extends EntityWithModified {
     })
     volunteersCount = 0;
 
+    // @DataControl({field: disabled-sort})
     @Field<Branch>((options, remult) => {
+        options.caption = terms.activities;
+        options.serverExpression = async branch => {
+            return remult.repo((await import("../activity/activity")).Activity).count({ bid: branch })//, status: ActivityStatus.openStatuses
+        };
+    })
+    activitiesCount = 0;
+
+    @Field<Branch>((options, remult) => {
+        options.caption = terms.photos;
+        options.serverExpression = async branch => {
+            return remult.repo((await import("../photo/photo")).Photo).count({ bid: branch })//, status: ActivityStatus.openStatuses
+        };
+    })
+    photosCount = 0;
+
+    @Field<Branch>((options, remult) => {
+        options.caption = terms.tenants
         if (1 == 1) {
             options.serverExpression = async branch => {
                 return remult.repo((await import("../tenant/tenant")).Tenant).count({ bid: branch })
@@ -108,12 +127,12 @@ export class Branch extends EntityWithModified {
 
         return result;
     }
-    static selectBranch<containerType = any>(explicit?:string[], change?: (e: containerType, b?: string) => void) {
+    static selectBranch<containerType = any>(explicit?: string[], change?: (e: containerType, b?: string) => void) {
         return (container: containerType, f: FieldRef<any, Branch | undefined>) => {
-            
-            if(!explicit){
+
+            if (!explicit) {
                 explicit = [] as string[]
-            }  
+            }
             openDialog(SelectBranchComponent, x => x.args = {
                 explicit: explicit,
                 canSelectAll: true,

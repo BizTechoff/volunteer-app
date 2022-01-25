@@ -4,6 +4,7 @@ import { Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { GridDialogComponent } from '../../../common/grid-dialog/grid-dialog.component';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
+import { NotificationService } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
@@ -36,7 +37,7 @@ export class VolunteersListComponent implements OnInit {
       newRow: _ => _.volunteer = true,
       allowCrud: false,
       // allowSelection: true,
-      numOfColumnsInGrid: 10,
+      numOfColumnsInGrid: 15,
       columnSettings: u => {
         let f = [] as DataControlInfo<Users>[];
         if (this.isBoard()) {
@@ -49,7 +50,10 @@ export class VolunteersListComponent implements OnInit {
           u.email,
           u.mobile,
           u.birthday,
-          u.points
+          u.points,
+          u.created,
+          u.modified//,
+          // u.createdBy
         );
         return f;
       }, //[
@@ -78,6 +82,13 @@ export class VolunteersListComponent implements OnInit {
           textInMenu: terms.volunteerDetails,
           icon: 'edit',
           click: async (u) => await this.addVolunteer(u.id)
+        },
+        {
+          textInMenu: terms.sendWelcomeSms,
+          icon: 'sms',
+          click: async () => await this.sendWelcomeMeesage(
+            this.volunteers.currentRow.name,
+            this.volunteers.currentRow.mobile)
         },
         // {
         //   //  visible: (v) => { return  this.showActivities(v)},
@@ -111,11 +122,11 @@ export class VolunteersListComponent implements OnInit {
   }
 
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove
   }
 
   isDonor() {
-    return this.remult.isAllowed(Roles.donor);
+    return this.remult.user.isReadOnly
   }
 
   async refresh() {
@@ -124,6 +135,39 @@ export class VolunteersListComponent implements OnInit {
 
   async transferVolunteer(v: Users) {
 
+  }
+
+  async sendWelcomeMeesage(name: string, mobile: string) {
+
+    let yes = await this.dialog.yesNoQuestion(
+      `לשלוח ל${name} (${mobile}) מסרון עם פרטי התחברות לאפליקציה`);
+    if (yes) {
+      let message = '';
+      message += `כניסה לאפליקציה `;
+      message += '\n';
+      message += 'bit.ly/gh-app ';
+      message += '\n';
+      message += `תודה ${name}!`;
+
+      // message += `תודה ${name}! `;
+      // message += '\n';
+      // message += 'bit.ly/eshel-app ';
+      // message += '\n';
+      // message += `כניסה עם סלולרי שלך`;
+
+      let sent = await NotificationService.SendSms({
+        uid: this.remult.user.id,
+        mobile: mobile,
+        message: message
+      });
+
+      if (sent) {
+        this.dialog.info(terms.smsSuccefullySent);
+      }
+      else {
+        this.dialog.info(terms.smsFailSent);
+      }
+    };
   }
 
   async showVolunteerTenants(user: Users) {
@@ -199,7 +243,7 @@ export class VolunteersListComponent implements OnInit {
             u!.$.mobile,
             u!.$.email,
             u!.$.birthday)
-          if (this.remult.isAllowed(Roles.manager)) {
+          if (this.remult.user.isManagerOrAbove) {
             f.push({ field: u!.$.age, width: '60' })
           }
           f.push(

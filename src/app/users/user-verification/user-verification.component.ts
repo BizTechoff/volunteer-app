@@ -56,9 +56,9 @@ export class UserVerificationComponent implements OnInit {
 
   async sendVerificationCode() {
     this.sending = true
-    console.log('sendVerificationCode')
+    // console.log('sendVerificationCode')
     let response = await this.auth.sendVerifyCode(this.args.in.mobile)
-    console.log('response', response)
+    // console.log('response', response)
     this.showLoginAsVolunteer = response.managerAsVolunteer
     if (response.success) {
       this.dialog.info(terms.verificationCodeSuccesfullySent);

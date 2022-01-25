@@ -58,10 +58,10 @@ export class SelectTenantComponent implements OnInit {
       this.select(this.tenants[0]);
   }
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove
   }
   isManager() {
-    return this.remult.isAllowed(Roles.manager);
+    return this.remult.user.isManagerOrAbove;
   }
   async create() {
     let t = this.remult.repo(Tenant).create();

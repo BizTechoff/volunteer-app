@@ -72,19 +72,19 @@ export class ActivitiesListComponent implements OnInit {
       ],
       rowButtons: [
         {
-          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor) && _.status === ActivityStatus.w4_start,
+          visible: (_) => !_.isNew() && !this.remult.user.isReadOnly && _.status === ActivityStatus.w4_start,
           textInMenu: terms.markAsStarted,
           icon: 'check',
           click: async (_) => await this.markActivityAs(_, ActivityStatus.w4_end)
         },
         {
-          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor) && _.status === ActivityStatus.w4_end,
+          visible: (_) => !_.isNew() && !this.remult.user.isReadOnly && _.status === ActivityStatus.w4_end,
           textInMenu: terms.markAsEnded,
           icon: 'done_all',
           click: async (_) => await this.markActivityAs(_, ActivityStatus.success)
         },
         {
-          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor),
+          visible: (_) => !_.isNew() && !this.remult.user.isReadOnly,
           textInMenu: terms.addActivityToCurrentTenant,
           icon: 'add',
           click: async (_) => await this.addActivityToCurrentTenant(_)
@@ -96,7 +96,7 @@ export class ActivitiesListComponent implements OnInit {
           click: async (_) => await this.showActivityDetails(_)
         },
         {
-          visible: (_) => !_.isNew() && !this.remult.isAllowed(Roles.donor),
+          visible: (_) => !_.isNew() && !this.remult.user.isReadOnly,
           textInMenu: terms.cancelActivity,
           icon: 'cancel',
           click: async (_) => await this.cancelActivity(_)
@@ -120,7 +120,7 @@ export class ActivitiesListComponent implements OnInit {
   }
 
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove;
   }
 
   async refresh() {

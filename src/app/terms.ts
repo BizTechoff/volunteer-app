@@ -225,7 +225,8 @@ declare module 'remult' {
         isReadOnly: boolean;
         isVolunteerMultiBrnach: boolean;
         isVolunteerOnly: boolean;
-        isBoardOrDonorOrAdmin: boolean;
+        isBoardOrAbove: boolean;
+        isManagerOrAbove: boolean;
         // bname: string;
         // bid2: string;
         // b2name: string;

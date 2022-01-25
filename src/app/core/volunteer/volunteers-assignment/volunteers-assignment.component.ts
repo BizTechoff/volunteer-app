@@ -69,11 +69,11 @@ export class VolunteersAssignmentComponent implements OnInit {
     return true;
   }
   isDonor() {
-    return this.remult.isAllowed(Roles.donor);
+    return this.remult.user.isReadOnly;
   }
 
   isManager() {
-    return this.remult.isAllowed(Roles.manager);
+    return this.remult.user.isManagerOrAbove;
   }
 
   async ngOnInit() {

@@ -146,15 +146,15 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove
   }
 
   isDonor() {
-    return this.remult.isAllowed(Roles.donor);
+    return this.remult.user.isReadOnly;
   }
  
   isManager() {
-    return this.remult.isAllowed(Roles.manager);
+    return this.remult.user.isManagerOrAbove;
   }
 
   isOnlyVolunteer() {

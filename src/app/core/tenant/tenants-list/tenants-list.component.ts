@@ -49,7 +49,7 @@ export class TenantsListComponent implements OnInit {
         name: this.search ? { $contains: this.search } : undefined
       }),
       allowCrud: false,
-      numOfColumnsInGrid: 10,
+      numOfColumnsInGrid: 15,
       columnSettings: t => {
 
         let f = [] as DataControlInfo<Tenant>[];
@@ -65,7 +65,10 @@ export class TenantsListComponent implements OnInit {
           t.mobile,
           t.referrer,
           // t.referrerRemark,
-          t.birthday
+          t.birthday,
+          t.created, 
+          t.modified//,
+          // t.createdBy
           // t.email
         );
         return f;
@@ -205,11 +208,11 @@ export class TenantsListComponent implements OnInit {
   }
 
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove
   }
 
   isDonor() {
-    return this.remult.isAllowed(Roles.donor);
+    return this.remult.user.isReadOnly;
   }
 
   async deleteTenant(t: Tenant) {

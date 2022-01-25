@@ -52,11 +52,11 @@ export class PhotosAlbumComponent implements OnInit {
   }
 
   isManager() {
-    return this.remult.isAllowed(Roles.manager);
+    return this.remult.user.isManagerOrAbove;
   }
 
   isDonor() {
-    return this.remult.isAllowed(Roles.donor);
+    return this.remult.user.isReadOnly;
   }
   async ngOnInit() {
     if (!this.args) {
@@ -262,9 +262,9 @@ export class PhotosAlbumComponent implements OnInit {
     result.title = name;
     result.type = type;
     result.link = link;
-    console.log('result.id.1', result.id)
+    // console.log('result.id.1', result.id)
     await result.save();
-    console.log('result.id.2', result.id)
+    // console.log('result.id.2', result.id)
     this.args.changed = true;
     return result;
   }

@@ -10,8 +10,8 @@
       <mat-icon>menu</mat-icon>
     </button>
     <span class="toolbar-title"> {{currentTitle()}}</span>
-    <ng-container *ngIf="!remult.authenticated()">
-      <button *ngIf="usersCount === 0" mat-flat-button color="primary" (click)="signUp()">{{terms.signUp}}</button>
+    <ng-container *ngIf="!remult.authenticated()"> 
+      <!-- <button mat-flat-button color="primary" style="margin-left: 7px;" (click)="signUp()">{{terms.signUp}}</button> -->
       <button mat-flat-button color="primary" (click)="signIn()">{{terms.signIn}}</button>
     </ng-container>
     <ng-container *ngIf="remult.authenticated()">
@@ -31,7 +31,7 @@
     </ng-container> -->  
   </mat-toolbar>
   <div color="primary" style="background-image: linear-gradient(90deg, #2CBCC1, #F69A48)">
-    <data-control [field]="this.$.branch!" *ngIf="this.remult.authenticated()&&(this.remult.user.isBoardOrDonorOrAdmin||this.remult.user.isVolunteerMultiBrnach)" style="width: 100%; color: white;"></data-control> 
+    <data-control [field]="this.$.branch!" *ngIf="this.remult.authenticated()&&(this.remult.user.isBoardOrAbove||this.remult.user.isVolunteerMultiBrnach)" style="width: 100%; color: white;"></data-control> 
   </div> 
   <mat-sidenav-container class="app-sidenav-container">
     <!-- !dialogService.isScreenSmall() -->

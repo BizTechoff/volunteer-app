@@ -85,7 +85,7 @@ export class PhotosAlbumBranchComponent implements OnInit {
   }
 
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove
   }
 
   @BackendMethod({ allowed: true })

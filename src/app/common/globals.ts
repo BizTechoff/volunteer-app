@@ -26,8 +26,12 @@ export const EntityRequiredValidation = (_: any, col: FieldRef<any, IdEntity>) =
 
 export const StringRequiredValidation = (_: any, col: FieldRef<any, string>) => {
     let ok = col.value && col.value.trim().length > 0 ? true : false;
-    if (!ok!)
+    if (!ok!) {
         col.error = terms.requiredField;
+    }
+    // else {
+
+    // }
 
     // col.dbTo = 0501234567;
     // col.dbFrom = 050-1234-567
@@ -103,7 +107,7 @@ export const mobileFromDb = (mobile: string) => {
     }
     return result;
 }
- 
+
 export const mobileToDb = (mobile: string, mobile2?: string): boolean | string => {
     let digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 

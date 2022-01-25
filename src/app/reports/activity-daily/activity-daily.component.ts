@@ -53,7 +53,7 @@ export class ActivityDailyComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
 
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove
   }
 
   @DataControl<ActivityDailyComponent, Date>({

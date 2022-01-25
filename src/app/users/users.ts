@@ -4,7 +4,7 @@ import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerFi
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
-import { pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
+import { mobileFromDb, mobileToDb, pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
 //import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 //import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
@@ -206,7 +206,7 @@ export class Users extends IdEntity {
     }
 
     isManager() {
-        return this.remult.isAllowed(Roles.manager);
+        return this.remult.user.isManagerOrAbove;
     }
 
     // activities = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
@@ -272,11 +272,12 @@ export class Users extends IdEntity {
 
     @Field({
         validate: [StringRequiredValidation, Validators.uniqueOnBackend],
-        caption: terms.mobile//,
-        // valueConverter: {
-        //     fromDb: col => mobileFromDb(mobileToDb(col)),
-        //     toDb: col => mobileToDb(col)
-        // }
+        caption: terms.mobile,
+        // displayValue: col => mobileFromDb(mobileToDb(col) as string),
+        valueConverter: {
+            fromDb: col => mobileFromDb(mobileToDb(col) as string),
+            toDb: col => mobileToDb(col) as string
+        }
     })
     mobile: string = '';
 

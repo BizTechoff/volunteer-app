@@ -1,14 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { async } from '@angular/core/testing';
-import { DataControl, openDialog } from '@remult/angular';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
-import { BackendMethod, Field, getFields, Remult } from 'remult';
+import { BackendMethod, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
 import { terms } from '../../terms';
-import { Roles } from '../../users/roles';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
-import { Branch } from '../branch/branch';
 // import { Referrer } from '../tenant/tenant';
 export interface stateResult {
   activitiesByBranches: { id: string, name: string, count: number }[];
@@ -62,6 +58,8 @@ export class CurrentStateComponent implements OnInit {
     // layout: { padding: { left: +28 } },
     legend: {
       // align: 'start',
+      // borderAlign: 10,
+      // labels: { usePointStyle: true },
       rtl: true,
       textDirection: 'rtl',
       position: 'right',
@@ -202,7 +200,7 @@ export class CurrentStateComponent implements OnInit {
   refreshedTime = '00:00';
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   maxLabelLength = 0;
-//<CurrentStateComponent, Branch | undefined>
+  //<CurrentStateComponent, Branch | undefined>
   // @DataControl({
   //   click:  Branch.selectBranch<CurrentStateComponent>(async r => await r.refresh())
   // })
@@ -225,21 +223,21 @@ export class CurrentStateComponent implements OnInit {
   }
 
   isBoard() {
-    return this.remult.isAllowed(Roles.board);
+    return this.remult.user.isBoardOrAbove
   }
 
   isRefreshing = false;
   async refresh() {
     // console.log('refresh')
     // if (!this.isRefreshing) {
-      this.isRefreshing = true;
-      var options = { hour12: false };
-      // console.log(date.toLocaleString('en-US', options));
-      this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
-      this.activitiesResult = await CurrentStateComponent.retrieveGraphes();
-        // this.branch?.id);
-      this.isRefreshing = false;
-      this.setChart();
+    this.isRefreshing = true;
+    var options = { hour12: false };
+    // console.log(date.toLocaleString('en-US', options));
+    this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
+    this.activitiesResult = await CurrentStateComponent.retrieveGraphes();
+    // this.branch?.id);
+    this.isRefreshing = false;
+    this.setChart();
     // }
   }
 

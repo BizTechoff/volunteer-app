@@ -58,7 +58,7 @@ export class VolunteerTenantsComponent implements OnInit {
   }
 
   isDonor() {
-    return this.remult.isAllowed(Roles.donor);
+    return this.remult.user.isReadOnly;
   }
 
   async refresh() {
@@ -94,7 +94,7 @@ export class VolunteerTenantsComponent implements OnInit {
         onSelect: t => newT = t
       })
     if (newT) {
-      console.log(2)
+      // console.log(2)
       let yes = await this.dialog.yesNoQuestion('האם לשייך לך את ' + newT.name)
       if (yes) {
         let f = newT.defVids.find(row => row.id === this.remult.user.id);
@@ -108,7 +108,7 @@ export class VolunteerTenantsComponent implements OnInit {
         }
       }
     }
-    console.log(3)
+    // console.log(3)
   }
 
   async openPhotosAlbum(t: Tenant) {

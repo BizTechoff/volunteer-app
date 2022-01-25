@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControlInfo, GridSettings } from '@remult/angular';
-import { Remult, SqlCommand, SqlResult } from 'remult';
+import { Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -23,27 +23,30 @@ export class BranchesListComponent implements OnInit {
       // allowInsert: this.remult.isAllowed(Roles.admin),
       allowUpdate: this.remult.isAllowed(Roles.admin),
       where: () => ({
+        id: this.remult.user.bid?.length > 0 ? this.remult.user.bid : undefined
         // id: this.remult.branchAllowedForUser()
         // bid: this.isBoard() ? undefined : { $co
       }),
+      numOfColumnsInGrid: 10,
       columnSettings: row => {
         let f = [] as DataControlInfo<Branch>[];
         f.push(row.name, row.address);
         // row.volunteersCount = await this.remult.repo(Users).count({volunteer: true});
-        f.push({
-          field: row.volunteersCount, caption: terms.volunteers //,
-          // getValue: (r, v) => {
-          //   // for await (const p of this.remult.repo(Tenant).query({
-          //   //   where: { bid: row }
-          //   // })) {
-  
-          //   // }
-          //   // let cmd: SqlCommand;
-          //   // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);
-          //   return 0; /*r.getVolunteersCount()*/
-          // }
-        });
-        f.push({ field: row.tenantsCount, caption: terms.tenants });
+
+        // getValue: (r, v) => {
+        //   // for await (const p of this.remult.repo(Tenant).query({
+        //   //   where: { bid: row }
+        //   // })) {
+
+        //   // }
+        //   // let cmd: SqlCommand;
+        //   // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);
+        //   return 0; /*r.getVolunteersCount()*/
+        // }
+        f.push({ field: row.volunteersCount, width: '88' });
+        f.push({ field: row.tenantsCount, width: '88' });
+        f.push({ field: row.activitiesCount, width: '88' })
+        f.push({ field: row.photosCount, width: '88' })
         // if (this.isAdmin()) { 
         //   f.push(row.email, row.color, row.frame); 
         // }  
