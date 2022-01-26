@@ -1,6 +1,8 @@
 import { IdFilter, Remult } from 'remult';
 
 export const terms = {
+    foods:'מנות',
+    uploads: 'העלאות',
     succefullyConnected: 'התחברת בהצלחה',
     wrongMobile: 'סלולרי שגוי',
     fromDate: 'מתאריך',
@@ -98,6 +100,7 @@ export const terms = {
     mustSetBidForSetVolunteers: 'חובה לבחור סניף לפני שיבוץ מתנדבים',
     mustSetBidForSetTenant: 'חובה לבחור סניף לפני שיבוץ דייר',
     selected: 'נבחרו',
+    deleteUser: 'מחיקת יוזר',
     deleteVolunteer: 'מחיקת מתנדב',
     deleteTenant: 'מחיקת דייר',
     activitiesByWeekDay: 'פעילויות לפי ימי השבוע',
@@ -225,8 +228,9 @@ declare module 'remult' {
         isReadOnly: boolean;
         isVolunteerMultiBrnach: boolean;
         isVolunteerOnly: boolean;
-        isBoardOrAbove: boolean;
         isManagerOrAbove: boolean;
+        isBoardOrAbove: boolean;
+        isAdmin: boolean;
         // bname: string;
         // bid2: string;
         // b2name: string;

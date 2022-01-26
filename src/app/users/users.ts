@@ -169,6 +169,9 @@ export class Langs {
                     user.bid = undefined;
                     user.branch2 = undefined;
                 }
+                if(user.manager){
+                    user.branch2 = undefined;
+                }
             }
         };
         // options.saved = async (user) => {

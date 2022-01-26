@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { GridSettings } from '@remult/angular';
 import { BackendMethod, Remult } from 'remult';
 import { DialogService } from '../common/dialog';
-import { NotificationService } from '../common/utils';
+import { Activity } from '../core/activity/activity';
+import { Tenant } from '../core/tenant/tenant';
 import { terms } from '../terms';
 import { Roles } from './roles';
 import { Users } from './users';
@@ -30,7 +31,7 @@ export class UsersComponent implements OnInit {
 
   async initGrid() {
     return new GridSettings<Users>(this.remult.repo(Users), {
-      allowDelete: true,
+      allowDelete: false,
       allowInsert: true,
       allowUpdate: true,
       numOfColumnsInGrid: 10,
@@ -107,14 +108,21 @@ export class UsersComponent implements OnInit {
       rowButtons: [
         {
           name: terms.resetPassword,
+          icon: 'password',
           click: async () => {
- 
+
             if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
               await UsersComponent.resetPassword(this.users.currentRow.id);
               this.dialog.info(terms.passwordReset);
             };
           }
-        }
+        }, 
+        {
+          visible: (_) => this.remult.isAllowed(Roles.admin),
+          textInMenu: terms.deleteUser,
+          icon: 'delete',//,
+          click: async (_) => await this.deleteUser(_)
+        } 
         // ,
         // {
         //   textInMenu: terms.sendWelcomeSms,
@@ -131,6 +139,27 @@ export class UsersComponent implements OnInit {
 
   async refresh() {
     await this.users.reloadData();
+  }
+
+  async deleteUser(u: Users) {
+    let yes = await this.dialog.confirmDelete(`היוזר: ${u.name}`);
+    if (yes) {
+      let count = await this.remult.repo(Activity).count({ vids: { $contains: u.id } });
+      if (count > 0) {
+        this.dialog.error('לא ניתן למחוק יוזר עם פעילויות');
+      }
+      else {
+        count = await this.remult.repo(Tenant).count({ defVids: { $contains: u.id } });
+        if (count > 0) {
+          this.dialog.error('לא ניתן למחוק יוזר שמשוייך לדייר');
+        }
+        else {
+          await u.delete();
+          this.dialog.info('היוזר נמחק בהצלחה');
+          await this.refresh();
+        }
+      }
+    }
   }
 
   @BackendMethod({ allowed: Roles.admin })

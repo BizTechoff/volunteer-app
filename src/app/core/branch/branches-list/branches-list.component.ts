@@ -46,8 +46,9 @@ export class BranchesListComponent implements OnInit {
         f.push({ field: row.volunteersCount, width: '88' });
         f.push({ field: row.tenantsCount, width: '88' });
         f.push({ field: row.activitiesCount, width: '88' })
+        f.push({ field: row.foodDeliveries, width: '88' });
         f.push({ field: row.photosCount, width: '88' })
-        // if (this.isAdmin()) { 
+        // if (this.isAdmin()) {  
         //   f.push(row.email, row.color, row.frame); 
         // }  
         return f;

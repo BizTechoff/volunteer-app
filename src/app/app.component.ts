@@ -40,6 +40,7 @@ export class AppComponent implements OnInit {
     public dialogService: DialogService,
     public remult: Remult,
     public auth: AuthService) {
+    console.log('AppComponent READY')
   }
   terms = terms;
   get $() { return getFields(this, this.remult) };
@@ -49,6 +50,14 @@ export class AppComponent implements OnInit {
     if (this.auth.isConnected) {
       await this.setSelectedBranch()
     }
+    console.log('AppComponent INIT')
+  }
+
+  showRemultUser(e: MouseEvent) {
+    try {
+      if (e.ctrlKey) { alert(JSON.stringify(this.remult.user)) }
+    }
+    catch (err) { console.log(err) }
   }
 
   async setSelectedBranch() {
@@ -68,14 +77,6 @@ export class AppComponent implements OnInit {
 
   isBoard() {
     return this.remult.user.isBoardOrAbove
-  }
-
-  async switchBranch() {
-    if (this.branch && this.branch.id.length > 0) {
-      await this.auth.swithToBranch(this.branch.id)
-      window?.location?.reload();
-      this.dialogService.info('סניף הוחלף בהצלחה');
-    }
   }
 
   showBizTechoff() {
@@ -155,6 +156,7 @@ export class AppComponent implements OnInit {
       }
     });
   }
+
   async changePassword() {
     let user = await this.remult.repo(Users).findId(this.remult.user.id);
     let password = new PasswordControl();

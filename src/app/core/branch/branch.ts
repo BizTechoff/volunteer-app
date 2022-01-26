@@ -81,12 +81,28 @@ export class Branch extends EntityWithModified {
     activitiesCount = 0;
 
     @Field<Branch>((options, remult) => {
-        options.caption = terms.photos;
+        options.caption = terms.uploads;
         options.serverExpression = async branch => {
             return remult.repo((await import("../photo/photo")).Photo).count({ bid: branch })//, status: ActivityStatus.openStatuses
         };
     })
     photosCount = 0;
+
+    @Field<Branch>((options, remult) => {
+        options.caption = terms.foods;
+        // options.
+        options.serverExpression = async branch => {
+            // let count = 0;
+            // for await (const a of remult.repo((await import("../activity/activity")).Activity).query({
+            //     where: { bid: branch, foodDelivered: true }
+            // })) {
+            //     count += a.foodCount.id
+            // }
+            // return count;
+            return remult.repo((await import("../activity/activity")).Activity).count({ bid: branch, foodDelivered: true })//, status: ActivityStatus.openStatuses
+        };
+    })
+    foodDeliveries = 0;
 
     @Field<Branch>((options, remult) => {
         options.caption = terms.tenants

@@ -46,29 +46,37 @@ export interface tenantVolunteersInfo {
 
 let folder = `D:\\documents\\אשל ירושלים\\הסבה\\`;
 let branches = [] as string[];
+// branches.push('אילת נוער'); 
+// branches.push('אילת קמפוס');
 // branches.push('אשקלון');
 // branches.push('זכרון יעקב');
-// branches.push('חולון');
+// branches.push('חולון'); 
+// branches.push('חולון ב');
 // branches.push('חיפה'); 
+// branches.push('טבריה');
 // branches.push('ירושלים');
+// branches.push('ירושלים ב'); 
 // branches.push('נס ציונה');
 // branches.push('קריית אונו');
 // branches.push('ראשון לציון');
 // branches.push('דימונה');
 // branches.push('חדרה');
 // branches.push('יבנה'); 
+// branches.push('נהריה');
 // branches.push('נתניה');
 // branches.push('עומר');
-// branches.push('קריית גת'); 
+// branches.push('קריית גת');
+// branches.push('ראשון לציון ב');
+// branches.push('שדרות');   
 // -------------------------------
 // branches.push('אילת נוער'); 
 // branches.push('אילת קמפוס');
+// branches.push('חולון ב');
+// branches.push('טבריה');
+// branches.push('ירושלים ב'); 
 // branches.push('נהריה');
 // branches.push('ראשון לציון ב');
 // branches.push('שדרות');   
-// branches.push('ירושלים ב');
-// branches.push('חולון ב');
-// branches.push('טבריה');
 // ------------------------------- 
 // branches.push('ירושלים ג');
 // -------------------------------
@@ -76,7 +84,7 @@ let branches = [] as string[];
 // נסים בוארון | 0584877770
 // branches.push('דימונה');//***
 // אלי לוין | 0
-// branches.push('חדרה');
+// branches.push('חדרה'); 
 // אין | 0
 // branches.push('יבנה');
 // שניאור לנדא | 0527703130
@@ -94,6 +102,10 @@ let saveToDb = true;
 
 let vMobileCounter = 117;
 let tMobileCounter = 117;
+
+export async function updateCalendars(branch: string, remult: Remult) {
+    // select all activities and create/update calendar-item
+}
 
 export async function updateTenants(branch: string, remult: Remult) {
 

@@ -27,6 +27,7 @@ export class AuthService {
             this.setAuthToken(token);
             // console.log('AuthService.constructor', remult.user)
         }
+        console.log('AuthService READY')
     }
 
     async sendVerifyCode(mobile: string) {
@@ -42,7 +43,7 @@ export class AuthService {
                 let u = await remult?.repo(Users).findFirst({ mobile: mobile });
                 if (u) {
                     result.managerAsVolunteer = u.manager! && u.volunteer!
-                    
+
                     let code = AuthService.generateCode();
                     u.verifyCode = code.toString()
                     u.verifyTime = new Date()
@@ -73,14 +74,13 @@ export class AuthService {
         return Math.floor(Math.random() * (max - min) + min)
     }
 
-    getIPAddress()
-  {
-    // https://www.itsolutionstuff.com/post/how-to-get-client-ip-address-in-angularexample.html
-    // import { HttpClientModule } from '@angular/common/http';
-    // this.http.get("http://api.ipify.org/?format=json").subscribe((res:any)=>{
-    //   this.ipAddress = res.ip;
-    // });
-  }
+    getIPAddress() {
+        // https://www.itsolutionstuff.com/post/how-to-get-client-ip-address-in-angularexample.html
+        // import { HttpClientModule } from '@angular/common/http';
+        // this.http.get("http://api.ipify.org/?format=json").subscribe((res:any)=>{
+        //   this.ipAddress = res.ip;
+        // });
+    }
 
     async signIn(mobile: string, code: string, managerAsVolunteer = false) {
         this.isConnected = false;
@@ -157,27 +157,10 @@ export class AuthService {
                 isReadOnly: false,
                 isVolunteerMultiBrnach: false,
                 isVolunteerOnly: false,
+                isManagerOrAbove: false,
                 isBoardOrAbove: false,
-                isManagerOrAbove: false
-                // bname: u.bid?.name ?? '',
-                // bid2: u.branch2?.id ?? '',
-                // b2name: u.branch2?.name ?? ''
+                isAdmin: false
             };
-            // if (u.admin) {
-            //     ui.roles.push(Roles.admin, Roles.board, Roles.manager, Roles.volunteer);
-            // }
-            // else if (u.donor) {
-            //     ui.roles.push(Roles.donor, Roles.board, Roles.manager, Roles.volunteer);
-            // }
-            // else if (u.board) {
-            //     ui.roles.push(Roles.board, Roles.manager, Roles.volunteer);
-            // }
-            // else if (u.manager) {
-            //     ui.roles.push(Roles.manager, Roles.volunteer);
-            // }
-            // if (u.volunteer) {
-            //     ui.roles.push(Roles.volunteer);
-            // }
             if (u.admin) {
                 ui.roles.push(Roles.admin);
             }
@@ -203,16 +186,17 @@ export class AuthService {
                     ui.roles.push(Roles.volunteer);
                 }
             }
-
-            ui.isReadOnly = ui.roles.length === 1 && ui.roles.includes(Roles.donor)
-            ui.isVolunteerMultiBrnach = u.bid && u.branch2 && u.bid?.id.length > 0 && u.branch2?.id.length > 0 ? true : false
-            ui.isVolunteerOnly = ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)
-            ui.isBoardOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
-            ui.isManagerOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.manager) || ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
+            ui.isVolunteerMultiBrnach = ui.roles.length == 1 && ui.roles.includes(Roles.volunteer) && u.bid && u.branch2 && u.bid?.id.length > 0 && u.branch2?.id.length > 0 ? true : false
         }
         else {
             ui = u as UserInfo
         }
+
+        ui.isReadOnly = ui.roles.length === 1 && ui.roles.includes(Roles.donor)
+        ui.isVolunteerOnly = ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)
+        ui.isManagerOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.manager) || ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
+        ui.isBoardOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
+        ui.isAdmin = ui.roles.length == 1 && ui.roles.includes(Roles.admin)
 
         return jwt.sign(ui, getJwtTokenSignKey())
     }
@@ -236,6 +220,7 @@ export class AuthService {
         this.remult.setUser(new JwtHelperService().decodeToken(token));
         localStorage.setItem(AUTH_TOKEN_KEY, token);
         this.isConnected = true;
+        // window?.location?.reload()
     }
     static fromStorage(): string {
         return localStorage.getItem(AUTH_TOKEN_KEY)!;

@@ -196,18 +196,23 @@ export class VolunteersListComponent implements OnInit {
   async showActivities(user: Users) {
     return true;
   }
-
   async deleteVolunteer(u: Users) {
-    let yes = await this.dialog.confirmDelete(terms.volunteer);
+    let yes = await this.dialog.confirmDelete(`המתנדב: ${u.name}`);
     if (yes) {
       let count = await this.remult.repo(Activity).count({ vids: { $contains: u.id } });
       if (count > 0) {
         this.dialog.error('לא ניתן למחוק מתנדב עם פעילויות');
       }
       else {
-        await u.delete();
-        this.dialog.info('המתנדב נמחק בהצלחה');
-        await this.refresh();
+        count = await this.remult.repo(Tenant).count({ defVids: { $contains: u.id } });
+        if (count > 0) {
+          this.dialog.error('לא ניתן למחוק מתנדב שמשוייך לדייר');
+        }
+        else {
+          await u.delete();
+          this.dialog.info('המתנדב נמחק בהצלחה');
+          await this.refresh();
+        }
       }
     }
   }
