@@ -28,11 +28,6 @@ export class ActiveStatus {
                 return { id: [] }//why not simple empty-string? ''
             return { bid: remult.branchAllowedForUser() };
         };
-        // (
-        //     {
-        //         bid: remult.branchAllowedForUser() // !remult.isAllowed(Roles.board) ? { $contains: remult.user.bid } : undefined
-        //     }
-        // );
         options.saving = async (row) => {
             if (isBackend()) {
                 if (row._.isNew()) {

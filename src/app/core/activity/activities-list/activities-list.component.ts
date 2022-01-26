@@ -29,7 +29,6 @@ export class ActivitiesListComponent implements OnInit {
       where: () => ({
         status: this.status.statuses,
         bid: this.remult.branchAllowedForUser()
-        // bid: this.bid ? this.bid : this.isBoard() ? undefined : { $contains: this.remult.user.bid }
       })
       ,
       allowCrud: false,// this.remult.isAllowed([Roles.manager, Roles.admin]) as boolean,
@@ -71,18 +70,18 @@ export class ActivitiesListComponent implements OnInit {
         }
       ],
       rowButtons: [
-        {
-          visible: (_) => !_.isNew() && !this.remult.user.isReadOnly && _.status === ActivityStatus.w4_start,
-          textInMenu: terms.markAsStarted,
-          icon: 'check',
-          click: async (_) => await this.markActivityAs(_, ActivityStatus.w4_end)
-        },
-        {
-          visible: (_) => !_.isNew() && !this.remult.user.isReadOnly && _.status === ActivityStatus.w4_end,
-          textInMenu: terms.markAsEnded,
-          icon: 'done_all',
-          click: async (_) => await this.markActivityAs(_, ActivityStatus.success)
-        },
+        // {
+        //   visible: (_) => !_.isNew() && !this.remult.user.isReadOnly && _.status === ActivityStatus.w4_start,
+        //   textInMenu: terms.markAsStarted,
+        //   icon: 'check',
+        //   click: async (_) => await this.markActivityAs(_, ActivityStatus.w4_end)
+        // },
+        // {
+        //   visible: (_) => !_.isNew() && !this.remult.user.isReadOnly && _.status === ActivityStatus.w4_end,
+        //   textInMenu: terms.markAsEnded,
+        //   icon: 'done_all',
+        //   click: async (_) => await this.markActivityAs(_, ActivityStatus.success)
+        // },
         {
           visible: (_) => !_.isNew() && !this.remult.user.isReadOnly,
           textInMenu: terms.addActivityToCurrentTenant,

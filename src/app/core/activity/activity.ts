@@ -8,7 +8,6 @@ import { SelectPurposesComponent } from "../../common/select-purposes/select-pur
 import { UserIdName } from "../../common/types";
 import { NotificationService } from "../../common/utils";
 import { terms } from "../../terms";
-import { Roles } from "../../users/roles";
 import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 import { CommaSeparatedStringArrayFieldUsersAsString, Tenant } from "../tenant/tenant";
@@ -396,7 +395,7 @@ export class Activity extends IdEntity {
         hideDataOnInput: true,
         clickIcon: 'search',
         getValue: (_, f) => f.value?.name,
-        click: Branch.selectBranch([], (e, b) => { e.tid = undefined!, e.vids.splice(0) })
+        click: Branch.selectBranch([], row => { row.tid = undefined!, row.vids.splice(0) })
     })
     @Field({
         caption: terms.branch, validate: EntityRequiredValidation
@@ -408,9 +407,10 @@ export class Activity extends IdEntity {
     //     console.log('@DataControl<Activity, Tenant>.');
     //      }
     // })
-    @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required.withMessage(terms.requiredField) })
+    // @Field(options => options.valueType = Tenant, { caption: terms.tenant, validate: Validators.required.withMessage(terms.requiredField) })
     // @Field(options => options.valueType = Tenant, {caption: terms.tenant} )
     //@Field({ caption: terms.tenant })
+    @Field({ caption: terms.tenant, validate: EntityRequiredValidation })// Validators.required.withMessage(terms.requiredField) })
     tid!: Tenant;
 
     //@CommaSeparatedStringArrayField<Users>({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })

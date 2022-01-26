@@ -66,7 +66,7 @@ export class SelectTenantComponent implements OnInit {
   async create() {
     let t = this.remult.repo(Tenant).create();
     if (!this.isBoard()) {
-      t.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
+      t.bid = await this.remult.repo(Branch).findId(this.remult.user.branch);
     }
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {

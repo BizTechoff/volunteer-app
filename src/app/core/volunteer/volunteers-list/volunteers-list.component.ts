@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
+import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
 import { GridDialogComponent } from '../../../common/grid-dialog/grid-dialog.component';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { NotificationService } from '../../../common/utils';
 import { terms } from '../../../terms';
-import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
 import { Activity } from '../../activity/activity';
 import { Branch } from '../../branch/branch';
@@ -116,7 +116,7 @@ export class VolunteersListComponent implements OnInit {
     }
   );
 
-  constructor(private remult: Remult, private dialog: DialogService) { }
+  constructor(private remult: Remult, public auth: AuthService, private dialog: DialogService) { }
 
   ngOnInit(): void {
   }
@@ -227,8 +227,9 @@ export class VolunteersListComponent implements OnInit {
     if (!u) {
       u = this.remult.repo(Users).create();
       u.volunteer = true;
-      u.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
+      u.bid = await this.remult.repo(Branch).findId(this.remult.user.branch);
     }
+    let branchChanged = false
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         disableClose: u.isNew(),
@@ -236,7 +237,7 @@ export class VolunteersListComponent implements OnInit {
         fields: () => {
           let f = [];
           if (this.isBoard()) {
-            f.push({ field: u!.$.bid, readonly: u.bid ? true : false })
+            f.push({ field: u!.$.bid, readonly: this.remult.hasValidBranch() })
             if (u!.hasBranch2()) {
               f.push({ field: u!.$.branch2, readonly: u.branch2 ? true : false })
             }
@@ -259,11 +260,21 @@ export class VolunteersListComponent implements OnInit {
           return f
         },
         ok: async () => {
-          if (!this.isDonor()) { await (u!.isNew() ? u!.create() : u!.save()); }
+          if (!this.isDonor()) {
+            branchChanged = (u && u.bid && u.$.bid && u.$.bid.valueChanged())!
+            await (u!.isNew() ? u!.create() : u!.save());
+          }
         }
       },
       _ => _ ? _.ok : false);
     if (changed) {
+      // check to change main-branch
+      if (branchChanged) {
+        if (!this.remult.hasValidBranch()) {
+          await this.auth.swithToBranch(u.bid!.id)
+          window?.location?.reload()
+        }
+      }
       await this.refresh();
     }
   }

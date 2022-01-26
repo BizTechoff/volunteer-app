@@ -98,7 +98,7 @@ export class AuthService {
 
     @BackendMethod({ allowed: Allow.authenticated })
     /*private*/ static async switchBranch(newBranchId?: string, remult?: Remult) {
-        remult!.user.bid = newBranchId ?? undefined!;//maybe check if it's a valid branch for the user
+        remult!.user.branch = newBranchId ?? undefined!;//maybe check if it's a valid branch for the user
         return await AuthService.buildToken(remult!.user)
     }
 
@@ -153,7 +153,7 @@ export class AuthService {
                 id: u.id,
                 roles: [],
                 name: u.name,
-                bid: u.bid?.id ?? '',
+                branch: u.bid?.id ?? '',
                 isReadOnly: false,
                 isVolunteerMultiBrnach: false,
                 isVolunteerOnly: false,
@@ -204,17 +204,6 @@ export class AuthService {
     isVolunteerOnly() {
         return this.remult.isAllowed(Roles.volunteer) && this.remult.user.roles.length === 1
     }
-
-    // getUserBranches() {
-    //     let result = [] as string[];
-    //     if (this.remult.user.bid) {
-    //         result.push(this.remult.user.bid)
-    //     }
-    //     if (this.remult.user.bid2) {
-    //         result.push(this.remult.user.bid2)
-    //     }
-    //     return result;
-    // }
 
     async setAuthToken(token: string) {
         this.remult.setUser(new JwtHelperService().decodeToken(token));

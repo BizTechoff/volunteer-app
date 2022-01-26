@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
+import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
-import { Roles } from '../../../users/roles';
 import { Activity } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
@@ -45,7 +45,6 @@ export class TenantsListComponent implements OnInit {
     {
       where: () => ({
         bid: this.remult.branchAllowedForUser(),
-        // bid: this.isBoard() ? undefined : { $contains: this.remult.user.bid },
         name: this.search ? { $contains: this.search } : undefined
       }),
       allowCrud: false,
@@ -66,7 +65,7 @@ export class TenantsListComponent implements OnInit {
           t.referrer,
           // t.referrerRemark,
           t.birthday,
-          t.created, 
+          t.created,
           t.modified//,
           // t.createdBy
           // t.email
@@ -131,7 +130,7 @@ export class TenantsListComponent implements OnInit {
     }
   );
 
-  constructor(private remult: Remult, private dialog: DialogService) {
+  constructor(private remult: Remult, public auth: AuthService, private dialog: DialogService) {
     // this.subject.subscribe(async () => {
     //   await this.refresh();
     // });
@@ -242,10 +241,11 @@ export class TenantsListComponent implements OnInit {
       t = this.remult.repo(Tenant).create();
       isNew = true;
       // if (!this.isBoard()) {
-      t.bid = await this.remult.repo(Branch).findId(this.remult.user.bid);
+      t.bid = await this.remult.repo(Branch).findId(this.remult.user.branch);
       // }
     }
     // console.log(t);
+    let branchChanged = false
     let changed = await openDialog(InputAreaComponent,
       _ => _.args = {
         disableClose: t.isNew(),
@@ -253,7 +253,7 @@ export class TenantsListComponent implements OnInit {
         fields: () => {
           let f = [];
           if (this.isBoard()) {
-            f.push({ field: t.$.bid, readonly: t.bid ? true : false });
+            f.push({ field: t.$.bid, readonly: this.remult.hasValidBranch() });//readonly: t.bid ? true : false
           }
           f.push(
             [{ field: t.$.referrer, width: '88' }, t.$.referrerRemark],
@@ -286,6 +286,7 @@ export class TenantsListComponent implements OnInit {
         // },
         ok: async () => {
           if (!this.isDonor()) {
+            branchChanged = t && t.bid && t.$.bid && t.$.bid.valueChanged()
             await t!.save();
             if (!(t.defVids && t.defVids.length > 0)!) {
               this.dialog.info(terms.notVolunteersForCurrentTenant);
@@ -295,6 +296,15 @@ export class TenantsListComponent implements OnInit {
       },
       _ => _ ? _.ok : false);
     if (changed) {
+      // check to change main-branch
+      // console.log(1,'t.$.bid.valueChanged()','current',t.bid.id,t.$.bid.valueChanged(),'originalValue',t.$.bid.originalValue)
+      if (branchChanged) {
+        if (!this.remult.hasValidBranch()) {
+          await this.auth.swithToBranch(t.bid.id)
+          window?.location?.reload()
+        }
+      }
+      // console.log(4)
       await this.refresh();
       // if (isNew) {
       //   if (await this.dialog.yesNoQuestion(terms.shouldAddActivity.replace('!t.name!', t.name))) {

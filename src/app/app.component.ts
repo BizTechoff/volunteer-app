@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
     },
     getValue: (_, f) => f.value ? `מציג רק את סניף ${f.value?.name}` : 'מציג את כל הסניפים'
   })
-  @Field({ caption: 'סניף לתצוגה' })
+  @Field({ caption: 'בחירת סניף ראשי לתצוגה' })
   branch: Branch = undefined!;
 
   constructor(
@@ -61,9 +61,8 @@ export class AppComponent implements OnInit {
   }
 
   async setSelectedBranch() {
-    if (this.remult.user.bid && this.remult.user.bid.length > 0) {
-      this.branch = await this.remult.repo(Branch).findId(this.remult.user.bid)
-      // console.log('ngOnInit', this.remult.user.bid)
+    if (this.remult.user.branch && this.remult.user.branch.length > 0) {
+      this.branch = await this.remult.repo(Branch).findId(this.remult.user.branch)
     }
   }
 
@@ -149,6 +148,7 @@ export class AppComponent implements OnInit {
       title: terms.updateInfo,
       fields: () => [
         { field: user.$.bid, readonly: true },
+        { field: user.$.branch2, readonly: true, visible: _ => this.remult.user.isVolunteerMultiBrnach },
         user.$.name
       ],
       ok: async () => {

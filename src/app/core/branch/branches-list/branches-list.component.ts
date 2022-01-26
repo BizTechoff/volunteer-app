@@ -23,7 +23,7 @@ export class BranchesListComponent implements OnInit {
       // allowInsert: this.remult.isAllowed(Roles.admin),
       allowUpdate: this.remult.isAllowed(Roles.admin),
       where: () => ({
-        id: this.remult.user.bid?.length > 0 ? this.remult.user.bid : undefined
+        id: this.remult.user.branch?.length > 0 ? this.remult.user.branch : undefined
         // id: this.remult.branchAllowedForUser()
         // bid: this.isBoard() ? undefined : { $co
       }),
@@ -43,11 +43,11 @@ export class BranchesListComponent implements OnInit {
         //   // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);
         //   return 0; /*r.getVolunteersCount()*/
         // }
-        f.push({ field: row.volunteersCount, width: '88' });
-        f.push({ field: row.tenantsCount, width: '88' });
-        f.push({ field: row.activitiesCount, width: '88' })
-        f.push({ field: row.foodDeliveries, width: '88' });
-        f.push({ field: row.photosCount, width: '88' })
+        f.push({ field: row.volunteersCount, width: '88', readonly: true });
+        f.push({ field: row.tenantsCount, width: '88', readonly: true });
+        f.push({ field: row.activitiesCount, width: '88', readonly: true })
+        f.push({ field: row.foodDeliveries, width: '88', readonly: true });
+        f.push({ field: row.photosCount, width: '88', readonly: true })
         // if (this.isAdmin()) {  
         //   f.push(row.email, row.color, row.frame); 
         // }  

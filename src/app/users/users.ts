@@ -169,7 +169,7 @@ export class Langs {
                     user.bid = undefined;
                     user.branch2 = undefined;
                 }
-                if(user.manager){
+                if (user.manager) {
                     user.branch2 = undefined;
                 }
             }
@@ -323,7 +323,7 @@ export class Users extends IdEntity {
     @Field({ caption: terms.address })
     address: string = '';
 
-    @Field(options => options.valueType = Tenant, { caption: terms.tenant, includeInApi: Allow.authenticated })
+    @Field({ caption: terms.tenant, includeInApi: Allow.authenticated })// options => options.valueType = Tenant, { caption: terms.tenant, includeInApi: Allow.authenticated })
     defTid!: Tenant;
 
     // @DataControl<Users, number>({

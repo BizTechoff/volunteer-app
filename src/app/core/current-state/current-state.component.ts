@@ -200,12 +200,6 @@ export class CurrentStateComponent implements OnInit {
   refreshedTime = '00:00';
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   maxLabelLength = 0;
-  //<CurrentStateComponent, Branch | undefined>
-  // @DataControl({
-  //   click:  Branch.selectBranch<CurrentStateComponent>(async r => await r.refresh())
-  // })
-  // @Field({ caption: terms.branch })
-  // branch: Branch = undefined!;
 
   constructor(private remult: Remult, private dialog: DialogService) {
 
@@ -215,10 +209,6 @@ export class CurrentStateComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
 
   async ngOnInit() {
-    // let b = await this.remult.repo(Branch).findId(this.remult.user.bid);
-    // if (b) {
-    //   this.branch = b;
-    // }
     await this.refresh();
   }
 

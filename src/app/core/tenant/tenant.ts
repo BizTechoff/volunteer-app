@@ -111,10 +111,7 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
     async (options, remult) => {
         options.apiPrefilter = () => (
             { bid: remult.branchAllowedForUser() }
-            // { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
         )
-        // options.saving = async (tenant) => {
-        // };
     })
 export class Tenant extends EntityWithModified {
 
@@ -132,7 +129,7 @@ export class Tenant extends EntityWithModified {
 
     @Field({ caption: terms.referrerRemark })
     referrerRemark: string = '';
-    
+
     @Field({ caption: terms.foodCount })
     foodCount: FoodDeliveredCount = FoodDeliveredCount.one;
 

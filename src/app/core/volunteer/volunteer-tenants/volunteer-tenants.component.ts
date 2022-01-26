@@ -90,7 +90,7 @@ export class VolunteerTenantsComponent implements OnInit {
       async x => x.args = {
         ignoreDefVids: true,
         title: 'דייר חדש לדיירים שלי',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
-        bid: await this.remult.repo(Branch).findId(this.remult.user.bid),
+        bid: await this.remult.repo(Branch).findId(this.remult.user.branch),
         onSelect: t => newT = t
       })
     if (newT) {

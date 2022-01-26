@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DataAreaFieldsSetting, DataAreaSettings, openDialog } from '@remult/angular';
 import { getFields, Remult } from 'remult';
+import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
 import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
@@ -75,6 +76,7 @@ export class ActivityDetailsComponent implements OnInit {
   } = { bid: undefined, aid: '', tid: undefined, readonly: false, changed: false };
   today = new Date();
   activity!: Activity;
+  branchChanged = false;
   top = new DataAreaSettings({});
   fields = new DataAreaSettings({});
   images: Photo[] = [];
@@ -84,7 +86,7 @@ export class ActivityDetailsComponent implements OnInit {
   // bid: string = '';
   get $() { return getFields(this, this.remult) };
 
-  constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) { }
+  constructor(private remult: Remult, public auth: AuthService, private dialog: DialogService, private win: MatDialogRef<any>) { }
 
   async ngOnInit() {
     if (!this.args) {
@@ -98,7 +100,6 @@ export class ActivityDetailsComponent implements OnInit {
     }
     this.args.changed = false;
     await this.retrieve();
-
 
     if (this.isShowDeliveredFoodToShabat() && this.didntCheckedFoodDelivery()) {
 
@@ -152,7 +153,7 @@ export class ActivityDetailsComponent implements OnInit {
   isDonor() {
     return this.remult.user.isReadOnly;
   }
- 
+
   isManager() {
     return this.remult.user.isManagerOrAbove;
   }
@@ -186,7 +187,7 @@ export class ActivityDetailsComponent implements OnInit {
         }
       }
       else {
-        branch = await this.remult.repo(Branch).findId(this.remult.user.bid);
+        branch = await this.remult.repo(Branch).findId(this.remult.user.branch);
       }
       let hour = this.today.getHours();
       let min = this.today.getMinutes();
@@ -221,7 +222,7 @@ export class ActivityDetailsComponent implements OnInit {
         //   f.push(this.activity.$.foodDelivered);
         // }
         if (this.isBoard()) {
-          f.push({ field: this.activity.$.bid, readonly: this.activity.status.isClosed() });
+          f.push({ field: this.activity.$.bid, readonly: this.remult.hasValidBranch() || this.activity.status.isClosed() });
         }
         if (this.isManager()) {
           f.push({ field: this.activity.$.status, readonly: this.activity.status.isClosed() });
@@ -339,9 +340,17 @@ export class ActivityDetailsComponent implements OnInit {
         this.activity.vids.push({ id: this.remult.user.id, name: this.remult.user.name });
       }
     }
-  }
+  } 
 
   async saveAndClose() {
+    if(!this.activity.bid){ 
+      return this.dialog.info(terms.mustEnterBranch)
+    }
+    if(!this.activity.tid){ 
+      return this.dialog.info(terms.mustEnterTenant)
+    }
+    this.branchChanged = this.activity && this.activity.bid && this.activity.$.bid && this.activity.$.bid.valueChanged()
+
     let alreadySaved = false;
     if (this.activity.vids.length > 0) {
       if (this.activity.status === ActivityStatus.w4_assign) {
@@ -364,14 +373,49 @@ export class ActivityDetailsComponent implements OnInit {
     // let success = await this.sendEmails();
     this.close();
   }
+
   // SEND EMAIL TO VOLUNTEERS + INVITETION.ics
-  close() {
+  async close() {
+
+    // check to change main-branch
+    if (this.branchChanged) {
+      if (!this.remult.hasValidBranch()) {
+        await this.auth.swithToBranch(this.activity.bid.id)
+        window?.location?.reload()
+      }
+    }
+    // if (this.activity && this.activity.bid && this.activity.$.bid && this.activity.$.bid.valueChanged()) {
+    //   if (!this.remult.user.branch || this.remult.user.branch.length === 0) {
+    //     await this.auth.swithToBranch(this.activity.bid.id)
+    //     window?.location?.reload()
+    //   }
+    // }
+
     this.win.close();
   }
 
   async CheckConflictsVolenteersOrTenant() {
     return false;
   }
+
+  async addPhoto() {
+
+  }
+
+  async removeImage(img: Photo) {
+    let yes = await this.dialog.confirmDelete(terms.delete)!;
+    if (yes) {
+      await img.delete();
+      var index = this.images.indexOf(img);
+      if (index >= 0) {
+        this.images.splice(index, 1);
+        this.dialog.info('התמונה הוסרה בהצלחה');
+      }
+    }
+  }
+}
+
+
 
   // async sendEmails() {
   //   // console.log('1');
@@ -570,25 +614,6 @@ export class ActivityDetailsComponent implements OnInit {
 
   // return await EmailSvc.SendEmail(email, subject, message, link);
   // }
-
-  async addPhoto() {
-
-  }
-
-  async removeImage(img: Photo) {
-    let yes = await this.dialog.confirmDelete(terms.delete)!;
-    if (yes) {
-      await img.delete();
-      var index = this.images.indexOf(img);
-      if (index >= 0) {
-        this.images.splice(index, 1);
-        this.dialog.info('התמונה הוסרה בהצלחה');
-      }
-    }
-  }
-}
-
-
 
   // async onFileInput(e: any) {
   //   let changed = this.loadFiles(e.target.files);

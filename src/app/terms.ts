@@ -1,7 +1,9 @@
 import { IdFilter, Remult } from 'remult';
 
 export const terms = {
-    foods:'מנות',
+    mustEnterBranch:'סניף: שדה חובה',
+    mustEnterTenant:'דייר: שדה חובה',
+    foods: 'מנות',
     uploads: 'העלאות',
     succefullyConnected: 'התחברת בהצלחה',
     wrongMobile: 'סלולרי שגוי',
@@ -221,10 +223,10 @@ export const terms = {
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
     appVersion: '2022.01.18.0'
 }
- 
+
 declare module 'remult' {
     export interface UserInfo {
-        bid: string;
+        branch: string;
         isReadOnly: boolean;
         isVolunteerMultiBrnach: boolean;
         isVolunteerOnly: boolean;
@@ -237,6 +239,7 @@ declare module 'remult' {
     }
     export interface Remult {
         branchAllowedForUser(): IdFilter<import('./core/branch/branch').Branch>
+        hasValidBranch(): boolean
     }
 }
 
@@ -248,11 +251,17 @@ declare module 'remult' {
 
 export function augmentRemult(remult: Remult) {
     remult.branchAllowedForUser = () => {
-        if (!remult.user.bid || remult.user.bid.trim().length === 0) {// if (remult.isAllowed(Roles.board))
-            // console.log('remult.user.ADMIN', remult.user.bid)
+        if (!remult.user.branch || remult.user.branch.trim().length === 0) {// if (remult.isAllowed(Roles.board))
             return undefined!;
         }
-        // console.log('remult.user.bid', remult.user.bid)
-        return { $id: [remult.user.bid] };//, remult.user.bid2
+        return { $id: [remult.user.branch] };
+    }
+    remult.hasValidBranch = () => {
+        if (remult.user.branch) {
+            if (remult.user.branch.trim().length > 0) {
+                return true
+            }
+        }
+        return false
     }
 }

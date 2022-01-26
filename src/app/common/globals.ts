@@ -49,7 +49,7 @@ export const TimeRequireValidator = (_: any, col: FieldRef<any, string>) => {
 
 export const ColorNumberValidator = (_: any, col: FieldRef<any, number>) => {
     // console.log(col.value);
-    let ok = col && col.value >= 0 && col.value <= 11 ? true : false;
+    let ok = col && col.value >= 1 && col.value <= 11 ? true : false;
     // if (ok) {
     //     // let v = parseInt(col.value);
     //     ok &&= (v >= 0 && v <= 11);

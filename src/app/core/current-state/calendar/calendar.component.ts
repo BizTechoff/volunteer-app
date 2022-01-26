@@ -25,7 +25,7 @@ export class CalendarComponent implements OnInit {
 
   async ngOnInit() {
 
-    let b = await this.remult.repo(Branch).findId(this.remult.user.bid);
+    let b = await this.remult.repo(Branch).findId(this.remult.user.branch);
     if (b) {
       this.selectedCalendarFrame = b.frame && b.frame.length > 0 ? b.frame : ''
     }

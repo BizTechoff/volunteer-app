@@ -17,7 +17,8 @@
                 </div>
             </div>  
             <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                <button *ngIf="this.isAllowEdit()" mat-flat-button color="primary" style="width: 100%;"
+                <!-- *ngIf="this.isAllowEdit()" -->
+                <button  mat-flat-button color="primary" style="width: 100%;"
                     (click)='saveAndClose()'>
                     {{ terms.saveAndClose }}
                 </button>

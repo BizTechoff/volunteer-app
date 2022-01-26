@@ -3,6 +3,7 @@ import { Entity, Field, FieldRef, Remult } from "remult";
 import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { terms } from "../../terms";
+import { Roles } from "../../users/roles";
 import { EntityWithModified } from "../EntityWithModified";
 
 
@@ -11,34 +12,15 @@ import { EntityWithModified } from "../EntityWithModified";
     hideDataOnInput: true,
     clickIcon: 'search',
     getValue: (_, f) => f.value?.name,
-    click: Branch.selectBranch()
+    click: Branch.selectBranch() //([], (_,value) => remult.user.branch = value )
 })
 @Entity<Branch>('branches', {
     allowApiDelete: false,
     allowApiInsert: false,
-    allowApiUpdate: true,
-    allowApiRead: c => true,
-    // allowApiInsert: Roles.admin,
-    // allowApiDelete: Roles.admin,
-    // allowApiUpdate: Roles.admin,
-    // allowApiRead: Allow.authenticated
+    allowApiUpdate: Roles.admin,
+    allowApiRead: true,
     defaultOrderBy: { name: "asc" }
-},
-    (options, remult) => {
-        // options.apiPrefilter = () => (
-        //     { id: remult.branchAllowedForUser() }
-        // )
-        // { bid: !remult.isAllowed(Roles.board) ? { $id: remult.user.bid } : undefined }
-        // options.apiPrefilter = () => {
-        //     return {
-        //         id: remult.branchAllowedForUser()
-        //     }
-        // }
-        // options.apiPrefilter = async () => ({
-        //     id: remult.branchAllowedForUser()
-        //     // id: !remult.isAllowed(Roles.board) ? remult.user.bid : undefined
-        // })
-    }
+}
 )
 export class Branch extends EntityWithModified {
 
