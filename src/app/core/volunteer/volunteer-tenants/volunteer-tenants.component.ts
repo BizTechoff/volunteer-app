@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { GridSettings, openDialog } from '@remult/angular';
 import { Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
@@ -6,7 +7,6 @@ import { SelectCallComponent } from '../../../common/select-call/select-call.com
 import { SelectNavigatorComponent } from '../../../common/select-navigator/select-navigator.component';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { terms } from '../../../terms';
-import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
@@ -51,7 +51,7 @@ export class VolunteerTenantsComponent implements OnInit {
       ]
     });
   userMessage = terms.loadingYourTenants;
-  constructor(private remult: Remult, private dialog: DialogService) { }
+  constructor(private remult: Remult, private router: Router, private dialog: DialogService) { }
   terms = terms;
   async ngOnInit() {
     await this.refresh();
@@ -102,6 +102,10 @@ export class VolunteerTenantsComponent implements OnInit {
           newT.defVids.push({ id: this.remult.user.id, name: this.remult.user.name });
           await newT.save()
           await this.refresh()
+          yes = await this.dialog.yesNoQuestion(`הדייר שוייך בהצלחה. האם ברצונך להקים פעילות חדשה עם ${newT.name}`)
+          if (yes) {
+            this.openActivity(newT)
+          }
         }
         else {
           this.dialog.info('דייר זה כבר משוייך לך')
@@ -174,7 +178,8 @@ export class VolunteerTenantsComponent implements OnInit {
       _ => _.args = { bid: tnt.bid, tid: tnt },
       _ => _ ? _.args.changed : false);
     if (changes) {
-      await this.refresh();
+      this.router.navigateByUrl(`/${terms.myActivities}`)
+      // await this.refresh();
     }
   }
 

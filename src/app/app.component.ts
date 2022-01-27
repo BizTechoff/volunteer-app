@@ -32,6 +32,14 @@ export class AppComponent implements OnInit {
   })
   @Field({ caption: 'בחירת סניף ראשי לתצוגה' })
   branch: Branch = undefined!;
+   
+  getBG() {
+    let result = ''
+    if (!this.router || this.router.url === "/" || this.router.url === "/" + encodeURI(terms.home)) {
+      result ='linear-gradient(180deg, #2CBCC1, #F69A48)'//'url(assets/logo_eshel.png)'// 'linear-gradient(180deg, #2CBCC1, #F69A48)'
+    }
+    return result
+  }
 
   constructor(
     public router: Router,

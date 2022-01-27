@@ -24,6 +24,9 @@ export class HomeComponent implements OnInit {
   timer: Subscription = undefined!;
   currentPhoto = { id: '', link: '', name: '', created: new Date() };
   photos = [] as { id: string, link: string, name: string, created: Date }[];
+  currentPhotoSocial = { id: '', link: '', name: '', created: new Date() };
+  photosSocial = [] as { id: string, link: string, name: string, created: Date }[];
+
   // timer = undefined!;
   async signIn() {
     await openDialog(UserLoginComponent);
@@ -59,6 +62,10 @@ export class HomeComponent implements OnInit {
       let i = this.getRandoxIndex();
       this.currentPhoto = this.photos[i];
     }
+    let min = 0
+    let max = 3
+    let i = Math.floor(Math.random() * (max - min) + min)
+    this.currentPhotoSocial = this.photosSocial[i]
     // console.log(JSON.stringify(this.currentPhoto));
   }
 
@@ -70,6 +77,12 @@ export class HomeComponent implements OnInit {
   }
 
   async ngOnInit() {
+
+    this.photosSocial.push({name: '1', created: new Date(), id:'1', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_001.jpeg'})
+    this.photosSocial.push({name: '2', created: new Date(), id:'2', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_002.jpeg'})
+    this.photosSocial.push({name: '3', created: new Date(), id:'3', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_003.jpeg'})
+    this.photosSocial.push({name: '4', created: new Date(), id:'4', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_004.jpeg'})
+
     await this.nextPhoto();
     this.timer = interval(3000)
       .subscribe(async (val) => { await this.nextPhoto(); });

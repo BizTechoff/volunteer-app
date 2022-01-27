@@ -33,8 +33,8 @@
   <div color="primary" style="background-image: linear-gradient(90deg, #2CBCC1, #F69A48)">
     <data-control [field]="this.$.branch!" *ngIf="this.remult.authenticated()&&(this.remult.user.isBoardOrAbove||this.remult.user.isVolunteerMultiBrnach)" style="width: 100%; color: white;"></data-control> 
   </div> 
-  <mat-sidenav-container class="app-sidenav-container">
-    <!-- !dialogService.isScreenSmall() -->
+  <mat-sidenav-container class="app-sidenav-container" [style.background-image]="getBG()">
+    <!-- !dialogService.isScreenSmall() --> 
     <mat-sidenav #sidenav class="app-sidenav mat-elevation-z10 no-print" [opened]="false"
       [mode]="dialogService.isScreenSmall()?'over':'side'">
       <div style="display:flex; justify-content: center; margin-top: 2%;">

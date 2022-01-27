@@ -36,7 +36,7 @@ function getEnvKeyFor(email: string) {
         // }
  
 NotificationService.sendCalendar = async (sender: string, req: IcsRequest) => {
-    console.debug(`sendCalendar: { sender: ${sender}, req: ${JSON.stringify(req)} }`);
+    console.debug(`sendCalendar: {sender: ${sender}, req: ${JSON.stringify(req)}}`);
 
     if (process.env.CALENDAR_CHANNEL_OPENED === 'true') {
         const SCOPE = 'https://www.googleapis.com/auth/calendar.events';

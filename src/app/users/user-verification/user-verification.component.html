@@ -3,7 +3,7 @@
     <p>
         <span style="text-align: center;"> {{ this.terms.pleaseEnterVerificationCode }} </span>
     </p>
-    <div *ngIf="this.showLoginAsVolunteer" style="padding-bottom: 7px;">
+    <div *ngIf="this.showLoginAsVolunteer" style="padding-bottom: 7px; color: blue;">
         <mat-radio-group [(ngModel)]="this.isLoginAsVolunteer">
             <mat-radio-button [value]="false">
                 <span>כניסה כמנהל</span>

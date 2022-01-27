@@ -1,17 +1,31 @@
-<div class="full-page">
-    <!-- <div style="display: flex; flex-direction: column; justify-content: space-evenly;"> -->
-        <div class="topdiv">
-            <!-- <h1>פעילות חברתית</h1> -->
-            <!-- <picture> -->
-            <img class="image" [srcset]="this.currentPhoto.link">
-        <!-- </picture> -->
+<div class="home-div">
+    <div *ngIf="this.currentPhoto.link.length === 0">
+        <img src="assets/logo_eshel.png" alt="Get-Hesed" style="display: block; margin-left: auto;margin-right: auto;margin-top: 50%;">
+    </div>
+    <div *ngIf="this.currentPhoto.link.length > 0" style="display: flex; flex-direction: column; justify-content: space-evenly;">
+        <div class="home-image-div">
+            <H2 style="color: white;">פעילויות מההוואי החברתי</H2>
+            <img class="home-image" [srcset]="this.currentPhotoSocial.link">
         </div>
-        <div class="bottomdiv">
-            <!-- <h1>פעילות התנדבותית</h1> -->
-            <!-- <picture>
-                <span>פעילות</span> -->
-            <img class="image" [srcset]="this.currentPhoto.link">
-        <!-- </picture> -->
+        <div class="home-image-div">
+            <H2 style="color: white;">פעילויות עם דיירים</H2>
+            <img class="home-image" [srcset]="this.currentPhoto.link">
         </div>
-    <!-- </div> -->
+    </div>
 </div>
+
+<!-- <div style="display: flex; flex-direction: column; justify-content: space-evenly;"> -->
+<!-- <div class="topdiv"> -->
+<!-- <h1>פעילות חברתית</h1> -->
+<!-- <picture> -->
+<!-- <img class="image" [srcset]="this.currentPhoto.link"> -->
+<!-- </picture> -->
+<!-- </div>
+    <div class="bottomdiv"> -->
+<!-- <h1>פעילות התנדבותית</h1> -->
+<!-- <picture>
+                <span>פעילות</span> -->
+<!-- <img class="image" [srcset]="this.currentPhoto.link"> -->
+<!-- </picture> -->
+<!-- </div> -->
+<!-- </div> -->

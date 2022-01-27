@@ -127,33 +127,40 @@ export class ActivityStatus {
     // static none = new ActivityStatus(0, 'ללא');
     static w4_assign = new ActivityStatus(1, 'ממתין לשיבוץ',
         async (a, to, uid) => {//t=the new status
+            let saved = false
             if (to === ActivityStatus.w4_start) {
                 a.assigned = new Date();
                 a.status = to;
                 await a.save();
+                saved = true
                 // sendEmail(a, insertToCalendar);
             }
             else if (to === ActivityStatus.cancel) {
                 a.canceled = new Date();
                 a.status = to;
                 await a.save();
+                saved = true
                 await ActivityStatus.showOnlySummary(a);
                 let success = await NotificationService.SendCalendar(a.id);
                 // sendEmail(a, deleteFromCalendar);
-            } else return;
+            }
+            return saved
         });
     static w4_start = new ActivityStatus(2, 'ממתין להתחלה',
         async (a, to, uid) => {//t=the new status
+            let saved = false
             if (to === ActivityStatus.w4_end) {
                 a.started = new Date();
                 a.status = to;
                 await a.save();
+                saved = true
                 await ActivityStatus.showAfterStarted(a);
             }
             else if (to === ActivityStatus.w4_assign) {
                 a.assigned = new Date();
                 a.status = to;
                 await a.save();
+                saved = true
                 // sendEmail(a, deleteFromCalendar);
             }
             else if (to === ActivityStatus.cancel) {
@@ -169,35 +176,39 @@ export class ActivityStatus {
                     }
                 }
                 await a.save();
+                saved = true
                 // console.log('after save', a.vids);
                 await ActivityStatus.showOnlySummary(a);
                 // console.log('from cancel - toCalendar 1')
                 let success = await NotificationService.SendCalendar(a.id);
                 // sendEmail(a, updateCalendar);
-            } else return;
-            // await a.save();
+            } 
+            return saved
         });
     static w4_end = new ActivityStatus(3, 'ממתין לסיום',
         async (a, to, uid) => {//t=the new status
+            let saved = false
             if (to === ActivityStatus.success) {
                 a.ended = new Date();
                 a.status = to;
                 await a.save();
+                saved = true
                 await ActivityStatus.showOnlySummary(a, pointsEachSuccessActivity);
             }
             else if (to === ActivityStatus.problem) {
                 a.problemed = new Date();
                 a.status = to;
                 await a.save();
+                saved = true
                 await ActivityStatus.showOnlySummary(a);
-            } else return;
-            // await a.save();
+            }
+            return saved
         });
     static success = new ActivityStatus(4, 'הסתיים בהצלחה', () => undefined!, 'green');
     static problem = new ActivityStatus(5, 'הסתיים בבעיה', () => undefined!, 'red');
     static cancel = new ActivityStatus(6, 'בוטל', () => undefined!, 'gray');
 
-    constructor(public id: number, public caption: string, public onChanging: (a: Activity, to: ActivityStatus, uid: string) => Promise<void>, public color: string = 'darkblue') { }
+    constructor(public id: number, public caption: string, public onChanging: (a: Activity, to: ActivityStatus, uid: string) => Promise<boolean>, public color: string = 'darkblue') { }
     // id:number;
 
 

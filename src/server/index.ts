@@ -99,7 +99,7 @@ async function startup() {
 
     // const remult = await api.getRemult(undefined!);
     // downloadPhotos(remult).then(() => { });
-    
+     
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
 
         const remult = await api.getRemult(undefined!);

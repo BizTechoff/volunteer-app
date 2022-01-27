@@ -117,7 +117,7 @@ export class ActivityDetailsComponent implements OnInit {
 
   didntCheckedFoodDelivery() {
     let result = false;
-    if (this.activity && !this.activity.foodDelivered!) {
+    if (this.remult.user.isVolunteerOnly && this.activity && !this.activity.foodDelivered!) {
       result = true;
     }
     return result;
@@ -350,21 +350,23 @@ export class ActivityDetailsComponent implements OnInit {
       return this.dialog.info(terms.mustEnterTenant)
     }
     this.branchChanged = this.activity && this.activity.bid && this.activity.$.bid && this.activity.$.bid.valueChanged()
-
+// console.log('this.branchChanged',this.branchChanged)
     let alreadySaved = false;
     if (this.activity.vids.length > 0) {
       if (this.activity.status === ActivityStatus.w4_assign) {
-        await this.activity.status.onChanging(this.activity, ActivityStatus.w4_start, this.remult.user.id);
-        alreadySaved = true;
+        alreadySaved = await this.activity.status.onChanging(this.activity, ActivityStatus.w4_start, this.remult.user.id);
+        console.log(1)
       }
     }
     else {
-      await this.activity.status.onChanging(this.activity, ActivityStatus.w4_assign, this.remult.user.id);
-      alreadySaved = true;
+      alreadySaved = await this.activity.status.onChanging(this.activity, ActivityStatus.w4_assign, this.remult.user.id);
+      console.log(2)
     }
     if (!alreadySaved) {
       await this.activity.save();
+      console.log(3)
     }
+    console.log(4)
     // console.log('isnew',this.activity.isNew());
     this.args.changed = true;
     this.args.aid = this.activity.id;
