@@ -289,7 +289,7 @@ async function getEvent(calendar: calendar_v3.Calendar, aid: string): Promise<ca
         });
 
         if (response['status'] == 200 && response['statusText'] === 'OK') {
-            console.log(response);
+            // console.log(response);
 
             return response.data;
         } else {

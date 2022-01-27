@@ -27,7 +27,7 @@ export class AuthService {
             this.setAuthToken(token);
             // console.log('AuthService.constructor', remult.user)
         }
-        console.log('AuthService READY')
+        // console.log('AuthService READY')
     }
 
     async sendVerifyCode(mobile: string) {

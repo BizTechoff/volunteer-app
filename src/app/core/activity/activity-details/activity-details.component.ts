@@ -355,18 +355,18 @@ export class ActivityDetailsComponent implements OnInit {
     if (this.activity.vids.length > 0) {
       if (this.activity.status === ActivityStatus.w4_assign) {
         alreadySaved = await this.activity.status.onChanging(this.activity, ActivityStatus.w4_start, this.remult.user.id);
-        console.log(1)
+        // console.log(1)
       }
     }
     else {
       alreadySaved = await this.activity.status.onChanging(this.activity, ActivityStatus.w4_assign, this.remult.user.id);
-      console.log(2)
+      // console.log(2)
     }
     if (!alreadySaved) {
       await this.activity.save();
-      console.log(3)
+      // console.log(3)
     }
-    console.log(4)
+    // console.log(4)
     // console.log('isnew',this.activity.isNew());
     this.args.changed = true;
     this.args.aid = this.activity.id;

@@ -13,7 +13,7 @@ NotificationService.sendSms = async (req: SmsRequest): Promise<{ success: boolea
     let result: SendSmsResponse = { success: false, message: 'Sms channel is close!', count: 0 };
 
     console.debug(`sendSms: ${JSON.stringify(req)}`);
-    console.log(process.env.SMS_CHANNEL_OPENED, process.env.SMS_CHANNEL_OPENED === 'true')
+    // console.log(process.env.SMS_CHANNEL_OPENED, process.env.SMS_CHANNEL_OPENED === 'true')
     if (process.env.SMS_CHANNEL_OPENED === 'true') {
         let url = process.env.SMS_URL!
             .replace('!user!', process.env.SMS_ACCOUNT!)

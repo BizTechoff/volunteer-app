@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
     public dialogService: DialogService,
     public remult: Remult,
     public auth: AuthService) {
-    console.log('AppComponent READY')
+    // console.log('AppComponent READY')
   }
   terms = terms;
   get $() { return getFields(this, this.remult) };
@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
     if (this.auth.isConnected) {
       await this.setSelectedBranch()
     }
-    console.log('AppComponent INIT')
+    // console.log('AppComponent INIT')
   }
 
   showRemultUser(e: MouseEvent) {
