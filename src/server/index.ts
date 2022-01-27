@@ -22,13 +22,22 @@ import './send-calendar';
 import './send-email';
 import './send-sms';
   
-export function isDevMode() {
-    let result = false;
+export function getDevMode(): string {
+    let result = '';
     let db = process.env.DATABASE_URL;
     if (db) {
         let i = db.indexOf('@localhost');
         if (i > 0) {
-            result = true;
+            result = 'DEV';
+        }
+        else {
+            i = db.indexOf('fqligozujsaanx')
+            if (i > 0) {
+                result = 'QA QA QA';
+            }
+            else {
+                result = 'PROD PROD PROD PROD PROD PROD PROD'
+            }
         }
     }
     return result;
@@ -37,13 +46,9 @@ export function isDevMode() {
 async function startup() {
     config(); //loads the configuration from the .env file
 
-    let enviroment = 'NO enviroment'.toUpperCase();
-    let isDev = isDevMode();
-    enviroment = 'PROD PROD PROD PROD PROD PROD PROD';
-    if (isDev) {
-        enviroment = 'DEV';
-    }
-
+    let enviroment = getDevMode();
+    let isDev = enviroment === 'DEV'
+ 
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());

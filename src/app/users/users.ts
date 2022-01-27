@@ -113,7 +113,7 @@ export class Langs {
         allowApiRead: true,
         allowApiUpdate: Allow.authenticated,
         allowApiDelete: Roles.admin,
-        allowApiInsert: Roles.manager,
+        allowApiInsert: [Roles.manager, Roles.admin],
         defaultOrderBy: {
             admin: "desc",
             donor: "desc",

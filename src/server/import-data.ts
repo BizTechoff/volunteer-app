@@ -46,7 +46,7 @@ export interface tenantVolunteersInfo {
 
 let folder = `D:\\documents\\אשל ירושלים\\הסבה\\`;
 let branches = [] as string[];
-// branches.push('אילת נוער'); 
+// branches.push('אילת נוער');   
 // branches.push('אילת קמפוס');
 // branches.push('אשקלון');
 // branches.push('זכרון יעקב');
@@ -55,7 +55,7 @@ let branches = [] as string[];
 // branches.push('חיפה'); 
 // branches.push('טבריה');
 // branches.push('ירושלים');
-// branches.push('ירושלים ב'); 
+// branches.push('ירושלים ב');  
 // branches.push('נס ציונה');
 // branches.push('קריית אונו');
 // branches.push('ראשון לציון');
