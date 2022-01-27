@@ -7,7 +7,8 @@ import * as jwt from 'express-jwt';
 import * as fs from 'fs';
 import * as helmet from 'helmet';
 import { createPostgresConnection } from 'remult/postgres';
-import { remultExpress } from 'remult/remult-express';
+import { remultExpress } from 'remult/server/expressBridge';
+// import { remultExpress } from 'remult/remult-express';
 //import '../app/app.module';
 // import '../app/users/*';
 import '../app/app-routing.module';
@@ -17,26 +18,26 @@ import '../app/common/types';
 import { augmentRemult } from '../app/terms';
 import './aws-s3';
 import { generateUploadURL } from './aws-s3';
-import { buildPhotoLinks, importDataNew } from './import-data';
+import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
-  
+
 export function getDevMode(): string {
     let result = '';
     let db = process.env.DATABASE_URL;
     if (db) {
         let i = db.indexOf('@localhost');
         if (i > 0) {
-            result = 'DEV';
+            result = 'dev';
         }
         else {
             i = db.indexOf('fqligozujsaanx')
             if (i > 0) {
-                result = 'QA QA QA';
+                result = 'qa';
             }
             else {
-                result = 'PROD PROD PROD PROD PROD PROD PROD'
+                result = 'prod'
             }
         }
     }
@@ -47,8 +48,10 @@ async function startup() {
     config(); //loads the configuration from the .env file
 
     let enviroment = getDevMode();
-    let isDev = enviroment === 'DEV'
- 
+    let isDev = enviroment === 'dev'
+    let isQA = enviroment === 'qa'
+    let isProd = enviroment === 'prod'
+
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());
@@ -63,7 +66,7 @@ async function startup() {
         initRequest: async (remult) => augmentRemult(remult)
     });
     app.use(api);
- 
+
     app.get("/api/s3Url", async (req, res) => {//?key=[key]&f=[fname]
         let result: { url: string, error: string } = { url: '', error: '' };
         // console.log('s3Url CALLED !');
@@ -85,7 +88,7 @@ async function startup() {
         // console.log(JSON.stringify(result));
         res.send(JSON.stringify(result));
     })
-  
+
     app.use(express.static('dist/volunteer-app'));
 
     app.use('/*', async (req, res) => {
@@ -96,7 +99,13 @@ async function startup() {
         }
     });
 
-    console.debug(enviroment);
+    let env = [] as string[]
+    let count = isProd ? 7 : isQA ? 3 : 1
+    for (let index = 0; index < count; index++) {
+        env.push(enviroment.toUpperCase())
+    }
+
+    console.debug(env.join(' '));
 
     // let f = new Date()
     // f= undefined!
@@ -104,7 +113,7 @@ async function startup() {
 
     // const remult = await api.getRemult(undefined!);
     // downloadPhotos(remult).then(() => { });
-     
+
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
 
         const remult = await api.getRemult(undefined!);

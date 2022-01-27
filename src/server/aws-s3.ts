@@ -1,5 +1,5 @@
 import * as aws from 'aws-sdk';
-import { isDevMode } from '.';
+import { getDevMode } from '.';
 // const randomBytes = promisify(crypto.randomBytes)
 //https://www.youtube.com/watch?v=yGYeYJpRWPM&ab_channel=SamMeech-Ward
 export async function generateUploadURL(fName: string, branch: string) {
@@ -13,7 +13,7 @@ export async function generateUploadURL(fName: string, branch: string) {
         const bucketName = process.env.AWS_S3_IAM_BTO_APP_BUCKET!
         const accessKeyId = process.env.AWS_S3_IAM_BTO_APP_ACCESS_KEY_ID!
         const secretAccessKey = process.env.AWS_S3_IAM_BTO_APP_SECRET_ACCESS_KEY!
-        
+
         const s3 = new aws.S3({
             region,
             accessKeyId,
@@ -23,7 +23,7 @@ export async function generateUploadURL(fName: string, branch: string) {
 
         const params = ({
             Bucket: bucketName,
-            Key: (isDevMode() ? 'dev/' : 'prod/') + branch + "/" + fName,
+            Key: getDevMode() + '/' + branch + "/" + fName,
             Expires: 60 //sec
         })
 
