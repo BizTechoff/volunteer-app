@@ -256,6 +256,7 @@ export class ActivityDetailsComponent implements OnInit {
     let bidOk = (this.activity.bid && this.activity.bid.id && this.activity.bid.id.length > 0)!;
     if (bidOk) {
       await openDialog(SelectTenantComponent, x => x.args = {
+        ignoreDefVids: true,
         bid: this.activity.bid,
         onSelect: t => {
           if (!this.activity.tid || this.activity.tid.id !== t.id) {

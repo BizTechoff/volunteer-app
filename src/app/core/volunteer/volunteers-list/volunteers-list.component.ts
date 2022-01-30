@@ -29,7 +29,7 @@ export class VolunteersListComponent implements OnInit {
   volunteers: GridSettings<Users> = new GridSettings<Users>(
     this.remult.repo(Users),
     {
-      where: () => ({
+      where: () => ({ 
         volunteer: true,
         bid: this.remult.branchAllowedForUser(),
         name: this.search ? { $contains: this.search } : undefined

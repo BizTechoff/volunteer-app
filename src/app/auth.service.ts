@@ -154,6 +154,7 @@ export class AuthService {
                 roles: [],
                 name: u.name,
                 branch: u.bid?.id ?? '',
+                branch2: u.branch2?.id ?? '',
                 isReadOnly: false,
                 isVolunteerMultiBrnach: false,
                 isVolunteerOnly: false,

@@ -2,6 +2,7 @@ import { DataControl, openDialog } from "@remult/angular";
 import { Entity, Field, FieldRef, Remult } from "remult";
 import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
+import { UserIdName } from "../../common/types";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { EntityWithModified } from "../EntityWithModified";
@@ -83,6 +84,9 @@ export class Branch extends EntityWithModified {
             // return count;
             return remult.repo((await import("../activity/activity")).Activity).count({ bid: branch, foodDelivered: true })//, status: ActivityStatus.openStatuses
         };
+        // options.sqlExpression = async branch => {
+        //     return `(select sum(foodCount) from activities where bid = ${branch} and foodDelivered = 'true')`
+        // }
     })
     foodDeliveries = 0;
 
@@ -99,6 +103,20 @@ export class Branch extends EntityWithModified {
     })
     tenantsCount = 0;
 
+    @Field<Branch>((options, remult) => {
+        options.caption = terms.assigns
+        if (1 == 1) { 
+            let empty:UserIdName[] = [] as UserIdName[];
+            options.serverExpression = async branch => {
+                return remult.repo((await import("../tenant/tenant")).Tenant).count({ bid: branch, defVids: {"$contains": '"id":'} })
+            };
+        }
+        else {
+            options.sqlExpression = () => "( select count(*) from tenants where tenants.bid = branches.id )";
+        }
+    })
+    assignCount = 0;
+    
     constructor(private remult: Remult) {
         super();
     }

@@ -1,19 +1,26 @@
 <div class="full-page">
     <div class="header" style="padding: 10px;">
-        <div style="display: flex; flex-direction: row;">
-            <div style="display: flex; flex-direction: row; justify-content: flex-start;">
+        <div style="display: flex; flex-direction: column;">
+            <!-- <div style="display: flex; flex-direction: row; justify-content: flex-start;">
                 <button mat-mini-fab (click)="this.refresh()">
                     <mat-icon>refresh</mat-icon>
                 </button>
-            </div>
-            <div style="display: flex; flex-direction: row; justify-content: flex-end;">
+            </div> -->
+            <!-- <div style="display: flex; flex-direction: row; justify-content: flex-end;">
                 <button mat-mini-fab (click)="this.addTenant()" title="שייך לי דייר חדש">
                     <mat-icon>group_add</mat-icon>
                 </button>
-            </div>
+            </div> -->
+            <!-- <form (submit)="selectFirst()"> -->
+            <!-- <span> {{ searchString }} </span> -->
+            <mat-form-field>
+                <input matInput [(ngModel)]="searchString" [ngModelOptions]="{standalone: true}"
+                    placeholder="חיפוש לפי שם דייר" (input)="doSearch()">
+            </mat-form-field>
+            <!-- </form> -->
+            <h3 *ngIf="this.tenants && this.tenants.length > 0" style="text-align: center;">לחיצה על הפלוס (+)
+                מוסיפה פעילות</h3>
         </div>
-        <h3 *ngIf="this.tenants && this.tenants.items.length > 0" style="text-align: center;">לחיצה על הפלוס (+) מוסיפה
-            לך פעילות חדשה עם הדייר</h3>
     </div>
     <!-- <div class="header">
         <h3 *ngIf="this.tenants && this.tenants.items.length > 0" style="text-align: center;">לחיצה על הפלוס (+) מוסיפה
@@ -21,8 +28,9 @@
     </div> -->
     <div class="grow-item">
         <div style="display: flex; flex-direction: column; justify-content: center;">
-            <h1 *ngIf="this.tenants && this.tenants.items.length == 0"> {{ this.userMessage }} </h1>
-            <ng-container *ngFor='let a of this.tenants.items'>
+            <h1 *ngIf="this.tenants.length === 0 && this.searchString && this.searchString.length > 0"> {{ terms.searchReturnEmptyList }} </h1>
+            <h1 *ngIf="this.tenants.length === 0 && !(this.searchString && this.searchString.length > 0)"> {{ this.userMessage }} </h1>
+            <ng-container *ngFor='let t of this.tenants'>
                 <mat-card style="margin: 7px;">
                     <mat-card-title>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
@@ -33,18 +41,18 @@
                                     </button>
                                 </div> -->
                                 <button mat-mini-fab color="accent" [title]="terms.addActivity"
-                                    (click)="openActivity(a)">
+                                    (click)="openActivity(t)">
                                     <mat-icon>add</mat-icon>
                                 </button>
-                                <p style="margin-top: 10px; margin-right: 5px;"> {{ a.name }} </p>
+                                <p style="margin-top: 10px; margin-right: 5px;"> {{ t.name }} </p>
                             </div>
                             <div style="display: flex; flex-direction: row; justify-content: end;">
-                                <button *ngIf="this.a?.mobile || this.a?.phone" mat-mini-fab color="primary"
-                                    (click)="this.call(this.a)">
+                                <button *ngIf="t.mobile || t.phone" mat-mini-fab color="primary"
+                                    (click)="this.call(t)">
                                     <mat-icon>call</mat-icon>
                                 </button>
-                                <button *ngIf="this.a?.address" style="margin-right: 10px;" mat-mini-fab color="primary"
-                                    [title]='this.a?.address' (click)="this.navigate(this.a)">
+                                <button *ngIf="t.address" style="margin-right: 10px;" mat-mini-fab color="primary"
+                                    [title]='t.address' (click)="this.navigate(t)">
                                     <!-- <mat-icon svgIcon="/assets/waze.svg"></mat-icon> -->
                                     <img src="./assets/waze.svg">
                                 </button>
@@ -58,17 +66,20 @@
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-start;">
                             <div>
-                                {{ a.birthday | date:'dd.MM.yyyy' }} (גיל: {{a.age }})
+                                {{ t.birthday | date:'dd.MM.yyyy' }} (גיל: {{t.age }})
                             </div>
                             <div>
-                                שפות: {{ this.getLang(a) }}
+                                שפות: {{ this.getLang(t) }}
+                            </div>
+                            <div>
+                                <button style="padding: 0; margin: 0; color: blue;" mat-flat-button (click)="this.navigate(t)"><u>{{ t.address }}</u></button>
                             </div>
                         </div>
                     </div>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: flex-end;">
-                        <button mat-flat-button (click)="this.removeTenant(a)">
+                        <!-- <button mat-flat-button (click)="this.removeTenant(a)">
                             הסר
-                        </button>
+                        </button> -->
                     </div>
                 </mat-card>
             </ng-container>

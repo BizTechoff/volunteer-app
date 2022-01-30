@@ -1,24 +1,29 @@
 <div class="full-page">
     <div class="header">
-        <div style="display: flex; flex-direction: row; justify-content: center; ">
-  
-            <button mat-flat-button (click)="this.prevWeek()">&#60; שבוע קודם</button>
-            <data-control [field]='this.$.fromDate'></data-control>
-            <span style="margin: 7px;margin-top: 10px;">{{this.getDayOfWeek(this.fromDate)}}' - {{this.getDayOfWeek(this.toDate)}}'</span>
-            <data-control [field]='this.$.toDate'></data-control>
-            <button mat-flat-button (click)="this.nextWeek()">שבוע הבא &#62;</button>
-            <!-- <button mat-mini-fab color='primary' (click)='this.refresh()'>
+        <div style="display: flex; flex-direction: column; justify-content: center; ">
+            <div style="display: flex; flex-direction: row; justify-content: center; ">
+                <button mat-flat-button (click)="this.prevWeek()">&#60; שבוע קודם</button>
+                <button mat-flat-button (click)="this.nextWeek()">שבוע הבא &#62;</button>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: center; ">
+
+                <data-control [field]='this.$.fromDate'></data-control>
+                <span style="margin: 2px;margin-top: 10px;">{{this.getDayOfWeek(this.fromDate)}}' -
+                    {{this.getDayOfWeek(this.toDate)}}'</span>
+                <data-control [field]='this.$.toDate'></data-control>
+                <!-- <button mat-mini-fab color='primary' (click)='this.refresh()'>
                 <mat-icon>refresh</mat-icon>
-            </button> --> 
-            <!-- <button mat-mini-fab color='primary' (click)='this.print()'>
+            </button> -->
+                <!-- <button mat-mini-fab color='primary' (click)='this.print()'>
                 <mat-icon>print</mat-icon>
             </button> -->
+            </div>
         </div>
     </div>
     <div class="grow-item" id="data">
         <data-grid [settings]="grid"></data-grid>
         <!-- <div class="ng-container"> -->
-            <!-- <table>
+        <!-- <table>
                 <thead>
                     <th> {{ terms.tenant }} </th>
                     <th> {{ terms.volunteer }} </th>

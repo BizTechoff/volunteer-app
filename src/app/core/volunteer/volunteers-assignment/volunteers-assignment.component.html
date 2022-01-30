@@ -2,11 +2,11 @@
     <div class="header">
         <div style="display: flex; flex-direction: column; justify-content: space-between; ">
             <div style="vertical-align: middle; display: flex; flex-direction: column; justify-content: flex-start; ">
-                <h4>{{ 'שיבוץ מתנדבים ל:' }}
+                <h4>{{ this.remult.user.isVolunteerOnly? 'צירוף חברים לפעילותך עם' : '  שיבוץ מתנדבים ל:' }}
                     <strong> {{ this.args.title }}</strong>
                 </h4>
             </div> 
-            <div style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
+            <div *ngIf="!this.remult.user.isVolunteerOnly" style="vertical-align: middle; display: flex; flex-direction: row; justify-content: flex-start; ">
                 <mat-checkbox [checked]="this.filterBtTenantLangs" (change)="checkedChanged($event)">
                     {{ terms.filterBtTenantLangs }} ({{ this.lgDesc }})
                 </mat-checkbox>

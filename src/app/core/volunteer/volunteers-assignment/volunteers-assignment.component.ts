@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DataAreaSettings, DataControl, GridSettings } from '@remult/angular';
+import { DataAreaSettings, DataControl, DataControlInfo, GridSettings } from '@remult/angular';
 import { EntityFilter, Field, getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
-import { Roles } from '../../../users/roles';
 import { Langs, Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
 
@@ -41,7 +40,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   } = { allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[], organizer: '' };
 
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
-  @Field({ caption: `${terms.serachForVolunteerHere}` })
+  @Field((col,rmt)=> {col.caption = rmt.user.isVolunteerOnly? `${terms.serachByName}`:`${terms.serachForVolunteerHere}`} )
   search: string = ''
 
   @DataControl<VolunteersAssignmentComponent>({
@@ -56,7 +55,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   lgDesc = '';
   volunteers: GridSettings<Users> = undefined!;
 
-  constructor(private remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) {
+  constructor(public remult: Remult, private dialog: DialogService, private win: MatDialogRef<any>) {
   }
 
   get $() { return getFields(this, this.remult) };
@@ -99,18 +98,25 @@ export class VolunteersAssignmentComponent implements OnInit {
           if (this.search) {
             result.$and!.push({ name: { $contains: this.search } });
           }
-          if (this.args.explicit) {
-            result.$and!.push({ id: this.args.explicit.map(x => x.id) });
-          }
-          else {
+          // if (this.args.explicit) {
+          //   result.$and!.push({ id: this.args.explicit.map(x => x.id) });
+          // }
+          // else {
             result.$and!.push({ bid: this.args.branch });
-          }
+          // }
           return result;
         },
         allowCrud: false,
         // allowSelection: true,
         // selectedChanged: () => {},
-        columnSettings: (u) => [{ field: u.name, caption: 'שם' }, u.langs, u.email],
+        columnSettings: (u) => {
+          let f = [] as DataControlInfo<Users>[]
+          f.push({ field: u.name, caption: 'שם', width: '150' })
+          if (!this.remult.user.isVolunteerOnly) {
+            f.push(u.langs, u.email);
+          }
+          return f
+        },
         gridButtons: [
           {
             textInMenu: () => terms.refresh,

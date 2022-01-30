@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GridSettings, openDialog } from '@remult/angular';
-import { Remult } from 'remult';
+import { BusyService, openDialog } from '@remult/angular';
+import { BackendMethod, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { SelectCallComponent } from '../../../common/select-call/select-call.component';
 import { SelectNavigatorComponent } from '../../../common/select-navigator/select-navigator.component';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { terms } from '../../../terms';
+import { Roles } from '../../../users/roles';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
@@ -18,40 +19,42 @@ import { Tenant } from '../../tenant/tenant';
   styleUrls: ['./volunteer-tenants.component.scss']
 })
 export class VolunteerTenantsComponent implements OnInit {
-
-  tenants = new GridSettings<Tenant>(
-    this.remult.repo(Tenant),
-    {
-      where: {
-        bid: this.remult.branchAllowedForUser(),
-        defVids: { $contains: this.remult.user.id }
-      },
-      columnSettings: row => [
-        row.name,
-        // row.defVids,
-        row.age,
-        row.mobile,
-        row.langs,
-        row.address
-      ],
-      gridButtons: [
-        {
-          textInMenu: () => terms.refresh,
-          icon: 'refresh',
-          click: async () => { await this.refresh(); }
-        }
-      ],
-      rowButtons: [
-        {
-          visible: (_) => !_.isNew() && !this.isDonor(),
-          textInMenu: terms.addActivity,
-          icon: 'add',
-          click: async (_) => await this.openActivity(_)
-        }
-      ]
-    });
+  searchString = '';
+  originTenants = [] as Tenant[]
+  tenants = [] as Tenant[]
+  // this.remult.repo(Tenant),
+  // {
+  //   where: {
+  //     bid: this.remult.branchAllowedForUser(),
+  //     name: this.searchString ? { $contains: this.searchString } : { $contains: this.searchString },
+  //     // defVids: { $contains: this.remult.user.id }
+  //   },
+  //   columnSettings: row => [
+  //     row.name,
+  //     // row.defVids,
+  //     row.age,
+  //     row.mobile,
+  //     row.langs,
+  //     row.address
+  //   ],
+  //   gridButtons: [
+  //     {
+  //       textInMenu: () => terms.refresh,
+  //       icon: 'refresh',
+  //       click: async () => { await this.refresh(); }
+  //     }
+  //   ],
+  //   rowButtons: [
+  //     {
+  //       visible: (_) => !_.isNew() && !this.isDonor(),
+  //       textInMenu: terms.addActivity,
+  //       icon: 'add',
+  //       click: async (_) => await this.openActivity(_)
+  //     }
+  //   ]
+  // });
   userMessage = terms.loadingYourTenants;
-  constructor(private remult: Remult, private router: Router, private dialog: DialogService) { }
+  constructor(private remult: Remult, private router: Router, private busy: BusyService, private dialog: DialogService) { }
   terms = terms;
   async ngOnInit() {
     await this.refresh();
@@ -63,10 +66,58 @@ export class VolunteerTenantsComponent implements OnInit {
 
   async refresh() {
     this.userMessage = terms.loadingYourTenants;
-    await this.tenants.reloadData();
-    if (this.tenants.items.length == 0) {
+    // await this.tenants.reloadData();
+    // this.tenants.splice(0)
+    this.originTenants.splice(0)
+    // let ids = [] as string[]
+    for await (const t of this.remult.repo(Tenant).query({
+      where: {
+        bid: this.remult.branchAllowedForUser(),
+        name: this.searchString ? { $contains: this.searchString } : { $contains: this.searchString },
+        // defVids: { $contains: this.remult.user.id }
+      }
+    })) {
+      this.originTenants.push(t)
+      // if (!ids.includes(t.id)) {
+      //   ids.push(t.id)
+      //   this.tenants.push(t)
+      // }
+    }
+
+    if (this.tenants.length === 0) {
+      this.tenants.push(...this.originTenants)
+    }
+
+    // console.log('this.tenants.items.length', this.tenants.length)
+    if (this.tenants.length === 0) {
       this.userMessage = terms.volunteerNoTenants;
     }
+    else {
+      this.userMessage = ''
+    }
+  }
+
+  @BackendMethod({ allowed: Roles.volunteer })
+  async tenantsByBidAndSearch() {
+
+    // where: {
+    //   bid: this.remult.branchAllowedForUser(),
+    //   name: this.searchString ? { $contains: this.searchString } : { $contains: this.searchString },
+    //   // defVids: { $contains: this.remult.user.id }
+    // },
+  }
+
+  async doSearch() {
+    if (this.searchString.length > 0) {
+      this.tenants = this.originTenants.filter(t => t.name.includes(this.searchString))
+      if (!this.tenants) {
+        this.tenants = [] as Tenant[]
+      }
+    }
+    else {
+      this.tenants.push(...this.originTenants)
+    }
+    // await this.busy.donotWait(async () => await this.refresh());
   }
 
   async removeTenant(t: Tenant) {
@@ -178,7 +229,12 @@ export class VolunteerTenantsComponent implements OnInit {
       _ => _.args = { bid: tnt.bid, tid: tnt },
       _ => _ ? _.args.changed : false);
     if (changes) {
-      this.router.navigateByUrl(`/${terms.myActivities}`)
+      let f = tnt.defVids.find(v => v.id === this.remult.user.id)
+      if (!f) {
+        tnt.defVids.push({ id: this.remult.user.id, name: this.remult.user.name })
+        await tnt.save()
+      }
+      this.router.navigateByUrl(`${terms.myActivities}`)
       // await this.refresh();
     }
   }

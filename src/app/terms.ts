@@ -1,8 +1,11 @@
 import { IdFilter, Remult } from 'remult';
+import { Users } from './users/users';
 
 export const terms = {
-    mustEnterBranch:'סניף: שדה חובה',
-    mustEnterTenant:'דייר: שדה חובה',
+    searchReturnEmptyList: 'לא נמצאו דיירים תואמים לחיפוש שלך',
+    assigns: 'שיבוצים',
+    mustEnterBranch: 'סניף: שדה חובה',
+    mustEnterTenant: 'דייר: שדה חובה',
     foods: 'מנות',
     uploads: 'העלאות',
     succefullyConnected: 'התחברת בהצלחה',
@@ -119,6 +122,7 @@ export const terms = {
     shouldOpenTheActivity: 'לפתוח את הפעילות שהקמת כרגע?',
     serachForTenantNameHere: 'חיפוש לפי שם דייר..',
     serachForVolunteerHere: 'חיפוש לפי שם מתנדב..',
+    serachByName: 'חיפוש לפי שם..',
     selectDate: 'בחירת תאריך',
     defaultPurposeDesc6: 'לארח חברה לספר ולהקשיב',
     showActivities: 'הצג פעילויות',
@@ -227,6 +231,7 @@ export const terms = {
 declare module 'remult' {
     export interface UserInfo {
         branch: string;
+        branch2: string;
         isReadOnly: boolean;
         isVolunteerMultiBrnach: boolean;
         isVolunteerOnly: boolean;
@@ -254,7 +259,18 @@ export function augmentRemult(remult: Remult) {
         if (!remult.user.branch || remult.user.branch.trim().length === 0) {// if (remult.isAllowed(Roles.board))
             return undefined!;
         }
-        return { $id: [remult.user.branch] };
+        let bids = [remult.user.branch]
+        // if(remult.user.branch2 && remult.user.branch2.length > 0){
+        //     bids.push(remult.user.branch2)
+        // }
+        // if (remult.user.isVolunteerMultiBrnach) {
+        //     let u: Users = undefined!
+        //     remult.repo(Users).findId(remult.user.id).then(_ => u = _)
+        //     if (u && u.branch2) {
+        //         bids.push(u.branch2.id)
+        //     }
+        // }
+        return { $id: bids };
     }
     remult.hasValidBranch = () => {
         if (remult.user.branch) {

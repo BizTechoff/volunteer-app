@@ -30,7 +30,15 @@ export class BranchesListComponent implements OnInit {
       numOfColumnsInGrid: 10,
       columnSettings: row => {
         let f = [] as DataControlInfo<Branch>[];
-        f.push(row.name, row.address);
+        f.push({ field: row.name, width: '130' });
+        f.push({ field: row.address, width: '140' });
+        f.push({ field: row.volunteersCount, width: '88', readonly: true });
+        f.push({ field: row.tenantsCount, width: '88', readonly: true });
+        f.push({ field: row.assignCount, width: '88', readonly: true });
+        f.push({ field: row.activitiesCount, width: '88', readonly: true })
+        f.push({ field: row.foodDeliveries, width: '88', readonly: true });
+        f.push({ field: row.photosCount, width: '88', readonly: true })
+        
         // row.volunteersCount = await this.remult.repo(Users).count({volunteer: true});
 
         // getValue: (r, v) => {
@@ -43,11 +51,6 @@ export class BranchesListComponent implements OnInit {
         //   // cmd.execute(`select count(*) from tenants where bid = ${r.id}`);
         //   return 0; /*r.getVolunteersCount()*/
         // }
-        f.push({ field: row.volunteersCount, width: '88', readonly: true });
-        f.push({ field: row.tenantsCount, width: '88', readonly: true });
-        f.push({ field: row.activitiesCount, width: '88', readonly: true })
-        f.push({ field: row.foodDeliveries, width: '88', readonly: true });
-        f.push({ field: row.photosCount, width: '88', readonly: true })
         // if (this.isAdmin()) {  
         //   f.push(row.email, row.color, row.frame); 
         // }  
