@@ -30,13 +30,13 @@ export class AppComponent implements OnInit {
     },
     getValue: (_, f) => f.value ? `מציג רק את סניף ${f.value?.name}` : 'מציג את כל הסניפים'
   })
-  @Field({ caption: 'בחירת סניף ראשי לתצוגה' })
+  @Field({ caption: 'סניף ראשי לתצוגה' })
   branch: Branch = undefined!;
-   
+
   getBG() {
     let result = ''
     if (!this.router || this.router.url === "/" || this.router.url === "/" + encodeURI(terms.home)) {
-      result ='linear-gradient(180deg, #2CBCC1, #F69A48)'//'url(assets/logo_eshel.png)'// 'linear-gradient(180deg, #2CBCC1, #F69A48)'
+      result = 'linear-gradient(180deg, #2CBCC1, #F69A48)'//'url(assets/logo_eshel.png)'// 'linear-gradient(180deg, #2CBCC1, #F69A48)'
     }
     return result
   }
@@ -57,6 +57,14 @@ export class AppComponent implements OnInit {
     // console.log('ngOnInit.this.router.url-0', this.router.url)
     if (this.auth.isConnected) {
       await this.setSelectedBranch()
+      if (this.remult.user.isVolunteerOnly) {
+        // console.log(this.router.url)
+        if (['/', ''].includes(this.router.url))
+        // if ur l ==== '/' - first time only
+        {
+          this.router.navigateByUrl(terms.myTenants)
+        }
+      }
     }
     // console.log('AppComponent INIT')
   }
@@ -155,7 +163,7 @@ export class AppComponent implements OnInit {
     openDialog(InputAreaComponent, i => i.args = {
       title: terms.updateInfo,
       fields: () => [
-        { field: user.$.bid, readonly: true },
+        { field: user.$.bid, readonly: true, visible: _ => !this.remult.user.isBoardOrAbove },
         { field: user.$.branch2, readonly: true, visible: _ => this.remult.user.isVolunteerMultiBrnach },
         user.$.name
       ],
