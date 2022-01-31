@@ -234,7 +234,7 @@ declare module 'remult' {
         branch2: string;
         isReadOnly: boolean;
         isVolunteerMultiBrnach: boolean;
-        isVolunteerOnly: boolean;
+        isVolunteer: boolean;
         isManagerOrAbove: boolean;
         isBoardOrAbove: boolean;
         isAdmin: boolean;

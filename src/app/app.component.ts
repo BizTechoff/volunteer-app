@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
     // console.log('ngOnInit.this.router.url-0', this.router.url)
     if (this.auth.isConnected) {
       await this.setSelectedBranch()
-      if (this.remult.user.isVolunteerOnly) {
+      if (this.remult.user.isVolunteer) {
         // console.log(this.router.url)
         if (['/', ''].includes(this.router.url))
         // if ur l ==== '/' - first time only

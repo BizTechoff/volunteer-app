@@ -157,7 +157,7 @@ export class AuthService {
                 branch2: u.branch2?.id ?? '',
                 isReadOnly: false,
                 isVolunteerMultiBrnach: false,
-                isVolunteerOnly: false,
+                isVolunteer: false,
                 isManagerOrAbove: false,
                 isBoardOrAbove: false,
                 isAdmin: false
@@ -194,7 +194,7 @@ export class AuthService {
         }
 
         ui.isReadOnly = ui.roles.length === 1 && ui.roles.includes(Roles.donor)
-        ui.isVolunteerOnly = ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)
+        ui.isVolunteer = ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)
         ui.isManagerOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.manager) || ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
         ui.isBoardOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
         ui.isAdmin = ui.roles.length == 1 && ui.roles.includes(Roles.admin)
@@ -202,7 +202,7 @@ export class AuthService {
         return jwt.sign(ui, getJwtTokenSignKey())
     }
 
-    isVolunteerOnly() {
+    isVolunteer() {
         return this.remult.isAllowed(Roles.volunteer) && this.remult.user.roles.length === 1
     }
 

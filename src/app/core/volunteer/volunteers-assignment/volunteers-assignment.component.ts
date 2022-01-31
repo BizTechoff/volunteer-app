@@ -40,7 +40,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   } = { allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[], organizer: '' };
 
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
-  @Field((col,rmt)=> {col.caption = rmt.user.isVolunteerOnly? `${terms.serachByName}`:`${terms.serachForVolunteerHere}`} )
+  @Field((col,rmt)=> {col.caption = rmt.user.isVolunteer? `${terms.serachByName}`:`${terms.serachForVolunteerHere}`} )
   search: string = ''
 
   @DataControl<VolunteersAssignmentComponent>({
@@ -112,7 +112,7 @@ export class VolunteersAssignmentComponent implements OnInit {
         columnSettings: (u) => {
           let f = [] as DataControlInfo<Users>[]
           f.push({ field: u.name, caption: 'שם', width: '150' })
-          if (!this.remult.user.isVolunteerOnly) {
+          if (!this.remult.user.isVolunteer) {
             f.push(u.langs, u.email);
           }
           return f

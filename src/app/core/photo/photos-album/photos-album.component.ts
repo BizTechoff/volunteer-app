@@ -6,14 +6,12 @@ import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { mediaAllowedUploadFileTypes, OnlyVolunteerEditActivity, uploadS3WithFileExtention } from '../../../common/globals';
 import { terms } from '../../../terms';
-import { Roles } from '../../../users/roles';
 import { Users } from '../../../users/users';
-import { Activity } from '../../activity/activity';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../photo';
 
 // import { v4 as uuidv4 } from 'uuid'; 
- 
+
 @Component({
   selector: 'app-photos-album',
   templateUrl: './photos-album.component.html',
@@ -27,9 +25,9 @@ export class PhotosAlbumComponent implements OnInit {
   args: {
     bid: Branch,
     aid: string,
-    tid: string,
+    // tid: string,
     changed?: boolean
-  } = { bid: undefined!, aid: '', tid: '', changed: false };
+  } = { bid: undefined!, aid: '' /*, tid: ''*/, changed: false };
 
   photos = [] as Photo[];
   terms = terms;
@@ -60,14 +58,14 @@ export class PhotosAlbumComponent implements OnInit {
   }
   async ngOnInit() {
     if (!this.args) {
-      this.args = { bid: undefined!, aid: '', tid: '', changed: false };
+      this.args = { bid: undefined!, aid: '' /*, tid: ''*/, changed: false };
     }
     if (!this.args.aid) {
       this.args.aid = '';
     }
-    if (!this.args.tid) {
-      this.args.tid = '';
-    }
+    // if (!this.args.tid) {
+    //   this.args.tid = '';
+    // }
     // if (!this.entityId) {
     //   this.entityId = '';
     // }
@@ -81,36 +79,43 @@ export class PhotosAlbumComponent implements OnInit {
   async refresh() {
     this.photos.splice(0);
     if (this.isValidEntityId()) {
-      let aids = [] as string[];
-      if (this.args.tid && this.args.tid.length > 0) {
-        //  let ts = await this.remult.repo(Activity).find({
-        //    where: {tid: }
-        //  })
-        for await (const a of this.remult.repo(Activity).query({
-          where: { tid: { $id: [this.args.tid] } }
-        })) {
-          aids.push(a.id)
-          // console.log(JSON.stringify(a))
-        }
+      for await (const p of this.remult.repo(Photo).query({
+        where: { eid: this.args.aid },
+        orderBy: { created: 'desc' }
+      })) {
+        this.photos.push(p);
       }
-      else if (this.args.aid && this.args.aid.length > 0) {
-        aids.push(this.args.aid)
-      }
-      // console.log(aids)
-      if (aids.length > 0) {
-        for await (const p of this.remult.repo(Photo).query({
-          where: { eid: aids },
-          orderBy: { created: 'desc' }
-        })) {
-          this.photos.push(p);
-        }
-      }
+      // let aids = [] as string[];
+      // // if (this.args.tid && this.args.tid.length > 0) {
+      // //   //  let ts = await this.remult.repo(Activity).find({
+      // //   //    where: {tid: }
+      // //   //  })
+      // //   for await (const a of this.remult.repo(Activity).query({
+      // //     where: { tid: { $id: [this.args.tid] } }
+      // //   })) {
+      // //     aids.push(a.id)
+      // //     // console.log(JSON.stringify(a))
+      // //   }
+      // // }
+      // // else 
+      // if (this.args.aid && this.args.aid.length > 0) {
+      //   aids.push(this.args.aid)
+      // }
+      // // console.log(aids)
+      // if (aids.length > 0) {
+      //   for await (const p of this.remult.repo(Photo).query({
+      //     where: { eid: aids },
+      //     orderBy: { created: 'desc' }
+      //   })) {
+      //     this.photos.push(p);
+      //   }
+      // }
     }
     // console.log('this.photos',this.photos.length);
   }
 
   isValidEntityId() {
-    return this.args.aid && this.args.aid.length > 0 || this.args.tid && this.args.tid.length > 0;
+    return this.args.aid && this.args.aid.length > 0// || this.args.tid && this.args.tid.length > 0;
   }
 
   getBranchFromEmail(email: string) {
@@ -123,10 +128,15 @@ export class PhotosAlbumComponent implements OnInit {
   }
 
   async onFileInput(e: any) {//eshel.app.hulon@gmail.com
-    let branch = this.getBranchFromEmail(this.args.bid.email);
-    let changed = await this.loadFiles(e.target.files, branch);
-    if (changed) {
-      await this.refresh();
+    let branch = this.getBranchFromEmail(this.args.bid.email);//this.args.bid?.id// 
+    if (branch && branch.length > 0) {
+      let changed = await this.loadFiles(e.target.files, branch);
+      if (changed) {
+        await this.refresh();
+      }
+    }
+    else {
+      this.dialog.error(`Invalid Branch`)
     }
   }
 

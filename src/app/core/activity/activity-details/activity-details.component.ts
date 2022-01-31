@@ -117,7 +117,7 @@ export class ActivityDetailsComponent implements OnInit {
 
   didntCheckedFoodDelivery() {
     let result = false;
-    if (this.remult.user.isVolunteerOnly && this.activity && !this.activity.foodDelivered!) {
+    if (this.remult.user.isVolunteer && this.activity && !this.activity.foodDelivered!) {
       result = true;
     }
     return result;
@@ -322,7 +322,7 @@ export class ActivityDetailsComponent implements OnInit {
 
   async openPhotosAlbum() {
     let changes = await openDialog(PhotosAlbumComponent,
-      _ => _.args = { bid: this.activity.bid, aid: this.activity.id, tid: '' },
+      _ => _.args = { bid: this.activity.bid, aid: this.activity.id },//, tid: '' },
       _ => _ ? _.args.changed : false);
     if (changes) {
       // await this.refresh();

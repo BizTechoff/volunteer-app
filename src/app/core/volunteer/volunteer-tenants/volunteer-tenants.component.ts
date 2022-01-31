@@ -6,8 +6,10 @@ import { DialogService } from '../../../common/dialog';
 import { SelectCallComponent } from '../../../common/select-call/select-call.component';
 import { SelectNavigatorComponent } from '../../../common/select-navigator/select-navigator.component';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
+import { DateUtils } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
+import { Activity, ActivityStatus } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
@@ -166,14 +168,14 @@ export class VolunteerTenantsComponent implements OnInit {
     // console.log(3)
   }
 
-  async openPhotosAlbum(t: Tenant) {
-    let changes = await openDialog(PhotosAlbumComponent,
-      _ => _.args = { bid: t.bid, aid: '', tid: t.id },
-      _ => _ ? _.args.changed : false);
-    if (changes) {
-      // await this.refresh();
-    }
-  }
+  // async openPhotosAlbum(t: Tenant) {
+  //   let changes = await openDialog(PhotosAlbumComponent,
+  //     _ => _.args = { bid: t.bid, aid: '', tid: t.id },
+  //     _ => _ ? _.args.changed : false);
+  //   if (changes) {
+  //     // await this.refresh();
+  //   }
+  // }
 
   getLang(a: Tenant) {
     let result = 'לא צויינו';
@@ -219,6 +221,30 @@ export class VolunteerTenantsComponent implements OnInit {
   }
 
   async openActivity(tnt: Tenant) {
+
+    let as = [] as Activity[];
+    for await (const a of this.remult.repo(Activity).query({
+      where: {
+        bid: this.remult.branchAllowedForUser(),
+        status: { $ne: [ActivityStatus.cancel] },
+        vids: { $contains: this.remult.user.id }
+      },
+      orderBy: { status: "asc", date: "asc", fh: "asc", th: "asc" }
+    })) {
+      await a.$.tid.load();
+      as.push(a);
+    }
+
+    let today = new Date();
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    for (const a of as) {
+      if (a.date < today) {
+        if (ActivityStatus.openStatuses().includes(a.status)) {
+          await this.dialog.error(terms.mustCloseOldActivities.replace('!date!', DateUtils.toDateString(a.date)));
+          return;
+        }
+      }
+    }
 
     // where: {
     //   status:  [ActivityStatus.openStatuses()],

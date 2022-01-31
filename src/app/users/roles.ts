@@ -56,7 +56,7 @@ export class DonorGuard extends AuthenticatedInGuard {
 export class OnlyVolunteerGuard extends AuthenticatedInGuard {
 
     isAllowed() {//this.remult.user.roles.length === 1
-        return this.remult.user.isVolunteerOnly
+        return this.remult.user.isVolunteer
     }
 }
 
