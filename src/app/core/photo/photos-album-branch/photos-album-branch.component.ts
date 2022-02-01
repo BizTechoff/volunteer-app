@@ -104,7 +104,7 @@ export class PhotosAlbumBranchComponent implements OnInit {
           created: p.created,
           type: p.type,
           link: p.link,
-          bname: p.bid?.name
+          bname: p.bid?.name?.trim()
         });
       });
     }

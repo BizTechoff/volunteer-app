@@ -40,7 +40,7 @@ export class VolunteersAssignmentComponent implements OnInit {
   } = { allowChange: true, branch: undefined!, title: '', langs: [], changed: false, explicit: [] as UserIdName[], selected: [] as UserIdName[], organizer: '' };
 
   @DataControl<VolunteersAssignmentComponent>({ valueChange: async (r) => await r.refresh() })
-  @Field((col,rmt)=> {col.caption = rmt.user.isVolunteer? `${terms.serachByName}`:`${terms.serachForVolunteerHere}`} )
+  @Field((col, rmt) => { col.caption = rmt.user.isVolunteer ? `${terms.serachByName}` : `${terms.serachForVolunteerHere}` })
   search: string = ''
 
   @DataControl<VolunteersAssignmentComponent>({
@@ -98,11 +98,14 @@ export class VolunteersAssignmentComponent implements OnInit {
           if (this.search) {
             result.$and!.push({ name: { $contains: this.search } });
           }
+          if (this.args.selected.length > 0) {
+            result.$and!.push({ id: { $ne: this.args.selected.map(u => u.id) } });
+          }
           // if (this.args.explicit) {
           //   result.$and!.push({ id: this.args.explicit.map(x => x.id) });
           // }
           // else {
-            result.$and!.push({ bid: this.args.branch });
+          result.$and!.push({ bid: this.args.branch });
           // }
           return result;
         },
@@ -110,6 +113,7 @@ export class VolunteersAssignmentComponent implements OnInit {
         // allowSelection: true,
         // selectedChanged: () => {},
         columnSettings: (u) => {
+          // this.args.selected.map(u => u.id)
           let f = [] as DataControlInfo<Users>[]
           f.push({ field: u.name, caption: 'שם', width: '150' })
           if (!this.remult.user.isVolunteer) {
@@ -119,6 +123,7 @@ export class VolunteersAssignmentComponent implements OnInit {
         },
         gridButtons: [
           {
+            //  visible: () => {},
             textInMenu: () => terms.refresh,
             icon: 'refresh',
             click: async () => { await this.refresh(); }
@@ -131,14 +136,15 @@ export class VolunteersAssignmentComponent implements OnInit {
             showInLine: true,
             icon: 'person_add',
             click: async (row) => { await this.addVolunteer(row); }
-          },
-          {
-            visible: (row) => { return this.args.selected.find(r => r.id === row.id) ? true : false; },
-            textInMenu: () => terms.removeVolunteerFromTenant,
-            showInLine: true,
-            icon: 'person_remove',
-            click: async (row) => { await this.removeVolunteer(row.id); }
           }
+          // ,
+          // {
+          //   visible: (row) => { return this.args.selected.find(r => r.id === row.id) ? true : false; },
+          //   textInMenu: () => terms.removeVolunteerFromTenant,
+          //   showInLine: true,
+          //   icon: 'person_remove',
+          //   click: async (row) => { await this.removeVolunteer(row.id); }
+          // }
         ]
       });
   }
@@ -160,6 +166,8 @@ export class VolunteersAssignmentComponent implements OnInit {
     let f = this.args.selected.find(r => r.id === v.id);
     if (!f) {
       this.args.selected.push({ id: v.id, name: v.name });
+      // this.volunteers.filterHelper.addToFindOptions({load:})
+      this.refresh()
     }
   }
 
@@ -172,6 +180,7 @@ export class VolunteersAssignmentComponent implements OnInit {
       }
       let index = this.args.selected.indexOf(f);
       this.args.selected.splice(index, 1);
+      await this.refresh();
     }
   }
 

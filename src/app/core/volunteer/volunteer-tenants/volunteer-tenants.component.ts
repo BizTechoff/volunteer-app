@@ -168,6 +168,22 @@ export class VolunteerTenantsComponent implements OnInit {
     // console.log(3)
   }
 
+  getTanantRemark(t: Tenant) {
+    let result = ''
+    if (t.apartment && t.apartment.length > 0) {
+      result += ` דירה ${t.apartment} `
+    }
+
+    if (t.floor && t.floor.length > 0) {
+      result += ` קומה ${t.floor} `
+    }
+
+    if (t.addressRemark && t.addressRemark.length > 0) {
+      result += ` ${t.addressRemark} `
+    }
+    return result.trim()
+  }
+
   // async openPhotosAlbum(t: Tenant) {
   //   let changes = await openDialog(PhotosAlbumComponent,
   //     _ => _.args = { bid: t.bid, aid: '', tid: t.id },

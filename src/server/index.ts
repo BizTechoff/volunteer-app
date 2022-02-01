@@ -74,7 +74,7 @@ async function startup() {
         if (key === process.env.AWS_CLIENT_KEY!) {
             let fName = req.query.f as string;
             let branch = req.query.branch as string;
-            // console.log('fName', fName);
+            // console.log('fName', fName); 
             if (fName && fName.length > 0) {
                 result.url = await generateUploadURL(fName, branch)
             }

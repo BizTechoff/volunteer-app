@@ -31,7 +31,7 @@ export const terms = {
     gender: 'מגדר',
     pointsExplain: 'הסבר צבירת נקודות',
     youGotMorePoint: 'צברת !points! נקודות נוספות, סה"כ צברת עד כה: !sum! נקודות',
-    youMustEnterPurposes: 'לפני סגירת הפעילות יש לציין את המטרות שנמצאו',
+    youMustEnterPurposes: 'לסגירת פעילות יש לציין מטרות שנמצאו',
     canNotRemoveActivityOrganizer: 'לא ניתן להסיר את מארגן הפעילות',
     canNotDeleteBrnachWhileRelationWithUsers: 'לא ניתן למחוק סניף כאשר מחובר למשתמש',
     canNotDeleteBrnachWhileRelationWithTenants: 'לא ניתן למחוק סניף כאשר מחובר לדייר',

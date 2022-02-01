@@ -54,19 +54,32 @@ export class AppComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
 
   async ngOnInit() {
+    console.log('ngOnInit', this.router.url)
     // console.log('ngOnInit.this.router.url-0', this.router.url)
     if (this.auth.isConnected) {
       await this.setSelectedBranch()
-      if (this.remult.user.isVolunteer) {
-        // console.log(this.router.url)
-        if (['/', ''].includes(this.router.url))
-        // if ur l ==== '/' - first time only
-        {
-          this.router.navigateByUrl(terms.myTenants)
-        }
-      }
+      this.setNavigation()
     }
     // console.log('AppComponent INIT')
+  }
+
+  setNavigation(){
+    if (this.remult.user.isVolunteer) {
+      console.log('ngOnInit-2', this.router.url)
+      // console.log(this.router.url)  
+      if (['/', '', terms.home, encodeURI(terms.home), '/' + terms.home, '/' + encodeURI(terms.home)].includes(this.router.url))
+      // if ur l ==== '/' - first time only
+      {
+        console.log('ngOnInit-3', this.router.url, terms.myTenants)
+        this.router.navigateByUrl(encodeURI(terms.myTenants))
+      }
+    }
+    else if(this.remult.user.isReadOnly){
+      this.router.navigateByUrl(encodeURI(terms.calendar))
+    }
+    else{
+      this.router.navigateByUrl(encodeURI(terms.tenants))
+    }
   }
 
   showRemultUser(e: MouseEvent) {
@@ -116,6 +129,7 @@ export class AppComponent implements OnInit {
     );
     if (connected) {
       await this.setSelectedBranch()
+      this.setNavigation()
     }
   }
 

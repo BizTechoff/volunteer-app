@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import * as jwt from 'jsonwebtoken';
 import { Allow, BackendMethod, Remult, UserInfo } from 'remult';
@@ -18,7 +19,8 @@ export class AuthService {
     forgotPassword = false;
     isFirstLogin = true;//welcome message
     isConnected = false;
-    constructor(private remult: Remult) {
+    constructor(private remult: Remult, private router:Router) {
+        console.log('constructor', this.router.url)
         augmentRemult(remult);
         // (<MotiUserInfo>remult.user).snif
         let token = AuthService.fromStorage();

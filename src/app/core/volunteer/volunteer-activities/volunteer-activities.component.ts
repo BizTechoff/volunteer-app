@@ -57,7 +57,7 @@ export class VolunteerActivitiesComponent implements OnInit {
     await this.refresh();
   }
 
-  async openActivity(act?: Activity) {
+  async openActivity(act?: Activity, autoOpenPurposes = false) {
     // console.log(6);
 
     let id = act && act.id && act.id.length > 0 ? act.id : '';
@@ -75,7 +75,7 @@ export class VolunteerActivitiesComponent implements OnInit {
       }
     }
     let changes = await openDialog(ActivityDetailsComponent,
-      input => input.args = { bid: this.volunteer.bid, aid: id, tid: act?.tid },
+      input => input.args = { bid: this.volunteer.bid, aid: id, tid: act?.tid, autoOpenPuposes: autoOpenPurposes },
       output => output ? output.args.changed : false);
     if (changes) {
       await this.refresh();
@@ -178,7 +178,7 @@ export class VolunteerActivitiesComponent implements OnInit {
     if (toStatus === ActivityStatus.success) {
       if (a.purposes?.length === 0) {
         this.dialog.info(terms.youMustEnterPurposes);
-        await this.openActivity(a);
+        await this.openActivity(a, true);
         return;
       }
     }

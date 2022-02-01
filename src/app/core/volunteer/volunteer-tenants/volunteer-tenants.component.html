@@ -28,8 +28,10 @@
     </div> -->
     <div class="grow-item">
         <div style="display: flex; flex-direction: column; justify-content: center;">
-            <h1 *ngIf="this.tenants.length === 0 && this.searchString && this.searchString.length > 0"> {{ terms.searchReturnEmptyList }} </h1>
-            <h1 *ngIf="this.tenants.length === 0 && !(this.searchString && this.searchString.length > 0)"> {{ this.userMessage }} </h1>
+            <h1 *ngIf="this.tenants.length === 0 && this.searchString && this.searchString.length > 0"> {{
+                terms.searchReturnEmptyList }} </h1>
+            <h1 *ngIf="this.tenants.length === 0 && !(this.searchString && this.searchString.length > 0)"> {{
+                this.userMessage }} </h1>
             <ng-container *ngFor='let t of this.tenants'>
                 <mat-card style="margin: 7px;">
                     <mat-card-title>
@@ -47,8 +49,7 @@
                                 <p style="margin-top: 10px; margin-right: 5px;"> {{ t.name }} </p>
                             </div>
                             <div style="display: flex; flex-direction: row; justify-content: end;">
-                                <button *ngIf="t.mobile || t.phone" mat-mini-fab color="primary"
-                                    (click)="this.call(t)">
+                                <button *ngIf="t.mobile || t.phone" mat-mini-fab color="primary" (click)="this.call(t)">
                                     <mat-icon>call</mat-icon>
                                 </button>
                                 <button *ngIf="t.address" style="margin-right: 10px;" mat-mini-fab color="primary"
@@ -63,6 +64,7 @@
                             </div>
                         </div>
                     </mat-card-title>
+
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-start;">
                             <div>
@@ -71,8 +73,12 @@
                             <div>
                                 שפות: {{ this.getLang(t) }}
                             </div>
-                            <div>
-                                <button style="padding: 0; margin: 0; color: blue;" mat-flat-button (click)="this.navigate(t)"><u>{{ t.address }}</u></button>
+                            <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: flex-start;">
+                                <button style="padding: 0; margin: 0; color: blue;" mat-flat-button
+                                    (click)="this.navigate(t)"><u>{{ t.address + (this.getTanantRemark(t).length> 0?' ('+this.getTanantRemark(t)+')':'') }}</u></button>
+                                <!-- <span style="padding: 0; margin: 0; border-radius: 5px;background-color: burlywood;"> {{
+                                    this.getTanantRemark(t) }}
+                                </span> -->
                             </div>
                         </div>
                     </div>

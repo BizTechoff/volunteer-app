@@ -6,6 +6,7 @@ import { getFields, Remult } from 'remult';
 import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
 import { OnlyVolunteerEditActivity } from '../../../common/globals';
+import { SelectPurposesComponent } from '../../../common/select-purposes/select-purposes.component';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { UserIdName } from '../../../common/types';
 import { NotificationService } from '../../../common/utils';
@@ -72,8 +73,9 @@ export class ActivityDetailsComponent implements OnInit {
     aid?: string,
     tid?: Tenant,
     readonly?: boolean,
-    changed?: boolean
-  } = { bid: undefined, aid: '', tid: undefined, readonly: false, changed: false };
+    changed?: boolean,
+    autoOpenPuposes?: boolean
+  } = { bid: undefined, aid: '', tid: undefined, readonly: false, changed: false, autoOpenPuposes: false };
   today = new Date();
   activity!: Activity;
   branchChanged = false;
@@ -90,13 +92,16 @@ export class ActivityDetailsComponent implements OnInit {
 
   async ngOnInit() {
     if (!this.args) {
-      this.args = { aid: '', tid: undefined, readonly: false, changed: false };
+      this.args = { aid: '', tid: undefined, readonly: false, changed: false, autoOpenPuposes: false };
     }
     if (!this.args.tid) {
       this.args.tid = undefined;
     }
     if (!this.args.aid) {
       this.args.aid = '';
+    }
+    if (!this.args.autoOpenPuposes) {
+      this.args.autoOpenPuposes = false;
     }
     this.args.changed = false;
     await this.retrieve();
@@ -112,6 +117,14 @@ export class ActivityDetailsComponent implements OnInit {
       wait(3500)
         .then(async () => this.applyNotifications())
         .catch(err => console.debug(err));
+    }
+
+    if (this.args.autoOpenPuposes) {
+      await openDialog(SelectPurposesComponent, x => x.args = {
+        // onSelect: site => f.value = site,
+        // title: f.metadata.caption,
+        purposes: this.activity.purposes
+      })
     }
   }
 
@@ -341,17 +354,17 @@ export class ActivityDetailsComponent implements OnInit {
         this.activity.vids.push({ id: this.remult.user.id, name: this.remult.user.name });
       }
     }
-  } 
+  }
 
   async saveAndClose() {
-    if(!this.activity.bid){ 
+    if (!this.activity.bid) {
       return this.dialog.info(terms.mustEnterBranch)
     }
-    if(!this.activity.tid){ 
+    if (!this.activity.tid) {
       return this.dialog.info(terms.mustEnterTenant)
     }
     this.branchChanged = this.activity && this.activity.bid && this.activity.$.bid && this.activity.$.bid.valueChanged()
-// console.log('this.branchChanged',this.branchChanged)
+    // console.log('this.branchChanged',this.branchChanged)
     let alreadySaved = false;
     if (this.activity.vids.length > 0) {
       if (this.activity.status === ActivityStatus.w4_assign) {
