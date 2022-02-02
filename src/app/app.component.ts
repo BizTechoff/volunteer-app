@@ -58,27 +58,30 @@ export class AppComponent implements OnInit {
     // console.log('ngOnInit.this.router.url-0', this.router.url)
     if (this.auth.isConnected) {
       await this.setSelectedBranch()
-      this.setNavigation()
+      this.setFirstRouting()
     }
     // console.log('AppComponent INIT')
   }
 
-  setNavigation(){
-    if (this.remult.user.isVolunteer) {
-      console.log('ngOnInit-2', this.router.url)
-      // console.log(this.router.url)  
-      if (['/', '', terms.home, encodeURI(terms.home), '/' + terms.home, '/' + encodeURI(terms.home)].includes(this.router.url))
-      // if ur l ==== '/' - first time only
-      {
-        console.log('ngOnInit-3', this.router.url, terms.myTenants)
-        this.router.navigateByUrl(encodeURI(terms.myTenants))
+  setFirstRouting() {
+    let isFirstRouting = [
+      '/',
+      '',
+      terms.home,
+      encodeURI(terms.home),
+      '/' + terms.home,
+      '/' + encodeURI(terms.home)
+    ].includes(this.router.url)
+    if (isFirstRouting) {
+      if (this.remult.user.isAdmin) {
+        this.router.navigateByUrl(encodeURI(terms.userAccounts))
       }
-    }
-    else if(this.remult.user.isReadOnly){
-      this.router.navigateByUrl(encodeURI(terms.calendar))
-    }
-    else{
-      this.router.navigateByUrl(encodeURI(terms.tenants))
+      else if (this.remult.user.isBoardOrAbove) {
+        this.router.navigateByUrl(encodeURI(terms.calendar))
+      }
+      else {
+        this.router.navigateByUrl(encodeURI(terms.tenants))
+      }
     }
   }
 
@@ -129,7 +132,7 @@ export class AppComponent implements OnInit {
     );
     if (connected) {
       await this.setSelectedBranch()
-      this.setNavigation()
+      this.setFirstRouting()
     }
   }
 
