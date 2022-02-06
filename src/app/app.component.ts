@@ -58,12 +58,12 @@ export class AppComponent implements OnInit {
     // console.log('ngOnInit.this.router.url-0', this.router.url)
     if (this.auth.isConnected) {
       await this.setSelectedBranch()
-      this.setFirstRouting()
+      await this.setFirstRouting()
     }
     // console.log('AppComponent INIT')
   }
 
-  setFirstRouting() {
+  async setFirstRouting() {
     let isFirstRouting = [
       '/',
       '',
@@ -72,15 +72,27 @@ export class AppComponent implements OnInit {
       '/' + terms.home,
       '/' + encodeURI(terms.home)
     ].includes(this.router.url)
+    // console.log('isFirstRouting',isFirstRouting,'url',this.router.url)
     if (isFirstRouting) {
+      // console.log(this.remult.user)
       if (this.remult.user.isAdmin) {
+        // console.log(1,terms.userAccounts)
         this.router.navigateByUrl(encodeURI(terms.userAccounts))
       }
       else if (this.remult.user.isBoardOrAbove) {
+        // console.log(2,terms.calendar)
         this.router.navigateByUrl(encodeURI(terms.calendar))
       }
-      else {
+      else if (this.remult.user.isVolunteer) {
+        // console.log(2,terms.calendar)
+        this.router.navigateByUrl(encodeURI(terms.myTenants))
+      }
+      else {//manager
         this.router.navigateByUrl(encodeURI(terms.tenants))
+        // console.log(3,terms.tenants)
+        // this.router.navigateByUrl(encodeURI(terms.tenants))
+        // let success = await this.router.navigateByUrl(encodeURI(terms.tenants))
+        // console.log('success',success)
       }
     }
   }
