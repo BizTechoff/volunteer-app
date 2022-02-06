@@ -31,13 +31,13 @@ export class BranchesListComponent implements OnInit {
       columnSettings: row => {
         let f = [] as DataControlInfo<Branch>[];
         f.push({ field: row.name, width: '130' });
-        f.push({ field: row.address, width: '140' });
+        f.push({ field: row.address });//, width: '155' 
         f.push({ field: row.volunteersCount, width: '88', readonly: true });
         f.push({ field: row.tenantsCount, width: '88', readonly: true });
         f.push({ field: row.assignCount, width: '88', readonly: true });
-        f.push({ field: row.activitiesCount, width: '88', readonly: true })
-        f.push({ field: row.foodDeliveries, width: '88', readonly: true });
-        f.push({ field: row.photosCount, width: '88', readonly: true })
+        // f.push({ field: row.activitiesCount, width: '88', readonly: true })
+        // f.push({ field: row.foodDeliveries, width: '88', readonly: true });
+        // f.push({ field: row.photosCount, width: '88', readonly: true })
         
         // row.volunteersCount = await this.remult.repo(Users).count({volunteer: true});
 

@@ -22,7 +22,7 @@ import { EntityWithModified } from "../EntityWithModified";
     allowApiRead: true,
     defaultOrderBy: { name: "asc" }
 }
-)
+) 
 export class Branch extends EntityWithModified {
 
     @Field({ caption: terms.name, validate: StringRequiredValidation })
@@ -105,10 +105,10 @@ export class Branch extends EntityWithModified {
 
     @Field<Branch>((options, remult) => {
         options.caption = terms.assigns
-        if (1 == 1) { 
-            let empty:UserIdName[] = [] as UserIdName[];
+        if (1 == 1) {
+            let empty: UserIdName[] = [] as UserIdName[];
             options.serverExpression = async branch => {
-                return remult.repo((await import("../tenant/tenant")).Tenant).count({ bid: branch, defVids: {"$contains": '"id":'} })
+                return remult.repo((await import("../tenant/tenant")).Tenant).count({ bid: branch, defVids: { "$contains": '"id":' } })
             };
         }
         else {
@@ -116,7 +116,7 @@ export class Branch extends EntityWithModified {
         }
     })
     assignCount = 0;
-    
+
     constructor(private remult: Remult) {
         super();
     }
