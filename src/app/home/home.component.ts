@@ -32,40 +32,45 @@ export class HomeComponent implements OnInit {
     await openDialog(UserLoginComponent);
   }
 
-  setTitle(){
-    terms.home = 'שלום ' +  this.remult.user.name;
+  setTitle() {
+    terms.home = 'שלום ' + this.remult.user.name;
   }
 
   tries = 5;
   async nextPhoto() {
-    let next: Photo = undefined!
-    if (this.photos.length < 30 && this.tries > 0) {
-      next = await this.busy.donotWait(async () => await this.remult.repo(Photo)
-        .findFirst({
-          id: { $ne: this.photos.map(itm => itm.id) },
-          type: { $contains: 'image' }
-        }));
-    }
-    if (next) {
-      let f = this.photos.find(p => p.id === next.id);
-      if (f) {
-        --this.tries;
-        this.currentPhoto = f;
-      }
-      else {
-        this.tries = 5;
-        this.currentPhoto = { id: next.id, link: next.link, name: next.createdBy.name, created: next.created };
-        this.photos.push(this.currentPhoto);
-      }
-    }
-    else if (this.photos.length > 0) {
-      let i = this.getRandoxIndex();
-      this.currentPhoto = this.photos[i];
-    }
+    // let next: Photo = undefined!
+    // if (this.photos.length < 30 && this.tries > 0) {
+    //   next = await this.busy.donotWait(async () => await this.remult.repo(Photo)
+    //     .findFirst({
+    //       id: { $ne: this.photos.map(itm => itm.id) },
+    //       type: { $contains: 'image' }
+    //     }));
+    // }
+    // if (next) {
+    //   let f = this.photos.find(p => p.id === next.id);
+    //   if (f) {
+    //     --this.tries;
+    //     this.currentPhoto = f;
+    //   }
+    //   else {
+    //     this.tries = 5;
+    //     this.currentPhoto = { id: next.id, link: next.link, name: next.createdBy.name, created: next.created };
+    //     this.photos.push(this.currentPhoto);
+    //   }
+    // }
+    // else if (this.photos.length > 0) {
+    //   let i = this.getRandoxIndex();
+    //   this.currentPhoto = this.photos[i];
+    // }
     let min = 0
-    let max = 3
+    let max = this.photosSocial.length - 1
     let i = Math.floor(Math.random() * (max - min) + min)
     this.currentPhotoSocial = this.photosSocial[i]
+
+    min = 0
+    max = this.photos.length - 1
+    i = Math.floor(Math.random() * (max - min) + min)
+    this.currentPhoto = this.photos[i]
     // console.log(JSON.stringify(this.currentPhoto));
   }
 
@@ -78,20 +83,23 @@ export class HomeComponent implements OnInit {
 
   async ngOnInit() {
 
-    this.photosSocial.push({name: '1', created: new Date(), id:'1', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_001.jpeg'})
-    this.photosSocial.push({name: '2', created: new Date(), id:'2', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_002.jpeg'})
-    this.photosSocial.push({name: '3', created: new Date(), id:'3', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_003.jpeg'})
-    this.photosSocial.push({name: '4', created: new Date(), id:'4', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_004.jpeg'})
+    this.photosSocial.push({ name: '1', created: new Date(), id: '1', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_001.jpeg' })
+    this.photosSocial.push({ name: '2', created: new Date(), id: '2', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_002.jpeg' })
+    this.photosSocial.push({ name: '3', created: new Date(), id: '3', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_003.jpeg' })
+    this.photosSocial.push({ name: '4', created: new Date(), id: '4', link: 'https://eshel-app.s3.eu-central-1.amazonaws.com/social/vv_004.jpeg' })
 
+    for await (const p of this.remult.repo(Photo).query({
+      where: { type: { $contains: 'image' } },
+      pageSize: 15,
+      orderBy: { created: 'desc' }
+    })) {
+      this.photos.push({ id: p.id, link: p.link, name: p.createdBy.name, created: p.created })
+    }
+    
     await this.nextPhoto();
     this.timer = interval(3000)
       .subscribe(async (val) => { await this.nextPhoto(); });
-    // // this.u = 
-    // const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-    // wait(100)
-    //   .then(async () => this.dialog.info(terms.reminder4FoodDelivery, 2300))
-    //   .catch(err => console.debug(err));
+    // console.log('this.photos.length', this.photos.length)
   }
 
   ngOnDestroy() {
@@ -100,6 +108,6 @@ export class HomeComponent implements OnInit {
       this.timer = undefined!;
     }
   }
-  
+
 }
 

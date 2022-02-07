@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
       '/' + terms.home,
       '/' + encodeURI(terms.home)
     ].includes(this.router.url)
-    // console.log('isFirstRouting',isFirstRouting,'url',this.router.url)
+    console.log('isFirstRouting',isFirstRouting,'url',this.router.url)
     if (isFirstRouting) {
       // console.log(this.remult.user)
       if (this.remult.user.isAdmin) {

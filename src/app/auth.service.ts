@@ -19,14 +19,14 @@ export class AuthService {
     forgotPassword = false;
     isFirstLogin = true;//welcome message
     isConnected = false;
-    constructor(private remult: Remult, private router:Router) {
+    constructor(private remult: Remult, private router: Router) {
         console.log('constructor', this.router.url)
         augmentRemult(remult);
         // (<MotiUserInfo>remult.user).snif
         let token = AuthService.fromStorage();
         if (token) {
             this.isFirstLogin = false;
-            this.setAuthToken(token);
+            this.setAuthToken(token).then(() => { });
             // console.log('AuthService.constructor', remult.user)
         }
         // console.log('AuthService READY')
@@ -88,7 +88,7 @@ export class AuthService {
         this.isConnected = false;
         let response = await AuthService.signIn(mobile, code, managerAsVolunteer)
         if (response.success) {
-            this.setAuthToken(response.token);
+           await this.setAuthToken(response.token);
             // console.log('AuthService.signIn', this.remult.user)
         }
         return this.isConnected;
@@ -209,7 +209,7 @@ export class AuthService {
     }
 
     async setAuthToken(token: string) {
-        this.remult.setUser(new JwtHelperService().decodeToken(token));
+        await this.remult.setUser(new JwtHelperService().decodeToken(token));
         localStorage.setItem(AUTH_TOKEN_KEY, token);
         this.isConnected = true;
         // window?.location?.reload()

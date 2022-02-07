@@ -6,7 +6,6 @@ export class VolunteersQuery {
     @BackendMethod({ allowed: Allow.authenticated })
     static async byBranch(branch: string, remult?: Remult): Promise<Users[]> {
         let result = [] as Users[]
-        let result2: EntityFilter<Users> = { $or: [] };
         for await (const u of remult!.repo(Users).query({
             where: {
                 active: true,
