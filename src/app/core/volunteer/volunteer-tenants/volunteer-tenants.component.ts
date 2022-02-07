@@ -117,7 +117,7 @@ export class VolunteerTenantsComponent implements OnInit {
       }
     }
     else {
-      this.tenants.push(...this.originTenants)
+      this.tenants = this.originTenants
     }
     // await this.busy.donotWait(async () => await this.refresh());
   }
