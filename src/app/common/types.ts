@@ -60,11 +60,11 @@ export interface IcsRequest {
 }
 
 export interface EmailRequest {
-    from: string,
-    to: string,
-    cc: string,
+    from?: string,
+    to?: string,
+    cc?: string,
     subject: string,
-    html: string
+    html?: string
 }
 
 export interface SmsRequest {
@@ -77,7 +77,7 @@ export interface SmsRequest {
 export interface CalendarRequest {
     sender: string,
     email?: EmailRequest,
-    ics: IcsRequest
+    ics?: IcsRequest
 }
 
 export interface CalendarClient {

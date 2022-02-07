@@ -10,7 +10,7 @@ import { createPostgresConnection } from 'remult/postgres';
 import { remultExpress } from 'remult/server/expressBridge';
 // import { remultExpress } from 'remult/remult-express';
 //import '../app/app.module';
-// import '../app/users/*';
+// import '../app/users/*';  
 import '../app/app-routing.module';
 //import '../app/app.component';
 import { getJwtTokenSignKey } from '../app/auth.service';
@@ -23,7 +23,7 @@ import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
-
+ 
 export function getDevMode(): string {
     let result = '';
     let db = process.env.DATABASE_URL;

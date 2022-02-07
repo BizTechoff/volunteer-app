@@ -1,13 +1,13 @@
 import { createTransport } from 'nodemailer';
 import * as Mail from 'nodemailer/lib/mailer';
-import { CalendarRequest, IcsRequest } from '../app/common/types';
+import { EmailRequest, IcsRequest } from '../app/common/types';
 import { NotificationService } from '../app/common/utils';
 
-NotificationService.sendMail = async (req: CalendarRequest) => {
+NotificationService.sendEmail = async (req: EmailRequest) => {
     console.debug('send-email', req);
     var transporter = createTransport({
         service: 'gmail',
-        port: 587,
+        port: 587, 
         secure: false,
         requireTLS: true,
         auth: {
@@ -16,27 +16,18 @@ NotificationService.sendMail = async (req: CalendarRequest) => {
         }
     });
 
-    let content = buildICS(req.ics);
-    // let content = buildICS2('eashel from original');
-
-    if (!req.email) {
-        req.email = { from: '', to: '', cc: '', subject: '', html: '' };
-        console.log('No Email Details, Could NOT send email.');
-        return false;
-    }
-
     var mailOptions: Mail.Options = {
         from: `אשל מתנדבים <${process.env.ADMIN_GMAIL_MAIL}>`,//'Sender Name <sender@server.com>'
-        to: req.email.to,
+        to: req.to ?? process.env.ADMIN_GMAIL_MAIL,
         // cc: req.sender,
-        subject: req.email.subject,
+        subject: req.subject,
         date: new Date(),
-        html: req.email.html,
-        icalEvent: {
-            filename: 'invite.ics',
-            method: 'REQUEST',//PUBLISH
-            content: content
-        }
+        html: req.html//,
+        // icalEvent: {
+        //     filename: 'invite.ics',
+        //     method: 'REQUEST',//PUBLISH
+        //     content: content
+        // }
     };
     new Promise((res, rej) => {
         transporter.sendMail(mailOptions, function (error: any, info: { response: string; }) {

@@ -15,11 +15,13 @@
     </div>
     <p>
         <data-control [field]="this.$.code"></data-control>
-        <button *ngIf="!this.sending" mat-flat-button (click)="this.sendVerificationCode()"> {{ this.terms.sendVerificationCode }} </button>
+        <button *ngIf="!this.sending && this.sentCount > 0" mat-flat-button (click)="this.sendVerificationCode()"> {{
+            this.terms.sendVerificationCode }} </button>
     </p>
 
     <div class="footer">
-        <button *ngIf="!this.sending" mat-raised-button (click)="this.signIn()" color='accent' style="margin-left: 15px;">
+        <button *ngIf="!this.sending" mat-raised-button (click)="this.signIn()" color='accent'
+            style="margin-left: 15px;">
             {{ terms.verifying }}
         </button>
         <button mat-raised-button (click)="this.close()">

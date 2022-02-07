@@ -62,16 +62,18 @@ export class HomeComponent implements OnInit {
     //   let i = this.getRandoxIndex();
     //   this.currentPhoto = this.photos[i];
     // }
-    let min = 0
-    let max = this.photosSocial.length - 1
-    let i = Math.floor(Math.random() * (max - min) + min)
-    this.currentPhotoSocial = this.photosSocial[i]
-
-    min = 0
-    max = this.photos.length - 1
-    i = Math.floor(Math.random() * (max - min) + min)
-    this.currentPhoto = this.photos[i]
-    // console.log(JSON.stringify(this.currentPhoto));
+    if (this.photosSocial.length > 0) {
+      let min = 0
+      let max = this.photosSocial.length - 1
+      let i = Math.floor(Math.random() * (max - min) + min)
+      this.currentPhotoSocial = this.photosSocial[i]
+    }
+    if (this.photosSocial.length > 0) {
+      let min = 0
+      let max = this.photos.length - 1 // floor([0-1] * 3) = floor([0.1,0.5,0.9]*3)
+      let i = Math.floor(Math.random() * (max - min) + min)
+      this.currentPhoto = this.photos[i]
+    }
   }
 
   getRandoxIndex() {
@@ -95,7 +97,7 @@ export class HomeComponent implements OnInit {
     })) {
       this.photos.push({ id: p.id, link: p.link, name: p.createdBy.name, created: p.created })
     }
-    
+
     await this.nextPhoto();
     this.timer = interval(3000)
       .subscribe(async (val) => { await this.nextPhoto(); });

@@ -88,14 +88,14 @@ export class AuthService {
         this.isConnected = false;
         let response = await AuthService.signIn(mobile, code, managerAsVolunteer)
         if (response.success) {
-           await this.setAuthToken(response.token);
+            await this.setAuthToken(response.token);
             // console.log('AuthService.signIn', this.remult.user)
         }
         return this.isConnected;
     }
 
     async swithToBranch(branch?: string) {
-        this.setAuthToken(await AuthService.switchBranch(branch));
+        await this.setAuthToken(await AuthService.switchBranch(branch));
     }
 
     @BackendMethod({ allowed: Allow.authenticated })
@@ -189,12 +189,13 @@ export class AuthService {
                     ui.roles.push(Roles.volunteer);
                 }
             }
-            ui.isVolunteerMultiBrnach = ui.roles.length == 1 && ui.roles.includes(Roles.volunteer) && u.bid && u.branch2 && u.bid?.id.length > 0 && u.branch2?.id.length > 0 ? true : false
+            // ui.isVolunteerMultiBrnach = ui.roles.length == 1 && ui.roles.includes(Roles.volunteer) && u.bid && u.branch2 && u.bid?.id.length > 0 && u.branch2?.id.length > 0 ? true : false
         }
         else {
             ui = u as UserInfo
         }
 
+        ui.isVolunteerMultiBrnach = ui.roles.length == 1 && ui.roles.includes(Roles.volunteer) && ui.branch && ui.branch.length > 0 && ui.branch2 && ui.branch2.length > 0 ? true : false
         ui.isReadOnly = ui.roles.length === 1 && ui.roles.includes(Roles.donor)
         ui.isVolunteer = ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)
         ui.isManagerOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.manager) || ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
@@ -209,9 +210,9 @@ export class AuthService {
     }
 
     async setAuthToken(token: string) {
+        this.isConnected = true;
         await this.remult.setUser(new JwtHelperService().decodeToken(token));
         localStorage.setItem(AUTH_TOKEN_KEY, token);
-        this.isConnected = true;
         // window?.location?.reload()
     }
     static fromStorage(): string {

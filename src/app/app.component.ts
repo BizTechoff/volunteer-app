@@ -57,42 +57,38 @@ export class AppComponent implements OnInit {
     console.log('ngOnInit', this.router.url)
     // console.log('ngOnInit.this.router.url-0', this.router.url)
     if (this.auth.isConnected) {
+      console.log(111111111111111)
+      await this.setFirstRouting() 
+      console.log(22222222222222222)
       await this.setSelectedBranch()
-      await this.setFirstRouting()
     }
+    console.log('ngOnInit-END', this.router.url)
     // console.log('AppComponent INIT')
   }
 
   async setFirstRouting() {
-    let isFirstRouting = [
-      '/',
-      '',
-      terms.home,
-      encodeURI(terms.home),
-      '/' + terms.home,
-      '/' + encodeURI(terms.home)
-    ].includes(this.router.url)
-    console.log('isFirstRouting',isFirstRouting,'url',this.router.url)
+    let isFirstRouting =
+      [
+        '/',
+        '',
+        terms.home,
+        encodeURI(terms.home),
+        '/' + terms.home,
+        '/' + encodeURI(terms.home)
+      ].includes(this.router.url)
+
     if (isFirstRouting) {
-      // console.log(this.remult.user)
       if (this.remult.user.isAdmin) {
-        // console.log(1,terms.userAccounts)
         this.router.navigateByUrl(encodeURI(terms.userAccounts))
       }
       else if (this.remult.user.isBoardOrAbove) {
-        // console.log(2,terms.calendar)
         this.router.navigateByUrl(encodeURI(terms.calendar))
       }
       else if (this.remult.user.isVolunteer) {
-        // console.log(2,terms.calendar)
         this.router.navigateByUrl(encodeURI(terms.myTenants))
       }
       else {//manager
         this.router.navigateByUrl(encodeURI(terms.tenants))
-        // console.log(3,terms.tenants)
-        // this.router.navigateByUrl(encodeURI(terms.tenants))
-        // let success = await this.router.navigateByUrl(encodeURI(terms.tenants))
-        // console.log('success',success)
       }
     }
   }
@@ -105,6 +101,8 @@ export class AppComponent implements OnInit {
   }
 
   async setSelectedBranch() {
+    console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx')
+    console.log('setSelectedBranch.branch',this.remult.user)
     if (this.remult.user.branch && this.remult.user.branch.length > 0) {
       this.branch = await this.remult.repo(Branch).findId(this.remult.user.branch)
     }
@@ -143,8 +141,8 @@ export class AppComponent implements OnInit {
       _ => _ ? _.args.out.connected : false
     );
     if (connected) {
-      await this.setSelectedBranch()
       this.setFirstRouting()
+      await this.setSelectedBranch()
     }
   }
 

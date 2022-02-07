@@ -152,10 +152,6 @@ export class Langs {
                     );
                     user.created = new Date();
                     user.$.createdBy.value = remult.user.id;
-
-                    if (!user.email || user.email.length === 0) {
-                        user.email = process.env.EMAIL_TESTER!
-                    }
                     // user.createdBy = await remult.repo(Users).findId(remult.user.id);
                     if ((await remult.repo(Users).count()) == 0)
                         user.admin = true;// If it's the first user, make it an admin
@@ -171,6 +167,9 @@ export class Langs {
                 }
                 if (user.manager) {
                     user.branch2 = undefined;
+                }
+                if (!user.email || user.email.trim().length === 0) {
+                    user.email = process.env.EMAIL_TESTER!
                 }
             }
         };

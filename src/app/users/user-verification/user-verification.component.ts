@@ -4,8 +4,9 @@ import { BusyService } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
 import { AuthService } from '../../auth.service';
 import { DialogService } from '../../common/dialog';
+import { NotificationService } from '../../common/utils';
 import { terms } from '../../terms';
-
+ 
 @Component({
   selector: 'app-user-verification',
   templateUrl: './user-verification.component.html',
@@ -21,6 +22,7 @@ export class UserVerificationComponent implements OnInit {
   @Field({ caption: terms.verificationCode })
   code!: number;
 
+  sentCount = 4
   sending = true
   showLoginAsVolunteer = false
   isLoginAsVolunteer = false;
@@ -55,6 +57,19 @@ export class UserVerificationComponent implements OnInit {
   }
 
   async sendVerificationCode() {
+    --this.sentCount
+    if (this.sentCount === 0) {
+      // await NotificationService.SendEmail({
+      //   // from: 'board',
+      //   // to: 'branch',
+      //   subject: `אימות סלולרי (${this.args.in.mobile}) נכשל 3 פעמים`,
+      //   html: new Date().toDateString()
+      // })
+      
+      // this.dialog.info('בוצעו 3 נסיונות אימות - הועברה הודעה לאחראי')
+      this.dialog.info('בוצעו 3 נסיונות אימות - יש לפנות לאחראי')
+      return
+    }
     this.sending = true
     // console.log('sendVerificationCode')
     let response = await this.auth.sendVerifyCode(this.args.in.mobile)

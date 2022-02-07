@@ -3,18 +3,18 @@ import { BackendMethod, Remult } from "remult";
 import { Activity } from "../core/activity/activity";
 import { terms } from "../terms";
 import { Users } from "../users/users";
-import { AttendeeRequest, CalendarRequest, IcsRequest, SmsRequest } from "./types";
+import { AttendeeRequest, CalendarRequest, EmailRequest, IcsRequest, SmsRequest } from "./types";
 
 export class NotificationService {
     static sendCalendar: (sender: string, req: IcsRequest) => Promise<boolean>;
     // static sendCalendar: (req: CalendarRequest) => Promise<boolean>;
-    static sendMail: (req: CalendarRequest) => Promise<boolean>;
+    static sendEmail: (req: EmailRequest) => Promise<boolean>;
 
     static sendSms: (req: SmsRequest) => Promise<{ success: boolean, message: string, count: number }>;
 
     @BackendMethod({ allowed: true /*(r, e) => r.authenticated()*/ })
-    static async SendEmail(req: CalendarRequest) {
-        return await NotificationService.sendMail(req);
+    static async SendEmail(req: EmailRequest) {
+        return await NotificationService.sendEmail(req);
     }
 
     @BackendMethod({ allowed: true })
