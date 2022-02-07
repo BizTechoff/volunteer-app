@@ -1,15 +1,19 @@
 <div class="home-div">
-    <div *ngIf="this.currentPhoto.link.length === 0">
-        <img src="assets/logo_eshel.png" alt="Get-Hesed" style="display: block; margin-left: auto;margin-right: auto;margin-top: 50%;">
-    </div>  
-    <div *ngIf="this.currentPhoto.link.length > 0" style="display: flex; flex-direction: column; justify-content: space-evenly;">
+    <div *ngIf="!this.currentPhoto || !this.currentPhoto.link || this.currentPhoto.link.length === 0">
+        <img src="assets/logo_eshel.png" alt="Get-Hesed"
+            style="display: block; margin-left: auto;margin-right: auto;margin-top: 50%;">
+    </div>
+    <div *ngIf="this.currentPhoto && this.currentPhoto.link && this.currentPhoto.link.length > 0"
+        style="display: flex; flex-direction: column; justify-content: space-evenly;">
         <div class="home-image-div">
             <H2 style="color: white;">פעילויות מההוואי החברתי</H2>
-            <img *ngIf="this.currentPhotoSocial && this.currentPhotoSocial.link" class="home-image" [srcset]="this.currentPhotoSocial.link">
-        </div>  
+            <img *ngIf="this.currentPhotoSocial && this.currentPhotoSocial.link" class="home-image"
+                [srcset]="this.currentPhotoSocial.link">
+        </div>
         <div class="home-image-div">
             <H2 style="color: white;">פעילויות עם דיירים</H2>
-            <img *ngIf="this.currentPhoto && this.currentPhoto.link" class="home-image" [srcset]="this.currentPhoto.link">
+            <img *ngIf="this.currentPhoto && this.currentPhoto.link" class="home-image"
+                [srcset]="this.currentPhoto.link">
         </div>
     </div>
 </div>
