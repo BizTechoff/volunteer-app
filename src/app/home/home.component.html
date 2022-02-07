@@ -5,11 +5,11 @@
     <div *ngIf="this.currentPhoto.link.length > 0" style="display: flex; flex-direction: column; justify-content: space-evenly;">
         <div class="home-image-div">
             <H2 style="color: white;">פעילויות מההוואי החברתי</H2>
-            <img class="home-image" [srcset]="this.currentPhotoSocial?.link">
+            <img *ngIf="this.currentPhotoSocial && this.currentPhotoSocial.link" class="home-image" [srcset]="this.currentPhotoSocial.link">
         </div>  
         <div class="home-image-div">
             <H2 style="color: white;">פעילויות עם דיירים</H2>
-            <img class="home-image" [srcset]="this.currentPhoto?.link">
+            <img *ngIf="this.currentPhoto && this.currentPhoto.link" class="home-image" [srcset]="this.currentPhoto.link">
         </div>
     </div>
 </div>
