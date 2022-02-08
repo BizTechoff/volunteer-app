@@ -1,8 +1,15 @@
 <div class="full-page">
-    <div class="header"></div>
-    <div *ngIf="this.all" class="ng-container">
+    <div class="header" style="display: flex; flex-direction: column; justify-content: center;">
+        <span style="color: blue;"> {{ this.args.address }} </span>
+        <p>פתח באמצעות:</p>
+    </div>
+    <!-- class="ng-container" -->
+    <div *ngIf="this.all" style="display: flex; flex-direction: column; justify-content: center;">
         <div *ngFor="let n of this.all">
-            <button (click)="this.close(n)"> {{ n.caption }} </button>
+            <button style="width: 100%; margin: 7px;" (click)="this.close(n)">
+                {{ n.caption }}
+                <!-- <mat-icon> {{ n.icon }} </mat-icon> -->
+            </button>
         </div>
     </div>
-</div> 
+</div>

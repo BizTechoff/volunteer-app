@@ -11,8 +11,9 @@ import { terms } from '../../terms';
 export class SelectNavigatorComponent implements OnInit {
 
   args: {
-    selected?: Navigators
-  } = { selected: undefined };
+    selected?: Navigators,
+    address?:string
+  } = { selected: undefined, address: '' };
   all: Navigators[] = [] as Navigators[];
   constructor(private win: MatDialogRef<any>) { }
   terms = terms;

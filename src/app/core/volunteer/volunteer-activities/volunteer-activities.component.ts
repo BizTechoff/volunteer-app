@@ -30,6 +30,7 @@ export class Navigators {
   }) { }
   id!: string
   caption!: string
+  icon: string = 'assets/waze.svg'
 
   static getOptions() {
     let op = new ValueListValueConverter(Navigators).getOptions();
@@ -198,7 +199,7 @@ export class VolunteerActivitiesComponent implements OnInit {
     let nav = undefined
     if (a.tid?.address) {
       nav = await openDialog(SelectNavigatorComponent,
-        dlg => dlg.args = {},
+        dlg => dlg.args = {address: a.tid?.address},
         dlg => dlg ? dlg.args.selected : undefined)
     }
     if (nav) {

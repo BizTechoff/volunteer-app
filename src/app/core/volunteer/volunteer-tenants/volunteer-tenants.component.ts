@@ -12,8 +12,8 @@ import { Roles } from '../../../users/roles';
 import { Activity, ActivityStatus } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
-import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
+import { TenantsQuery } from '../tenants-query';
 
 @Component({
   selector: 'app-volunteer-tenants',
@@ -70,25 +70,42 @@ export class VolunteerTenantsComponent implements OnInit {
     this.userMessage = terms.loadingYourTenants;
     // await this.tenants.reloadData();
     // this.tenants.splice(0)
-    this.originTenants.splice(0)
-    // let ids = [] as string[]
-    for await (const t of this.remult.repo(Tenant).query({
-      where: {
-        bid: this.remult.branchAllowedForUser(),
-        name: this.searchString ? { $contains: this.searchString } : { $contains: this.searchString },
-        // defVids: { $contains: this.remult.user.id }
-      }
-    })) {
-      this.originTenants.push(t)
-      // if (!ids.includes(t.id)) {
-      //   ids.push(t.id)
-      //   this.tenants.push(t)
-      // }
-    }
-
-    if (this.tenants.length === 0) {
-      this.tenants.push(...this.originTenants)
-    }
+    //     let startDayOfWeek = new Date()
+    //     startDayOfWeek = new Date(
+    //       startDayOfWeek.getFullYear(),
+    //       startDayOfWeek.getMonth(),
+    //       startDayOfWeek.getDate() - startDayOfWeek.getDay());
+    //     let endDayOfWeek = new Date()
+    //     endDayOfWeek = new Date(
+    //       endDayOfWeek.getFullYear(),
+    //       endDayOfWeek.getMonth(),
+    //       startDayOfWeek.getDate() + 7 - 1);
+    // console.log(startDayOfWeek,' - ::-', endDayOfWeek)
+    this.tenants = await TenantsQuery.noActivity(
+      // this.remult.user.branch,
+      // startDayOfWeek,
+      // endDayOfWeek,
+      this.searchString
+    )
+    // this.originTenants.splice(0)
+    // // let ids = [] as string[]
+    // for await (const t of this.remult.repo(Tenant).query({
+    //   where: {
+    //     bid: this.remult.branchAllowedForUser(),
+    //     name: this.searchString ? { $contains: this.searchString } : { $contains: this.searchString },
+    //     // defVids: { $contains: this.remult.user.id }
+    //   }
+    // })) {
+    //   this.originTenants.push(t)
+    //   // if (!ids.includes(t.id)) {
+    //   //   ids.push(t.id)
+    //   //   this.tenants.push(t)
+    //   // }
+    // }
+    // this.tenants = this.originTenants
+    // if (this.tenants.length === 0) {
+    //   this.tenants.push(...this.originTenants)
+    // }
 
     // console.log('this.tenants.items.length', this.tenants.length)
     if (this.tenants.length === 0) {
@@ -110,15 +127,16 @@ export class VolunteerTenantsComponent implements OnInit {
   }
 
   async doSearch() {
-    if (this.searchString.length > 0) {
-      this.tenants = this.originTenants.filter(t => t.name.includes(this.searchString))
-      if (!this.tenants) {
-        this.tenants = [] as Tenant[]
-      }
-    }
-    else {
-      this.tenants = this.originTenants
-    }
+    await this.refresh()
+    // if (this.searchString.length > 0) {
+    //   this.tenants = this.originTenants.filter(t => t.name.includes(this.searchString))
+    //   if (!this.tenants) {
+    //     this.tenants = [] as Tenant[]
+    //   }
+    // }
+    // else {
+    //   this.tenants = this.originTenants
+    // }
     // await this.busy.donotWait(async () => await this.refresh());
   }
 
@@ -206,7 +224,7 @@ export class VolunteerTenantsComponent implements OnInit {
     let nav = undefined
     if (a.address) {
       nav = await openDialog(SelectNavigatorComponent,
-        dlg => dlg.args = {},
+        dlg => dlg.args = { address: a.address },
         dlg => dlg ? dlg.args.selected : undefined)
     }
     if (nav) {
@@ -262,6 +280,8 @@ export class VolunteerTenantsComponent implements OnInit {
       }
     }
 
+    tnt = await this.remult.repo(Tenant).findId(tnt.id)
+
     // where: {
     //   status:  [ActivityStatus.openStatuses()],
     //   date: { '<': today }
@@ -274,7 +294,10 @@ export class VolunteerTenantsComponent implements OnInit {
       let f = tnt.defVids.find(v => v.id === this.remult.user.id)
       if (!f) {
         tnt.defVids.push({ id: this.remult.user.id, name: this.remult.user.name })
+        // console.log(1213)
+        // console.log('tnt',tnt )
         await tnt.save()
+        // console.log(3121)
       }
       this.router.navigateByUrl(`${terms.myActivities}`)
       // await this.refresh();

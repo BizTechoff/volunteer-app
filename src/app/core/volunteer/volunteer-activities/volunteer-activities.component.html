@@ -35,7 +35,7 @@
                                     [style.background]='a.status.color'>
                                     {{ a.status.caption }}</h2>
                             </span>
-
+ 
                             <div style="display: flex; flex-direction: row; justify-content: end;">
                                 <button *ngIf="a?.tid?.mobile || a?.tid?.phone" mat-mini-fab color="primary"
                                     (click)="this.call(a)">
