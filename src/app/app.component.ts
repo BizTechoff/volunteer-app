@@ -54,15 +54,15 @@ export class AppComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
 
   async ngOnInit() {
-    console.log('ngOnInit', this.router.url)
+    // console.log('ngOnInit', this.router.url)
     // console.log('ngOnInit.this.router.url-0', this.router.url)
     if (this.auth.isConnected) {
-      console.log(111111111111111)
-      await this.setFirstRouting() 
-      console.log(22222222222222222)
+      // console.log(111111111111111)
       await this.setSelectedBranch()
+      await this.setFirstRouting() 
+      // console.log(222222222222222)
     }
-    console.log('ngOnInit-END', this.router.url)
+    // console.log('ngOnInit-END', this.router.url)
     // console.log('AppComponent INIT')
   }
 
@@ -101,8 +101,8 @@ export class AppComponent implements OnInit {
   }
 
   async setSelectedBranch() {
-    console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx')
-    console.log('setSelectedBranch.branch',this.remult.user)
+    // console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx')
+    // console.log('setSelectedBranch.branch',this.remult.user)
     if (this.remult.user.branch && this.remult.user.branch.length > 0) {
       this.branch = await this.remult.repo(Branch).findId(this.remult.user.branch)
     }

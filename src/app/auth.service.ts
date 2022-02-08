@@ -20,7 +20,7 @@ export class AuthService {
     isFirstLogin = true;//welcome message
     isConnected = false;
     constructor(private remult: Remult, private router: Router) {
-        console.log('constructor', this.router.url)
+        // console.log('constructor', this.router.url)
         augmentRemult(remult);
         // (<MotiUserInfo>remult.user).snif
         let token = AuthService.fromStorage();

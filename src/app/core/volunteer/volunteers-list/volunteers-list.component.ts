@@ -145,7 +145,7 @@ export class VolunteersListComponent implements OnInit {
       let message = '';
       message += `כניסה לאפליקציה `;
       message += '\n';
-      message += 'bit.ly/gh-app ';
+      message += 'bit.ly/eshel-app';
       message += '\n';
       message += `תודה ${name}!`;
 
