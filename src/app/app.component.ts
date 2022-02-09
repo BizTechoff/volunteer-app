@@ -24,6 +24,7 @@ export class AppComponent implements OnInit {
   @DataControl<AppComponent, Branch>({
     click: (_, f) => {
       Branch.selectBranch(_.explicit, async (r, b) => {
+        // r.auth.signOut()
         await r.auth.swithToBranch(b)
         r.refresh();
       })(_, f)

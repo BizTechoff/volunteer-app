@@ -94,7 +94,8 @@ export class AuthService {
         return this.isConnected;
     }
 
-    async swithToBranch(branch?: string) {
+    async swithToBranch(branch?: string) { 
+        // localStorage.removeItem(AUTH_TOKEN_KEY);ks
         await this.setAuthToken(await AuthService.switchBranch(branch));
     }
 
@@ -203,7 +204,8 @@ export class AuthService {
         ui.isAdmin = ui.roles.length == 1 && ui.roles.includes(Roles.admin)
 
         let days = `${process.env.TOKEN_EXPIRES_IN_DAYS!}d`
-        return jwt.sign(ui, getJwtTokenSignKey(), { expiresIn: days })
+        return jwt.sign(ui, getJwtTokenSignKey());
+        // return jwt.sign(ui, getJwtTokenSignKey(), { expiresIn: days })
     }
 
     isVolunteer() {

@@ -140,6 +140,7 @@ export const terms = {
     requiredField: 'שדה חובה',
     donor: 'תורם',
     addBranch: 'הוספת סניף',
+    addSecondBranch: 'שיוך סניף נוסף ל!user!',
     addTenant: 'הוספת דייר חדש',
     addActivity: 'הוספת פעילות',
     cancelActivity: 'בטל פעילות',
@@ -225,7 +226,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2022.02.09.0'
+    appVersion: '2022.02.09.2'
 }
 
 declare module 'remult' {

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { GridSettings } from '@remult/angular';
+import { GridSettings, openDialog } from '@remult/angular';
 import { BackendMethod, Remult } from 'remult';
 import { DialogService } from '../common/dialog';
+import { InputAreaComponent } from '../common/input-area/input-area.component';
 import { Activity } from '../core/activity/activity';
 import { Tenant } from '../core/tenant/tenant';
 import { terms } from '../terms';
@@ -93,8 +94,11 @@ export class UsersComponent implements OnInit {
             }
           }
         },
-        { field: users.bid, caption: terms.branch },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
-        { field: users.branch2, caption: terms.branch2 },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
+        {
+          field: users.bid, caption: terms.branch,
+          getValue: (_, f) => f.value ? f.value.name + (_.branch2 ? ' (+1)' : '') : ''
+        },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
+        // { field: users.branch2, caption: terms.branch2 },//, width: '80' //, readonly: this.remult.isAllowed(Roles.board)
         { field: users.email },
         { field: users.mobile }//, width: '100'
       ],
@@ -106,23 +110,29 @@ export class UsersComponent implements OnInit {
         }
       ],
       rowButtons: [
-        {
-          name: terms.resetPassword,
-          icon: 'password',
-          click: async () => {
+        // {
+        //   name: terms.resetPassword,
+        //   icon: 'password',
+        //   click: async () => {
 
-            if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
-              await UsersComponent.resetPassword(this.users.currentRow.id);
-              this.dialog.info(terms.passwordReset);
-            };
-          }
-        }, 
+        //     if (await this.dialog.yesNoQuestion("Are you sure you want to delete the password of " + this.users.currentRow.name)) {
+        //       await UsersComponent.resetPassword(this.users.currentRow.id);
+        //       this.dialog.info(terms.passwordReset);
+        //     };
+        //   }
+        // }, 
+        {
+          visible: (row) => this.remult.user.isAdmin && row.volunteer,
+          textInMenu: terms.addBranch,
+          icon: 'domain_add',//,
+          click: async (_) => await this.addBranch(_)
+        },
         {
           visible: (_) => this.remult.isAllowed(Roles.admin),
           textInMenu: terms.deleteUser,
           icon: 'delete',//,
           click: async (_) => await this.deleteUser(_)
-        } 
+        }
         // ,
         // {
         //   textInMenu: terms.sendWelcomeSms,
@@ -139,6 +149,18 @@ export class UsersComponent implements OnInit {
 
   async refresh() {
     await this.users.reloadData();
+  }
+
+  async addBranch(u: Users) {
+    if (u && u.id) {
+      let clone = await this.remult.repo(Users).findId(u.id)
+      openDialog(InputAreaComponent,
+        _ => _.args = {
+          title: terms.addSecondBranch.replace('!user!', clone.name),
+          fields: () => [clone.$.branch2!],
+          ok: async () => { await clone.save(); await this.refresh() }
+        });
+    }
   }
 
   async deleteUser(u: Users) {
