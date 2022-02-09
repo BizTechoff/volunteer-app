@@ -30,18 +30,21 @@ function getEnvKeyFor(email: string) {
     }
     return '';
 }
-       // if (!envKey || envKey.length == 0) {
-        //     console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
-        //     return false;
-        // }
- 
+// if (!envKey || envKey.length == 0) {
+//     console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
+//     return false;
+// }
+
 NotificationService.sendCalendar = async (sender: string, req: IcsRequest) => {
     console.debug(`sendCalendar: {sender: ${sender}, req: ${JSON.stringify(req)}}`);
 
     if (process.env.CALENDAR_CHANNEL_OPENED === 'true') {
         const SCOPE = 'https://www.googleapis.com/auth/calendar.events';
-
-        let envKey = 'CALENDAR_' + sender.replace('.', '_').toUpperCase() // getEnvKeyFor(sender);
+        //eshel.app.jerusalem@gmail.com
+        let branchName = sender.split('@')[0].replace('eshel.app.', '').replace('.', '_').trim().toUpperCase()
+ 
+        let envKey = 'CALENDAR_' + branchName // sender.replace('.', '_').toUpperCase() // getEnvKeyFor(sender);
+        // console.log('envKey',envKey)
         let envBranch = process.env[envKey];
         if (!envBranch) {
             console.debug(`אימייל הסניף ${sender} אינו מוגדר במערכת`);
