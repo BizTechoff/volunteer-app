@@ -202,7 +202,8 @@ export class AuthService {
         ui.isBoardOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
         ui.isAdmin = ui.roles.length == 1 && ui.roles.includes(Roles.admin)
 
-        return jwt.sign(ui, getJwtTokenSignKey())
+        let days = `${process.env.TOKEN_EXPIRES_IN_DAYS!}d`
+        return jwt.sign(ui, getJwtTokenSignKey(), { expiresIn: days })
     }
 
     isVolunteer() {

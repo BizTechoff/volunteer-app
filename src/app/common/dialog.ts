@@ -17,7 +17,6 @@ export class DialogService {
         this.snackBar.open(info, "סגירה", { duration: duration });
     }
     async error(err: any) {
-
         return await openDialog(YesNoQuestionComponent, d => d.args = {
             message: extractError(err),
             isAQuestion: false
@@ -56,6 +55,10 @@ export class ShowDialogOnErrorErrorHandler extends ErrorHandler {
             return;
         this.lastErrorString = error.toString();
         this.lastErrorTime = new Date().valueOf();
+
+        if (this.lastErrorString.includes('verifyToken')) {
+            error = 'תוקף החיבור פג, יש להתחבר מחדש'
+        }
         this.zone.run(() => {
             this.dialog.error(error);
         });
@@ -65,8 +68,9 @@ export class ShowDialogOnErrorErrorHandler extends ErrorHandler {
 
 
 export function extractError(err: any): string {
-    if (typeof err === 'string')
+    if (typeof err === 'string') {
         return err;
+    }
     if (err.modelState) {
         if (err.message)
             return err.message;
