@@ -76,7 +76,7 @@ export class VolunteerActivitiesComponent implements OnInit {
       }
     }
     let changes = await openDialog(ActivityDetailsComponent,
-      input => input.args = { bid: this.volunteer.bid, aid: id, tid: act?.tid, autoOpenPuposes: autoOpenPurposes },
+      input => input.args = { branch: this.volunteer.bid, aid: id, tid: act?.tid, autoOpenPuposes: autoOpenPurposes },
       output => output ? output.args.changed : false);
     if (changes) {
       await this.refresh();

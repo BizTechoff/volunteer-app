@@ -54,6 +54,7 @@ import { UserVerificationComponent } from './users/user-verification/user-verifi
 import { GridDialogComponent } from './common/grid-dialog/grid-dialog.component';
 import { SelectNavigatorComponent } from './common/select-navigator/select-navigator.component';
 import { SelectCallComponent } from './common/select-call/select-call.component';
+import { SelectActivitiesComponent } from './common/select-activities/select-activities.component';
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -87,7 +88,8 @@ import { SelectCallComponent } from './common/select-call/select-call.component'
     SelectTenantComponent,
     UserVerificationComponent,
     SelectNavigatorComponent,
-    SelectCallComponent
+    SelectCallComponent,
+    SelectActivitiesComponent
   ], 
   imports: [
     BrowserModule,

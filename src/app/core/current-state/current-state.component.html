@@ -7,44 +7,47 @@
             <!-- valueChnaged NOT fired! -->
             <!-- <data-control *ngIf="this.isBoard()" style="width: 100%;" [field]="this.$.branch!"></data-control> -->
         </div>
-    </div> 
+    </div>
     <div class="grow-item">
         <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-around; flex-wrap: wrap;">
-            
+
+            <div style="display: block; width:350px;">
+                <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataStatuses"
+                    [labels]="pieChartLabelsStatuses" [chartType]="pieChartType" [options]="pieChartOptionsByStatuses"
+                    [plugins]="pieChartPlugins" [legend]="pieChartLegend"
+                    (chartClick)="chartClicked(this.filterBy.status, $event)">
+                </canvas>
+            </div> 
             <div style="display: block; width:350px;">
                 <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataDayPeriods"
                     [labels]="pieChartLabelsDayPeriods" [chartType]="pieChartType"
                     [options]="pieChartOptionsByDayPeriods" [plugins]="pieChartPlugins" [legend]="pieChartLegend"
-                    (chartClick)="chartClicked($event)">
-                </canvas>
-            </div>
-            <div style="display: block; width:350px;">
-                <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataStatuses"
-                    [labels]="pieChartLabelsStatuses" [chartType]="pieChartType" [options]="pieChartOptionsByStatuses"
-                    [plugins]="pieChartPlugins" [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                    (chartClick)="chartClicked(this.filterBy.period, $event)">
                 </canvas>
             </div>
             <div style="display: block; width:350px;">
                 <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataPurposes"
                     [labels]="pieChartLabelsPurposes" [chartType]="pieChartType" [options]="pieChartOptionsByPurpose"
-                    [plugins]="pieChartPlugins" [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                    [plugins]="pieChartPlugins" [legend]="pieChartLegend"
+                    (chartClick)="chartClicked(this.filterBy.purpose, $event)">
                 </canvas>
             </div>
             <div style="display: block; width:350px;">
                 <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataWeekDay"
                     [labels]="pieChartLabelsWeekDay" [chartType]="pieChartType" [options]="pieChartOptionsByWeekDay"
-                    [plugins]="pieChartPlugins" [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                    [plugins]="pieChartPlugins" [legend]="pieChartLegend"
+                    (chartClick)="chartClicked(this.filterBy.day, $event)">
                 </canvas>
             </div>
-            
+
             <!-- <div *ngIf="this.isBoard()">
                 <canvas baseChart [colors]="pieChartColors" [data]="pieChartDataBranches"
                     [labels]="pieChartLabelsBranches" [chartType]="pieChartType" [options]="pieChartOptionsByBranches"
-                    [plugins]="pieChartPlugins" [legend]="pieChartLegend" (chartClick)="chartClicked($event)">
+                    [plugins]="pieChartPlugins" [legend]="pieChartLegend" (chartClick)="chartClicked(this.filterBy.branch ,$event)">
                 </canvas>
             </div> -->
         </div>
-    </div> 
+    </div>
     <div class="footer" style="margin: 1em;">
         <span> נכון ל: {{ this.refreshedTime }} </span>
         <!-- <button (click)='this.sendEmail()'>Send Email</button> -->

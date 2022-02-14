@@ -1,11 +1,22 @@
 import { Component, OnInit } from '@angular/core';
+import { DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
-import { BackendMethod, getFields, Remult } from 'remult';
+import { BackendMethod, EntityFilter, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
+import { GridDialogComponent } from '../../common/grid-dialog/grid-dialog.component';
 import { terms } from '../../terms';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
 // import { Referrer } from '../tenant/tenant';
+
+export class filterBy {
+  static branch = new filterBy()
+  static status = new filterBy()
+  static purpose = new filterBy()
+  static period = new filterBy()
+  static day = new filterBy()
+}
+
 export interface stateResult {
   activitiesByBranches: { id: string, name: string, count: number }[];
   activitiesByStatus: { id: string, status: ActivityStatus, count: number }[];
@@ -205,6 +216,7 @@ export class CurrentStateComponent implements OnInit {
 
   }
 
+  filterBy = filterBy
   terms = terms;
   get $() { return getFields(this, this.remult) };
 
@@ -401,17 +413,55 @@ export class CurrentStateComponent implements OnInit {
     // (this.pieChartColors[0].backgroundColor as string[]).push(...this.colors2);
   }
 
-  public async chartClicked(e: any) {
-    // console.log(e);
+  public async chartClicked(by: filterBy, e: any) {
+
+    if (e.active && e.active.length > 0) {
+      let index = e.active[0]._index;
+      switch (by) {
+        case filterBy.status: {
+          this.showClickedData({
+            status: this.activitiesResult.activitiesByStatus[index].status
+          })
+          break;
+        }
+        case filterBy.period: {
+          this.dialog.info('לא פעיל עדיין')
+          // this.showClickedData({
+          //   period: this.activitiesResult.activitiesByDayPeriods[index].period
+          // })
+          break;
+        }
+        case filterBy.day: {
+          this.dialog.info('לא פעיל עדיין')
+          // this.showClickedData({
+          //   day: this.activitiesResult.activitiesByWeekDay[index].day
+          // })
+          break;
+        }
+        case filterBy.purpose: {
+          this.showClickedData({
+            purpose: this.activitiesResult.activitiesByPurpose[index].purpose
+          }) 
+          break;
+        }
+      }
+    }
+    // if (by === filterBy.day) {
+    //   console.log('chartClicked', e, 'by', 'BRANCH');
+    // }
+    // else {
+    //   console.log('chartClicked', e, 'by', by);
+    // }
     // if (e.active && e.active.length > 0) {
     //   let index = e.active[0]._index;
-    //   let act = this.activitiesByStatus[index];
+    //   console.log(index)
+    //   // let act = this.activitiesByStatus[index];
     //   // this.selectedStatus = this.statuses.statuses[index];
     //   // this.refreshDeliveries();
-    //   if (this.isBoard()) {
-    //     //dril-down to view by branches
-    //   }
-    //   await this.openActivities(act.branch, act.status);
+    //   // if (this.isBoard()) {
+    //   //dril-down to view by branches
+    //   // }
+    //   // await this.openActivities(act.branch, act.status);
     // }
   }
 
@@ -430,13 +480,118 @@ export class CurrentStateComponent implements OnInit {
     // this.dialog.info('פתיחת רשימה לסטטוסים מסוג: ' + status.caption + ' בסניף: ' + bid)
   }
 
-  // async sendEmail() {
-  //   let ok = await CurrentStateComponent.TestSendEmail('noam.honig@gmail.com', 'Welcome Volunteer', 'test', '');
-  //   this.dialog.info(`שליחת מייל ${ok ? 'הצליחה' : 'נכשלה'}`);
+  showClickedData(
+    params: {
+      status?: ActivityStatus,
+      purpose?: ActivityPurpose,
+      period?: ActivityDayPeriod,
+      day?: number
+    }) {
+    console.log('params',params)
+
+    openDialog(GridDialogComponent, gd => gd.args = {
+      title: `פעילויות שנבחרו`,
+      settings: new GridSettings(this.remult.repo(Activity), {
+        allowCrud: false,
+        where: () => {
+          let result: EntityFilter<Activity> = {
+            bid: this.remult.branchAllowedForUser(),
+            status: params.status,
+            purposes: params.purpose ? { $contains: params.purpose?.id.toString() } : undefined//,
+            // $and:
+            //   params.period
+            //     ? params.period === ActivityDayPeriod.afternoon
+            //       ? [
+            //         { fh: { ">=": '12:00' } },
+            //         { fh: { "<": '17:00' } }]
+            //       : params.period === ActivityDayPeriod.evening
+            //         ? [
+            //           { fh: { ">=": '17:00' } },
+            //           { fh: { "<": '20:00' } }]
+            //         : [
+            //           { fh: { ">=": '20:00' } },
+            //           { fh: { "<": '12:00' } }]
+            //     : []
+          };
+
+          // if (params.period) {
+          //   if(!result.$and){
+          //     result.$and = []
+          //   }
+          //   result.$and!.push(this.contains(this.args.langs));
+          // }
+
+          //   let result = ActivityDayPeriod.morning;
+          // if (this.fh >= '07:00' && this.fh < '12:00')
+          //     result = ActivityDayPeriod.morning;
+          // else if (this.fh >= '12:00' && this.fh < '17:00')
+          //     result = ActivityDayPeriod.afternoon;
+          // else if (this.fh >= '17:00' && this.fh < '20:00')
+          //     result = ActivityDayPeriod.evening;
+
+          // return result;
+
+          // if (params.period) {
+          //   result.$and!.push(this.contains(this.args.langs));
+          // }
+          // if (params.day) {
+          //   result.$and!.push({ name: { $contains: this.search } });
+          // }
+          return result;
+        },
+        numOfColumnsInGrid: 20,
+        //  { defVids: { $contains: user.id } },
+        columnSettings: a => //[//(r, v) => { return this.remult.user.isBoardOrAbove }
+        {
+          let f = [] as DataControlInfo<Activity>[];
+          if (this.remult.user.isBoardOrAbove) {
+            f.push(a.bid);
+          }
+          f.push(
+            a.tid,
+            a.vids,
+            a.status,
+            a.date,
+            a.purposes,
+            a.purposeDesc,
+            a.fh,
+            a.th,
+            a.remark,
+            a.createdBy,
+            a.created,
+            a.modifiedBy,
+            a.modified)
+          return f
+        }//,
+        // gridButtons:
+        //   [
+        //     {
+        //       textInMenu: () => terms.refresh,
+        //       icon: 'refresh',
+        //       click: async () => { await this.settings; }
+        //     }
+        //   ]
+      }),
+      ok: () => { }
+    })
+
+    // openDialog(SelectActivitiesComponent,
+    //   dlg => dlg.args = {
+    //     branch: params.branch,
+    //     status: params.status,
+    //     purposes: params.purposes,
+    //     period: params.period,
+    //     day: params.day
+    //   })
+
+  }
+
+  // contains(period: ActivityDayPeriod) {
+  //   let result: EntityFilter<Activity> = { $or: [] };
+  //     result.$or!.push({
+  //       date: { : l.id.toString() }
+  //     })
+  //   return result
   // }
-  // @BackendMethod({ allowed: true })
-  // static async TestSendEmail(to: string, subject: string, text: string, link: string, remult?: Remult) {
-  //   return await EmailSvc.sendMail(to, subject, text, link, remult!);
-  // } 
 
 }

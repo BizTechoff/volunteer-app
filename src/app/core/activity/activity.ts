@@ -27,10 +27,11 @@ export function CommaSeparatedStringArrayFieldPurpose<entityType = any>(
         ((options: FieldOptions<entityType, ActivityPurpose[]>, remult: Remult) => void))[]) {
     return Field({
         displayValue: (r, x) => {
-            return x ? x.map(i => i.caption).join(', ').trim() : '';
+            console.log('XXX-XXX-XXX', x)
+            return x && x.length > 0 ? x.map(i => i.caption).join(', ').trim() : '';
         },
         valueConverter: {
-            toDb: x => x ? x.map(i => i.id.toString()).join(',') : undefined,
+            toDb: x => x && x.length > 0 ? x.map(i => i.id.toString()).join(',') : undefined,
             fromDb: x => x ? ActivityPurpose.fromString(x.toString()) : []
         }
     }, ...options);

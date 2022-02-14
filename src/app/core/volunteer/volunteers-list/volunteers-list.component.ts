@@ -9,6 +9,7 @@ import { NotificationService } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Users } from '../../../users/users';
 import { Activity } from '../../activity/activity';
+import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
 import { Tenant } from '../../tenant/tenant';
 
@@ -79,6 +80,12 @@ export class VolunteersListComponent implements OnInit {
           click: async (u) => await this.showVolunteerTenants(u)
         },
         {
+          visible: (_) => !_.isNew() && this.isAllowEdit(),
+          textInMenu: terms.addActivity,
+          icon: 'add',
+          click: async (_) => await this.openActivity(_)
+        },
+        {
           textInMenu: terms.volunteerDetails,
           icon: 'edit',
           click: async (u) => await this.addVolunteer(u.id)
@@ -127,6 +134,22 @@ export class VolunteersListComponent implements OnInit {
 
   isDonor() {
     return this.remult.user.isReadOnly
+  }
+
+  isAllowEdit() {
+    if (this.remult.user.isAdmin) {
+      return true
+    }
+    if (this.remult.user.isReadOnly) {
+      return false
+    }
+    if (this.remult.user.isBoardOrAbove) {
+      return false
+    }
+    if (this.remult.user.isVolunteer) {
+      return false;
+    }
+    return true;
   }
 
   async refresh() {
@@ -275,6 +298,16 @@ export class VolunteersListComponent implements OnInit {
           window?.location?.reload()
         }
       }
+      await this.refresh();
+    }
+  }
+
+  async openActivity(volunteer: Users) {
+    let changes = await openDialog(ActivityDetailsComponent,
+      _ => _.args = { branch: volunteer.bid, volunteer: volunteer },
+      _ => _ ? _.args.changed : false);
+    if (changes) {
+      // let yes 
       await this.refresh();
     }
   }

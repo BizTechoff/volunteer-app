@@ -5,13 +5,13 @@ import { DataAreaFieldsSetting, DataAreaSettings, openDialog } from '@remult/ang
 import { getFields, Remult } from 'remult';
 import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
-import { OnlyVolunteerEditActivity } from '../../../common/globals';
 import { SelectPurposesComponent } from '../../../common/select-purposes/select-purposes.component';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { UserIdName } from '../../../common/types';
 import { NotificationService } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
+import { Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
 import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
@@ -69,13 +69,14 @@ import { Activity, ActivityStatus } from '../activity';
 export class ActivityDetailsComponent implements OnInit {
 
   args: {
-    bid?: Branch,
+    branch?: Branch,
     aid?: string,
+    volunteer?: Users,
     tid?: Tenant,
     readonly?: boolean,
     changed?: boolean,
     autoOpenPuposes?: boolean
-  } = { bid: undefined, aid: '', tid: undefined, readonly: false, changed: false, autoOpenPuposes: false };
+  } = { branch: undefined, aid: '', volunteer: undefined, tid: undefined, readonly: false, changed: false, autoOpenPuposes: false };
   today = new Date();
   activity!: Activity;
   branchChanged = false;
@@ -92,7 +93,7 @@ export class ActivityDetailsComponent implements OnInit {
 
   async ngOnInit() {
     if (!this.args) {
-      this.args = { aid: '', tid: undefined, readonly: false, changed: false, autoOpenPuposes: false };
+      this.args = { aid: '', volunteer: undefined, tid: undefined, readonly: false, changed: false, autoOpenPuposes: false };
     }
     if (!this.args.tid) {
       this.args.tid = undefined;
@@ -153,10 +154,25 @@ export class ActivityDetailsComponent implements OnInit {
   }
 
   isAllowEdit() {
-    if (this.isDonor() || (OnlyVolunteerEditActivity && this.isManager())) {
-      return false;
+    if (this.remult.user.isAdmin) {
+      return true
     }
-    return true;
+    if (this.remult.user.isReadOnly) {
+      return false
+    }
+    if (this.remult.user.isBoardOrAbove) {
+      return false
+    }
+    if (!this.activity || this.activity.isNew()) {
+      return true
+    }
+    if (this.activity.status.isClosed()) {
+      return false
+    }
+    if (this.remult.user.isVolunteer) {
+      return true;
+    }
+    return false;
   }
 
   isBoard() {
@@ -195,8 +211,8 @@ export class ActivityDetailsComponent implements OnInit {
     if (!this.activity) {
       let branch = undefined;
       if (this.isBoard()) {
-        if (this.args.bid) {
-          branch = this.args.bid;
+        if (this.args.branch) {
+          branch = this.args.branch;
         }
       }
       else {
@@ -205,16 +221,9 @@ export class ActivityDetailsComponent implements OnInit {
       let hour = this.today.getHours();
       let min = this.today.getMinutes();
 
-      // console.log(this.today);
-      // console.log(hour);
-      // console.log(min);
-
-      // console.log((hour + 1).toString().padStart(2, '0') + ':' + '00');
-
-
-
       this.activity = this.remult.repo(Activity).create({
         bid: branch,
+        vids: this.args.volunteer ? [{ id: this.args.volunteer.id, name: this.args.volunteer.name }] : [],
         tid: this.args.tid,//await this.remult.repo(Tenant).findId(this.args.tid!),
         // purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()),
@@ -238,14 +247,19 @@ export class ActivityDetailsComponent implements OnInit {
           f.push({ field: this.activity.$.bid, readonly: this.remult.hasValidBranch() || this.activity.status.isClosed() });
         }
         if (this.isManager()) {
-          f.push({ field: this.activity.$.status, readonly: this.activity.status.isClosed() });
+          f.push({ field: this.activity.$.status, readonly: this.activity.status.isClosed(), visible: (r, v) => this.remult.user.isAdmin });
         }
         return f;
       }
     })
     this.fields = new DataAreaSettings({
       fields: () => [
-        { field: this.activity.$.tid, readonly: this.activity.status.isClosed(), clickIcon: 'search', click: async () => await this.openTenants() },//, readonly: true },
+        {
+          field: this.activity.$.tid,
+          readonly: this.activity.status.isClosed(),
+          clickIcon: 'search',
+          click: async () => await this.openTenants()
+        },//, readonly: true },
         {
           field: this.activity.$.vids,
           hideDataOnInput: true,
@@ -277,7 +291,6 @@ export class ActivityDetailsComponent implements OnInit {
             this.activity.vids.splice(0);
             this.addCurrentUserToVids();
           }
-          // console.log(9);
         },
         title: 'דייר'// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
         // tenantLangs: []
@@ -293,14 +306,9 @@ export class ActivityDetailsComponent implements OnInit {
     let bidOk = (this.activity.bid && this.activity.bid.id && this.activity.bid.id.length > 0)!;
     if (bidOk) {
       let explicit = [] as UserIdName[];
-      // if (this.isOnlyVolunteer()) {
       for (const v of this.activity.tid.defVids) {
         explicit.push({ id: v.id, name: v.name });
       }
-      // if(explicit.length == 0){
-      //   explicit = undefined!;
-      // }
-      // }
       let selected = [] as UserIdName[];
       for (const v of this.activity.vids) {
         selected.push({ id: v.id, name: v.name });
@@ -344,14 +352,17 @@ export class ActivityDetailsComponent implements OnInit {
 
   addCurrentUserToVids() {
     let found = false;
-    if (!this.isManager()) {
+    if (this.remult.user.isVolunteer || this.args.volunteer) {
+      let id = this.args.volunteer ? this.args.volunteer.id : this.remult.user.id
+      let name = this.args.volunteer ? this.args.volunteer.name : this.remult.user.name
+
       this.activity.vids.forEach(v => {
-        if (v.id === this.remult.user.id) {
+        if (v.id === id) {
           found = true;
         }
       });
       if (!found) {
-        this.activity.vids.push({ id: this.remult.user.id, name: this.remult.user.name });
+        this.activity.vids.push({ id: id, name: name });
       }
     }
   }
@@ -364,12 +375,10 @@ export class ActivityDetailsComponent implements OnInit {
       return this.dialog.info(terms.mustEnterTenant)
     }
     this.branchChanged = this.activity && this.activity.bid && this.activity.$.bid && this.activity.$.bid.valueChanged()
-    // console.log('this.branchChanged',this.branchChanged)
     let alreadySaved = false;
     if (this.activity.vids.length > 0) {
       if (this.activity.status === ActivityStatus.w4_assign) {
         alreadySaved = await this.activity.status.onChanging(this.activity, ActivityStatus.w4_start, this.remult.user.id);
-        // console.log(1)
       }
     }
     else {
@@ -378,15 +387,10 @@ export class ActivityDetailsComponent implements OnInit {
     }
     if (!alreadySaved) {
       await this.activity.save();
-      // console.log(3)
     }
-    // console.log(4)
-    // console.log('isnew',this.activity.isNew());
     this.args.changed = true;
     this.args.aid = this.activity.id;
-    // let success = await EmailSvc.toCalendar(this.activity.id);
     let success = await NotificationService.SendCalendar(this.activity.id);
-    // let success = await this.sendEmails();
     this.close();
   }
 
@@ -400,12 +404,6 @@ export class ActivityDetailsComponent implements OnInit {
         window?.location?.reload()
       }
     }
-    // if (this.activity && this.activity.bid && this.activity.$.bid && this.activity.$.bid.valueChanged()) {
-    //   if (!this.remult.user.branch || this.remult.user.branch.length === 0) {
-    //     await this.auth.swithToBranch(this.activity.bid.id)
-    //     window?.location?.reload()
-    //   }
-    // }
 
     this.win.close();
   }
@@ -430,280 +428,3 @@ export class ActivityDetailsComponent implements OnInit {
     }
   }
 }
-
-
-
-  // async sendEmails() {
-  //   // console.log('1');
-  //   let emails: { uid: string, name: string, email: string, type: NotificationsTypes }[] =
-  //     [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
-
-  //   // console.log('2');
-  //   // get volunteers that already sent email, to cancel them.
-  //   let vols = await this.remult.repo(NotificationActivity).find({
-  //     where: row => row.activity.isEqualTo(this.activity)
-  //       .and(row.sentAssigned.isEqualTo(true))
-  //   });
-
-  //   // console.log('3');
-  //   let removed = 0;
-  //   // for each one, send cancel if not in current-volunteers.
-  //   vols.forEach(async v => {
-  //     let f = this.activity.vids.find(itm => itm.id === v.id);
-  //     if (!f) {
-  //       let u = await this.remult.repo(Users).findId(v.id);
-  //       emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailCancelAssign });
-  //       ++removed;
-  //     }
-  //   });
-
-  //   // console.log('4-', this.activity.vids.length);
-  //   // console.log(emails);
-  //   let added = 0;
-
-  //   for (const v of this.activity.vids) {
-  //     // console.log('4.1', v.name);
-  //     let u = await this.remult.repo(Users).findId(v.id);
-  //     let f = emails.find(itm => itm.email === u.email);
-  //     if (f) {
-  //       // console.log('4.2', v.name);
-  //       let i = emails.indexOf(f);
-  //       emails.splice(i, 1);//dont send again.
-  //       --removed;
-  //       // f.type = NotificationsTypes.EmailAssign;
-  //     }
-  //     else {
-  //       // console.log('4.3', v.name);
-  //       emails.push({ uid: u.id, name: u.name, email: u.email, type: NotificationsTypes.EmailNewAssign });
-  //       ++added;
-  //     }
-  //     // console.log('4.4', v.name);
-  //   }
-
-  //   return await this.sendMail(emails);
-  // console.log('5', emails.length);
-
-  // if (emails.length > 0) {
-  // console.log('6');
-  // console.log('emails', emails);
-  // console.log('11111');
-
-  // let message = `האם לשלוח אמייל` +
-  //   `\n` +
-  //   (removed > 0 ? `ל- ${removed} מתנדבים לגבי ביטול השתתפותם בפעילות` : '') +
-  //   `\n` +
-  //   (added > 0 ? (added > 0 ? 'ו' : '') + `ל- ${added} מתנדבים זימון השתתפות בפעילות` : '');
-  // console.log('message', message);
-
-  // console.log('7');
-  // console.log('22222');
-  // let yes = true;// await this.dialog.yesNoQuestion(message);
-  // if (yes) {
-  // console.log('8');
-  // let users: { name: string, email: string }[] = [] as { name: string, email: string }[];
-  // for (const e of emails) {
-  //   users.push({
-  //     name: e.name,
-  //     email: e.email
-  //   });
-  // }
-  // for (const e of emails) {
-  // let ok = await this.sendMail(emails);
-  // if (ok) {
-  //   // let u = await this.remult.repo(Users).findId(e.uid);
-  //   // let n = await this.remult.repo(NotificationActivity).findId({where: row => row.activity.isEqualTo(e.) e.uid});
-  //   // n.
-  // }
-  // }
-  // }
-  // }
-  // else{
-  //   // send cancel
-  //   let req: CalendarRequest;
-  // return await EmailSvc.sendToCalendar(req);
-  // }
-  // }
-
-  // async sendMail(emails: { uid: string, name: string, email: string, type: NotificationsTypes }[]) {
-  //   // console.log('this.activity.bid.id', this.activity.bid.id, this.activity.bid.name, this.activity.bid.email, this.activity.bid.color);
-
-  //   // async sendMail(email: string, type: NotificationsTypes, users: { name: string, email: string }[]) {
-  //   // let b = await this.remult.repo(Branch).findId(this.activity.bid.id);
-  //   let b = this.activity.bid;
-  //   if (!emails) {
-  //     emails = [] as { uid: string, name: string, email: string, type: NotificationsTypes }[];
-  //   }
-  //   let attendees = [] as AttendeeRequest[];
-  //   for (const u of emails) {
-  //     attendees.push(
-  //       {
-  //         name: u.name,
-  //         email: u.email,
-  //         rsvp: true,
-  //         partstat: 'ACCEPTED',
-  //         role: 'OPT-PARTICIPANT'
-  //       });
-  //   };
-
-  //   let vidsNames = '';
-  //   if (this.activity.vids.length > 1) {
-  //     vidsNames = `לכם (${this.activity.$.vids.displayValue})`;
-  //   }
-  //   else if (this.activity.vids.length === 1) {
-  //     vidsNames = `לך (${this.activity.$.vids.displayValue})`;
-  //   }
-  //   let subject = terms.voulnteerNewAssignSubject
-  //     .replace('!tname!', this.activity.tid.name)
-  //     .replace('!branch!', b.name);
-  //   let html = terms.voulnteerNewAssign
-  //     .replace('!vnames!', vidsNames)
-  //     .replace('!purposeDesc!', this.activity.purposeDesc)
-  //     .replace('!name!', this.activity.tid.name)
-  //     .replace('!date!', DateUtils.toDateString(this.activity.date))
-  //     .replace('!from!', this.activity.fh)
-  //     .replace('!to!', this.activity.th)
-  //     .replace('!address!', this.activity.tid.address);
-  //   // let start
-  //   // let split = this.activity.fh.split(':');
-  //   // if(split.length > 0){
-
-  //   // }
-  //   // if (this.remult.isAllowed(Roles.))
-  //   let req: CalendarRequest = {
-  //     sender: b.email,
-  //     email: {
-  //       from: b.email,
-  //       to: emails.map(e => e.email).join(','),
-  //       cc: '',
-  //       subject: subject,
-  //       html: html
-  //     },
-  //     ics: {
-  //       aid: this.activity.id,
-  //       color: b.color,
-  //       sequence: 2,// new Date().getTime(),
-  //       title: subject,
-  //       description: html,
-  //       location: this.activity.tid.address,
-  //       url: '',// 'bit.ly/eshel-app',
-  //       start: {
-  //         year: this.activity.date.getFullYear(),
-  //         month: this.activity.date.getMonth() + 1,
-  //         day: this.activity.date.getDate(),
-  //         hours: parseInt(this.activity.fh.split(':')[0]),
-  //         minutes: parseInt(this.activity.fh.split(':')[1])
-  //       },
-  //       duration: {
-  //         hours: parseInt(this.activity.th.split(':')[0]) - parseInt(this.activity.fh.split(':')[0]),
-  //         minutes: parseInt(this.activity.th.split(':')[1]) - parseInt(this.activity.fh.split(':')[1])
-  //       },
-  //       status: 'CONFIRMED',
-  //       busyStatus: 'BUSY',
-  //       organizer: {
-  //         displayName: b.name, //u.name
-  //         email: b.email // this.isManager() ? b.email : u.email
-  //       },
-  //       attendees: attendees
-  //     }
-  //   };
-
-  //   // return await EmailSvc.SendEmail(req);//sendToCalendar(req);
-  //   return await EmailSvc.sendToCalendar(req);
-
-  // let message = type.text
-  //   .replace('!name!', this.activity.tid.name)
-  //   .replace('!date!', this.activity.date.toLocaleDateString())
-  //   .replace('!from!', this.activity.fh)
-  //   .replace('!to!', this.activity.th)
-  //   .replace('!address!', this.activity.tid.address);
-
-  // const datepipe: DatePipe = new DatePipe('en-US');//yyyyMMddTHHmmssZ
-  // let fdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.fh.replace(':', '') + '00Z';
-  // let tdate = datepipe.transform(this.activity.date, 'yyyyMMdd')! + 'T' + this.activity.th.replace(':', '') + '00Z';
-  // let link = type.link
-  //   .replace('!title!', encodeURI(type.subject))
-  //   .replace('!fDate!', fdate)
-  //   .replace('!tDate!', tdate)
-  //   .replace('!location!', encodeURI(this.activity.tid.address))
-  //   .replace('!details!', encodeURI('תודה!'));
-  // let subject = type.subject.replace('!tname!', this.activity.tid.name);
-
-  // return await EmailSvc.SendEmail(email, subject, message, link);
-  // }
-
-  // async onFileInput(e: any) {
-  //   let changed = this.loadFiles(e.target.files);
-  //   // if (changed) {
-  //   //   await this.refresh();
-  //   // }
-  // }
-
-// private async loadFiles(files: any) {
-//   for (let index = 0; index < files.length; index++) {
-//     const file = files[index];
-//     let f: File = file;
-//     // console.log(f);
-//     // f.lastModified;
-//     // f.name;
-//     // f.size;
-//     // f.type;
-//     // f.webkitRelativePath;
-//     await new Promise((res) => {
-//       var fileReader = new FileReader();
-
-//       fileReader.onload = async (e: any) => {
-//         var img = new Image();
-
-//         var canvas = document.createElement("canvas");
-//         if (true) {
-//           img.onload = async () => {
-//             var ctx = canvas.getContext("2d");
-//             ctx!.drawImage(img, 0, 0);
-
-//             var MAX_WIDTH = 800;
-//             var MAX_HEIGHT = 600;
-//             var width = img.width;
-//             var height = img.height;
-
-//             if (width > height) {
-//               if (width > MAX_WIDTH) {
-//                 height *= MAX_WIDTH / width;
-//                 width = MAX_WIDTH;
-//               }
-//             } else {
-//               if (height > MAX_HEIGHT) {
-//                 width *= MAX_HEIGHT / height;
-//                 height = MAX_HEIGHT;
-//               }
-//             }
-//             canvas.width = width;
-//             canvas.height = height;
-
-//             let margin = 50;
-//             // canvas.pad?
-
-//             var ctx = canvas.getContext("2d");
-//             ctx!.drawImage(img, 0, 0, width, height);
-
-//             var dataurl = canvas.toDataURL("image/png");
-//             //console.log(dataurl);
-//             //create row in db
-
-//             let uimg = await this.addImage(f.name, dataurl);
-//             this.images.push(uimg);
-
-//             // addImageInfo(imgId)
-
-
-//           }
-//           img.src = e.target.result.toString();
-//           // console.log(img.src)
-//         }
-//         //   this.image.image.value = e.target.result.toString();
-//         //   this.image.fileName.value = f.name;
-//         res({});
-//       };
-//       fileReader.readAsDataURL(f);
-//     });
-//   }
-// }

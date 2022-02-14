@@ -288,7 +288,7 @@ export class VolunteerTenantsComponent implements OnInit {
     // },
 
     let changes = await openDialog(ActivityDetailsComponent,
-      _ => _.args = { bid: tnt.bid, tid: tnt },
+      _ => _.args = { branch: tnt.bid, tid: tnt },
       _ => _ ? _.args.changed : false);
     if (changes) {
       let f = tnt.defVids.find(v => v.id === this.remult.user.id)

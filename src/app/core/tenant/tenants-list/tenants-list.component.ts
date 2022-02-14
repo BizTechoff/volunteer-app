@@ -96,12 +96,12 @@ export class TenantsListComponent implements OnInit {
           icon: 'groups',
           click: async (_) => await this.assignVolunteers(_, true)
         },
-        // {
-        //   visible: (_) => !_.isNew() && !this.isDonor(),
-        //   textInMenu: terms.addActivity,
-        //   icon: 'add',
-        //   click: async (_) => await this.openActivity(_)
-        // },
+        {
+          visible: (_) => !_.isNew() && this.isAllowEdit(),
+          textInMenu: terms.addActivity,
+          icon: 'add',
+          click: async (_) => await this.openActivity(_)
+        },
         {
           visible: (_) => !_.isNew(),
           textInMenu: terms.tenantDetails,
@@ -129,6 +129,7 @@ export class TenantsListComponent implements OnInit {
       ]
     }
   );
+  
 
   constructor(private remult: Remult, public auth: AuthService, private dialog: DialogService) {
     // this.subject.subscribe(async () => {
@@ -137,6 +138,22 @@ export class TenantsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  isAllowEdit() {
+    if (this.remult.user.isAdmin) {
+      return true
+    }
+    if (this.remult.user.isReadOnly) {
+      return false
+    }
+    if (this.remult.user.isBoardOrAbove) {
+      return false
+    }
+    if (this.remult.user.isVolunteer) {
+      return false;
+    }
+    return true;
   }
 
   async refresh() {
@@ -199,9 +216,10 @@ export class TenantsListComponent implements OnInit {
 
   async openActivity(tnt: Tenant) {
     let changes = await openDialog(ActivityDetailsComponent,
-      _ => _.args = { bid: tnt.bid, tid: tnt },
+      _ => _.args = { branch: tnt.bid, tid: tnt },
       _ => _ ? _.args.changed : false);
     if (changes) {
+      // let yes 
       await this.refresh();
     }
   }

@@ -129,17 +129,18 @@ export class ActivitiesListComponent implements OnInit {
 
   async addActivityToCurrentTenant(act?: Activity) {
     let changes = await openDialog(ActivityDetailsComponent,
-      _ => _.args = { bid: act?.bid, tid: act?.tid },
+      _ => _.args = { branch: act?.bid, tid: act?.tid },
       _ => _ ? _.args.changed : false);
     if (changes) {
-      await this.refresh();
+      await this.refresh(); 
     }
   }
 
   async showActivityDetails(act?: Activity) {
     let id = act && act.id && act.id.length > 0 ? act.id : '';
+    let branch = await this.remult.repo(Branch).findId(this.remult.user.branch)
     let changes = await openDialog(ActivityDetailsComponent,
-      input => input.args = { aid: id },
+      input => input.args = { branch: branch, aid: id },
       output => output ? output.args.changed : false);
     if (changes) {
       await this.refresh();
@@ -147,7 +148,7 @@ export class ActivitiesListComponent implements OnInit {
   }
 
   private async cancelActivity(act: Activity) {
-    act.status.onChanging(act, ActivityStatus.cancel, null!);
+    await act.status.onChanging(act, ActivityStatus.cancel, null!);
     await act.save();
     await this.refresh();
   }
