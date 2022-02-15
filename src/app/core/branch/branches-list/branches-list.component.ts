@@ -39,7 +39,7 @@ export class BranchesListComponent implements OnInit {
         f.push({ field: row.volunteersCount, width: '88', readonly: true });
         f.push({ field: row.tenantsCount, width: '88', readonly: true });
         f.push({ field: row.assignCount, width: '88', readonly: true });
-        // f.push({ field: row.activitiesCount, width: '88', readonly: true })
+        f.push({ field: row.activitiesCount, width: '88', readonly: true })
         // f.push({ field: row.foodDeliveries, width: '88', readonly: true });
         // f.push({ field: row.photosCount, width: '88', readonly: true })
 
