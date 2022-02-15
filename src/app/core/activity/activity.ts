@@ -1,5 +1,5 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, IdEntity, isBackend, Remult, Validators, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { FoodDeliveredCount } from "../../common/enums";
 import { DateRequiredValidation, EntityRequiredValidation, pointsEachSuccessActivity, TimeRequireValidator } from "../../common/globals";
@@ -105,6 +105,7 @@ export class ActivityDayPeriod {
     static morning = new ActivityDayPeriod(1, 'בוקר');
     static afternoon = new ActivityDayPeriod(2, 'צהריים');
     static evening = new ActivityDayPeriod(3, 'ערב');
+    static nigth = new ActivityDayPeriod(4, 'לילה');//,`fh >= !from! and fh < !to!`
 
     constructor(public id: number, public caption: string) { }
     // id:number;
@@ -183,7 +184,7 @@ export class ActivityStatus {
                 // console.log('from cancel - toCalendar 1')
                 let success = await NotificationService.SendCalendar(a.id);
                 // sendEmail(a, updateCalendar);
-            } 
+            }
             return saved
         });
     static w4_end = new ActivityStatus(3, 'ממתין לסיום',
@@ -437,6 +438,23 @@ export class Activity extends IdEntity {
             x?.toLocaleDateString()
     })
     date: Date = new Date();
+    @Field<Activity>({
+        sqlExpression: e => {
+            return 'extract(dow from date)'
+        }
+    })
+    dayOfWeek: number = -1;
+    @Field<Activity>({
+        sqlExpression: e => {
+            return `CASE WHEN fh>='05:00' AND fh<'12:00' THEN ${ActivityDayPeriod.morning.id}
+                         WHEN fh>='12:00' AND fh<'17:00' THEN ${ActivityDayPeriod.afternoon.id}
+                         WHEN fh>='17:00' AND fh<'22:00' THEN ${ActivityDayPeriod.evening.id}
+                         WHEN fh>='22:00' OR  fh<'05:00' THEN ${ActivityDayPeriod.nigth.id}
+                    ELSE '0'
+                    END`
+        }
+    })
+    dayPeriod: ActivityDayPeriod = ActivityDayPeriod.morning
 
     // vols = new OneToMany(this.remult.repo(ActivitiesVolunteers), {
     //     where: _ => _.a!.isEqualTo(this)
@@ -521,16 +539,33 @@ export class Activity extends IdEntity {
     @Field({ caption: terms.modified })
     modified!: Date;
 
-    period() {
-        let result = ActivityDayPeriod.morning;
-        if (this.fh >= '07:00' && this.fh < '12:00')
-            result = ActivityDayPeriod.morning;
-        else if (this.fh >= '12:00' && this.fh < '17:00')
-            result = ActivityDayPeriod.afternoon;
-        else if (this.fh >= '17:00' && this.fh < '20:00')
-            result = ActivityDayPeriod.evening;
+    // static nameStartsWith = Filter.createCustom<Activity, string>(async (remult, val) => {
+    //     //this code will always run on the backend
+    //     return SqlDatabase.customFilter((x) => {
+    //         let sql =
+    //             `
+    //                 CASE WHEN fh>='05:00' AND fh<'12:00' THEN 1
+    //                      WHEN fh>='12:00' AND fh<'17:00' THEN 2
+    //                      WHEN fh>='17:00' AND fh<'22:00' THEN 3
+    //                      WHEN fh>='22:00' OR fh<'05:00' THEN 4
+    //                 ELSE '0'
+    //                 END AS period
+    //             `
+    //         x.sql = sql// `fh >= '05:00' and fh < '12:00' ${x.addParameterAndReturnSqlToken(val)}||'%'`;
+    //         console.log(x.sql);
+    //     })
+    // });
 
-        return result;
-    }
 
+    // period() {
+    //     let result = ActivityDayPeriod.morning;
+    //     if (this.fh >= '07:00' && this.fh < '12:00')
+    //         result = ActivityDayPeriod.morning;
+    //     else if (this.fh >= '12:00' && this.fh < '17:00')
+    //         result = ActivityDayPeriod.afternoon;
+    //     else if (this.fh >= '17:00' && this.fh < '20:00')
+    //         result = ActivityDayPeriod.evening;
+
+    //     return result;
+    // }
 }

@@ -1,10 +1,11 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Entity, Field, FieldRef, Remult } from "remult";
+import { Entity, EntityFilter, Field, FieldRef, Filter, Remult, SqlDatabase } from "remult";
 import { ColorNumberValidator, EmailValidator, StringRequiredValidation } from "../../common/globals";
 import { SelectBranchComponent } from "../../common/select-branch/select-branch.component";
 import { UserIdName } from "../../common/types";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
+import { Users } from "../../users/users";
 import { EntityWithModified } from "../EntityWithModified";
 
 
@@ -22,7 +23,7 @@ import { EntityWithModified } from "../EntityWithModified";
     allowApiRead: true,
     defaultOrderBy: { name: "asc" }
 }
-) 
+)
 export class Branch extends EntityWithModified {
 
     @Field({ caption: terms.name, validate: StringRequiredValidation })
@@ -42,13 +43,13 @@ export class Branch extends EntityWithModified {
 
     @Field<Branch>((options, remult) => {
         options.caption = terms.volunteers
-        if (true) {
+        if (false) {
             options.serverExpression = async branch => {
                 return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
             };
         }
         else {
-            options.sqlExpression = (branch) => `( select count(*) from users where users.bid = '${branch.key}' && users.volunteer = 'true' )`;
+            options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id and users.volunteer = 'true' )`;
             // options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )`;
         }
     })
@@ -143,6 +144,31 @@ export class Branch extends EntityWithModified {
 
         return result;
     }
+    static hasVolunteer = Filter.createCustom<Branch, string>(async (remult, val) => {
+        const volunteers = await remult.repo(Users).find({
+            where: {
+                volunteer: true,
+                name: { $contains: val }
+            }
+        });
+        const ids: string[] = [...volunteers.map(v => v.bid), ...volunteers.map(v => v.branch2)].filter(v => v).map(v => v!.id);
+        var result: EntityFilter<Branch> = {
+            id: ids
+        };
+        return result;
+    });
+
+    static nameStartsWith = Filter.createCustom<Branch, string>(async (remult, val) => {
+        //this code will always run on the backend
+
+
+
+        return SqlDatabase.customFilter((x) => {
+            x.sql = `name like ${x.addParameterAndReturnSqlToken(val)}||'%'`;
+            console.log(x.sql);
+        })
+    });
+
     static selectBranch<containerType = any>(explicit?: string[], change?: (e: containerType, b?: string) => void) {
         return (container: containerType, f: FieldRef<any, Branch | undefined>) => {
 

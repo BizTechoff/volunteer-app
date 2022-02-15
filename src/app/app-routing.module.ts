@@ -8,6 +8,7 @@ import { ActivitiesListComponent } from './core/activity/activities-list/activit
 import { BranchesListComponent } from './core/branch/branches-list/branches-list.component';
 import { CalendarComponent } from './core/current-state/calendar/calendar.component';
 import { CurrentStateComponent } from './core/current-state/current-state.component';
+import { NoamKComponent } from './core/demo/noam-k/noam-k.component';
 import { PhotosAlbumBranchComponent } from './core/photo/photos-album-branch/photos-album-branch.component';
 import { TenantsListComponent } from './core/tenant/tenants-list/tenants-list.component';
 import { VolunteerActivitiesComponent } from './core/volunteer/volunteer-activities/volunteer-activities.component';
@@ -24,6 +25,7 @@ import { UsersComponent } from './users/users.component';
 
 const defaultRoute = terms.home;
 const routes: Routes = [
+  { path: 'noam-k', component: NoamKComponent },
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
   { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerOrAboveGuard] },
   { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerOrAboveGuard] },

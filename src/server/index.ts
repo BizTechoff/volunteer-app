@@ -15,6 +15,7 @@ import '../app/app-routing.module';
 //import '../app/app.component';
 import { getJwtTokenSignKey } from '../app/auth.service';
 import '../app/common/types';
+import { Activity, ActivityDayPeriod } from '../app/core/activity/activity';
 import { augmentRemult } from '../app/terms';
 import './aws-s3';
 import { generateUploadURL } from './aws-s3';
@@ -23,7 +24,10 @@ import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
- 
+import { Branch } from '../app/core/branch/branch';
+import { SqlDatabase } from 'remult';
+//SqlDatabase.LogToConsole = true;
+
 export function getDevMode(): string {
     let result = '';
     let db = process.env.DATABASE_URL;
@@ -67,6 +71,54 @@ async function startup() {
         initRequest: async (remult) => augmentRemult(remult)
     });
     app.use(api);
+
+    api.getRemult(undefined!).then(async remult => {
+        if(false)
+        console.table(await remult.repo(Activity).find(
+            {
+                where: {dayPeriod: ActivityDayPeriod.nigth}
+            }
+        ).then(x => x.map(({ fh,dayPeriod }) => ({ fh,dayPeriod }))));
+ 
+        if(false)
+        console.table(await remult.repo(Branch).find(
+            {
+                where: Branch.nameStartsWith("א")
+            }
+        ).then(x => x.map(({ name }) => ({ name }))));
+
+        if (false)
+            console.table(await remult.repo(Branch).find(
+                {
+                    where: SqlDatabase.customFilter((x) => {
+                        x.sql = `name like 'א%'`;
+                    })
+                }
+            ).then(x => x.map(({ name }) => ({ name }))));
+
+        if (false) {
+            console.time("branches");
+            console.table(await remult.repo(Branch).find(
+                {
+                    where: {
+                        volunteersCount: { $gt: 100 }
+                    }
+                }
+            ).then(x => x.map(({ name, volunteersCount }) => ({ name, volunteersCount }))));
+            console.timeEnd("branches");
+        }
+
+        if (false) {
+            console.table(await remult.repo(Activity).find({
+                where: {
+                    dayOfWeek: 4
+                }
+            }).then(x => x.map(y => ({
+                date: y.date,
+                dow: y.dayOfWeek
+            }))))
+        }
+    });
 
     app.get("/api/s3Url", async (req, res) => {//?key=[key]&f=[fname]
         let result: { url: string, error: string } = { url: '', error: '' };

@@ -55,6 +55,7 @@ import { GridDialogComponent } from './common/grid-dialog/grid-dialog.component'
 import { SelectNavigatorComponent } from './common/select-navigator/select-navigator.component';
 import { SelectCallComponent } from './common/select-call/select-call.component';
 import { SelectActivitiesComponent } from './common/select-activities/select-activities.component';
+import { NoamKComponent } from './core/demo/noam-k/noam-k.component';
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -89,7 +90,8 @@ import { SelectActivitiesComponent } from './common/select-activities/select-act
     UserVerificationComponent,
     SelectNavigatorComponent,
     SelectCallComponent,
-    SelectActivitiesComponent
+    SelectActivitiesComponent,
+    NoamKComponent
   ], 
   imports: [
     BrowserModule,

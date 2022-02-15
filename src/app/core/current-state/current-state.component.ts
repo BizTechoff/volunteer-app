@@ -284,17 +284,17 @@ export class CurrentStateComponent implements OnInit {
 
 
       // By Purpose
-      let foundDayPeriod = result.activitiesByDayPeriods.find(itm => itm.period === a.period());
+      let foundDayPeriod = result.activitiesByDayPeriods.find(itm => itm.period === a.dayPeriod);
       if (!foundDayPeriod) {
-        foundDayPeriod = { id: a.bid.id, period: a.period(), count: 0 };
+        foundDayPeriod = { id: a.bid.id, period: a.dayPeriod, count: 0 };
         result.activitiesByDayPeriods.push(foundDayPeriod);
       }
       ++foundDayPeriod.count;
 
       // By Purpose
-      let foundDayWeekDay = result.activitiesByWeekDay.find(itm => itm.day === a.date.getDay());
+      let foundDayWeekDay = result.activitiesByWeekDay.find(itm => itm.day === a.dayOfWeek);
       if (!foundDayWeekDay) {
-        foundDayWeekDay = { id: a.bid.id, day: a.date.getDay(), count: 0 };
+        foundDayWeekDay = { id: a.bid.id, day: a.dayOfWeek, count: 0 };
         result.activitiesByWeekDay.push(foundDayWeekDay);
       }
       ++foundDayWeekDay.count;
@@ -416,32 +416,38 @@ export class CurrentStateComponent implements OnInit {
   public async chartClicked(by: filterBy, e: any) {
 
     if (e.active && e.active.length > 0) {
+      console.log(e.active[0])
       let index = e.active[0]._index;
+      let label = e.active[0]._model.label
       switch (by) {
         case filterBy.status: {
           this.showClickedData({
+            title: `${this.pieChartOptionsByStatuses.title!.text}: ${label}`,// ${this.activitiesResult.activitiesByStatus[index].status.caption}`,
             status: this.activitiesResult.activitiesByStatus[index].status
           })
           break;
         }
         case filterBy.period: {
-          this.dialog.info('לא פעיל עדיין')
-          // this.showClickedData({
-          //   period: this.activitiesResult.activitiesByDayPeriods[index].period
-          // })
+          // this.dialog.info('לא פעיל עדיין')
+          this.showClickedData({
+            title: `${this.pieChartOptionsByDayPeriods.title!.text}: ${label}`,//${this.activitiesResult.activitiesByDayPeriods[index].period.caption}`,
+            period: this.activitiesResult.activitiesByDayPeriods[index].period
+          })
           break;
         }
         case filterBy.day: {
-          this.dialog.info('לא פעיל עדיין')
-          // this.showClickedData({
-          //   day: this.activitiesResult.activitiesByWeekDay[index].day
-          // })
+          // this.dialog.info('לא פעיל עדיין')
+          this.showClickedData({
+            title: `${this.pieChartOptionsByWeekDay.title!.text}: ${label}`,//${this.weekDays[this.activitiesResult.activitiesByWeekDay[index].day]}`,
+            day: this.activitiesResult.activitiesByWeekDay[index].day
+          })
           break;
         }
         case filterBy.purpose: {
           this.showClickedData({
+            title: `${this.pieChartOptionsByPurpose.title!.text}: ${label}`,//${this.activitiesResult.activitiesByPurpose[index].purpose.caption}`,
             purpose: this.activitiesResult.activitiesByPurpose[index].purpose
-          }) 
+          })
           break;
         }
       }
@@ -482,36 +488,25 @@ export class CurrentStateComponent implements OnInit {
 
   showClickedData(
     params: {
+      title: string,
       status?: ActivityStatus,
       purpose?: ActivityPurpose,
       period?: ActivityDayPeriod,
       day?: number
     }) {
-    console.log('params',params)
+    console.log('params', params)
 
     openDialog(GridDialogComponent, gd => gd.args = {
-      title: `פעילויות שנבחרו`,
+      title: params.title,
       settings: new GridSettings(this.remult.repo(Activity), {
         allowCrud: false,
         where: () => {
           let result: EntityFilter<Activity> = {
             bid: this.remult.branchAllowedForUser(),
             status: params.status,
-            purposes: params.purpose ? { $contains: params.purpose?.id.toString() } : undefined//,
-            // $and:
-            //   params.period
-            //     ? params.period === ActivityDayPeriod.afternoon
-            //       ? [
-            //         { fh: { ">=": '12:00' } },
-            //         { fh: { "<": '17:00' } }]
-            //       : params.period === ActivityDayPeriod.evening
-            //         ? [
-            //           { fh: { ">=": '17:00' } },
-            //           { fh: { "<": '20:00' } }]
-            //         : [
-            //           { fh: { ">=": '20:00' } },
-            //           { fh: { "<": '12:00' } }]
-            //     : []
+            purposes: params.purpose ? { $contains: params.purpose?.id.toString() } : undefined,
+            dayOfWeek: params.day,
+            dayPeriod: params.period
           };
 
           // if (params.period) {
@@ -595,3 +590,30 @@ export class CurrentStateComponent implements OnInit {
   // }
 
 }
+
+
+            // $and: [
+            //   {
+            //     $and:
+            //       params.period
+            //         ? params.period === ActivityDayPeriod.afternoon
+            //           ? [
+            //             { fh: { ">=": '12:00' } },
+            //             { fh: { "<": '17:00' } }]
+            //           : params.period === ActivityDayPeriod.evening
+            //             ? [
+            //               { fh: { ">=": '17:00' } },
+            //               { fh: { "<": '20:00' } }]
+            //             : [
+            //               { fh: { ">=": '20:00' } },
+            //               { fh: { "<": '12:00' } }]
+            //         : [],
+
+            //   },
+            //   {
+            //     $and:
+            //       [
+            //         { dayOfWeek: params.day }
+            //       ]
+            //   }
+            // ]

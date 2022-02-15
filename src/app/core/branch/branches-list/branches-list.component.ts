@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControlInfo, GridSettings } from '@remult/angular';
-import { Remult } from 'remult';
+import { Remult, SqlDatabase } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -23,7 +23,11 @@ export class BranchesListComponent implements OnInit {
       // allowInsert: this.remult.isAllowed(Roles.admin),
       allowUpdate: this.remult.isAllowed(Roles.admin),
       where: () => ({
-        id: this.remult.user.branch?.length > 0 ? this.remult.user.branch : undefined
+        id: this.remult.user.branch?.length > 0 ? this.remult.user.branch : undefined,
+        // $and: [
+        // //  Branch.nameStartsWith("א")
+        // Branch.hasVolunteer("אבי")
+        // ]
         // id: this.remult.branchAllowedForUser()
         // bid: this.isBoard() ? undefined : { $co
       }),
@@ -38,7 +42,7 @@ export class BranchesListComponent implements OnInit {
         // f.push({ field: row.activitiesCount, width: '88', readonly: true })
         // f.push({ field: row.foodDeliveries, width: '88', readonly: true });
         // f.push({ field: row.photosCount, width: '88', readonly: true })
-        
+
         // row.volunteersCount = await this.remult.repo(Users).count({volunteer: true});
 
         // getValue: (r, v) => {
