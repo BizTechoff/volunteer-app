@@ -25,7 +25,7 @@ import { UsersComponent } from './users/users.component';
 
 const defaultRoute = terms.home;
 const routes: Routes = [
-  { path: 'noam-k', component: NoamKComponent },
+  // { path: 'noam-k', component: NoamKComponent },
   { path: defaultRoute, component: HomeComponent, canActivate: [NotAuthenticatedGuard] },
   { path: terms.calendar, component: CalendarComponent, canActivate: [ManagerOrAboveGuard] },
   { path: terms.currentState, component: CurrentStateComponent, canActivate: [ManagerOrAboveGuard] },
