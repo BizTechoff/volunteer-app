@@ -315,7 +315,7 @@ export class ActivityDetailsComponent implements OnInit {
       }
       let volids = await openDialog(VolunteersAssignmentComponent,
         input => input.args = {
-          allowChange: !this.isManager(),
+          allowChange: !this.activity.status.isClosed() && (this.isManager() ? this.activity.isNew() : true),
           branch: this.activity.bid,
           explicit: explicit,
           title: this.activity.tid.name,
@@ -373,6 +373,9 @@ export class ActivityDetailsComponent implements OnInit {
     }
     if (!this.activity.tid) {
       return this.dialog.info(terms.mustEnterTenant)
+    }
+    if (!this.activity.vids || this.activity.vids.length === 0) {
+      return this.dialog.info(terms.mustEnterVolunteers)
     }
     this.branchChanged = this.activity && this.activity.bid && this.activity.$.bid && this.activity.$.bid.valueChanged()
     let alreadySaved = false;

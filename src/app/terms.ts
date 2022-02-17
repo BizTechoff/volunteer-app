@@ -6,6 +6,7 @@ export const terms = {
     assigns: 'שיבוצים',
     mustEnterBranch: 'סניף: שדה חובה',
     mustEnterTenant: 'דייר: שדה חובה',
+    mustEnterVolunteers: 'מתנדבים: שדה חובה',
     foods: 'מנות',
     uploads: 'העלאות',
     succefullyConnected: 'התחברת בהצלחה',
@@ -226,7 +227,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2022.02.16.2'
+    appVersion: '2022.02.17.0'
 }
 
 declare module 'remult' {

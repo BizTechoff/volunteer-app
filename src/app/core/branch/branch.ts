@@ -43,21 +43,40 @@ export class Branch extends EntityWithModified {
 
     @Field<Branch>((options, remult) => {
         options.caption = terms.volunteers
-        if (false) {
+        options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id and users.volunteer = 'true' )`
+        // if (false) {
+        //     options.serverExpression = async branch => {
+        //         return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
+        //     };
+        // }
+        // else {
+        //     options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id and users.volunteer = 'true' )`;
+        //     // options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )`;
+        // }
+    })
+    volunteersCount = 0;
+
+    @Field<Branch>((options, remult) => {
+        options.caption = terms.tenants
+        // options.sqlExpression = (branch) => `( select count(*) from tenants where tenants.bid = branches.id )`
+        if (1 == 1) {
             options.serverExpression = async branch => {
-                return remult.repo((await import("../../users/users")).Users).count({ bid: branch, volunteer: true })
+                return remult.repo((await import("../tenant/tenant")).Tenant).count({ bid: branch })
             };
         }
         else {
-            options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id and users.volunteer = 'true' )`;
-            // options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id && users.volunteer = 'true' )`;
+            options.sqlExpression = () => "( select count(*) from tenants where tenants.bid = branches.id )";
         }
     })
-    volunteersCount = 0;
+    tenantsCount = 0;
 
     // @DataControl({field: disabled-sort})
     @Field<Branch>((options, remult) => {
         options.caption = terms.activities;
+        
+        
+        // options.sqlExpression = (branch) => `( select count(*) from activities where activities.bid = branches.id )`
+        // options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id and users.volunteer = 'true' )`;
         options.serverExpression = async branch => {
             return remult.repo((await import("../activity/activity")).Activity).count({ bid: branch })//, status: ActivityStatus.openStatuses
         };
@@ -90,19 +109,6 @@ export class Branch extends EntityWithModified {
         // }
     })
     foodDeliveries = 0;
-
-    @Field<Branch>((options, remult) => {
-        options.caption = terms.tenants
-        if (1 == 1) {
-            options.serverExpression = async branch => {
-                return remult.repo((await import("../tenant/tenant")).Tenant).count({ bid: branch })
-            };
-        }
-        else {
-            options.sqlExpression = () => "( select count(*) from tenants where tenants.bid = branches.id )";
-        }
-    })
-    tenantsCount = 0;
 
     @Field<Branch>((options, remult) => {
         options.caption = terms.assigns
