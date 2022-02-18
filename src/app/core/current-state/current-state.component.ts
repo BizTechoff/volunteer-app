@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControlInfo, GridSettings, openDialog } from '@remult/angular';
+import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { ChartOptions, ChartType } from 'chart.js';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
-import { BackendMethod, EntityFilter, getFields, Remult } from 'remult';
+import { BackendMethod, DateOnlyField, EntityFilter, getFields, Remult } from 'remult';
 import { DialogService } from '../../common/dialog';
 import { GridDialogComponent } from '../../common/grid-dialog/grid-dialog.component';
+import { DateUtils } from '../../common/utils';
 import { terms } from '../../terms';
 import { Activity, ActivityDayPeriod, ActivityPurpose, ActivityStatus } from '../activity/activity';
 // import { Referrer } from '../tenant/tenant';
@@ -31,6 +32,28 @@ export interface stateResult {
 })
 export class CurrentStateComponent implements OnInit {
 
+  @DataControl<CurrentStateComponent, Date>({
+    valueChange: async (r, v) => {
+      if (r.toDate < v.value) {
+        r.toDate = v.value;
+      }
+      await r.refresh();
+    }
+  })
+  @DateOnlyField({ caption: terms.fromDate })
+  fromDate: Date = new Date();
+
+  @DataControl<CurrentStateComponent>({
+    valueChange: async (r, v) => {
+      if (r.fromDate > v.value) {
+        r.fromDate = v.value;
+      }
+      await r.refresh();
+    }
+  })
+  @DateOnlyField({ caption: terms.toDate })
+  toDate: Date = new Date();
+
   activitiesResult!: stateResult;
 
   // colors = {
@@ -54,8 +77,8 @@ export class CurrentStateComponent implements OnInit {
     'ffce56',//yellow2
     'cc65fe',//purple
     '36a2eb',//blue2
-    'ff6384',//red2
-    'gray'
+    'ff6384'//red2
+    // 'gray'
   ];
 
   public pieChartOptionsByBranches: ChartOptions = {
@@ -185,6 +208,31 @@ export class CurrentStateComponent implements OnInit {
   //   legend: { labels: {  usePointStyle: true } }
   // };
 
+  public barChartOptionsByBranch: ChartOptions = {
+    responsive: true,
+    title: { text: terms.activitiesByBranches, display: true },
+    // maintainAspectRatio: false,
+    // layout: { padding: 12 },
+    legend: {
+      display: false,
+      rtl: true,
+      textDirection: 'rtl',
+      position: 'right',
+      // onClick: (event: MouseEvent, legendItem: any) => {
+      //   // this.currentStatFilter = this.pieChartStatObjects[legendItem.index];
+
+      //   return false;
+      // }
+    },
+  };
+
+  public barChartType: ChartType = 'bar';
+  public barChartLegend = true;
+  public barChartPlugins = [];
+  public barChartLabelsBranches: Label[] = [];
+  public barChartDataBranches: SingleDataSet = [];
+  public barChartColors: Color[] = [{ backgroundColor: [] }];
+
   public pieChartColors: Color[] = [{ backgroundColor: [] }];
   public pieChartLabelsStatuses: Label[] = [];
   public pieChartDataStatuses: SingleDataSet = [];
@@ -221,11 +269,47 @@ export class CurrentStateComponent implements OnInit {
   get $() { return getFields(this, this.remult) };
 
   async ngOnInit() {
+    this.fromDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() - this.fromDate.getDay());
+    this.toDate = new Date(
+      this.toDate.getFullYear(),
+      this.toDate.getMonth(),
+      this.fromDate.getDate() + 7 - 1);
     await this.refresh();
   }
 
   isBoard() {
     return this.remult.user.isBoardOrAbove
+  }
+
+  async prevWeek() {
+    this.fromDate = new Date(// יום 1 = 0
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() - this.fromDate.getDay() - 7);
+    this.toDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() + 6);
+    await this.refresh();
+  }
+  async nextWeek() {
+    this.fromDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() - this.fromDate.getDay() + 7);
+    this.toDate = new Date(
+      this.fromDate.getFullYear(),
+      this.fromDate.getMonth(),
+      this.fromDate.getDate() + 6);
+    await this.refresh();
+  }
+
+  getDayOfWeek(d: Date) {
+    let days = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז']
+    return days[d.getDay()]
   }
 
   isRefreshing = false;
@@ -236,7 +320,8 @@ export class CurrentStateComponent implements OnInit {
     var options = { hour12: false };
     // console.log(date.toLocaleString('en-US', options));
     this.refreshedTime = new Date().toLocaleTimeString('en-US', options);
-    this.activitiesResult = await CurrentStateComponent.retrieveGraphes();
+    this.activitiesResult = await CurrentStateComponent.retrieveGraphes(
+      this.fromDate, this.toDate);
     // this.branch?.id);
     this.isRefreshing = false;
     this.setChart();
@@ -244,7 +329,7 @@ export class CurrentStateComponent implements OnInit {
   }
 
   @BackendMethod({ allowed: rml => rml.authenticated() })
-  static async retrieveGraphes(branchId?: string, remult?: Remult) {
+  static async retrieveGraphes(fromDate?: Date, toDate?: Date, remult?: Remult) {
     const result: stateResult = {
       activitiesByBranches: [],
       activitiesByDayPeriods: [],
@@ -253,9 +338,12 @@ export class CurrentStateComponent implements OnInit {
       activitiesByWeekDay: []
     };
     for await (const a of remult!.repo(Activity).query({
-      where: ({ bid: remult?.branchAllowedForUser() })// branchId ? { $id: branchId } : undefined })
+      where: ({
+        bid: remult?.branchAllowedForUser(),
+        date: { ">=": fromDate!, "<=": toDate! },
+      })
     })) {
-
+      // branchId ? { $id: branchId } : undefined })
       // By Branch
       let foundBranch = result.activitiesByBranches.find(itm => itm.id === a.bid.id);
       if (!foundBranch) {
@@ -339,12 +427,29 @@ export class CurrentStateComponent implements OnInit {
     //   }
     // });
     this.pieChartColors = [{ backgroundColor: this.colors }];
+    this.barChartColors = [{ backgroundColor: [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(155, 103, 22, 0.2)',
+        'rgba(0, 255, 0, 0.2)',
+        'rgba(102, 0, 204, 0.2)',
+        'rgba(155, 0, 22, 0.2)',
+        'rgba(255, 55, 22, 0.2)',
+        'rgba(55, 103, 55, 0.2)',
+        'rgba(128, 54, 22, 0.2)',
+        'rgba(143, 103, 89, 0.2)',
+        'rgba(68, 54, 122, 0.2)',
+        'rgba(206, 103, 189, 0.2)',
+        'rgba(255, 128, 0, 0.2)',
+        ...this.colors
+    ] }];
     this.pieChartLabelsStatuses = [];
     this.pieChartDataStatuses = [];
     this.pieChartLabelsPurposes = [];
     this.pieChartDataPurposes = [];
-    this.pieChartLabelsBranches = [];
-    this.pieChartDataBranches = [];
+    this.barChartLabelsBranches = [];
+    this.barChartDataBranches = [];
     this.pieChartLabelsWeekDay = [];
     this.pieChartDataWeekDay = [];
     this.pieChartLabelsDayPeriods = [];
@@ -367,8 +472,8 @@ export class CurrentStateComponent implements OnInit {
       // if (a.purpose === ActivityPurpose.fail) {
       //   label = terms.activities + ' ' + label;
       // }
-      this.pieChartLabelsBranches.push(label);
-      this.pieChartDataBranches.push(a.count);
+      this.barChartLabelsBranches.push(label);
+      this.barChartDataBranches.push(a.count);
     }
 
     for (const a of this.activitiesResult.activitiesByPurpose) {
@@ -420,9 +525,20 @@ export class CurrentStateComponent implements OnInit {
       let index = e.active[0]._index;
       let label = e.active[0]._model.label
       switch (by) {
+        case filterBy.branch: {
+          this.showClickedData({
+            title: `${this.barChartOptionsByBranch.title!.text}: ${label}`,// ${this.activitiesResult.activitiesByStatus[index].status.caption}`,
+            fromDate: this.fromDate,
+            toDate: this.toDate,
+            branch: this.activitiesResult.activitiesByBranches[index].id
+          })
+          break;
+        }
         case filterBy.status: {
           this.showClickedData({
             title: `${this.pieChartOptionsByStatuses.title!.text}: ${label}`,// ${this.activitiesResult.activitiesByStatus[index].status.caption}`,
+            fromDate: this.fromDate,
+            toDate: this.toDate,
             status: this.activitiesResult.activitiesByStatus[index].status
           })
           break;
@@ -431,6 +547,8 @@ export class CurrentStateComponent implements OnInit {
           // this.dialog.info('לא פעיל עדיין')
           this.showClickedData({
             title: `${this.pieChartOptionsByDayPeriods.title!.text}: ${label}`,//${this.activitiesResult.activitiesByDayPeriods[index].period.caption}`,
+            fromDate: this.fromDate,
+            toDate: this.toDate,
             period: this.activitiesResult.activitiesByDayPeriods[index].period
           })
           break;
@@ -439,6 +557,8 @@ export class CurrentStateComponent implements OnInit {
           // this.dialog.info('לא פעיל עדיין')
           this.showClickedData({
             title: `${this.pieChartOptionsByWeekDay.title!.text}: ${label}`,//${this.weekDays[this.activitiesResult.activitiesByWeekDay[index].day]}`,
+            fromDate: this.fromDate,
+            toDate: this.toDate,
             day: this.activitiesResult.activitiesByWeekDay[index].day
           })
           break;
@@ -446,6 +566,8 @@ export class CurrentStateComponent implements OnInit {
         case filterBy.purpose: {
           this.showClickedData({
             title: `${this.pieChartOptionsByPurpose.title!.text}: ${label}`,//${this.activitiesResult.activitiesByPurpose[index].purpose.caption}`,
+            fromDate: this.fromDate,
+            toDate: this.toDate,
             purpose: this.activitiesResult.activitiesByPurpose[index].purpose
           })
           break;
@@ -471,24 +593,27 @@ export class CurrentStateComponent implements OnInit {
     // }
   }
 
-  async openActivities(bid: string, status: ActivityStatus) {
-    let list = [];
-    for await (const a of this.remult.repo(Activity).query({
-      where: {
-        bid: { $id: bid },
-        status
-      }
-    }
-    )) {
-      list.push(`${a.date.toLocaleDateString()} (${a.fh} - ${a.th})`);
-    }
-    this.dialog.error(list);
-    // this.dialog.info('פתיחת רשימה לסטטוסים מסוג: ' + status.caption + ' בסניף: ' + bid)
-  }
+  // async openActivities(bid: string, status: ActivityStatus) {
+  //   let list = [];
+  //   for await (const a of this.remult.repo(Activity).query({
+  //     where: {
+  //       bid: { $id: bid },
+  //       status
+  //     }
+  //   }
+  //   )) {
+  //     list.push(`${a.date.toLocaleDateString()} (${a.fh} - ${a.th})`);
+  //   }
+  //   this.dialog.error(list);
+  //   // this.dialog.info('פתיחת רשימה לסטטוסים מסוג: ' + status.caption + ' בסניף: ' + bid)
+  // }
 
   showClickedData(
     params: {
       title: string,
+      fromDate: Date,
+      toDate: Date,
+      branch?: string,
       status?: ActivityStatus,
       purpose?: ActivityPurpose,
       period?: ActivityDayPeriod,
@@ -497,12 +622,16 @@ export class CurrentStateComponent implements OnInit {
     console.log('params', params)
 
     openDialog(GridDialogComponent, gd => gd.args = {
-      title: params.title,
+      title: params.title + '\n' + ` ${DateUtils.toDateString(this.fromDate)} - ${DateUtils.toDateString(this.toDate)}`,
       settings: new GridSettings(this.remult.repo(Activity), {
         allowCrud: false,
         where: () => {
           let result: EntityFilter<Activity> = {
-            bid: this.remult.branchAllowedForUser(),
+            $and: [
+              { bid: { $contains: params.branch } },
+              { bid: this.remult.branchAllowedForUser() }
+            ],
+            date: { ">=": params.fromDate!, "<=": params.toDate! },
             status: params.status,
             purposes: params.purpose ? { $contains: params.purpose?.id.toString() } : undefined,
             dayOfWeek: params.day,
@@ -588,6 +717,7 @@ export class CurrentStateComponent implements OnInit {
   //     })
   //   return result
   // }
+
 
 }
 
