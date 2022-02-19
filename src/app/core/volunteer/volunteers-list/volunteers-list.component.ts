@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
+import { BusyService, DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
+import * as xlsx from 'xlsx';
 import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
 import { GridDialogComponent } from '../../../common/grid-dialog/grid-dialog.component';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
+import { exportData } from '../../../common/types';
 import { NotificationService } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Users } from '../../../users/users';
@@ -30,7 +32,7 @@ export class VolunteersListComponent implements OnInit {
   volunteers: GridSettings<Users> = new GridSettings<Users>(
     this.remult.repo(Users),
     {
-      where: () => ({ 
+      where: () => ({
         volunteer: true,
         bid: this.remult.branchAllowedForUser(),
         name: this.search ? { $contains: this.search } : undefined
@@ -71,6 +73,12 @@ export class VolunteersListComponent implements OnInit {
           textInMenu: () => terms.refresh,
           icon: 'refresh',
           click: async () => { await this.refresh(); }
+        },
+        {
+          visible: () => this.isManager(),
+          textInMenu: () => terms.export,
+          icon: 'file_download',
+          click: async () => { await this.export(); }
         }
       ],
       rowButtons: [
@@ -123,9 +131,13 @@ export class VolunteersListComponent implements OnInit {
     }
   );
 
-  constructor(private remult: Remult, public auth: AuthService, private dialog: DialogService) { }
+  constructor(private remult: Remult, public auth: AuthService, private busy: BusyService, private dialog: DialogService) { }
 
   ngOnInit(): void {
+  }
+
+  isManager() {
+    return this.remult.user.isManagerOrAbove && !this.remult.user.isBoardOrAbove
   }
 
   isBoard() {
@@ -299,6 +311,53 @@ export class VolunteersListComponent implements OnInit {
         }
       }
       await this.refresh();
+    }
+  }
+
+  async export() {
+    let yes = await this.dialog.yesNoQuestion(terms.sureExportData)
+    if (yes) {
+      await this.busy.doWhileShowingBusy(async () => {
+        // let result = [];
+        // let s = this.tenants.columns
+        // for (const ss of this.tenants.columns.getGridColumns()) {
+        //   ss.field!.getValue().
+        // }
+        // for (const t of this.tenants.items) {
+
+        //   let row: exportData = [];
+        //   for (const col of s) {
+        //     row[col.caption!] = t.$.
+        //   }
+        //   result.push(row);
+        // }
+        let allowed = ['name', 'langs', 'birthday', 'age', 'email', 'mobile', 'points']
+        await this.busy.doWhileShowingBusy(async () => {
+          let result = [];
+          for await (const t of this.remult.repo(Users).query({
+            where: {
+              volunteer: true,
+              bid: this.remult.branchAllowedForUser()
+            },
+          })) {
+            let row: exportData = [];
+            for (const col of t.$) {
+              if (allowed.includes(col.metadata.key)) {
+                let val = col.value
+                if (col.metadata.key === 'langs') {
+                  val = t.langs.map(v => v.caption).join(', ')
+                }
+                row[col.metadata.caption] = val
+              }
+            }
+            result.push(row);
+          }
+          let wb = xlsx.utils.book_new();
+          wb.Workbook = { Views: [{ RTL: true }] };
+          xlsx.utils.book_append_sheet(wb, xlsx.utils.json_to_sheet(result));
+          xlsx.writeFile(wb, "volunteers.xlsx");
+        });
+      })
     }
   }
 

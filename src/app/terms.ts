@@ -2,6 +2,7 @@ import { IdFilter, Remult } from 'remult';
 import { Users } from './users/users';
 
 export const terms = {
+    sureExportData: 'האם לייצא נתונים',
     searchReturnEmptyList: 'לא נמצאו דיירים תואמים לחיפוש שלך',
     assigns: 'שיבוצים',
     mustEnterBranch: 'סניף: שדה חובה',
@@ -116,6 +117,7 @@ export const terms = {
     activitiesByDayPeriods: 'פעילויות לפי זמני היום',
     activitiesByReferrer: 'פעילויות לפי גורם מפנה',
     refresh: 'רענן',
+    export: 'ייצא',
     print: 'הדפס',
     newActivity: 'פעילות חדשה',
     addActivityToCurrentTenant: 'הוסף פעילות לדייר זה',

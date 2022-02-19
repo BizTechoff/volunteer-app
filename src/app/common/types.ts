@@ -59,6 +59,13 @@ export interface IcsRequest {
     attendees: AttendeeRequest[]
 }
 
+export interface exportData {
+    // "excelLine": number;
+    // "import-status": string;
+    // "error"?: string;
+    [caption: string]: any;
+}
+
 export interface EmailRequest {
     from?: string,
     to?: string,

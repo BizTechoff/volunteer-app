@@ -70,7 +70,7 @@
             </div> -->
         </div>
 
-        <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-around; flex-wrap: wrap;">
+        <div *ngIf="this.remult.user.isBoardOrAbove" style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-around; flex-wrap: wrap;">
             <div style="display: block; width:95%;">
                 <canvas baseChart [colors]="barChartColors" [data]="barChartDataBranches"
                     [labels]="barChartLabelsBranches" [chartType]="barChartType" [options]="barChartOptionsByBranch"

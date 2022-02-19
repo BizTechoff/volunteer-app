@@ -260,8 +260,7 @@ export class CurrentStateComponent implements OnInit {
   weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   maxLabelLength = 0;
 
-  constructor(private remult: Remult, private dialog: DialogService) {
-
+  constructor(public remult: Remult, private dialog: DialogService) {
   }
 
   filterBy = filterBy
@@ -430,19 +429,26 @@ export class CurrentStateComponent implements OnInit {
     this.barChartColors = [{ backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
         'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-        'rgba(155, 103, 22, 0.2)',
-        'rgba(0, 255, 0, 0.2)',
-        'rgba(102, 0, 204, 0.2)',
-        'rgba(155, 0, 22, 0.2)',
-        'rgba(255, 55, 22, 0.2)',
-        'rgba(55, 103, 55, 0.2)',
-        'rgba(128, 54, 22, 0.2)',
         'rgba(143, 103, 89, 0.2)',
         'rgba(68, 54, 122, 0.2)',
-        'rgba(206, 103, 189, 0.2)',
-        'rgba(255, 128, 0, 0.2)',
-        ...this.colors
+        'rgba(206, 188, 189, 0.2)',
+        'rgba(100, 128, 0, 0.2)',
+        'rgba(100, 55, 100, 0.2)',
+        'rgba(55, 100, 55, 0.2)',
+        'rgba(100, 54, 22, 0.2)',
+        'rgba(100, 208, 100, 0.2)',
+        'rgba(68, 54, 122, 0.2)',
+        'rgba(100, 103, 55, 0.2)',
+        'rgba(100, 128, 45, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(155, 103, 22, 0.2)',
+        'rgba(240, 255, 0, 0.2)',
+        'rgba(102, 34, 204, 0.2)',
+        'rgba(155, 24, 22, 0.2)',
+        'rgba(255, 55, 22, 0.2)',
+        'rgba(55, 103, 55, 0.2)',
+        'rgba(128, 54, 22, 0.2)'
+        // ...this.colors
     ] }];
     this.pieChartLabelsStatuses = [];
     this.pieChartDataStatuses = [];
@@ -628,7 +634,7 @@ export class CurrentStateComponent implements OnInit {
         where: () => {
           let result: EntityFilter<Activity> = {
             $and: [
-              { bid: { $contains: params.branch } },
+              { bid: params.branch? { $contains:  params.branch } : undefined },
               { bid: this.remult.branchAllowedForUser() }
             ],
             date: { ">=": params.fromDate!, "<=": params.toDate! },

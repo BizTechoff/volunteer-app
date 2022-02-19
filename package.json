@@ -45,6 +45,7 @@
     "safe-pipe": "^1.0.3",
     "tslib": "^2.3.0",
     "uuid": "^8.3.2",
+    "xlsx": "^0.18.2",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -62,6 +63,7 @@
     "@types/nodemailer": "^6.4.4",
     "@types/password-hash": "^1.2.20",
     "@types/pg": "^7.14.4",
+    "@types/xlsx": "0.0.36",
     "jasmine-core": "~3.8.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",

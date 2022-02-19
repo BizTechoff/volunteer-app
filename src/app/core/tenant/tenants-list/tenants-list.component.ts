@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
+import { BusyService, DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
 import { Field, getFields, Remult } from 'remult';
+import * as xlsx from 'xlsx';
 import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
 import { InputAreaComponent } from '../../../common/input-area/input-area.component';
-import { UserIdName } from '../../../common/types';
+import { exportData, UserIdName } from '../../../common/types';
 import { terms } from '../../../terms';
 import { Activity } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { Branch } from '../../branch/branch';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
 import { Tenant } from '../tenant';
-
 
 @Component({
   selector: 'app-tenants-list',
@@ -87,6 +87,12 @@ export class TenantsListComponent implements OnInit {
           textInMenu: () => terms.refresh,
           icon: 'refresh',
           click: async () => { await this.refresh(); }
+        },
+        {
+          visible: () => this.isManager(),
+          textInMenu: () => terms.export,
+          icon: 'file_download',
+          click: async () => { await this.export(); }
         }
       ],
       rowButtons: [
@@ -129,15 +135,19 @@ export class TenantsListComponent implements OnInit {
       ]
     }
   );
-  
 
-  constructor(private remult: Remult, public auth: AuthService, private dialog: DialogService) {
+
+  constructor(private remult: Remult, public auth: AuthService, public busy: BusyService, private dialog: DialogService) {
     // this.subject.subscribe(async () => {
     //   await this.refresh();
     // });
   }
 
   ngOnInit(): void {
+  }
+
+  isManager() {
+    return this.remult.user.isManagerOrAbove && !this.remult.user.isBoardOrAbove
   }
 
   isAllowEdit() {
@@ -160,6 +170,58 @@ export class TenantsListComponent implements OnInit {
     // this.refreshing = true;
     await this.tenants.reloadData();
     // this.refreshing = false;
+  }
+
+  async export() {
+    let yes = await this.dialog.yesNoQuestion(terms.sureExportData)
+    if (yes) {
+      await this.busy.doWhileShowingBusy(async () => {
+        // let result = [];
+        // let s = this.tenants.columns
+        // for (const ss of this.tenants.columns.getGridColumns()) {
+        //   ss.field!.getValue().
+        // }
+        // for (const t of this.tenants.items) {
+
+        //   let row: exportData = [];
+        //   for (const col of s) {
+        //     row[col.caption!] = t.$.
+        //   }
+        //   result.push(row);
+        // }
+        let allowed = ['name', 'defVids', 'langs', 'birthday', 'age', 'address', 'mobile', 'referrer', 'apartment', 'floor', 'addressRemark']
+        await this.busy.doWhileShowingBusy(async () => {
+          let result = [];
+          for await (const t of this.remult.repo(Tenant).query({
+            where: {
+              bid: this.remult.branchAllowedForUser()
+            },
+          })) {
+            let row: exportData = [];
+            for (const col of t.$) {
+              if (allowed.includes(col.metadata.key)) {
+                let val = col.value
+                if (col.metadata.key === 'defVids') {
+                  val = t.defVids.map(v => v.name).join(', ')
+                }
+                else if (col.metadata.key === 'referrer') {
+                  val = t.referrer.caption
+                }
+                else if (col.metadata.key === 'langs') {
+                  val = t.langs.map(v => v.caption).join(', ')
+                }
+                row[col.metadata.caption] = val
+              }
+            }
+            result.push(row);
+          }
+          let wb = xlsx.utils.book_new();
+          wb.Workbook = { Views: [{ RTL: true }] };
+          xlsx.utils.book_append_sheet(wb, xlsx.utils.json_to_sheet(result));
+          xlsx.writeFile(wb, "tenants.xlsx");
+        });
+      })
+    }
   }
 
   async assignVolunteers(t: Tenant, autoSave = false) {
@@ -277,7 +339,7 @@ export class TenantsListComponent implements OnInit {
             [{ field: t.$.referrer, width: '88' }, t.$.referrerRemark],
             t.$.name,
             [t.$.mobile, t.$.phone],
-            [t.$.address, { field: t.$.apartment, width: '50' }, { field: t.$.floor, width: '50' }],
+            [t.$.address, { field: t.$.apartment, width: '53' }, { field: t.$.floor, width: '53' }],
             t.$.addressRemark,
             [t.$.birthday,
             t.$.age],
