@@ -79,7 +79,7 @@ async function startup() {
                 where: {dayPeriod: ActivityDayPeriod.nigth}
             }
         ).then(x => x.map(({ fh,dayPeriod }) => ({ fh,dayPeriod }))));
- 
+  
         if(false)
         console.table(await remult.repo(Branch).find(
             {
