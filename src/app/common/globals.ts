@@ -3,12 +3,13 @@ import { terms } from "../terms";
 
 
 export const OnlyVolunteerEditActivity = true;
-export const useVolunteerLoginWithVerificationCode = true;
+// export const useVolunteerLoginWithVerificationCode = true;
 export const validVerificationCodeResponseMinutes = 5;
 export const pointsEachSuccessActivity = 500;
-export const pointsEachSuccessPhoto = 200;
-export const pointsEachSuccessVideo = 200;
-export const pointsForSurprise = 2000;
+export const pointsEachSuccessMedia = 200;
+// export const pointsEachSuccessPhoto = 200;
+// export const pointsEachSuccessVideo = 200;
+// export const pointsForSurprise = 2000;
 export const mediaAllowedUploadFileTypes = 'audio/mp3,video/mp4,video/avi,image/png,image/jpg,image/jpeg';
 export const uploadS3WithFileExtention = false;
 

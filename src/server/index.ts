@@ -168,10 +168,10 @@ async function startup() {
     // downloadPhotos(remult).then(() => { });
 
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
-
-        // const remult = await api.getRemult(undefined!);
+ 
+        const remult = await api.getRemult(undefined!);
         // exportData(remult).then(() => { });
-        // importDataNew(remult).then(() => { });
+        importDataNew(remult).then(() => { });
         // updateTenants('יבנה',remult).then(() => { });
         // buildPhotoLinks(remult).then(() => { });
     }

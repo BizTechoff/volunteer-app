@@ -73,14 +73,16 @@ let branches = [] as string[];
 // branches.push('אילת קמפוס');
 // branches.push('חולון ב');
 // branches.push('טבריה');
-// branches.push('ירושלים ב'); 
-// branches.push('נהריה');
+// branches.push('ירושלים ב');  
+// branches.push('נהריה'); 
 // branches.push('ראשון לציון ב');
 // branches.push('שדרות');   
+// branches.push('רחובות');
+// branches.push('גדרה');  
 // ------------------------------- 
 // branches.push('ירושלים ג');
 // -------------------------------
- 
+
 // נסים בוארון | 0584877770
 // branches.push('דימונה');//***
 // אלי לוין | 0
@@ -195,13 +197,13 @@ export async function importDataNew(remult: Remult) {
         }
 
         debug(`Importing Branch: ${brn}..`);
-
+ 
         await importVolunteers(b, remult);
-        await importTenants(b, remult);
+        await importTenants(b, remult); 
         await importTenantVolunteers(b, remult);
 
         debug(`Finished Import Branch: ${brn}..`);
-
+ 
     }
     console.timeEnd("import");
     console.log("finished import");

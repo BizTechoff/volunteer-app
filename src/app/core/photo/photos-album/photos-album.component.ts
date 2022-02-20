@@ -4,7 +4,7 @@ import { BusyService } from '@remult/angular';
 import * as fetch from 'node-fetch';
 import { getFields, Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { mediaAllowedUploadFileTypes, OnlyVolunteerEditActivity, uploadS3WithFileExtention } from '../../../common/globals';
+import { mediaAllowedUploadFileTypes, OnlyVolunteerEditActivity, pointsEachSuccessMedia, uploadS3WithFileExtention } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Users } from '../../../users/users';
 import { Branch } from '../../branch/branch';
@@ -155,7 +155,7 @@ export class PhotosAlbumComponent implements OnInit {
         // console.log('success-1', success)
         if (success!) {
           // console.log(file.type);
-          points += this.getPointByFileType(file.type);
+          points += pointsEachSuccessMedia;// this.getPointByFileType(file.type);
         }
       }
       if (points > 0) {
@@ -173,9 +173,9 @@ export class PhotosAlbumComponent implements OnInit {
 
   getPointByFileType(type: string) {
     let result = 200;
-    if (type.includes('video')) {
-      result = 500;
-    }
+    // if (type.includes('video')) {
+    //   result = 500;
+    // }
     return result;
   }
 

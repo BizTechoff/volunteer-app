@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DataAreaSettings } from '@remult/angular';
 import { Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
-import { pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise } from '../../../common/globals';
+import { pointsEachSuccessActivity, pointsEachSuccessMedia } from '../../../common/globals';
 import { terms } from '../../../terms';
 import { Users } from '../../../users/users';
 
@@ -37,32 +37,22 @@ export class VolunteerDetailsComponent implements OnInit {
         ],
       });
   }
- 
+
   async update() {
     await this.volunteer.save();
     this.dialog.info(terms.yoursDetailsSuccesfulySaved);
-  } 
+  }
 
-  getPointsForSuccess(){
+  getPointsForSuccess() {
     return pointsEachSuccessActivity.toString();
   }
 
-  getPointsForMedia(){
-    return pointsEachSuccessPhoto.toString();
+  getPointsForMedia() {
+    return pointsEachSuccessMedia.toString();
   }
 
-  getPointsForSurprise(){
-    return pointsForSurprise.toString();
-  }
-  
-  async showPointsExplain() {
-    let message = '';
-    message += `כל דיווח מוצלח = ${pointsEachSuccessActivity} נקודות`;
-    message += ", \n";
-    message += `כל העלאת תמונה או וידאו = ${pointsEachSuccessPhoto} נקודות`;
-    message += "\n";
-    message += "\n";
-    message += `ועל כל ${pointsForSurprise} נקודות מקבלים הפתעה`;
-    await this.dialog.error(message);
-}
+  // getPointsForSurprise(){
+  //   return pointsForSurprise.toString();
+  // }
+
 }

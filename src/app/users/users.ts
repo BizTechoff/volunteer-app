@@ -4,7 +4,7 @@ import { Allow, BackendMethod, DateOnlyField, Entity, Field, IdEntity, IntegerFi
 import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
-import { mobileFromDb, mobileToDb, pointsEachSuccessActivity, pointsEachSuccessPhoto, pointsForSurprise, StringRequiredValidation } from "../common/globals";
+import { mobileFromDb, mobileToDb, StringRequiredValidation } from "../common/globals";
 //import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 //import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
@@ -387,19 +387,6 @@ export class Users extends IdEntity {
 
     @Field({ caption: terms.active })
     active: boolean = true;
-
-    async showPointsExplain() {
-        let message = '';
-        message += `כל דיווח מוצלח = ${pointsEachSuccessActivity} נקודות`;
-        message += "\n";
-        message += `כל העלאת תמונה או וידאו = ${pointsEachSuccessPhoto} נקודות`;
-        message += "\n";
-        message += "\n";
-        message += `על כל ${pointsForSurprise} מקבלים הפתעה`;
-        if (this.dialog) {
-            await this.dialog.error(message);
-        }
-    }
 
     calcAge() {
         let result = 0;
