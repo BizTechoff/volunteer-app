@@ -14,7 +14,8 @@ NotificationService.sendSms = async (req: SmsRequest): Promise<{ success: boolea
   
     console.debug(`sendSms: ${JSON.stringify(req)}`);
     // console.log(process.env.SMS_CHANNEL_OPENED, process.env.SMS_CHANNEL_OPENED === 'true')
-         let url = process.env.SMS_URL!
+    if (process.env.SMS_CHANNEL_OPENED === 'true') {
+        let url = process.env.SMS_URL!
             .replace('!user!', process.env.SMS_ACCOUNT!)
             .replace('!password!', process.env.SMS_PASSWORD!)
             .replace('!from!', process.env.SMS_FROM_NAME!)
@@ -22,12 +23,11 @@ NotificationService.sendSms = async (req: SmsRequest): Promise<{ success: boolea
             .replace('!message!', encodeURI(req.message))
             .replace('!userid!', req.uid)
             .replace('!international!', req.mobile.startsWith('1') ? '1' : '0');
- 
+
         // .replace('!schedule!', '0000-00-00+00:00:00')
 
-        console.log('url',url);
-        if (process.env.SMS_CHANNEL_OPENED === 'true') {
-   
+        console.debug('url',url);
+
         let r = await fetch.default(url, {//require('node-fetch').
             method: 'GET'
         });
