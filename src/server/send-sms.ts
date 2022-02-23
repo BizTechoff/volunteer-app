@@ -11,10 +11,11 @@ export interface SendSmsResponse {
 
 NotificationService.sendSms = async (req: SmsRequest): Promise<{ success: boolean, message: string, count: number }> => {
     let result: SendSmsResponse = { success: false, message: 'Sms channel is close!', count: 0 };
-  
+
     console.debug(`sendSms: ${JSON.stringify(req)}`);
     // console.log(process.env.SMS_CHANNEL_OPENED, process.env.SMS_CHANNEL_OPENED === 'true')
     if (process.env.SMS_CHANNEL_OPENED === 'true') {
+        let usa = req.mobile.startsWith('1')
         let url = process.env.SMS_URL!
             .replace('!user!', process.env.SMS_ACCOUNT!)
             .replace('!password!', process.env.SMS_PASSWORD!)
@@ -22,12 +23,13 @@ NotificationService.sendSms = async (req: SmsRequest): Promise<{ success: boolea
             .replace('!mobile!', req.mobile)
             .replace('!message!', encodeURI(req.message))
             .replace('!userid!', req.uid)
-            .replace('!international!', req.mobile.startsWith('1') ? '1' : '0');
-
+            .replace('!international!', usa ? '1' : '0');
+ 
         // .replace('!schedule!', '0000-00-00+00:00:00')
 
-        console.debug('url',url);
-
+        if (usa) {
+            console.debug('url', url);
+        }
         let r = await fetch.default(url, {//require('node-fetch').
             method: 'GET'
         });
