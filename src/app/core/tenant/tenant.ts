@@ -12,8 +12,6 @@ import { Langs, Users } from "../../users/users";
 import { Branch } from "../branch/branch";
 import { EntityWithModified } from "../EntityWithModified";
 
-
-
 @ValueListFieldType()
 export class Referrer {
     static welfare = new Referrer(1, 'רווחה');

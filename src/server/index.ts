@@ -27,7 +27,7 @@ import './send-sms';
 import { Branch } from '../app/core/branch/branch';
 import { SqlDatabase } from 'remult';
 //SqlDatabase.LogToConsole = true;
-
+ 
 export function getDevMode(): string {
     let result = '';
     let db = process.env.DATABASE_URL;
@@ -71,7 +71,7 @@ async function startup() {
         initRequest: async (remult) => augmentRemult(remult)
     });
     app.use(api);
-
+ 
     api.getRemult(undefined!).then(async remult => {
         if(false)
         console.table(await remult.repo(Activity).find(

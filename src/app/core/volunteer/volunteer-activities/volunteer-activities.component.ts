@@ -199,7 +199,7 @@ export class VolunteerActivitiesComponent implements OnInit {
     let nav = undefined
     if (a.tid?.address) {
       nav = await openDialog(SelectNavigatorComponent,
-        dlg => dlg.args = {address: a.tid?.address},
+        dlg => dlg.args = { address: a.tid?.address },
         dlg => dlg ? dlg.args.selected : undefined)
     }
     if (nav) {
@@ -235,10 +235,10 @@ export class VolunteerActivitiesComponent implements OnInit {
         dlg => dlg.args = { options: [a.tid?.mobile, a.tid?.phone] },
         dlg => dlg ? dlg.args.selected! : '')
     }
-    else if (a.tid?.mobile){
+    else if (a.tid?.mobile) {
       number = a.tid?.mobile
     }
-    else if (a.tid?.phone){
+    else if (a.tid?.phone) {
       number = a.tid?.phone
     }
     if (number && number.length > 0) {

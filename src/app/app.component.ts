@@ -60,14 +60,14 @@ export class AppComponent implements OnInit {
     if (this.auth.isConnected) {
       // console.log(111111111111111)
       await this.setSelectedBranch()
-      await this.setFirstRouting() 
+      await this.navigateByRoleIfFirstRouting() 
       // console.log(222222222222222)
     }
     // console.log('ngOnInit-END', this.router.url)
     // console.log('AppComponent INIT')
   }
 
-  async setFirstRouting() {
+  async navigateByRoleIfFirstRouting() {
     let isFirstRouting =
       [
         '/',
@@ -86,7 +86,7 @@ export class AppComponent implements OnInit {
         this.router.navigateByUrl(encodeURI(terms.calendar))
       }
       else if (this.remult.user.isVolunteer) {
-        this.router.navigateByUrl(encodeURI(terms.myTenants))
+        this.router.navigateByUrl(encodeURI(terms.myActivities))
       }
       else {//manager
         this.router.navigateByUrl(encodeURI(terms.tenants))
@@ -142,7 +142,7 @@ export class AppComponent implements OnInit {
       _ => _ ? _.args.out.connected : false
     );
     if (connected) {
-      this.setFirstRouting()
+      this.navigateByRoleIfFirstRouting()
       await this.setSelectedBranch()
     }
   }
@@ -158,7 +158,7 @@ export class AppComponent implements OnInit {
   private async signUp() {
     let user = this.remult.repo(Users).create();
     // user.bid = undefined;// only admin should be here
-    user.volunteer = true;
+    // user.volunteer = true; - only after manager approoved volunteer
     let password = new PasswordControl();
     let confirmPassword = new PasswordControl(terms.confirmPassword);
     // for await (const u of this.remult.repo(Users).query({ where: { manager: true } })) {

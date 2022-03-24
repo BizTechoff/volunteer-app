@@ -48,7 +48,7 @@ export class SelectBranchComponent implements OnInit {
     this.branches = await this.remult.repo(Branch).find({
       where: {
         name: this.searchString ? { $contains: this.searchString } : undefined!,
-        id: bids.length > 0 ? bids : undefined!
+        id: bids.length > 0 ? bids : undefined! // {} [] - no-one-selected
         // id: this.args.explicit && this.args.explicit.length > 0 ? this.args.explicit : undefined
       }
     });

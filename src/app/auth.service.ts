@@ -30,7 +30,7 @@ export class AuthService {
             // console.log('AuthService.constructor', remult.user)
         }
         // console.log('AuthService READY')
-    }
+    } 
 
     async sendVerifyCode(mobile: string) {
         return await AuthService.sendVerifyCode(mobile)
@@ -39,11 +39,19 @@ export class AuthService {
     @BackendMethod({ allowed: true })
     private static async sendVerifyCode(mobile: string, remult?: Remult): Promise<{ success: boolean, error: string, managerAsVolunteer: boolean }> {
         let result: { success: boolean, error: string, managerAsVolunteer: boolean } = { success: false, error: terms.wrongMobile, managerAsVolunteer: false };
+        // console.log(1)
         if (mobile) {
+            // console.log(2)
+
             mobile = mobileToDb(mobile) as string
             if (mobile.length > 0) {
+                // console.log(3, mobile)
+ 
                 let u = await remult?.repo(Users).findFirst({ mobile: mobile });
+                // console.log(u?u:"NULL")
                 if (u) {
+                    // console.log(4)
+
                     result.managerAsVolunteer = u.manager! && u.volunteer!
 
                     let code = AuthService.generateCode();
@@ -62,11 +70,15 @@ export class AuthService {
                         result.error = terms.verificationCodeSuccesfullySent
                     }
                     else {
+                        // console.log(5)
+
                         result.error = response.message
                     }
                 }
             }
-        }
+        }        
+        // console.log(6)
+
         return result;
     }
 
@@ -203,9 +215,9 @@ export class AuthService {
         ui.isBoardOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))
         ui.isAdmin = ui.roles.length == 1 && ui.roles.includes(Roles.admin)
 
-        let days = `${process.env.TOKEN_EXPIRES_IN_DAYS!}d`
-        return jwt.sign(ui, getJwtTokenSignKey());
+        // let days = `${process.env.TOKEN_EXPIRES_IN_DAYS!}d`
         // return jwt.sign(ui, getJwtTokenSignKey(), { expiresIn: days })
+        return jwt.sign(ui, getJwtTokenSignKey());
     }
 
     isVolunteer() {

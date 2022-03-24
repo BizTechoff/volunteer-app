@@ -1,7 +1,7 @@
 import { Entity, Field, IdEntity } from "remult";
-import { terms } from "../../../terms";
-import { Users } from "../../../users/users";
-import { Activity } from "../../activity/activity";
+import { terms } from "../../terms";
+import { Users } from "../../users/users";
+import { Activity } from "../activity/activity";
 
 export class NotificationsTypes {
     static EmailNewAssign = new NotificationsTypes(1, 'new-assign', terms.voulnteerNewAssignSubject, terms.voulnteerNewAssign);

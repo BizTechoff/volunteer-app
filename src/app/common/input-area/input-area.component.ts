@@ -5,10 +5,6 @@ import { getFields } from 'remult';
 import { terms } from '../../terms';
 import { DialogService } from '../dialog';
 
-
-
-
-
 @Component({
   selector: 'app-input-area',
   templateUrl: './input-area.component.html',
@@ -16,7 +12,7 @@ import { DialogService } from '../dialog';
 })
 export class InputAreaComponent implements OnInit {
   args!: {
-    disableClose?:boolean,
+    disableClose?: boolean,
     title: string,
     helpText?: string,
     fields?: () => DataAreaFieldsSetting<any>[];
@@ -39,9 +35,7 @@ export class InputAreaComponent implements OnInit {
   area!: DataAreaSettings;
 
   ngOnInit() {
-    if(this.args.disableClose){
-      this.dialogRef.disableClose = true;
-    }
+    this.dialogRef.disableClose = this.args.disableClose;
     if (this.args.areaSettings)
       this.area = new DataAreaSettings(this.args.areaSettings, undefined, undefined);
     else if (this.args.fields) {

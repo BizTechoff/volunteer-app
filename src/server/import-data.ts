@@ -68,10 +68,11 @@ let branches = [] as string[];
 // branches.push('קריית גת');
 // branches.push('ראשון לציון ב');
 // branches.push('שדרות');   
-// -------------------------------
+// ------------------------------- 
+// branches.push('קריית ביאליק')  
 // branches.push('אילת נוער'); 
 // branches.push('אילת קמפוס');
-// branches.push('חולון ב');
+// branches.push('חולון ב');  
 // branches.push('טבריה');
 // branches.push('ירושלים ב');  
 // branches.push('נהריה'); 
@@ -79,7 +80,11 @@ let branches = [] as string[];
 // branches.push('שדרות');   
 // branches.push('רחובות');
 // branches.push('גדרה');  
+// branches.push('רחובות נוער')
+// branches.push('לוד נוער') 
 // ------------------------------- 
+// branches.push('רחובות נוער') 
+// branches.push('לוד נוער') 
 // branches.push('ירושלים ג');
 // -------------------------------
 
