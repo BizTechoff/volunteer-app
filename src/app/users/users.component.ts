@@ -37,7 +37,14 @@ export class UsersComponent implements OnInit {
       allowUpdate: true,
       numOfColumnsInGrid: 10,
 
-      where: { bid: this.remult.branchAllowedForUser() },
+      where: { 
+        $or: [
+          { bid: this.remult.branchAllowedForUser() },
+          { branch2: this.remult.branchAllowedForUser() }
+          // { bid: { $id: this.remult.user.branch } },
+          // { branch2: { $id: this.remult.user.branch } }
+        ]
+       },
 
       columnSettings: users => [
         users.name,
@@ -164,7 +171,7 @@ export class UsersComponent implements OnInit {
   }
 
   async deleteUser(u: Users) {
-    let yes = await this.dialog.confirmDelete(`היוזר: ${u.name}`);
+    let yes = await this.dialog.confirmDelete(`יוזר: ${u.name}`);
     if (yes) {
       let count = await this.remult.repo(Activity).count({ vids: { $contains: u.id } });
       if (count > 0) {

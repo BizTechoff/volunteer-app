@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BusyService, DataControl, DataControlInfo, GridSettings, openDialog } from '@remult/angular';
-import { Field, getFields, Remult } from 'remult';
+import { EntityFilter, Field, getFields, Remult } from 'remult';
 import * as xlsx from 'xlsx';
 import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
@@ -32,11 +32,27 @@ export class VolunteersListComponent implements OnInit {
   volunteers: GridSettings<Users> = new GridSettings<Users>(
     this.remult.repo(Users),
     {
-      where: () => ({
-        volunteer: true,
-        bid: this.remult.branchAllowedForUser(),
-        name: this.search ? { $contains: this.search } : undefined
-      }),
+      where: () => {
+      let result: EntityFilter<Users> = { $and: [] };
+      result.$and?.push({ volunteer: true })
+      if (this.search) {
+        result.$and?.push({ name: { $contains: this.search } })
+      }
+      result.$and?.push({
+        $or: [
+          { bid: this.remult.branchAllowedForUser() },
+          { branch2: this.remult.branchAllowedForUser() }
+          // { bid: { $id: this.remult.user.branch } },
+          // { branch2: { $id: this.remult.user.branch } }
+        ]
+      })
+      return result
+    },
+      // where: () => ({
+      //   volunteer: true,
+      //   bid: this.remult.branchAllowedForUser(),
+      //   name: this.search ? { $contains: this.search } : undefined
+      // }),
       newRow: _ => _.volunteer = true,
       allowCrud: false,
       // allowSelection: true,

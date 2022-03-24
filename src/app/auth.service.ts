@@ -114,6 +114,7 @@ export class AuthService {
     @BackendMethod({ allowed: Allow.authenticated })
     /*private*/ static async switchBranch(newBranchId?: string, remult?: Remult) {
         remult!.user.branch = newBranchId ?? undefined!;//maybe check if it's a valid branch for the user
+        // remult!.user.branch2 = undefined! 
         return await AuthService.buildToken(remult!.user)
     }
 
@@ -169,7 +170,7 @@ export class AuthService {
                 roles: [],
                 name: u.name,
                 branch: u.bid?.id ?? '',
-                branch2: u.branch2?.id ?? '',
+                // branch2: u.branch2?.id ?? '',
                 isReadOnly: false,
                 isVolunteerMultiBrnach: false,
                 isVolunteer: false,
@@ -202,13 +203,12 @@ export class AuthService {
                     ui.roles.push(Roles.volunteer);
                 }
             }
-            // ui.isVolunteerMultiBrnach = ui.roles.length == 1 && ui.roles.includes(Roles.volunteer) && u.bid && u.branch2 && u.bid?.id.length > 0 && u.branch2?.id.length > 0 ? true : false
+            ui.isVolunteerMultiBrnach = ui.roles.length == 1 && ui.roles.includes(Roles.volunteer) && u.bid?.id?.length && u.branch2?.id?.length ? true : false
         }
         else {
             ui = u as UserInfo
         }
 
-        ui.isVolunteerMultiBrnach = ui.roles.length == 1 && ui.roles.includes(Roles.volunteer) && ui.branch && ui.branch.length > 0 && ui.branch2 && ui.branch2.length > 0 ? true : false
         ui.isReadOnly = ui.roles.length === 1 && ui.roles.includes(Roles.donor)
         ui.isVolunteer = ui.roles.length === 1 && ui.roles.includes(Roles.volunteer)
         ui.isManagerOrAbove = ui.roles.length === 1 && (ui.roles.includes(Roles.manager) || ui.roles.includes(Roles.board) || ui.roles.includes(Roles.donor) || ui.roles.includes(Roles.admin))

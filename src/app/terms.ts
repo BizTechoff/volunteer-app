@@ -229,13 +229,13 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2022.03.03.0'
+    appVersion: '2022.03.24.0'
 }
 
 declare module 'remult' {
     export interface UserInfo {
         branch: string;
-        branch2: string;
+        // branch2: string;
         isReadOnly: boolean;
         isVolunteerMultiBrnach: boolean;
         isVolunteer: boolean;
@@ -263,7 +263,7 @@ export function augmentRemult(remult: Remult) {
         if (!remult.user.branch || remult.user.branch.trim().length === 0) {// if (remult.isAllowed(Roles.board))
             return undefined!;
         }
-        let bids = [remult.user.branch]
+        let bids = [remult.user.branch]//,remult.user.branch2]
         // if(remult.user.branch2 && remult.user.branch2.length > 0){
         //     bids.push(remult.user.branch2)
         // }

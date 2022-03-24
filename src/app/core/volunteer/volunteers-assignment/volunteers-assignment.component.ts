@@ -105,7 +105,15 @@ export class VolunteersAssignmentComponent implements OnInit {
           //   result.$and!.push({ id: this.args.explicit.map(x => x.id) });
           // }
           // else {
-          result.$and!.push({ bid: this.args.branch });
+          result.$and!.push({ 
+            $or: [
+              { bid: this.args.branch },
+              { branch2: this.args.branch }
+              // { bid: { $id: this.remult.user.branch } },
+              // { branch2: { $id: this.remult.user.branch } }
+            ]
+            // bid: this.args.branch 
+          });
           // }
           return result;
         },
