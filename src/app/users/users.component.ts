@@ -36,7 +36,7 @@ export class UsersComponent implements OnInit {
       allowInsert: true,
       allowUpdate: true,
       numOfColumnsInGrid: 10,
-
+ 
       where: { 
         $or: [
           { bid: this.remult.branchAllowedForUser() },
@@ -129,7 +129,7 @@ export class UsersComponent implements OnInit {
         //   }
         // }, 
         {
-          visible: (row) => this.remult.user.isAdmin && row.volunteer,
+          visible: (row) => this.remult.user.isAdmin && row.volunteer && !row.manager,
           textInMenu: terms.addBranch,
           icon: 'domain_add',//,
           click: async (_) => await this.addBranch(_)

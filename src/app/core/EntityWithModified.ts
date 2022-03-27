@@ -1,4 +1,5 @@
 import { Field, IdEntity, isBackend } from "remult";
+import { datetimeFormat } from "../common/utils";
 import { terms } from "../terms";
 import { Users } from "../users/users";
 
@@ -7,8 +8,9 @@ import { Users } from "../users/users";
 
 
 export class EntityWithModified extends IdEntity {
-    @Field<EntityWithModified>({
+    @Field<EntityWithModified, Date>({
         caption: terms.created,
+        displayValue: (row,col) => datetimeFormat(col),
         allowApiUpdate: false,
         saving: self => {
             if (self.isNew() && isBackend())
@@ -28,8 +30,9 @@ export class EntityWithModified extends IdEntity {
     })
     createdBy: IUser = null!;
 
-    @Field<EntityWithModified>({
-        caption: terms.modified,
+    @Field<EntityWithModified, Date>({
+        caption: terms.modified,//
+        displayValue: (row,col) => datetimeFormat(col),
         allowApiUpdate: false,
         saving: self => {
             if (!self.isNew() && isBackend())

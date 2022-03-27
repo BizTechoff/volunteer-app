@@ -107,4 +107,33 @@ export class DateUtils {
     static toDateString(d: Date) {
         return DateUtils.pipe.transform(d, 'dd.MM.yyyy')!;
     }
+    
+}
+
+export const dateFormat = (col: Date) => {
+    // let result = ''
+    // if(col){
+    //     let y = col.getFullYear()
+    //     let m = col.getMonth()
+    //     let d = col.getDate()
+
+    //     result = `${d> 9?d:'0'+d}/${m > 9?m:'0' +m}/${y}`
+    // }
+    // return result
+    return (col?.toLocaleDateString('en-GB') ?? undefined)//'zh-Hans-CN')
+    // https://stackoverflow.com/questions/27939773/tolocaledatestring-short-format
+}
+
+export const datetimeFormat = (col: Date) => {
+    // let result = ''
+    // if(col){
+    //     let y = col.getFullYear()
+    //     let m = col.getMonth()
+    //     let d = col.getDate()
+
+    //     result = `${d> 9?d:'0'+d}/${m > 9?m:'0' +m}/${y}`
+    // }
+    // return result
+    return (col?.toLocaleString('en-GB') ?? undefined)//'zh-Hans-CN')
+    // https://stackoverflow.com/questions/27939773/tolocaledatestring-short-format
 }

@@ -6,7 +6,7 @@ import { DateRequiredValidation, EntityRequiredValidation, pointsEachSuccessActi
 import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
-import { NotificationService } from "../../common/utils";
+import { dateFormat, datetimeFormat, NotificationService } from "../../common/utils";
 import { terms } from "../../terms";
 import { Users } from "../../users/users";
 import { Branch } from "../branch/branch";
@@ -434,8 +434,9 @@ export class Activity extends IdEntity {
     status: ActivityStatus = ActivityStatus.w4_assign;
 
     @DateOnlyField({
-        caption: terms.date, validate: DateRequiredValidation, displayValue: (_, x) =>
-            x?.toLocaleDateString()
+        caption: terms.date,
+        validate: DateRequiredValidation,
+        displayValue: (_, x) => dateFormat(x)
     })
     date: Date = new Date();
     @Field<Activity>({
@@ -503,40 +504,62 @@ export class Activity extends IdEntity {
     @Field({ caption: terms.commentAndSummary })
     remark: string = '';
 
-    @Field({})
+    @Field({
+        displayValue: (row,col) => datetimeFormat(col)
+    })
     called!: Date;
 
-    @Field({})
+    @Field({
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     wazed!: Date;
 
-    @Field({})
+    @Field({
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     photoed!: Date;
 
-    @Field({})
+    @Field({
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     assigned!: Date;
 
-    @Field({})
+    @Field({
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     started!: Date;
 
-    @Field({})
+    @Field({
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     ended!: Date;
 
-    @Field({})
+    @Field({
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     canceled!: Date;
 
-    @Field({})
+    @Field({
+        // displayValue: (row, col) => datetimeFormat(col)
+    })
     problemed!: Date;
 
     @Field({ caption: terms.createdBy })
     createdBy!: Users;
 
-    @Field({ caption: terms.created })
+    @Field({
+        caption: terms.created,
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     created!: Date;
 
     @Field({ caption: terms.modifiedBy })
     modifiedBy!: Users;
 
-    @Field({ caption: terms.modified })
+    @Field({
+        caption: terms.modified,
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     modified!: Date;
 
     // static nameStartsWith = Filter.createCustom<Activity, string>(async (remult, val) => {

@@ -6,6 +6,7 @@ import { StringRequiredValidation } from "../../common/globals";
 import { SelectLangsComponent } from "../../common/select-langs/select-langs.component";
 import { SelectTenantComponent } from "../../common/select-tenant/select-tenant.component";
 import { UserIdName } from "../../common/types";
+import { dateFormat } from "../../common/utils";
 import { terms } from "../../terms";
 import { Roles } from "../../users/roles";
 import { Langs, Users } from "../../users/users";
@@ -145,7 +146,7 @@ export class Tenant extends EntityWithModified {
 
     @Field({
         caption: terms.mobile,
-        validate: [StringRequiredValidation, Validators.unique]//,052-3333333 BUG
+        // validate: [StringRequiredValidation, Validators.unique]//,052-3333333 BUG
         // valueConverter: {
         //     fromDb: col => mobileFromDb(mobileToDb(col)),
         //     toDb: col => mobileToDb(col)
@@ -190,7 +191,9 @@ export class Tenant extends EntityWithModified {
     @DataControl<Tenant, Date>({
         valueChange: (r, _) => { r.calcAge(); }
     })
-    @DateOnlyField({ caption: terms.birthday })//
+    @DateOnlyField({ caption: terms.birthday,
+        displayValue: (row,col) => dateFormat(col) 
+    })//
     birthday!: Date;
 
     @DataControl<Tenant, number>({

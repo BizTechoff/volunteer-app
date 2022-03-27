@@ -5,6 +5,7 @@ import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
 import { mobileFromDb, mobileToDb, StringRequiredValidation } from "../common/globals";
+import { dateFormat, datetimeFormat } from "../common/utils";
 //import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 //import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
 import { Branch } from "../core/branch/branch";
@@ -286,7 +287,9 @@ export class Users extends IdEntity {
     @Field({ includeInApi: false })
     verifyCode: string = ''
 
-    @Field({ includeInApi: false })
+    @Field({ includeInApi: false,
+        displayValue: (row,col) => datetimeFormat(col)
+     })
     verifyTime: Date = new Date()
 
     @Field<Users, string>({
@@ -308,7 +311,8 @@ export class Users extends IdEntity {
         valueChange: (r, _) => { r.calcAge(); }
     })
     @DateOnlyField({
-        caption: terms.birthday
+        caption: terms.birthday,
+        displayValue: (row,col) => dateFormat(col)
     })
     birthday!: Date;
 
@@ -336,7 +340,8 @@ export class Users extends IdEntity {
     password: string = '';
 
     @Field({
-        allowApiUpdate: false
+        allowApiUpdate: false,
+        displayValue: (row,col) => datetimeFormat(col)
     })
     created: Date = new Date();
 
@@ -346,7 +351,8 @@ export class Users extends IdEntity {
     createdBy: string = '';
 
     @Field({
-        allowApiUpdate: false
+        allowApiUpdate: false,
+        displayValue: (row,col) => datetimeFormat(col)
     })
     modified: Date = new Date();
 
