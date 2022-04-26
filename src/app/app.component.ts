@@ -166,7 +166,7 @@ export class AppComponent implements OnInit {
     // } 
     openDialog(InputAreaComponent, i => i.args = {
       title: terms.signUp,
-      fields: () => {
+      fields: () => { 
         let f = []
         f.push(
           user.$.bid!,//this.$.branchesManagers,

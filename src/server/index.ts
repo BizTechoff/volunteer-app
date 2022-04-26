@@ -35,7 +35,7 @@ export function getDevMode(): string {
         let i = db.indexOf('@localhost');
         if (i > 0) {
             result = 'dev';
-        }
+        } 
         else {
             i = db.indexOf('d7bu1v9rhhrr57')
             if (i > 0) {
