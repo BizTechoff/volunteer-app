@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { openDialog } from '@remult/angular';
-import { Remult, ValueListFieldType } from 'remult';
+import { Allow, BackendMethod, Remult, ValueListFieldType } from 'remult';
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { DialogService } from '../../../common/dialog';
 import { pointsEachSuccessActivity } from '../../../common/globals';
+import { InputAreaComponent } from '../../../common/input-area/input-area.component';
 import { SelectCallComponent } from '../../../common/select-call/select-call.component';
 import { SelectNavigatorComponent } from '../../../common/select-navigator/select-navigator.component';
 import { UserIdName } from '../../../common/types';
 import { DateUtils } from '../../../common/utils';
 import { terms } from '../../../terms';
 import { Users } from '../../../users/users';
-import { Activity, ActivityStatus } from '../../activity/activity';
+import { Activity, ActivityPurpose, ActivityStatus } from '../../activity/activity';
 import { ActivityDetailsComponent } from '../../activity/activity-details/activity-details.component';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 
@@ -58,6 +59,47 @@ export class VolunteerActivitiesComponent implements OnInit {
     await this.refresh();
   }
 
+  editable(a: Activity) {
+    let result = true
+    if (false) {//this.showClosedActivitySign(a)) {
+      result = false
+    }
+    else if (this.isDelivery(a)) {
+      result = false
+    }
+    return result
+  }
+
+  async setDelivery(a: Activity) {
+    if (a?.id?.length ?? false) {
+      let edit = await this.remult.repo(Activity).findId(a.id)
+      if (edit) {
+        let saved = await openDialog(
+          InputAreaComponent,
+          dlg => dlg.args = {
+            title: '',
+            fields: () =>
+            //[],
+            {
+              let f = []
+              f.push(edit.$.foodCount!)
+              f.push(edit.$.remark!)
+              return f
+            },
+            ok: () => { }
+          },
+          dlg => dlg?.ok ?? false
+        )
+        console.log('saved', saved)
+        if (saved) {
+          // a.foodDelivered = true
+          // await a.save()
+          await this.refresh()
+        }
+      }
+    }
+  }
+
   async openActivity(act?: Activity, autoOpenPurposes = false) {
     // console.log(6);
 
@@ -97,16 +139,43 @@ export class VolunteerActivitiesComponent implements OnInit {
   isFuture(a: Activity) {
     let today = new Date();
     let todayOnlyDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    let result = a.date.getTime() > todayOnlyDate.getTime();
-    if (result)//check also times
-    {
 
+    let result = false
+    if (a && a.date && a.date.getTime) {
+      result = a?.date?.getTime() > todayOnlyDate.getTime();
+      if (result)//check also times (fh-th)
+      {
+
+      }
     }
     return result;
   }
 
   showClosedActivitySign(a: Activity) {
-    return !ActivityStatus.openStatuses().find(s => s === a.status)!;
+    return !ActivityStatus.openStatuses().includes(a.status)//.find(s => s === a.status)!;
+    // return a.purposes.find(p=>p.isDelivery()) && !ActivityStatus.openStatuses().find(s => s === a.status)!;
+  }
+
+  isDelivery(a: Activity) {
+    for (const p of a?.purposes) {
+      // console.log(p)
+      if (ActivityPurpose.isDelivery(p)) {
+        return true
+      }
+    }
+    return false
+    // let dlv = a.isDeliveryPurpose()
+    // console.log('dlv', dlv)
+    // return dlv
+    // console.log(a.purposes)
+    // for (const p of a.purposes) {
+    //   console.log('p',p)
+    //   if (p.isDelivery! && p.isDelivery()) {
+    //     return true
+    //   }
+    // }
+    // return false
+    // return a?.purposes?.find(row => row.isDelivery()) ?? false
   }
 
   ActivityStatus = ActivityStatus;
@@ -117,18 +186,18 @@ export class VolunteerActivitiesComponent implements OnInit {
     if (!this.refreshing) {
       this.userMessage = terms.loadingYourActivities;
       this.refreshing = true;
-      let as = [] as Activity[];
-      for await (const a of this.remult.repo(Activity).query({
-        where: {
-          bid: this.remult.branchAllowedForUser(),
-          status: { $ne: [this.AcitivityStatus.cancel] },
-          vids: { $contains: this.remult.user.id }
-        },
-        orderBy: { status: "asc", date: "asc", fh: "asc", th: "asc" }
-      })) {
-        await a.$.tid.load();
-        as.push(a);
-      }
+      let as = await VolunteerActivitiesComponent.getVolunteerActivities()
+      // for await (const a of this.remult.repo(Activity).query({
+      //   where: {
+      //     bid: this.remult.branchAllowedForUser(),
+      //     status: { $ne: [this.AcitivityStatus.cancel] },
+      //     vids: { $contains: this.remult.user.id }
+      //   },
+      //   orderBy: { status: "asc", date: "asc", fh: "asc", th: "asc" }
+      // })) {
+      //   await a.$.tid.load();
+      //   as.push(a);
+      // }
       this.activities.splice(0);
       this.activities.push(...as);
       this.refreshing = false;
@@ -138,10 +207,28 @@ export class VolunteerActivitiesComponent implements OnInit {
     }
   }
 
+  @BackendMethod({ allowed: Allow.authenticated })
+  static async getVolunteerActivities(remult?: Remult) {
+    let result: Activity[] = [] as Activity[]
+    for await (const a of remult!.repo(Activity).query({
+      where: {
+        bid: remult!.branchAllowedForUser(),
+        status: ActivityStatus.openStatuses(),
+        // status: { $ne: [ActivityStatus.cancel] },
+        vids: { $contains: remult!.user.id }
+      },
+      orderBy: { status: "asc", date: "asc", fh: "asc", th: "asc" }
+    })) {
+      await a.$.tid.load();
+      result.push(a);
+    }
+    return result
+  }
+
   getPurposes(a: Activity) {
     let result = 'לא צויינו מטרות';
     if (a && a.purposes && a.purposes.length > 0) {
-      result = a.purposes.map(l => l.caption).join(', ');
+      result = a.purposes.map(l => l.caption + (ActivityPurpose.isDelivery(l) ? ` (${a.foodCount?.id} מנות)` : '')).join(', ');
     }
     return result;
   }

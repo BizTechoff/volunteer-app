@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DataControlInfo, GridSettings } from '@remult/angular';
-import { Remult, SqlDatabase } from 'remult';
+import { Remult } from 'remult';
 import { DialogService } from '../../../common/dialog';
 import { terms } from '../../../terms';
 import { Roles } from '../../../users/roles';
@@ -65,6 +65,12 @@ export class BranchesListComponent implements OnInit {
           textInMenu: () => terms.refresh,
           icon: 'refresh',
           click: async () => { await this.refresh(); }
+        },
+        {
+          textInMenu: () => terms.summary,
+          icon: 'functions',
+          click: async () => { await this.showSummary() },
+          visible: () => this.remult.user.branch && this.remult.user.branch.trim().length > 0 ? false : true
         }
       ]//,
       // rowButtons: [
@@ -88,6 +94,15 @@ export class BranchesListComponent implements OnInit {
 
   async refresh() {
     await this.branches.reloadData();
+  }
+
+  async showSummary() {
+    let test = await this.remult.repo(Branch).findFirst({ name: 'בדיקות' })
+    let message = ''
+    message += `סה"כ:  ${await this.remult.repo(Users).count({ volunteer: true, bid: { $ne: test } })}   מתנדבים`
+    message += ', \n'
+    message += `${await this.remult.repo(Tenant).count({ bid: { $ne: test } })}  דיירים`
+    this.dialog.error(message)
   }
 
   async deleteBranch(b: Branch) {

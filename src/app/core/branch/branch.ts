@@ -16,14 +16,15 @@ import { EntityWithModified } from "../EntityWithModified";
     getValue: (_, f) => f.value?.name,
     click: Branch.selectBranch() //([], (_,value) => remult.user.branch = value )
 })
-@Entity<Branch>('branches', {
-    allowApiDelete: false,
-    allowApiInsert: false,
-    allowApiUpdate: Roles.admin,
-    allowApiRead: true,
-    defaultOrderBy: { name: "asc" }
-}
-)
+@Entity<Branch>('branches', (options, remult) => {
+    options.allowApiDelete = false
+    options.allowApiInsert = false
+    options.allowApiUpdate = Roles.admin
+    options.allowApiRead = true
+    options.defaultOrderBy = { name: "asc" }
+    // options.backendPrefilter = () => remult.branchAllowedForUser()
+    // options.backendPrefilter = { id: remult.user.isBoardOrAbove ? undefined : remult.user.branch }
+})
 export class Branch extends EntityWithModified {
 
     @Field({ caption: terms.name, validate: StringRequiredValidation })
@@ -73,8 +74,8 @@ export class Branch extends EntityWithModified {
     // @DataControl({field: disabled-sort})
     @Field<Branch>((options, remult) => {
         options.caption = terms.activities;
-        
-        
+
+
         // options.sqlExpression = (branch) => `( select count(*) from activities where activities.bid = branches.id )`
         // options.sqlExpression = (branch) => `( select count(*) from users where users.bid = branches.id and users.volunteer = 'true' )`;
         options.serverExpression = async branch => {

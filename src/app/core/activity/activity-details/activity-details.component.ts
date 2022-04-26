@@ -5,6 +5,7 @@ import { DataAreaFieldsSetting, DataAreaSettings, openDialog } from '@remult/ang
 import { getFields, Remult } from 'remult';
 import { AuthService } from '../../../auth.service';
 import { DialogService } from '../../../common/dialog';
+import { FoodDeliveredCount } from '../../../common/enums';
 import { SelectPurposesComponent } from '../../../common/select-purposes/select-purposes.component';
 import { SelectTenantComponent } from '../../../common/select-tenant/select-tenant.component';
 import { UserIdName } from '../../../common/types';
@@ -17,7 +18,7 @@ import { Photo } from '../../photo/photo';
 import { PhotosAlbumComponent } from '../../photo/photos-album/photos-album.component';
 import { Tenant } from '../../tenant/tenant';
 import { VolunteersAssignmentComponent } from '../../volunteer/volunteers-assignment/volunteers-assignment.component';
-import { Activity, ActivityStatus } from '../activity';
+import { Activity, ActivityPurpose, ActivityStatus } from '../activity';
 
 @Component({
   selector: 'app-activity-details',
@@ -124,6 +125,7 @@ export class ActivityDetailsComponent implements OnInit {
       await openDialog(SelectPurposesComponent, x => x.args = {
         // onSelect: site => f.value = site,
         // title: f.metadata.caption,
+        removeDelivery: this.remult.user.isVolunteer,
         purposes: this.activity.purposes
       })
     }
@@ -172,7 +174,7 @@ export class ActivityDetailsComponent implements OnInit {
     if (this.remult.user.isVolunteer) {
       return true;
     }
-    return false;
+    return true;
   }
 
   isBoard() {
@@ -228,7 +230,8 @@ export class ActivityDetailsComponent implements OnInit {
         // purposeDesc: terms.defaultPurposeDesc6,
         date: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate()),
         fh: ((hour + 1) % 24).toString().padStart(2, '0') + ':' + '00',
-        th: ((hour + 3) % 24).toString().padStart(2, '0') + ':' + '00'
+        th: ((hour + 3) % 24).toString().padStart(2, '0') + ':' + '00',
+        foodCount: this.args.tid?.foodCount ?? FoodDeliveredCount.one
       });
 
       if (!this.activity.vids) {
@@ -272,11 +275,20 @@ export class ActivityDetailsComponent implements OnInit {
         { field: this.activity.$.date, readonly: this.activity.status.isClosed() },
         [{ field: this.activity.$.fh, readonly: this.activity.status.isClosed() },
         { field: this.activity.$.th, readonly: this.activity.status.isClosed() }],
-        { field: this.activity.$.purposes, readonly: this.activity.status.isClosed() },
+        [{ field: this.activity.$.purposes, readonly: this.activity.status.isClosed() },
+        { field: this.activity.$.foodCount, readonly: this.activity.status.isClosed(), visible: (row, col) => this.isDelivery() }],
         { field: this.activity.$.purposeDesc, readonly: this.activity.status.isClosed() },
         { field: this.activity.$.remark, readonly: this.activity.status.isClosed() }
       ]
     });
+  }
+
+  isDelivery() {
+    let f = this.activity.purposes?.filter(row => ActivityPurpose.isDelivery(row))
+    if (f && f.length > 0) {
+      return true
+    }
+    return false
   }
 
   async openTenants() {
@@ -288,6 +300,7 @@ export class ActivityDetailsComponent implements OnInit {
         onSelect: t => {
           if (!this.activity.tid || this.activity.tid.id !== t.id) {
             this.activity.tid = t;
+            this.activity.foodCount = t.foodCount ?? FoodDeliveredCount.one
             this.activity.vids.splice(0);
             this.addCurrentUserToVids();
           }

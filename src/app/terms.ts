@@ -1,5 +1,4 @@
 import { IdFilter, Remult } from 'remult';
-import { Users } from './users/users';
 
 export const terms = {
     sureExportData: 'האם לייצא נתונים',
@@ -117,6 +116,7 @@ export const terms = {
     activitiesByDayPeriods: 'פעילויות לפי זמני היום',
     activitiesByReferrer: 'פעילויות לפי גורם מפנה',
     refresh: 'רענן',
+    summary: 'סיכום',
     export: 'ייצא',
     print: 'הדפס',
     newActivity: 'פעילות חדשה',
@@ -260,10 +260,15 @@ declare module 'remult' {
 
 export function augmentRemult(remult: Remult) {
     remult.branchAllowedForUser = () => {
+        // branch contains the current root-branch to display (user selected)
         if (!remult.user.branch || remult.user.branch.trim().length === 0) {// if (remult.isAllowed(Roles.board))
-            return undefined!;
+            if (remult.user.isBoardOrAbove) {
+                return undefined!;
+            }
+            throw `augmentRemult: { remult.user.isBoardOrAbove: false, remult.user.branch: EMPTY }`
         }
-        let bids = [remult.user.branch]//,remult.user.branch2]
+        return { $id: remult.user.branch };
+        // let bids = [remult.user.branch]//,remult.user.branch2]
         // if(remult.user.branch2 && remult.user.branch2.length > 0){
         //     bids.push(remult.user.branch2)
         // }
@@ -274,7 +279,7 @@ export function augmentRemult(remult: Remult) {
         //         bids.push(u.branch2.id)
         //     }
         // }
-        return { $id: bids };
+        // return { $id: bids };
     }
     remult.hasValidBranch = () => {
         if (remult.user.branch) {

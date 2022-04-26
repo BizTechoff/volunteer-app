@@ -5,6 +5,7 @@ import { InputTypes } from "remult/inputTypes";
 import { ValueListValueConverter } from "remult/valueConverters";
 import { DialogService } from "../common/dialog";
 import { mobileFromDb, mobileToDb, StringRequiredValidation } from "../common/globals";
+import { SelectTenantComponent } from "../common/select-tenant/select-tenant.component";
 import { dateFormat, datetimeFormat } from "../common/utils";
 //import { SelectLangsComponent } from "../common/select-langs/select-langs.component";
 //import { SelectVolunteersComponent } from "../common/select-volunteers/select-volunteers.component";
@@ -287,9 +288,10 @@ export class Users extends IdEntity {
     @Field({ includeInApi: false })
     verifyCode: string = ''
 
-    @Field({ includeInApi: false,
-        displayValue: (row,col) => datetimeFormat(col)
-     })
+    @Field({
+        includeInApi: false,
+        displayValue: (row, col) => datetimeFormat(col)
+    })
     verifyTime: Date = new Date()
 
     @Field<Users, string>({
@@ -312,7 +314,7 @@ export class Users extends IdEntity {
     })
     @DateOnlyField({
         caption: terms.birthday,
-        displayValue: (row,col) => dateFormat(col)
+        displayValue: (row, col) => dateFormat(col)
     })
     birthday!: Date;
 
@@ -326,6 +328,17 @@ export class Users extends IdEntity {
     @Field({ caption: terms.address })
     address: string = '';
 
+    @DataControl<Users, Tenant>({
+        click: async (row, col) => {
+            await openDialog(SelectTenantComponent,
+                async x => x.args = {
+                    title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
+                    // bid: f.value.bid,
+                    bid: row.remult.user.isBoardOrAbove ? col.value?.bid : await row.remult.repo(Branch).findId( row.remult.user.branch),
+                    onSelect: t => col.value = t
+                })
+        }
+    })
     @Field({ caption: terms.tenant, includeInApi: Allow.authenticated })// options => options.valueType = Tenant, { caption: terms.tenant, includeInApi: Allow.authenticated })
     defTid!: Tenant;
 
@@ -341,7 +354,7 @@ export class Users extends IdEntity {
 
     @Field({
         allowApiUpdate: false,
-        displayValue: (row,col) => datetimeFormat(col)
+        displayValue: (row, col) => datetimeFormat(col)
     })
     created: Date = new Date();
 
@@ -352,7 +365,7 @@ export class Users extends IdEntity {
 
     @Field({
         allowApiUpdate: false,
-        displayValue: (row,col) => datetimeFormat(col)
+        displayValue: (row, col) => datetimeFormat(col)
     })
     modified: Date = new Date();
 

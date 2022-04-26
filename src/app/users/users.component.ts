@@ -36,15 +36,15 @@ export class UsersComponent implements OnInit {
       allowInsert: true,
       allowUpdate: true,
       numOfColumnsInGrid: 10,
- 
-      where: { 
+
+      where: {
         $or: [
           { bid: this.remult.branchAllowedForUser() },
           { branch2: this.remult.branchAllowedForUser() }
           // { bid: { $id: this.remult.user.branch } },
           // { branch2: { $id: this.remult.user.branch } }
         ]
-       },
+      },
 
       columnSettings: users => [
         users.name,

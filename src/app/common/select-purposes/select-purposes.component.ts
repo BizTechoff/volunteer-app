@@ -11,23 +11,39 @@ import { terms } from '../../terms';
 export class SelectPurposesComponent implements OnInit {
 
   args: {
-    purposes?: ActivityPurpose[]
-  } = { purposes: [] };
+    purposes?: ActivityPurpose[],
+    removeDelivery?: boolean
+  } = { purposes: [], removeDelivery: false };
   allActivityPurpose: { l: ActivityPurpose, c: boolean }[] = [];
-  constructor(private win:MatDialogRef<any>) { }
+  constructor(private win: MatDialogRef<any>) { }
+  ActivityPurpose=ActivityPurpose
 
   ngOnInit(): void {
-    ActivityPurpose.getOptions().forEach(lng => {
-      this.allActivityPurpose.push({l:lng, c: this.args.purposes?.find(_ => _.id === lng.id) ? true : false})
+    ActivityPurpose.getOptions(this.args.removeDelivery).forEach(lng => {
+      this.allActivityPurpose.push({ l: lng, c: this.args.purposes?.find(_ => _.id === lng.id) ? true : false })
     });
   }
 
   terms = terms;
 
-  close(){
+  selectedCount() {
+    let count = 0
+    for (const p of this.allActivityPurpose) {
+      if (p.c) {
+        ++count
+      }
+    }
+    // console.log(`selectedCount: { count: ${count} }`)
+    return count
+  }
+
+  close() {
     this.args.purposes?.splice(0);
+    if (this.args.removeDelivery) {
+      this.args.purposes?.push(ActivityPurpose.delivery)
+    }
     this.allActivityPurpose.forEach(l => {
-      if(l.c){
+      if (l.c) {
         this.args.purposes?.push(l.l);
       }
     });

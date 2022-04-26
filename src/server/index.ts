@@ -6,6 +6,7 @@ import * as express from 'express';
 import * as jwt from 'express-jwt';
 import * as fs from 'fs';
 import * as helmet from 'helmet';
+import { SqlDatabase } from 'remult';
 import { createPostgresConnection } from 'remult/postgres';
 import { remultExpress } from 'remult/server/expressBridge';
 // import { remultExpress } from 'remult/remult-express';
@@ -15,19 +16,18 @@ import '../app/app-routing.module';
 //import '../app/app.component';
 import { getJwtTokenSignKey } from '../app/auth.service';
 import '../app/common/types';
+import '../app/core/activity/activity';
 import { Activity, ActivityDayPeriod } from '../app/core/activity/activity';
+import { Branch } from '../app/core/branch/branch';
 import { augmentRemult } from '../app/terms';
 import './aws-s3';
 import { generateUploadURL } from './aws-s3';
-import { exportData } from './export-data';
 import { importDataNew } from './import-data';
 import './send-calendar';
 import './send-email';
 import './send-sms';
-import { Branch } from '../app/core/branch/branch';
-import { SqlDatabase } from 'remult';
 //SqlDatabase.LogToConsole = true;
- 
+
 export function getDevMode(): string {
     let result = '';
     let db = process.env.DATABASE_URL;
@@ -37,7 +37,7 @@ export function getDevMode(): string {
             result = 'dev';
         }
         else {
-            i = db.indexOf('fqligozujsaanx')
+            i = db.indexOf('d7bu1v9rhhrr57')
             if (i > 0) {
                 result = 'qa';
             }
@@ -71,21 +71,21 @@ async function startup() {
         initRequest: async (remult) => augmentRemult(remult)
     });
     app.use(api);
- 
+
     api.getRemult(undefined!).then(async remult => {
-        if(false)
-        console.table(await remult.repo(Activity).find(
-            {
-                where: {dayPeriod: ActivityDayPeriod.nigth}
-            }
-        ).then(x => x.map(({ fh,dayPeriod }) => ({ fh,dayPeriod }))));
-  
-        if(false)
-        console.table(await remult.repo(Branch).find(
-            {
-                where: Branch.nameStartsWith("א")
-            }
-        ).then(x => x.map(({ name }) => ({ name }))));
+        if (false)
+            console.table(await remult.repo(Activity).find(
+                {
+                    where: { dayPeriod: ActivityDayPeriod.nigth }
+                }
+            ).then(x => x.map(({ fh, dayPeriod }) => ({ fh, dayPeriod }))));
+
+        if (false)
+            console.table(await remult.repo(Branch).find(
+                {
+                    where: Branch.nameStartsWith("א")
+                }
+            ).then(x => x.map(({ name }) => ({ name }))));
 
         if (false)
             console.table(await remult.repo(Branch).find(
@@ -109,14 +109,15 @@ async function startup() {
         }
 
         if (false) {
-            console.table(await remult.repo(Activity).find({
-                where: {
-                    dayOfWeek: 4
-                }
-            }).then(x => x.map(y => ({
-                date: y.date,
-                dow: y.dayOfWeek
-            }))))
+            console.table(
+                await remult.repo(Activity).find({
+                    where: {
+                        dayOfWeek: 4
+                    }
+                }).then(x => x.map(y => ({
+                    date: y.date,
+                    dow: y.dayOfWeek
+                }))))
         }
     });
 
@@ -168,7 +169,7 @@ async function startup() {
     // downloadPhotos(remult).then(() => { });
 
     if (process.env.IMPORT_DATA && process.env.IMPORT_DATA === "true") {
- 
+
         const remult = await api.getRemult(undefined!);
         // exportData(remult).then(() => { });
         importDataNew(remult).then(() => { });

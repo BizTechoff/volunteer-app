@@ -2,7 +2,9 @@
     <div class="header"></div>
     <div *ngIf="this.allActivityPurpose" class="ng-container">
         <div *ngFor="let l of this.allActivityPurpose">
-            <mat-checkbox [(ngModel)]="l.c"> {{ l.l.caption }} </mat-checkbox>
+            <mat-checkbox [disabled]="!l.c && this.selectedCount() >= 2" [(ngModel)]="l.c"> {{ l.l.caption }} </mat-checkbox>
+            <!-- <mat-checkbox *ngIf="this.ActivityPurpose.isDelivery(l.l)" [disabled]="false" [(ngModel)]="l.c"> {{ l.l.caption }} </mat-checkbox>
+            <mat-checkbox *ngIf="!this.ActivityPurpose.isDelivery(l.l)" [disabled]="!l.c && this.selectedCount() >= 2" [(ngModel)]="l.c"> {{ l.l.caption }} </mat-checkbox> -->
         </div>
     </div>
     <div class="footer">

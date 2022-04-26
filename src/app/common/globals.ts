@@ -26,7 +26,7 @@ export const EntityRequiredValidation = (_: any, col: FieldRef<any, IdEntity>) =
 }
 
 export const StringRequiredValidation = (_: any, col: FieldRef<any, string>) => {
-    let ok = col.value && col.value.trim().length > 0 ? true : false;
+    let ok = (col?.value?.trim() ?? '').length > 0// col.value && col.value.trim().length > 0 ? true : false;
     if (!ok!) {
         col.error = terms.requiredField;
     }

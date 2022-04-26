@@ -305,7 +305,8 @@ export class VolunteersListComponent implements OnInit {
           }
           f.push(
             u!.$.langs,
-            { field: u!.$.points, readonly: true }//,
+            { field: u!.$.points, readonly: true },
+            u!.$.defTid//,
             // { field: u!.$.defTid, clickIcon: 'search', click: async () => await this.openTenants(u!) }
           )
           return f

@@ -14,20 +14,19 @@
         </div>
     </div>
     <div class="grow-item">
- 
+  
         <div style="display: flex; flex-direction: column; justify-content: center;">
             <h1 *ngIf="this.activities && this.activities.length == 0"> {{ this.userMessage }} </h1>
             <ng-container *ngFor='let a of this.activities'>
                 <mat-card style="margin: 7px;">
-                    <mat-card-title> 
+                    <mat-card-title>
                         <div style="display: flex; flex-direction: row; justify-content: space-between;">
                             <div style="display: flex; flex-direction: row; justify-content: start;">
- 
-                                <button *ngIf="!this.showClosedActivitySign(a)" mat-mini-fab color="primary"
-                                    [title]="terms.edit" (click)="openActivity(a)">
+                                <button *ngIf="this.editable(a)" mat-mini-fab
+                                    color="primary" [title]="terms.edit" (click)="openActivity(a)">
                                     <mat-icon>edit</mat-icon>
-                                </button>
-                               <p style="margin-top: 10px; margin-right: 5px;"> {{ a?.tid?.name }}</p>
+                                </button> 
+                                <p style="margin-top: 10px; margin-right: 5px;"> {{ a?.tid?.name }}</p>
                             </div>
 
                             <span *ngIf="this.showClosedActivitySign(a)">
@@ -35,7 +34,7 @@
                                     [style.background]='a.status.color'>
                                     {{ a.status.caption }}</h2>
                             </span>
- 
+
                             <div style="display: flex; flex-direction: row; justify-content: end;">
                                 <button *ngIf="a?.tid?.mobile || a?.tid?.phone" mat-mini-fab color="primary"
                                     (click)="this.call(a)">
@@ -54,7 +53,8 @@
                         </div>
                     </mat-card-title>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: flex-start;">
-                        <span style="border-radius: 5px;background-color: burlywood;"> {{ this.getTanantRemark(a) }} </span>
+                        <span style="border-radius: 5px;background-color: burlywood;"> {{ this.getTanantRemark(a) }}
+                        </span>
                     </div>
                     <div style="display:flex;flex-direction: row;flex-grow: 1;justify-content: space-between;">
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-start;">
@@ -71,7 +71,7 @@
 
                         <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;">
                             <div>
-                                {{ getPurposes(a) }}
+                                <b>{{ getPurposes(a) }}</b>
                             </div>
                             <div>
                                 {{ a.purposeDesc? a.purposeDesc : '(אין תיאור)' }}
@@ -85,24 +85,30 @@
                         <span> {{ 'משתתפים:' }} <b>{{ this.getVolunteers(a) }}</b> </span>
                     </div>
                     <div style="display:flex;flex-direction: column;flex-grow: 1;justify-content: space-between;">
-                        <button [disabled]="this.isFuture(a)" (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'
-                            *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
+                        <button [disabled]="false" (click)='this.setDelivery(a)' *ngIf="this.isDelivery(a)" mat-raised-button
+                            [style.background]='true? "green" : "blue"' style="margin-top: 7px; color: white;"> {{
+                            a.vids.length > 1 ? 'מסרנו' : 'מסרתי' }}
+                        </button>
+                        <button [disabled]="this.isFuture(a)"
+                            (click)='this.setNextStatus(a, this.ActivityStatus.w4_end)'
+                            mat-raised-button
                             [style.background]='this.isFuture(a)? "gray" : "blue"'
                             style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? 'התחלנו' : 'התחלתי' }}
                         </button>
-                        <button 
-                            (click)='this.setNextStatus(a, this.ActivityStatus.cancel)'
+                        <button (click)='this.setNextStatus(a, this.ActivityStatus.cancel)'
                             *ngIf="a.status === this.ActivityStatus.w4_start" mat-raised-button
-                            [style.background]='"blue"'
-                            style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ? terms.canNotComeToActivityThisTime :terms.canNotComeToActivityThisTime}} </button>
+                            [style.background]='"blue"' style="margin-top: 7px; color: white;"> {{ a.vids.length > 1 ?
+                            terms.canNotComeToActivityThisTime :terms.canNotComeToActivityThisTime}} </button>
                         <button (click)='this.setNextStatus(a, this.ActivityStatus.success)'
-                            *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
+                            *ngIf="a.status === this.ActivityStatus.w4_end && !this.isDelivery(a)" mat-raised-button
                             style="margin-top: 7px; background: green; color: white;"> {{ a.vids.length > 1 ? 'סיימנו' :
-                            'סיימתי' }} </button>
+                            'סיימתי' }}
+                        </button>
                         <button (click)='this.setNextStatus(a, this.ActivityStatus.problem)'
                             *ngIf="a.status === this.ActivityStatus.w4_end" mat-raised-button
                             style="margin-top: 7px; background: red; color: white;">ישנה
-                            בעיה</button>
+                            בעיה
+                        </button>
                     </div>
                 </mat-card>
             </ng-container>

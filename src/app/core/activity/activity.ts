@@ -1,8 +1,8 @@
 import { DataControl, openDialog } from "@remult/angular";
-import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
+import { Allow, DateOnlyField, Entity, Field, FieldOptions, FieldRef, getFields, IdEntity, isBackend, Remult, ValueListFieldType } from "remult";
 import { ValueListValueConverter } from 'remult/valueConverters';
 import { FoodDeliveredCount } from "../../common/enums";
-import { DateRequiredValidation, EntityRequiredValidation, pointsEachSuccessActivity, TimeRequireValidator } from "../../common/globals";
+import { DateRequiredValidation, EntityRequiredValidation, pointsEachSuccessActivity } from "../../common/globals";
 import { InputAreaComponent } from "../../common/input-area/input-area.component";
 import { SelectPurposesComponent } from "../../common/select-purposes/select-purposes.component";
 import { UserIdName } from "../../common/types";
@@ -67,12 +67,22 @@ export class ActivityPurpose {
     static cleaning = new ActivityPurpose(3, 'ניקיון');
     static shopping = new ActivityPurpose(4, 'קניות');
     static maintenance = new ActivityPurpose(5, 'תחזוקה');
-
+    static delivery = new ActivityPurpose(6, 'חלוקת מזון');
+ 
     constructor(public id: number, public caption: string) { }
-    // id:number;
+    // isDelivery() { return this === ActivityPurpose.delivery }
+    static isDelivery(ap:ActivityPurpose) { 
+        // console.log(`isDelivery: {ap: ${JSON.stringify(ap)}} returns: ${ap?.id === ActivityPurpose.delivery.id}`)
+        return ap?.id === ActivityPurpose.delivery.id }
 
-    static getOptions() {
+    static getOptions(removeDelivery = false) {
         let op = new ValueListValueConverter(ActivityPurpose).getOptions();
+        if (removeDelivery) {
+            let i = op.findIndex(o => ActivityPurpose.isDelivery(o))
+            if (i >= 0) {
+                op.splice(i)
+            }
+        }
         return op;
     }
     static fromString(str: string) {
@@ -188,7 +198,7 @@ export class ActivityStatus {
             return saved
         });
     static w4_end = new ActivityStatus(3, 'ממתין לסיום',
-        async (a, to, uid) => {//t=the new status
+        async (a, to, uid) => {//to=the new status
             let saved = false
             if (to === ActivityStatus.success) {
                 a.ended = new Date();
@@ -370,13 +380,13 @@ export class ActivityGeneralStatus {
 export class Activity extends IdEntity {
 
     constructor(private remult: Remult) { super(); }
+//   get $() { return getFields(this, this.remult) };
 
     // @DataControl<Activity,boolean>({
     //     valueChange: (r,c) => c.metadata.options.
     // })
     @Field({ caption: terms.foodDelivered })
     foodDelivered = false;
-
 
     @DataControl<Activity, FoodDeliveredCount>({
         valueChange: (r, c) => r.foodDelivered = true
@@ -408,7 +418,7 @@ export class Activity extends IdEntity {
         hideDataOnInput: true,
         clickIcon: 'search',
         getValue: (_, f) => f.value?.name,
-        click: Branch.selectBranch([], row => { row.tid = undefined!, row.vids.splice(0) })
+        click: Branch.selectBranch([], (row, col) => { row.tid = undefined!, row.vids.splice(0) })
     })
     @Field({
         caption: terms.branch, validate: EntityRequiredValidation
@@ -443,10 +453,10 @@ export class Activity extends IdEntity {
         sqlExpression: e => {
             return 'extract(dow from date)'
         }
-    })
+    }) 
     dayOfWeek: number = -1;
     @Field<Activity>({
-        sqlExpression: e => {
+        sqlExpression: e => {//${await e.fields.fh.getDbName()}
             return `CASE WHEN fh>='05:00' AND fh<'12:00' THEN ${ActivityDayPeriod.morning.id}
                          WHEN fh>='12:00' AND fh<'17:00' THEN ${ActivityDayPeriod.afternoon.id}
                          WHEN fh>='17:00' AND fh<'22:00' THEN ${ActivityDayPeriod.evening.id}
@@ -461,7 +471,7 @@ export class Activity extends IdEntity {
     //     where: _ => _.a!.isEqualTo(this)
     // })
 
-    @DataControl<Tenant, ActivityPurpose[]>({
+    @DataControl<Activity, ActivityPurpose[]>({
         hideDataOnInput: true,
         clickIcon: 'search',
         getValue: (r, v) => { return v && v.value ? v.value.map(i => i.caption).join(', ').trim() : ''; },
@@ -470,6 +480,7 @@ export class Activity extends IdEntity {
             await openDialog(SelectPurposesComponent, x => x.args = {
                 // onSelect: site => f.value = site,
                 // title: f.metadata.caption,
+                removeDelivery: _.remult.user.isVolunteer,
                 purposes: f.value
             })
         }
@@ -495,17 +506,17 @@ export class Activity extends IdEntity {
     // // @Field({ caption: terms.volunteers })//, displayValue: (r,v) => ''.join(',', v.displayValue) })
     // volids: Users[] = [] as Users[];
 
-    @Field({ caption: terms.fromHour, inputType: 'time', validate: TimeRequireValidator })
+    @Field({ caption: terms.fromHour, inputType: 'time' })//, validate: TimeRequireValidator })
     fh: string = '00:00';
 
-    @Field({ caption: terms.toHour, inputType: 'time', validate: TimeRequireValidator })
+    @Field({ caption: terms.toHour, inputType: 'time' })//, validate: TimeRequireValidator })
     th: string = '00:00';
 
     @Field({ caption: terms.commentAndSummary })
     remark: string = '';
 
     @Field({
-        displayValue: (row,col) => datetimeFormat(col)
+        displayValue: (row, col) => datetimeFormat(col)
     })
     called!: Date;
 
@@ -561,6 +572,16 @@ export class Activity extends IdEntity {
         displayValue: (row, col) => datetimeFormat(col)
     })
     modified!: Date;
+
+    // isDeliveryPurpose() {
+    //     for (const p of this.purposes) {
+    //         // console.log(p)
+    //         if(ActivityPurpose.isDelivery(p)){
+    //             return true
+    //         }
+    //     }
+    //     return false
+    // }
 
     // static nameStartsWith = Filter.createCustom<Activity, string>(async (remult, val) => {
     //     //this code will always run on the backend

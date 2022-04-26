@@ -426,7 +426,8 @@ export class CurrentStateComponent implements OnInit {
     //   }
     // });
     this.pieChartColors = [{ backgroundColor: this.colors }];
-    this.barChartColors = [{ backgroundColor: [
+    this.barChartColors = [{
+      backgroundColor: [
         'rgba(255, 99, 132, 0.6)',
         'rgba(54, 162, 235, 0.6)',
         'rgba(143, 103, 89, 0.6)',
@@ -443,13 +444,14 @@ export class CurrentStateComponent implements OnInit {
         'rgba(255, 206, 86, 0.6)',
         'rgba(155, 103, 22, 0.6)',
         'rgba(240, 255, 0, 0.6)',
-        'rgba(102, 34, 204, 0.6)',  
+        'rgba(102, 34, 204, 0.6)',
         'rgba(155, 24, 22, 0.6)',
         'rgba(255, 55, 22, 0.6)',
         'rgba(55, 103, 55, 0.6)',
         'rgba(128, 54, 22, 0.6)',
         ...this.colors
-    ] }];
+      ]
+    }];
     this.pieChartLabelsStatuses = [];
     this.pieChartDataStatuses = [];
     this.pieChartLabelsPurposes = [];
@@ -465,6 +467,21 @@ export class CurrentStateComponent implements OnInit {
 
     for (const a of this.activitiesResult.activitiesByStatus) {
       let label = a.status.caption;//.replace('ממתין', 'לא');
+      if (label === 'ממתין לשיבוץ') {
+        label = 'לא שובץ'
+      }
+      else if (label === 'ממתין להתחלה') {
+        label = 'לא התחיל'
+      }
+      else if (label === 'ממתין לסיום') {
+        label = 'התחיל'
+      }
+      else if (label === 'הסתיים בהצלחה') {
+        label = 'הצלחה'
+      }
+      else if (label === 'הסתיים בבעיה') {
+        label = 'בעיה'
+      }
       // if (a.status === ActivityStatus.problem) {
       //   label = label;
       // }
@@ -634,7 +651,7 @@ export class CurrentStateComponent implements OnInit {
         where: () => {
           let result: EntityFilter<Activity> = {
             $and: [
-              { bid: params.branch? { $contains:  params.branch } : undefined },
+              { bid: params.branch ? { $contains: params.branch } : undefined },
               { bid: this.remult.branchAllowedForUser() }
             ],
             date: { ">=": params.fromDate!, "<=": params.toDate! },

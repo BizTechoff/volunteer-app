@@ -89,29 +89,27 @@ export function CommaSeparatedStringArrayFieldUsers<Tenant>(
             x => x.args = {
                 title: 'דייר',// f.metadata && f.metadata.caption?f.metadata.caption:'בחירה',
                 bid: f.value.bid,
+                // bid: _.remult.user.isBoardOrAbove ? f?.value?.bid : _.remult.user.branch,
                 onSelect: t => f.value = t
             })
     }
 })
-@Entity<Tenant>('tenants',
-    {
-        allowApiInsert: [Roles.admin, Roles.manager],
-        allowApiDelete: [Roles.admin, Roles.manager],
-        allowApiUpdate: Allow.authenticated,
-        // if (typeof roles === 'function') {
-        //     return (<any>roles)(this(context));//even static-function!
-        // }
-        allowApiRead: Allow.authenticated,
-        defaultOrderBy: {
-            bid: "desc",
-            name: "asc"
-        }
-    },
-    async (options, remult) => {
-        options.apiPrefilter = () => (
-            { bid: remult.branchAllowedForUser() }
-        )
-    })
+@Entity<Tenant>('tenants', async (options, remult) => {
+    options.allowApiInsert = [Roles.admin, Roles.manager]
+    options.allowApiDelete = [Roles.admin, Roles.manager]
+    options.allowApiUpdate = Allow.authenticated
+    // if (typeof roles === 'function') {
+    //     return (<any>roles)(this(context));//even static-function!
+    // }
+    options.allowApiRead = Allow.authenticated
+    options.defaultOrderBy = {
+        bid: "desc",
+        name: "asc"
+    }
+    options.apiPrefilter = () => (
+        { bid: remult.branchAllowedForUser() }
+    )
+})
 export class Tenant extends EntityWithModified {
 
     constructor(private remult: Remult) {
@@ -191,8 +189,9 @@ export class Tenant extends EntityWithModified {
     @DataControl<Tenant, Date>({
         valueChange: (r, _) => { r.calcAge(); }
     })
-    @DateOnlyField({ caption: terms.birthday,
-        displayValue: (row,col) => dateFormat(col) 
+    @DateOnlyField({
+        caption: terms.birthday,
+        displayValue: (row, col) => dateFormat(col)
     })//
     birthday!: Date;
 

@@ -68,7 +68,8 @@ let branches = [] as string[];
 // branches.push('קריית גת');
 // branches.push('ראשון לציון ב');
 // branches.push('שדרות');   
-// ------------------------------- 
+// branches.push('מכללת אורנים') 
+// -------------------------------   
 // branches.push('קריית ביאליק')  
 // branches.push('אילת נוער'); 
 // branches.push('אילת קמפוס');

@@ -5,7 +5,6 @@ import { Remult } from 'remult';
 import { Branch } from '../../core/branch/branch';
 import { Tenant } from '../../core/tenant/tenant';
 import { terms } from '../../terms';
-import { Roles } from '../../users/roles';
 import { Langs } from '../../users/users';
 import { InputAreaComponent } from '../input-area/input-area.component';
 
@@ -21,7 +20,7 @@ export class SelectTenantComponent implements OnInit {
     Langs.hebrew, Langs.english, Langs.russian, Langs.french
   ]
   args!: {
-    ignoreDefVids?:boolean,
+    ignoreDefVids?: boolean,
     title?: string,
     // uid: Users,
     bid: Branch
@@ -30,7 +29,13 @@ export class SelectTenantComponent implements OnInit {
   constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
   tenants: Tenant[] = [];
   terms = terms;
-  ngOnInit() {
+  async ngOnInit() {
+    if (!this.args) {
+      this.args = { bid: undefined!, onSelect: () => { } }
+    }
+    if (!this.args.bid) {
+      this.args.bid = await this.remult.repo(Branch).findId(this.remult.user.branch)
+    }
     this.loadTenants();
   }
   async loadTenants() {
@@ -39,7 +44,7 @@ export class SelectTenantComponent implements OnInit {
         // if there is a search value, search by it
         // t.langs.isIn([this.langs])
         active: true,
-        defVids: this.isManager() ? undefined :  this.args.ignoreDefVids!? undefined! : { $contains: this.remult.user.id },//@@@@@@@@@@@2
+        defVids: this.isManager() ? undefined : this.args.ignoreDefVids! ? undefined! : { $contains: this.remult.user.id },//@@@@@@@@@@@2
         bid: this.args.bid,// this.isBoard() ? undefined : this.args.bid,
         name: this.searchString ? { $contains: this.searchString } : undefined
       }

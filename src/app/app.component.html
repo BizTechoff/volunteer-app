@@ -5,7 +5,7 @@
 </div>
   <mat-toolbar color="primary" style="flex-shrink: 0; background-image: linear-gradient(90deg, #F69A48, #2CBCC1)">
     <!-- <mat-toolbar color="primary" style="flex-shrink: 0;"> -->
-      
+       
     <button *ngIf="this.remult.authenticated()" mat-button class="sidenav-toggle" (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
@@ -59,7 +59,7 @@
       <mat-nav-list role="list">
 
         <ng-container *ngFor="let m of router.config">
-
+ 
           <mat-divider *ngIf="shouldDisplayRoute(m) && terms.dailyActivityReport === m.path"></mat-divider>
           <mat-list-item *ngIf="shouldDisplayRoute(m)" routerLinkActive="active-route">
             <a matLine [routerLink]="m.path" (click)="routeClicked()">{{routeName(m)}}</a>
