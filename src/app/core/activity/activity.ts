@@ -505,7 +505,7 @@ export class Activity extends IdEntity {
     remark: string = '';
 
     @Field({
-        displayValue: (row,col) => datetimeFormat(col)
+        displayValue: (row, col) => datetimeFormat(col)
     })
     called!: Date;
 
@@ -556,7 +556,7 @@ export class Activity extends IdEntity {
     @Field({ caption: terms.modifiedBy })
     modifiedBy!: Users;
 
-    @Field({
+    @Field<Activity, Date>({
         caption: terms.modified,
         displayValue: (row, col) => datetimeFormat(col)
     })

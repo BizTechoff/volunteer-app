@@ -59,7 +59,8 @@ export function CommaSeparatedStringArrayFieldUsersAsString<entityType = any>(
         ((options: FieldOptions<entityType, UserIdName[]>, remult: Remult) => void))[]) {
     return Field({
         displayValue: (r, x) => {//(i.id === this.remult.user.id ? 'את\ה' : i.name)
-            return x && x.length > 0 ? x.map(i => i.name.trim()).join(', ') : '';
+            console.log('JSON.stringify(x)',JSON.stringify(x))
+            return x && x.length > 0 && x.map ? x.map(i => i.name.trim()).join(', ') : '';
         }
     }, ...options);
 }

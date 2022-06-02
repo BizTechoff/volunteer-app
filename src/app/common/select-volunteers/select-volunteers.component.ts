@@ -15,13 +15,13 @@ export class SelectVolunteersComponent implements OnInit {
   options = Langs.getOptions();
   args!: {
     title?: string,
-    usersLangs: Langs[],
+    // usersLangs: Langs[],
     onSelect: (u: Users) => void;
-  }
+  } 
   constructor(private remult: Remult, private busy: BusyService, private dialogRef: MatDialogRef<any>) { }
   volunteers: Users[] = [];
   ngOnInit() {
-    this.langs = this.args.usersLangs;
+    // this.langs = this.args.usersLangs;
     this.loadUserss();
   }
   async loadUserss() {

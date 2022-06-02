@@ -1,17 +1,17 @@
-<h1 mat-dialog-title>בחירת {{args.title||'מתנדב'}}</h1>
+<h1 mat-dialog-title>בחירת {{args?.title||'מתנדב'}}</h1>
 <div mat-dialog-content>
     <form (submit)="selectFirst()">
         <mat-form-field>
             <input matInput [(ngModel)]="searchString" [ngModelOptions]="{standalone: true}" placeholder="שם המתנדב"
                 (input)="doSearch()">
         </mat-form-field>
-        <mat-form-field >
+        <!-- <mat-form-field >
             <mat-label>שפות</mat-label>
             <mat-select multiple [(value)]="this.langs" (valueChange)="doSearch()">
                 <mat-option *ngFor="let t of options" [value]="t">{{t.caption}}</mat-option>
             </mat-select>
-        </mat-form-field>
-    </form>
+        </mat-form-field> -->
+    </form> 
 
     <mat-nav-list role="list" *ngIf="this.volunteers">
         <ng-container *ngFor="let o of this.volunteers">

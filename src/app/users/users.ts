@@ -103,9 +103,9 @@ export class Langs {
     click: async (_, f) => {
         await openDialog((await import("../common/select-volunteers/select-volunteers.component")).SelectVolunteersComponent, x => x.args = {
             onSelect: u => f.value = u,
-            title: f.metadata.caption,
-            usersLangs: f.value.langs
-        })
+            title: f.metadata.caption//,
+            // usersLangs: f.value?.langs
+        }) 
     }
 })
 @Entity<Users>(
