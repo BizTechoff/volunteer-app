@@ -229,7 +229,7 @@ export const terms = {
     invalidSignIn: "פרטי כניסה שגויים",
     signOut: 'התנתקות',
     emailFormatError: 'פורמט ___@_.___ אמייל שגוי',
-    appVersion: '2022.03.24.0'
+    appVersion: '2022.07.24.1'
 }
 
 declare module 'remult' {

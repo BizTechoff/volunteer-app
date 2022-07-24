@@ -37,7 +37,7 @@ export function getDevMode(): string {
             result = 'dev';
         }
         else {
-            i = db.indexOf('fqligozujsaanx')
+            i = db.indexOf('ec2-34-253-29-48.eu-west-1')
             if (i > 0) {
                 result = 'qa';
             }
@@ -56,7 +56,7 @@ async function startup() {
     let isDev = enviroment === 'dev'
     let isQA = enviroment === 'qa'
     let isProd = enviroment === 'prod'
-
+ 
     let app = express();
     app.use(jwt({ secret: getJwtTokenSignKey(), credentialsRequired: false, algorithms: ['HS256'] }));
     app.use(compression());
